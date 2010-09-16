@@ -1,0 +1,5 @@
+C:\Code\Cyan\Cyan.Communication\bin\Debug\Cyan.Communication.dll
+C:\Code\Cyan\Cyan.Communication\bin\Debug\Cyan.Communication.pdb
+C:\Code\Cyan\Cyan.Communication\obj\Debug\ResolveAssemblyReference.cache
+C:\Code\Cyan\Cyan.Communication\obj\Debug\Cyan.Communication.dll
+C:\Code\Cyan\Cyan.Communication\obj\Debug\Cyan.Communication.pdb
