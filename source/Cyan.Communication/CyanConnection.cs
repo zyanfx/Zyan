@@ -212,7 +212,7 @@ namespace Cyan.Communication
         }
 
         // Schalter der angibt, ob Dispose bereits aufgerufen wurde
-        private bool _disposing = false;
+        private bool _isDisposed = false;
 
         /// <summary>
         /// Verwaltete Ressourcen freigeben.
@@ -220,10 +220,10 @@ namespace Cyan.Communication
         public void Dispose()
         {
             // Wenn Dispose nicht bereits ausgeführt wurde ...
-            if (!_disposing)
+            if (!_isDisposed)
             { 
                 // Schalter setzen
-                _disposing = true;
+                _isDisposed = true;
 
                 // Vom Server abmelden
                 RemoteComponentFactory.Logoff(_sessionID);
@@ -234,8 +234,8 @@ namespace Cyan.Communication
                 _serverUrl = string.Empty;
                 _sessionID = Guid.Empty;
 
-                // Auf Finalisierer warten
-                GC.WaitForPendingFinalizers();
+                // Nicht auf Finalisierer warten (da keine unverwalteten Ressourcen freigegeben werden müssen)
+                GC.SuppressFinalize(this);
             }
         }
 
