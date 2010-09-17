@@ -13,7 +13,7 @@ namespace Cyan.Communication
         #region Singleton-Implementierung
 
         // Sperr-Objekt
-        private static object _lockObject = new object();
+        private static volatile object _lockObject = new object();
 
         /// <summary>
         /// Erstellt eine neue Instanz von SessionManager.
@@ -38,8 +38,10 @@ namespace Cyan.Communication
                 {
                     lock (_lockObject)
                     {
-                        // Singleton-Instanz erzeugen
-                        _singelton = new SessionManager();
+                        // Erneute Prüfung, ob die Instanz existiert (Double Lock-Methode)
+                        if (_singelton==null)
+                            // Singleton-Instanz erzeugen
+                            _singelton = new SessionManager();
                     }
                 }
                 // Singleton-Instanz zurückgeben
