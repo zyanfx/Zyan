@@ -28,12 +28,23 @@ namespace Zyan.Communication
         // Protokoll-Einstellungen
         private IClientProtocolSetup _protocolSetup = null;
 
+        // Name des entfernten Komponentenhosts
+        private string _componentHostName = string.Empty;
+        
         /// <summary>
         /// Gibt den URL zum Server-Prozess zurück.
         /// </summary>
         public string ServerUrl
         {
             get { return _serverUrl; }           
+        }
+
+        /// <summary>
+        /// Gibt den Namen des Komponentenhosts zurück.
+        /// </summary>
+        public string ComponentHostName
+        {
+            get { return _componentHostName; }
         }
 
         /// <summary>
@@ -79,6 +90,12 @@ namespace Zyan.Communication
 
             // Server-URL übernehmen
             _serverUrl = serverUrl;
+
+            // Server-URL in Bestandteile zerlegen
+            string[] addressParts=_serverUrl.Split('/');
+
+            // Name des Komponentenhots speichern
+            _componentHostName = addressParts[3];
                         
             // TCP-Kommunikationskanal öffnen
             IChannel channel = (IChannel)_protocolSetup.CreateChannel();
@@ -134,7 +151,7 @@ namespace Zyan.Communication
             IComponentInvoker factory=RemoteComponentFactory;
             
             // Proxy erzeugen
-            ZyanProxy proxy = new ZyanProxy(typeof(T), factory,implicitTransactionTransfer,_sessionID);
+            ZyanProxy proxy = new ZyanProxy(typeof(T), factory,implicitTransactionTransfer,_sessionID,_componentHostName);
 
             // Proxy transparent machen und zurückgeben
             return (T)proxy.GetTransparentProxy();

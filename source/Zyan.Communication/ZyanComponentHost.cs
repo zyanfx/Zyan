@@ -290,6 +290,14 @@ namespace Zyan.Communication
         private string _name = string.Empty;
 
         /// <summary>
+        /// Gibt den Namen des Komponentenhosts zurück.
+        /// </summary>
+        public string Name
+        {
+            get { return _name; }
+        }
+
+        /// <summary>
         /// Startet das Horchen auf Client-Anfragen.
         /// </summary>
         private void StartListening()
