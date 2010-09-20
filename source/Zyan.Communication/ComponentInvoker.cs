@@ -116,7 +116,7 @@ namespace Zyan.Communication
             TransactionScope scope = null;
             
             // Kontextdaten aus dem Aufrufkontext lesen (Falls welche hinterlegt sind)
-            LogicalCallContextData data=CallContext.GetData("__ZyanContextData") as LogicalCallContextData;
+            LogicalCallContextData data=CallContext.GetData("__ZyanContextData_" + _host.Name) as LogicalCallContextData;
 
             // Wenn Kontextdaten übertragen wurden ...
             if (data != null)
