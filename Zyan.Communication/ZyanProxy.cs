@@ -20,6 +20,7 @@ namespace Zyan.Communication
         private ArrayList _outputMessageCorrelationSet = null;
         private bool _implicitTransactionTransfer = false;
         private Guid _sessionID;
+        private string _componentHostName = string.Empty;
                
         /// <summary>
         /// Konstruktor.
@@ -28,7 +29,7 @@ namespace Zyan.Communication
         /// <param name="remoteInvoker">Aufrufer für entfernte Komponenten</param>   
         /// <param name="implicitTransactionTransfer">Implizite Transaktionsübertragung</param>
         /// <param name="sessionID">Sitzungsschlüssel</param>
-        public ZyanProxy(Type type, IComponentInvoker remoteInvoker, bool implicitTransactionTransfer, Guid sessionID)
+        public ZyanProxy(Type type, IComponentInvoker remoteInvoker, bool implicitTransactionTransfer, Guid sessionID, string componentHostName)
             : base(type)
         {
             // Wenn kein Typ angegeben wurde ...
@@ -43,6 +44,9 @@ namespace Zyan.Communication
             
             // Sitzungsschlüssel übernehmen
             _sessionID = sessionID;
+
+            // Name des Komponentenhosts übernehmen
+            _componentHostName = componentHostName;
 
             // Schnittstellentyp übernehmen
             _interfaceType = type;
@@ -124,7 +128,7 @@ namespace Zyan.Communication
                     }
                 }
                 // Transferobjekt in den Aufrufkontext einhängen
-                CallContext.SetData("__ZyanContextData", data);
+                CallContext.SetData("__ZyanContextData_" + _componentHostName, data);
 
                 // Entfernten Methodenaufruf durchführen und jede Antwortnachricht sofort über einen Rückkanal empfangen
                 return InvokeRemoteMethod(methodCallMessage);                
