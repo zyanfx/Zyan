@@ -61,7 +61,7 @@ namespace Zyan.Communication
 
             // Sitzungsliste erzeugen
             _sessions = new Dictionary<Guid,ServerSession>();
-                        
+            
             // Komponentenaufrufer erzeugen
             _invoker = new ComponentInvoker(this);
 
@@ -71,8 +71,18 @@ namespace Zyan.Communication
 
             // Beginnen auf Client-Anfragen zu horchen
             StartListening();
-        }
 
+            //TODO: Intervall konfigurierbar machen, statt hart zu codieren!
+            // Zeitgeber für Sitzungs-Aufräumvorgang erzeugen
+            _sessionSweeper = new System.Timers.Timer(300000);
+            
+            // Elapsed-Ereignis abonnieren
+            _sessionSweeper.Elapsed += new System.Timers.ElapsedEventHandler(_sessionSweeper_Elapsed);
+
+            // Zeitgeber starten
+            _sessionSweeper.Start();
+        }
+        
         #endregion
         
         #region Authentifizierung
@@ -86,7 +96,37 @@ namespace Zyan.Communication
 
         #region Sitzungsverwaltung
 
+        // Sitzungsauflistung
         private Dictionary<Guid,ServerSession> _sessions = null;
+
+        // Zeitgeber für Sitzungs-Aufräumvorgang
+        private System.Timers.Timer _sessionSweeper = null;
+
+        // Sperrobjekt für Thread-Synchronisierung
+        private object _sessionLock = new object();
+
+        /// <summary>
+        /// Bei Intervall abgelaufene Sitzungen löschen.
+        /// </summary>
+        /// <param name="sender">Herkunftsobjekt</param>
+        /// <param name="e">Ereignisargumente</param>
+        private void _sessionSweeper_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            lock (_sessionLock)
+            {
+                // Abgelaufene Sitzung abrufen
+                Guid[] expiredSessions = (from session in _sessions.Values
+                                                   where session.Timestamp.ToUniversalTime().AddHours(4) < DateTime.Now.ToUniversalTime()
+                                                   select session.SessionID).ToArray();
+
+                // Alle abgelaufenen Sitzungen durchlaufen
+                foreach (Guid expiredSessionID in expiredSessions)
+                { 
+                    // Sitzung entfernen
+                    _sessions.Remove(expiredSessionID);
+                }
+            }
+        }
 
         internal bool ExistSession(Guid sessionID)
         {
@@ -104,13 +144,23 @@ namespace Zyan.Communication
         internal void StoreSession(ServerSession session)
         {
             if (!ExistSession(session.SessionID))
-                _sessions.Add(session.SessionID, session);
+            {
+                lock (_sessionLock)
+                {
+                    _sessions.Add(session.SessionID, session);
+                }
+            }
         }
 
         internal void RemoveSession(Guid sessionID)
         {
             if (ExistSession(sessionID))
-                _sessions.Remove(sessionID);
+            {
+                lock (_sessionLock)
+                {
+                    _sessions.Remove(sessionID);
+                }
+            }
         }
 
         #endregion
@@ -353,7 +403,8 @@ namespace Zyan.Communication
 
         #endregion
 
-        private bool _disposing = false;
+        // Gibt an, ob Dispose bereits aufgerufen wurde, oder nicht
+        private bool _isDisposed = false;
 
         /// <summary>
         /// Verwaltete Ressourcen freigeben.
@@ -361,14 +412,25 @@ namespace Zyan.Communication
         public void Dispose()
         {
             // Wenn Dispose noch nicht aufgerufen wurde ...
-            if (!_disposing)
+            if (!_isDisposed)
             {
                 // Schalter setzen
-                _disposing = true;
+                _isDisposed = true;
 
                 // Horchen auf Client-Anfragen beenden
                 StopListening();
                 
+                // Wenn der Sitzungs-Aufräumzeitgeber noch existiert ...
+                if (_sessionSweeper != null)
+                { 
+                    // Wenn der Zeitgeber noch läuft ...
+                    if (_sessionSweeper.Enabled)
+                        // Zeitgeber anhalten
+                        _sessionSweeper.Stop();
+
+                    // Zeitgeber entsorgen
+                    _sessionSweeper.Dispose();
+                }
                 // Wenn der Komponentenaufrufer existiert ...
                 if (_invoker != null)
                     // Komponnetenaufrufer entsorgen
