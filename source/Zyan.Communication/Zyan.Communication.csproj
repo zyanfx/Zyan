@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InvalidSessionException.cs" />
     <Compile Include="Protocols\Http\HttpCustomClientProtocolSetup.cs" />
     <Compile Include="Protocols\Http\HttpCustomServerProtocolSetup.cs" />
     <Compile Include="Protocols\Tcp\TcpCustomClientProtocolSetup.cs" />
@@ -73,7 +74,6 @@
     <Compile Include="Security\AuthResponseMessage.cs" />
     <Compile Include="Security\IAuthenticationProvider.cs" />
     <Compile Include="Security\NullAuthenticationProvider.cs" />
-    <Compile Include="SessionManager.cs" />
     <Compile Include="Security\IntegratedWindowsAuthProvider.cs" />
     <Compile Include="ServerSession.cs" />
     <Compile Include="Toolbox\Asynchronizer.cs" />

@@ -21,6 +21,8 @@ namespace Zyan.Communication
         private bool _implicitTransactionTransfer = false;
         private Guid _sessionID;
         private string _componentHostName = string.Empty;
+        private bool _autoLoginOnExpiredSession = false;
+        private Hashtable _autoLoginCredentials = null;
                
         /// <summary>
         /// Konstruktor.
@@ -28,8 +30,10 @@ namespace Zyan.Communication
         /// <param name="type">Schnittstelle der entfernten Komponente</param>
         /// <param name="remoteInvoker">Aufrufer für entfernte Komponenten</param>   
         /// <param name="implicitTransactionTransfer">Implizite Transaktionsübertragung</param>
+        /// <param name="autoLoginOnExpiredSession">Gibt an, ob sich der Proxy automatisch neu anmelden soll, wenn die Sitzung abgelaufen ist</param>
+        /// <param name="autoLogoninCredentials">Optional! Anmeldeinformationen, die nur benötigt werden, wenn autoLoginOnExpiredSession auf Wahr eingestellt ist</param>
         /// <param name="sessionID">Sitzungsschlüssel</param>
-        public ZyanProxy(Type type, IComponentInvoker remoteInvoker, bool implicitTransactionTransfer, Guid sessionID, string componentHostName)
+        public ZyanProxy(Type type, IComponentInvoker remoteInvoker, bool implicitTransactionTransfer, Guid sessionID, string componentHostName, bool autoLoginOnExpiredSession, Hashtable autoLogoninCredentials)
             : base(type)
         {
             // Wenn kein Typ angegeben wurde ...
@@ -56,6 +60,14 @@ namespace Zyan.Communication
          
             // Schalter für implizite Transaktionsübertragung übernehmen
             _implicitTransactionTransfer = implicitTransactionTransfer;
+
+            // Schalter für automatische Anmeldung bei abgelaufender Sitzung übernehmen
+            _autoLoginOnExpiredSession = autoLoginOnExpiredSession;
+
+            // Wenn automatische Anmeldung aktiv ist ...
+            if (_autoLoginOnExpiredSession)
+                // Anmeldeinformationen speichern
+                _autoLoginCredentials = autoLogoninCredentials;
 
             // Sammlung für Korrelationssatz erzeugen
             _outputMessageCorrelationSet = new ArrayList();            
@@ -143,13 +155,30 @@ namespace Zyan.Communication
         private IMessage InvokeRemoteMethod(IMethodCallMessage methodCallMessage)
         {
             try
-            {                
+            {
                 // Methodeninformationen ermitteln
-                MethodInfo info = (MethodInfo)methodCallMessage.MethodBase;                                   
+                MethodInfo info = (MethodInfo)methodCallMessage.MethodBase;
 
-                // Entfernten Methodenaufruf durchführen
-                object returnValue = _remoteInvoker.Invoke(_interfaceType.FullName, _outputMessageCorrelationSet, methodCallMessage.MethodName, methodCallMessage.Args);
+                // Variable für Rückgabewert
+                object returnValue = null;
 
+                try
+                {
+                    // Entfernten Methodenaufruf durchführen
+                    returnValue = _remoteInvoker.Invoke(_interfaceType.FullName, _outputMessageCorrelationSet, methodCallMessage.MethodName, methodCallMessage.Args);
+                }
+                catch (InvalidSessionException)
+                {
+                    // Wenn automatisches Anmelden bei abgelaufener Sitzung aktiviert ist ...
+                    if (_autoLoginOnExpiredSession)
+                    {
+                        // Neu anmelden
+                        _remoteInvoker.Logon(_sessionID, _autoLoginCredentials);
+
+                        // Entfernten Methodenaufruf erneut versuchen                        
+                        returnValue = _remoteInvoker.Invoke(_interfaceType.FullName, _outputMessageCorrelationSet, methodCallMessage.MethodName, methodCallMessage.Args);
+                    }
+                }
                 // Remoting-Antwortnachricht erstellen und zurückgeben
                 return new ReturnMessage(returnValue, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
             }
@@ -162,6 +191,11 @@ namespace Zyan.Communication
             {
                 // TCP-Sockelfehler als Remoting-Nachricht zurückgeben
                 return new ReturnMessage(socketException, methodCallMessage);
+            }
+            catch (InvalidSessionException sessionException)
+            {
+                // Sitzungsfehler als Remoting-Nachricht zurückgeben
+                return new ReturnMessage(sessionException, methodCallMessage);
             }
         }
     }

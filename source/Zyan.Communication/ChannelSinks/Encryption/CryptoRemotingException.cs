@@ -12,14 +12,14 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 	public class CryptoRemotingException : RemotingException, ISerializable
 	{	
         /// <summary>
-        /// Erstellt eine neue Instanz von EncryptedRemotingException.
+        /// Erstellt eine neue Instanz von CryptoRemotingException.
         /// </summary>
 		public CryptoRemotingException()
 		{
 		}
 		
 		/// <summary>
-        /// Erstellt eine neue Instanz von EncryptedRemotingException.
+        /// Erstellt eine neue Instanz von CryptoRemotingException.
         /// </summary>
         /// <param name="message">Fehlermeldung</param>
 		public CryptoRemotingException(string message) : base(message)
@@ -27,7 +27,7 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 		}
 
 		/// <summary>
-        /// Erstellt eine neue Instanz von EncryptedRemotingException.
+        /// Erstellt eine neue Instanz von CryptoRemotingException.
         /// </summary>
         /// <param name="message">Fehlermeldung</param>
         /// <param name="innerException">Ausnahme, welche diese Ausnahme verursacht hat</param>
@@ -35,15 +35,17 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 		{
 		}
 
-		/// <summary>Initializes the exception with serialized information.</summary>
-		/// <param name="info">Serialization information.</param>
-		/// <param name="context">Streaming context.</param>
+		/// <summary>
+        /// Erstellt eine neue Instanz von CryptoRemotingException.
+        /// </summary>
+		/// <param name="info">Serialisirungsinformationen</param>
+        /// <param name="context">Streaming-Kontext der Serialisierung</param>
 		protected CryptoRemotingException(SerializationInfo info, StreamingContext context) : base(info, context)
 		{
 		}
 
 		/// <summary>
-        /// Erstellt eine neue Instanz von EncryptedRemotingException.
+        /// Gibt Objektdaten für die Serialisierung zurück.
         /// </summary>
         /// <param name="info">Serialisierungsinformationen</param>
         /// <param name="context">Streaming-Kontext der Serialisierung</param>

@@ -141,7 +141,7 @@ namespace Zyan.Communication
                     }
                     else
                         // Ausnahme werfen
-                        throw new SecurityException(string.Format("Sitzungsschlüssel '{0}' ist ungültig! Bitte melden Sie sich erneut am Server an.", sessionID.ToString()));
+                        throw new InvalidSessionException(string.Format("Sitzungsschlüssel '{0}' ist ungültig! Bitte melden Sie sich erneut am Server an.", sessionID.ToString()));
                 }
                 // Wenn eine Transaktion übertragen wurde ...
                 if (data.Store.ContainsKey("transaction"))
