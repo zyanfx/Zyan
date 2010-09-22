@@ -30,7 +30,13 @@ namespace Zyan.Communication
 
         // Name des entfernten Komponentenhosts
         private string _componentHostName = string.Empty;
-        
+
+        // Schalter für automatisches Anmelden, bei abgelaufender Sitzung
+        private bool _autoLoginOnExpiredSession = false;
+
+        // Anmeldeinformationen für automatisches Anmelden
+        private Hashtable _autoLoginCredentials = null;
+
         /// <summary>
         /// Gibt den URL zum Server-Prozess zurück.
         /// </summary>
@@ -52,7 +58,16 @@ namespace Zyan.Communication
         /// </summary>
         /// <param name="serverUrl">Server-URL (z.B. "tcp://server1:46123/ebcserver")</param>                
         public ZyanConnection(string serverUrl)
-            : this(serverUrl, new TcpBinaryClientProtocolSetup() ,null)
+            : this(serverUrl, new TcpBinaryClientProtocolSetup() ,null, false)
+        { }
+
+        /// <summary>
+        /// Konstruktor.
+        /// </summary>
+        /// <param name="serverUrl">Server-URL (z.B. "tcp://server1:46123/ebcserver")</param>                
+        /// <param name="autoLoginOnExpiredSession">Gibt an, ob sich der Proxy automatisch neu anmelden soll, wenn die Sitzung abgelaufen ist</param>
+        public ZyanConnection(string serverUrl, bool autoLoginOnExpiredSession)
+            : this(serverUrl, new TcpBinaryClientProtocolSetup(), null, autoLoginOnExpiredSession)
         { }
 
         /// <summary>
@@ -61,7 +76,17 @@ namespace Zyan.Communication
         /// <param name="serverUrl">Server-URL (z.B. "tcp://server1:46123/ebcserver")</param>                
         /// <param name="protocolSetup">Protokoll-Einstellungen</param>
         public ZyanConnection(string serverUrl, IClientProtocolSetup protocolSetup)
-            : this(serverUrl, protocolSetup, null)
+            : this(serverUrl, protocolSetup, null, false)
+        { }
+
+        /// <summary>
+        /// Konstruktor.
+        /// </summary>
+        /// <param name="serverUrl">Server-URL (z.B. "tcp://server1:46123/ebcserver")</param>                
+        /// <param name="protocolSetup">Protokoll-Einstellungen</param>
+        /// <param name="autoLoginOnExpiredSession">Gibt an, ob sich der Proxy automatisch neu anmelden soll, wenn die Sitzung abgelaufen ist</param>
+        public ZyanConnection(string serverUrl, IClientProtocolSetup protocolSetup, bool autoLoginOnExpiredSession)
+            : this(serverUrl, protocolSetup, null, autoLoginOnExpiredSession)
         { }
 
         /// <summary>
@@ -70,7 +95,8 @@ namespace Zyan.Communication
         /// <param name="serverUrl">Server-URL (z.B. "tcp://server1:46123/ebcserver")</param>        
         /// <param name="protocolSetup">Protokoll-Einstellungen</param>
         /// <param name="credentials">Anmeldeinformationen</param>
-        public ZyanConnection(string serverUrl, IClientProtocolSetup protocolSetup, Hashtable credentials)
+        /// <param name="autoLoginOnExpiredSession">Gibt an, ob sich der Proxy automatisch neu anmelden soll, wenn die Sitzung abgelaufen ist</param>
+        public ZyanConnection(string serverUrl, IClientProtocolSetup protocolSetup, Hashtable credentials, bool autoLoginOnExpiredSession)
         {
             // Wenn kein Server-URL angegeben wurde ...
             if (string.IsNullOrEmpty(serverUrl))
@@ -90,6 +116,14 @@ namespace Zyan.Communication
 
             // Server-URL übernehmen
             _serverUrl = serverUrl;
+
+            // Einstellung für automatisches Anmelden bei abgelaufener Sitzung übernehmen
+            _autoLoginOnExpiredSession = autoLoginOnExpiredSession;
+
+            // Wenn automatisches Anmelden aktiv ist ...
+            if (_autoLoginOnExpiredSession)
+                // Anmeldedaten speichern
+                _autoLoginCredentials = credentials;
 
             // Server-URL in Bestandteile zerlegen
             string[] addressParts=_serverUrl.Split('/');
@@ -151,7 +185,7 @@ namespace Zyan.Communication
             IComponentInvoker factory=RemoteComponentFactory;
             
             // Proxy erzeugen
-            ZyanProxy proxy = new ZyanProxy(typeof(T), factory,implicitTransactionTransfer,_sessionID,_componentHostName);
+            ZyanProxy proxy = new ZyanProxy(typeof(T), factory,implicitTransactionTransfer,_sessionID,_componentHostName, _autoLoginOnExpiredSession, _autoLoginCredentials);
 
             // Proxy transparent machen und zurückgeben
             return (T)proxy.GetTransparentProxy();
