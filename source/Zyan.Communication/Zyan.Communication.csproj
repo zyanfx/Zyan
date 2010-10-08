@@ -62,6 +62,8 @@
     <Compile Include="Protocols\IServerProtocolSetup.cs" />
     <Compile Include="Security\BasicWindowsAuthProvider.cs" />
     <Compile Include="Security\WindowsSecurityTools.cs" />
+    <Compile Include="SessionMgmt\InProcSessionManager.cs" />
+    <Compile Include="SessionMgmt\ISessionManager.cs" />
     <Compile Include="ZyanComponentHost.cs" />
     <Compile Include="ZyanConnection.cs" />
     <Compile Include="ComponentRegistration.cs" />
