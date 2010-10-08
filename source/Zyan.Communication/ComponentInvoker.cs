@@ -128,10 +128,10 @@ namespace Zyan.Communication
                     Guid sessionID = (Guid)data.Store["sessionid"];
 
                     // Wenn eine Sitzung mit dem angegebenen Schlüssel existiert ...
-                    if (_host.ExistSession(sessionID))
+                    if (_host.SessionManager.ExistSession(sessionID))
                     {
                         // Sitzung abrufen
-                        ServerSession session = _host.GetSessionBySessionID(sessionID);
+                        ServerSession session = _host.SessionManager.GetSessionBySessionID(sessionID);
 
                         // Sitzung verlängern
                         session.Timestamp = DateTime.Now;
@@ -221,7 +221,7 @@ namespace Zyan.Communication
                 throw new ArgumentException("Leerer Sitzungsschlüssel is nicht erlaubt.", "sessionID");
 
             // Wenn noch keine Sitzung mit dem angegebenen Sitzungsschlüssel existiert ...
-            if (!_host.ExistSession(sessionID))
+            if (!_host.SessionManager.ExistSession(sessionID))
             { 
                 // Authentifizieren
                 AuthResponseMessage authResponse = _host.Authenticate(new AuthRequestMessage() { Credentials = credentials });
@@ -235,7 +235,7 @@ namespace Zyan.Communication
                 ServerSession session = new ServerSession(sessionID, authResponse.AuthenticatedIdentity);
 
                 // Sitzung speichern
-                _host.StoreSession(session);
+                _host.SessionManager.StoreSession(session);
 
                 // Aktuelle Sitzung im Threadspeicher ablegen
                 ServerSession.CurrentSession = session;
@@ -249,7 +249,7 @@ namespace Zyan.Communication
         public void Logoff(Guid sessionID)
         {
             // Sitzung entfernen
-            _host.RemoveSession(sessionID);
+            _host.SessionManager.RemoveSession(sessionID);
         }
 
         #region Lebenszeitsteuerung
