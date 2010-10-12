@@ -129,7 +129,7 @@ namespace Zyan.Communication
             string[] addressParts=_serverUrl.Split('/');
 
             // Name des Komponentenhots speichern
-            _componentHostName = addressParts[3];
+            _componentHostName = addressParts[addressParts.Length-1];
                         
             // TCP-Kommunikationskanal öffnen
             IChannel channel = (IChannel)_protocolSetup.CreateChannel();

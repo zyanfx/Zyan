@@ -46,6 +46,8 @@
     <Compile Include="InvalidSessionException.cs" />
     <Compile Include="Protocols\Http\HttpCustomClientProtocolSetup.cs" />
     <Compile Include="Protocols\Http\HttpCustomServerProtocolSetup.cs" />
+    <Compile Include="Protocols\Ipc\IpcBinaryClientProtocolSetup.cs" />
+    <Compile Include="Protocols\Ipc\IpcBinaryServerProtocolSetup.cs" />
     <Compile Include="Protocols\Tcp\TcpCustomClientProtocolSetup.cs" />
     <Compile Include="Protocols\Tcp\TcpCustomServerProtocolSetup.cs" />
     <Compile Include="Protocols\Tcp\TcpBinaryClientProtocolSetup.cs" />
