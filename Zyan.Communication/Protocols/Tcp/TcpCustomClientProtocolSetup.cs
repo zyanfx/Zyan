@@ -30,6 +30,9 @@ namespace Zyan.Communication.Protocols.Tcp
         /// </summary>
         public TcpCustomClientProtocolSetup()
         {
+            // Socket-Caching standardmäßig einschalten
+            SocketCachingEnabled = true;
+
             // Zufälligen Kanalnamen vergeben
             _channelName = "TcpCustomClientProtocolSetup" + Guid.NewGuid().ToString();
         }
@@ -128,6 +131,12 @@ namespace Zyan.Communication.Protocols.Tcp
         }
 
         /// <summary>
+        /// Gibt zurück, ob Socket-Caching aktiviert ist, oder legt dies fest.
+        /// </summary>
+        public bool SocketCachingEnabled
+        { get; set; }
+
+        /// <summary>
         /// Erzeugt einen fertig konfigurierten Remoting-Kanal.
         /// <remarks>
         /// Wenn der Kanal in der aktuellen Anwendungsdomäne bereits registriert wurde, wird null zurückgegeben.
@@ -147,7 +156,7 @@ namespace Zyan.Communication.Protocols.Tcp
                 channelSettings["name"] = _channelName;
                 channelSettings["port"] = 0;                
                 channelSettings["socketCacheTimeout"] = 0;
-                channelSettings["socketCachePolicy"] = SocketCachePolicy.Default;
+                channelSettings["socketCachePolicy"] = SocketCachingEnabled ? SocketCachePolicy.Default : SocketCachePolicy.AbsoluteTimeout;
 
                 // Standardmäßige Windows-Authentifizierung des Remoting TCP-Kanals abschalten
                 channelSettings["secure"] = false;
