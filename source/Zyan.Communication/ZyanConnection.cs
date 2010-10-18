@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Remoting;
@@ -36,6 +37,17 @@ namespace Zyan.Communication
 
         // Anmeldeinformationen für automatisches Anmelden
         private Hashtable _autoLoginCredentials = null;
+
+        // Auflistung der bekannten Verbindungen
+        private static List<ZyanConnection> _connections = new List<ZyanConnection>();
+
+        /// <summary>
+        /// Gibt eine Auflistung aller bekanten Verbindungen Hosts zurück.
+        /// </summary>
+        public static List<ZyanConnection> Connections
+        {
+            get { return _connections.ToList<ZyanConnection>(); }
+        }
 
         /// <summary>
         /// Gibt den URL zum Server-Prozess zurück.
@@ -144,6 +156,9 @@ namespace Zyan.Communication
 
             // Registrierte Komponenten vom Server abrufen
             _registeredComponents = new List<string>(RemoteComponentFactory.GetRegisteredComponents());
+
+            // Verbindung der Auflistung zufügen
+            _connections.Add(this);
         }
 
         /// <summary>
@@ -272,12 +287,20 @@ namespace Zyan.Communication
         {
             // Wenn Dispose nicht bereits ausgeführt wurde ...
             if (!_isDisposed)
-            { 
+            {
                 // Schalter setzen
                 _isDisposed = true;
 
-                // Vom Server abmelden
-                RemoteComponentFactory.Logoff(_sessionID);
+                // Verbindung aus der Auflistung entfernen
+                _connections.Remove(this);
+                
+                try
+                {
+                    // Vom Server abmelden
+                    RemoteComponentFactory.Logoff(_sessionID);
+                }
+                catch (RemotingException)
+                { }
 
                 // Variablen freigeben
                 _registeredComponents = null;
