@@ -52,10 +52,19 @@ namespace Zyan.Communication.Protocols.Tcp
         }
 
         /// <summary>
+        /// Gibt zurück, ob Socket-Caching aktiviert ist, oder legt dies fest.
+        /// </summary>
+        public bool SocketCachingEnabled
+        { get; set; }
+
+        /// <summary>
         /// Erstellt eine neue Instanz von TcpBinaryClientProtocolSetup.
         /// </summary>
         public TcpBinaryClientProtocolSetup ()
 	    {
+            // Socket-Caching standardmäßig einschalten
+            SocketCachingEnabled = true;
+
             // Zufälligen Kanalnamen vergeben
             _channelName = "TcpWindowsSecuredClientProtocol_" + Guid.NewGuid().ToString();
 	    }
@@ -81,7 +90,7 @@ namespace Zyan.Communication.Protocols.Tcp
                 channelSettings["port"] = 0;
                 channelSettings["secure"] = _useWindowsSecurity;
                 channelSettings["socketCacheTimeout"] = 0;
-                channelSettings["socketCachePolicy"] = SocketCachePolicy.Default;
+                channelSettings["socketCachePolicy"] = SocketCachingEnabled ? SocketCachePolicy.Default : SocketCachePolicy.AbsoluteTimeout;
 
                 // Wenn Sicherheit aktiviert ist ...
                 if (_useWindowsSecurity)

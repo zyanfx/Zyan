@@ -5,7 +5,7 @@ namespace Zyan.Communication
     /// <summary>
     /// Beschreibt eine Komponenten-Registrierung.
     /// </summary>
-    internal class ComponentRegistration
+    public class ComponentRegistration
     {
         /// <summary>
         /// Standardkonstruktor.
@@ -52,6 +52,59 @@ namespace Zyan.Communication
             this.InterfaceType = interfaceType;
             this.ImplementationType = singletonInstance.GetType();
             this.SingletonInstance = singletonInstance;            
+        }
+
+        /// <summary>
+        /// Konstruktor.
+        /// </summary>
+        /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
+        /// <param name="implementationType">Implementierungstyp der Komponente</param>        
+        /// <param name="moduleName">Modulname</param>
+        public ComponentRegistration(Type interfaceType, Type implementationType, string moduleName)
+        {
+            // Werte übernehmen
+            this.InterfaceType = interfaceType;
+            this.ImplementationType = implementationType;
+            this.ModuleName = moduleName;
+        }
+
+        /// <summary>
+        /// Konstruktor.
+        /// </summary>
+        /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
+        /// <param name="intializationHandler">Delegat auf Inizialisierungsfunktion</param>
+        /// <param name="syncBehavior">Sync/Async Verhalten der Komponente</param>
+        /// <param name="moduleName">Modulname</param>
+        public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, string moduleName)
+        {
+            // Werte übernehmen
+            this.InterfaceType = interfaceType;
+            this.InitializationHandler = intializationHandler;
+            this.ModuleName = moduleName;
+        }
+
+        /// <summary>
+        /// Konstruktor.
+        /// </summary>
+        /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
+        /// <param name="singletonInstance">Singleton-Instanz der Komponente</param>
+        /// <param name="moduleName">Modulname</param>
+        public ComponentRegistration(Type interfaceType, object singletonInstance, string moduleName)
+        {
+            // Werte übernehmen
+            this.InterfaceType = interfaceType;
+            this.ImplementationType = singletonInstance.GetType();
+            this.SingletonInstance = singletonInstance;
+            this.ModuleName = moduleName;
+        }
+
+        /// <summary>
+        /// Gibt den Modulnamen zurück, oder legt ihn fest.        
+        /// </summary>
+        public string ModuleName
+        {
+            get;
+            set;
         }
 
         /// <summary>

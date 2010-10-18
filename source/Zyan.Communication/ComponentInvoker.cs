@@ -38,32 +38,6 @@ namespace Zyan.Communication
         }
 
         /// <summary>
-        /// Gibt eine Instanz einer registrierten Komponente zurück.
-        /// </summary>
-        /// <param name="registration">Komponentenregistrierung</param>
-        /// <returns>Komponenten-Instanz</returns>
-        private object GetComponentInstance(ComponentRegistration registration)
-        {
-            // Wenn keine Komponentenregistrierung angegeben wurde ...
-            if (registration == null)
-                // Ausnahme werfen
-                throw new ArgumentNullException("registration");
-
-            // Wenn eine Singleton-Instanz registriert wurde ...
-            if (registration.SingletonInstance != null)
-                // Singleton-Instanz zurückgeben
-                return registration.SingletonInstance;
-            
-            // Wenn eine Initialisierungsfunktion angegeben wurde ...
-            if (registration.InitializationHandler != null)
-                // Komponenteninstanz von Inizialisierungsfunktion erzeugen lassen
-                return registration.InitializationHandler();
-            else
-                // Komponenteninstanz erzeugen
-                return Activator.CreateInstance(registration.ImplementationType);
-        }
-        
-        /// <summary>
         /// Ruft eine bestimmte Methode einer Komponente auf und übergibt die angegebene Nachricht als Parameter.
         /// Für jeden Aufruf wird temporär eine neue Instanz der Komponente erstellt.
         /// </summary>
@@ -98,7 +72,7 @@ namespace Zyan.Communication
             ComponentRegistration registration = _host.ComponentRegistry[interfaceName];
                         
             // Komponenteninstanz erzeugen
-            object instance = GetComponentInstance(registration);
+            object instance =  _host.GetComponentInstance(registration);
 
             // Implementierungstyp abrufen
             Type type = instance.GetType();

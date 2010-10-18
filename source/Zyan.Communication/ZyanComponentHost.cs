@@ -12,6 +12,7 @@ using Zyan.Communication.Security;
 using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp;
 using Zyan.Communication.SessionMgmt;
+using Zyan.Communication.Modularity;
 
 namespace Zyan.Communication
 {    
@@ -27,7 +28,18 @@ namespace Zyan.Communication
         private IAuthenticationProvider _authProvider = null;
         
         // Protokoll-Einstellungen
-        private IServerProtocolSetup _protocolSetup = null;               
+        private IServerProtocolSetup _protocolSetup = null;
+
+        // Auflistung der bekannten Komponenten Hosts
+        private static List<ZyanComponentHost> _hosts = new List<ZyanComponentHost>();
+
+        /// <summary>
+        /// Gibt eine Auflistung aller bekanten Komponenten Hosts zurück.
+        /// </summary>
+        public static List<ZyanComponentHost> Hosts
+        {
+            get { return _hosts.ToList<ZyanComponentHost>(); }
+        }
 
         #region Konstruktor
       
@@ -36,7 +48,18 @@ namespace Zyan.Communication
         /// </summary>
         /// <param name="name">Name des Komponentenhosts</param>        
         /// <param name="tcpPort">TCP-Anschlussnummer</param>                
-        public ZyanComponentHost(string name, int tcpPort) : this(name, new TcpBinaryServerProtocolSetup(tcpPort), new InProcSessionManager())
+        public ZyanComponentHost(string name, int tcpPort)
+            : this(name, new TcpBinaryServerProtocolSetup(tcpPort), new InProcSessionManager(), new ComponentCatalog())
+        { }
+
+        /// <summary>
+        /// Konstruktor.
+        /// </summary>
+        /// <param name="name">Name des Komponentenhosts</param>        
+        /// <param name="tcpPort">TCP-Anschlussnummer</param>                
+        /// <param name="catalog">Komponenten-Katalog</param>
+        public ZyanComponentHost(string name, int tcpPort, ComponentCatalog catalog)
+            : this(name, new TcpBinaryServerProtocolSetup(tcpPort), new InProcSessionManager(), catalog)
         { }
 
         /// <summary>
@@ -44,7 +67,8 @@ namespace Zyan.Communication
         /// </summary>
         /// <param name="name">Name des Komponentenhosts</param>        
         /// <param name="protocolSetup">Protokoll-Einstellungen</param>        
-        public ZyanComponentHost(string name, IServerProtocolSetup protocolSetup) : this(name,protocolSetup,new InProcSessionManager())
+        public ZyanComponentHost(string name, IServerProtocolSetup protocolSetup)
+            : this(name, protocolSetup, new InProcSessionManager(), new ComponentCatalog())
         { }
 
         /// <summary>
@@ -52,7 +76,28 @@ namespace Zyan.Communication
         /// </summary>
         /// <param name="name">Name des Komponentenhosts</param>        
         /// <param name="protocolSetup">Protokoll-Einstellungen</param>        
-        public ZyanComponentHost(string name, IServerProtocolSetup protocolSetup, ISessionManager sessionManager)
+        /// <param name="catalog">Komponenten-Katalog</param>
+        public ZyanComponentHost(string name, IServerProtocolSetup protocolSetup, ComponentCatalog catalog)
+            : this(name, protocolSetup, new InProcSessionManager(), catalog)
+        { }
+
+        /// <summary>
+        /// Konstruktor.
+        /// </summary>
+        /// <param name="name">Name des Komponentenhosts</param>        
+        /// <param name="protocolSetup">Protokoll-Einstellungen</param>
+        /// <param name="sessionManager">Sitzungsverwaltung</param>
+        public ZyanComponentHost(string name, IServerProtocolSetup protocolSetup, ISessionManager sessionManager) : this(name,protocolSetup,sessionManager,new ComponentCatalog())
+        { }
+
+        /// <summary>
+        /// Konstruktor.
+        /// </summary>
+        /// <param name="name">Name des Komponentenhosts</param>        
+        /// <param name="protocolSetup">Protokoll-Einstellungen</param>        
+        /// <param name="sessionManager">Sitzungsverwaltung</param>
+        /// <param name="catalog">Komponenten-Katalog</param>
+        public ZyanComponentHost(string name, IServerProtocolSetup protocolSetup, ISessionManager sessionManager, ComponentCatalog catalog)
         {
             // Wenn kein Name angegeben wurde ...
             if (string.IsNullOrEmpty(name))
@@ -69,11 +114,17 @@ namespace Zyan.Communication
                 // Ausnahme werfen
                 throw new ArgumentNullException("sessionManager");
 
+            // Wenn kein Komponenten-Katalog angegeben wurde ...
+            if (catalog == null)
+                // Ausnahme werfen
+                throw new ArgumentNullException("catalog");
+
             // Werte übernehmen
             _name = name;
             _protocolSetup = protocolSetup;
             _sessionManager = sessionManager;
-                        
+            _catalog = catalog;
+            
             // Komponentenaufrufer erzeugen
             _invoker = new ComponentInvoker(this);
 
@@ -81,10 +132,22 @@ namespace Zyan.Communication
             _authProvider = protocolSetup.AuthenticationProvider;
             this.Authenticate = _authProvider.Authenticate;
 
+            // Komponenten Host der Host-Auflistung zufügen
+            _hosts.Add(this);
+
             // Beginnen auf Client-Anfragen zu horchen
             StartListening();
         }
-        
+
+        /// <summary>
+        /// Destruktor.
+        /// </summary>
+        ~ZyanComponentHost()
+        {
+            // Ressourcen freigeben
+            Dispose();
+        }
+
         #endregion
         
         #region Authentifizierung
@@ -96,7 +159,7 @@ namespace Zyan.Communication
 
         #endregion
 
-        #region Sitzungsverwaltung        
+        #region Sitzungsverwaltung
 
         // Sitzungsverwaltung
         private ISessionManager _sessionManager = null;
@@ -113,8 +176,26 @@ namespace Zyan.Communication
 
         #region Komponenten-Hosting
 
-        // Liste der Registrierten Komponenten
-        private Dictionary<string, ComponentRegistration> _componentRegistry = null;
+        // Komponenten-Katalog
+        private ComponentCatalog _catalog = null;
+
+        /// <summary>
+        /// Gibt den zu veröffentlichenden Komponenten-Katalog zurück, oder legt ihn fest.
+        /// </summary>
+        public ComponentCatalog ComponentCatalog
+        {
+            get { return _catalog; }
+            set
+            { 
+                // Wenn kein Wert angegeben wurde ...
+                if (value == null)
+                    // Ausnahme werfen
+                    throw new ArgumentNullException();
+
+                // Komponenten-Katalog festlegen
+                _catalog = value;
+            }
+        }
 
         /// <summary>
         /// Gibt die Liste der Registrierten Komponenten zurück.
@@ -123,15 +204,21 @@ namespace Zyan.Communication
         internal Dictionary<string, ComponentRegistration> ComponentRegistry
         { 
             get
-            {
-                // Wenn die Liste der Registrierten Komponenten noch nicht erzeugt wurde ...
-                if (_componentRegistry == null)
-                    // Liste erzeugen
-                    _componentRegistry = new Dictionary<string, ComponentRegistration>();
-
+            {        
                 // Liste zurückgeben
-                return _componentRegistry;
+                return _catalog.ComponentRegistry;
             }
+        }
+
+        /// <summary>
+        /// Gibt eine Instanz einer registrierten Komponente zurück.
+        /// </summary>
+        /// <param name="registration">Komponentenregistrierung</param>
+        /// <returns>Komponenten-Instanz</returns>
+        internal object GetComponentInstance(ComponentRegistration registration)
+        {
+            // Aufruf an Komponentenkatalog weiterleiten
+            return _catalog.GetComponentInstance(registration);
         }
 
         /// <summary>
@@ -140,15 +227,8 @@ namespace Zyan.Communication
         /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
         public void UnregisterComponent<I>()
         {
-            // Typinformationen abrufen
-            Type interfaceType = typeof(I);
-
-            // Wenn eine Komponente mit der angegebenen Schnittstelle registriert ist ...
-            if (ComponentRegistry.ContainsKey(interfaceType.FullName))
-            { 
-                // Registrierung aufheben
-                ComponentRegistry.Remove(interfaceType.FullName);
-            }
+            // Aufruf an Komponentenkatalog weiterleiten
+            _catalog.UnregisterComponent<I>();            
         }
 
         /// <summary>
@@ -158,32 +238,8 @@ namespace Zyan.Communication
         /// <typeparam name="T">Implementierungstyp der Komponente</typeparam>
         public void RegisterComponent<I, T>()
         {
-            // Typinformationen abrufen
-            Type interfaceType = typeof(I);
-            Type implementationType = typeof(T);
-
-            // Wenn der Schnittstellentyp keine Schnittstelle ist ...
-            if (!interfaceType.IsInterface)
-                // Ausnahme werfen
-                throw new ArgumentException("Der angegebene Schnittstellentyp ist keine Schnittstelle!", "interfaceType");
-
-            // Wenn der Implementierungstyp keine Klasse ist ...
-            if (!implementationType.IsClass)
-                // Ausnahme werfen
-                throw new ArgumentException("Der angegebene Implementierungstyp ist keine Klasse!", "interfaceType");
-
-            // Name der Schnittstelle abfragen
-            string interfaceName = interfaceType.FullName;
-
-            // Wenn für die angegebene Schnittstelle noch keine Komponente registriert wurde ...
-            if (!ComponentRegistry.ContainsKey(interfaceName))
-            {
-                // Registrierungseintrag erstellen
-                ComponentRegistration registration = new ComponentRegistration(interfaceType, implementationType);
-
-                // Registrierungseintrag der Liste zufügen
-                ComponentRegistry.Add(interfaceName, registration);
-            }
+            // Aufruf an Komponentenkatalog weiterleiten
+            _catalog.RegisterComponent<I, T>();            
         }
         
         /// <summary>
@@ -193,31 +249,8 @@ namespace Zyan.Communication
         /// <param name="factoryMethod">Delegat auf Fabrikmethode, die sich um die Erzeugung und Inizialisierung der Komponente kümmert</param>
         public void RegisterComponent<I>(Func<object> factoryMethod)
         {
-            // Typinformationen abrufen
-            Type interfaceType = typeof(I);
-            
-            // Wenn der Schnittstellentyp keine Schnittstelle ist ...
-            if (!interfaceType.IsInterface)
-                // Ausnahme werfen
-                throw new ApplicationException("Der angegebene Schnittstellentyp ist keine Schnittstelle!");
-
-            // Wenn kein Delegat auf eine Fabrikmethode angegeben wurde ...
-            if (factoryMethod==null)
-                // Ausnahme werfen
-                throw new ArgumentException("Keinen Delegaten für Komponentenerzeugung angegeben.","factoryMethod");
-
-            // Name der Schnittstelle abfragen
-            string interfaceName = interfaceType.FullName;
-            
-            // Wenn für die angegebene Schnittstelle noch keine Komponente registriert wurde ...
-            if (!ComponentRegistry.ContainsKey(interfaceName))
-            {
-                // Registrierungseintrag erstellen
-                ComponentRegistration registration = new ComponentRegistration(interfaceType, factoryMethod);
-
-                // Registrierungseintrag der Liste zufügen
-                ComponentRegistry.Add(interfaceName, registration);
-            }
+            // Aufruf an Komponentenkatalog weiterleiten
+            _catalog.RegisterComponent<I>(factoryMethod);            
         }
 
         /// <summary>
@@ -228,32 +261,45 @@ namespace Zyan.Communication
         /// <param name="instance">Instanz</param>
         public void RegisterComponent<I, T>(T instance)
         {
-            // Typinformationen abrufen
-            Type interfaceType = typeof(I);
-            Type implementationType = typeof(T);
+            // Aufruf an Komponentenkatalog weiterleiten
+            _catalog.RegisterComponent<I, T>(instance);            
+        }
 
-            // Wenn der Schnittstellentyp keine Schnittstelle ist ...
-            if (!interfaceType.IsInterface)
-                // Ausnahme werfen
-                throw new ArgumentException("Der angegebene Schnittstellentyp ist keine Schnittstelle!", "interfaceType");
+        /// <summary>
+        /// Registriert eine bestimmte Komponente.
+        /// </summary>        
+        /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
+        /// <typeparam name="T">Implementierungstyp der Komponente</typeparam>
+        /// <param name="moduleName">Modulname</param>
+        public void RegisterComponent<I, T>(string moduleName)
+        {
+            // Aufruf an Komponentenkatalog weiterleiten
+            _catalog.RegisterComponent<I, T>(moduleName);            
+        }
 
-            // Wenn der Implementierungstyp keine Klasse ist ...
-            if (!implementationType.IsClass)
-                // Ausnahme werfen
-                throw new ArgumentException("Der angegebene Implementierungstyp ist keine Klasse!", "interfaceType");
+        /// <summary>
+        /// Registriert eine bestimmte Komponente.
+        /// </summary>
+        /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
+        /// <param name="moduleName">Modulname</param>
+        /// <param name="factoryMethod">Delegat auf Fabrikmethode, die sich um die Erzeugung und Inizialisierung der Komponente kümmert</param>
+        public void RegisterComponent<I>(string moduleName, Func<object> factoryMethod)
+        {
+            // Aufruf an Komponentenkatalog weiterleiten
+            _catalog.RegisterComponent<I>(moduleName, factoryMethod);            
+        }
 
-            // Name der Schnittstelle abfragen
-            string interfaceName = interfaceType.FullName;
-
-            // Wenn für die angegebene Schnittstelle noch keine Komponente registriert wurde ...
-            if (!ComponentRegistry.ContainsKey(interfaceName))
-            {
-                // Registrierungseintrag erstellen
-                ComponentRegistration registration = new ComponentRegistration(interfaceType, instance);
-
-                // Registrierungseintrag der Liste zufügen
-                ComponentRegistry.Add(interfaceName, registration);
-            }
+        /// <summary>
+        /// Registriert eine bestimmte Komponenteninstanz.
+        /// </summary>
+        /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
+        /// <typeparam name="T">Implementierungstyp der Komponente</typeparam>
+        /// <param name="moduleName">Modulname</param>
+        /// <param name="instance">Instanz</param>        
+        public void RegisterComponent<I, T>(string moduleName, T instance)
+        {
+            // Aufruf an Komponentenkatalog weiterleiten
+            _catalog.RegisterComponent<I, T>(moduleName,instance);            
         }
 
         /// <summary>
@@ -262,17 +308,8 @@ namespace Zyan.Communication
         /// <returns>Liste der registrierten Komponenten</returns>
         public List<string> GetRegisteredComponents()
         { 
-            // Wörterbuch erzeugen 
-            List<string> result = new List<string>();
-
-            // Komponentenregistrierung druchlaufen
-            foreach (ComponentRegistration registration in ComponentRegistry.Values)
-            { 
-                // Neuen Eintrag erstellen
-                result.Add(registration.InterfaceType.FullName);
-            }
-            // Wörterbuch zurückgeben
-            return result;
+            // Aufruf an Komponentenkatalog weiterleiten
+            return _catalog.GetRegisteredComponents();
         }
 
         #endregion               
@@ -363,6 +400,9 @@ namespace Zyan.Communication
                 // Schalter setzen
                 _isDisposed = true;
 
+                // Host aus der Auflistung entfernen
+                _hosts.Remove(this);
+
                 // Horchen auf Client-Anfragen beenden
                 StopListening();
                 
@@ -388,12 +428,11 @@ namespace Zyan.Communication
                     // Authentifizierungsanbieter entsorgen
                     _authProvider = null;
 
-                // Wenn die Liste der Registrierten Komponenten existiert ...
-                if (_componentRegistry != null)
+                // Wenn der Komponentenkatalog existiert ...
+                if (_catalog != null)
                 {
-                    // Liste der registrierten Komponenten entsorgen
-                    _componentRegistry.Clear();
-                    _componentRegistry = null;
+                    // Komponentenkatalog entsorgen                    
+                    _catalog = null;
                 }
             }
         }
