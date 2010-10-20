@@ -269,9 +269,13 @@ namespace Zyan.Communication
                 // Neuen TCP-Kanal erzeugen
                 channel = new TcpChannel(channelSettings, clientFormatter, provider);
 
-                // Sicherstellen, dass vollständige Ausnahmeinformationen übertragen werden
-                RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
-
+                // Wenn Zyan nicht mit mono ausgeführt wird ...
+                if (!MonoCheck.IsRunningOnMono)
+                {
+                    // Sicherstellen, dass vollständige Ausnahmeinformationen übertragen werden
+                    if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
+                        RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
+                }
                 // Kanal registrieren
                 ChannelServices.RegisterChannel(channel, enableSecurity);
             }

@@ -234,10 +234,13 @@ namespace Zyan.Communication.Protocols.Http
                 // Neuen HTTP-Kanal erzeugen
                 channel = new HttpChannel(channelSettings, clientFormatter, firstServerSinkProvider);
 
-                // Sicherstellen, dass vollständige Ausnahmeinformationen übertragen werden
-                if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
-                    RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
-
+                // Wenn Zyan nicht mit mono ausgeführt wird ...
+                if (!MonoCheck.IsRunningOnMono)
+                {
+                    // Sicherstellen, dass vollständige Ausnahmeinformationen übertragen werden
+                    if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
+                        RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
+                }
                 // Kanal zurückgeben
                 return channel;
             }
