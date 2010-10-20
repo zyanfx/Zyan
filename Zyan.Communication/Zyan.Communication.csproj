@@ -49,6 +49,7 @@
     <Compile Include="Modularity\ModuleHost.cs" />
     <Compile Include="Modularity\ZyanApplication.cs" />
     <Compile Include="Modularity\ZyanModuleControlerAttribute.cs" />
+    <Compile Include="MonoCheck.cs" />
     <Compile Include="Protocols\Http\HttpCustomClientProtocolSetup.cs" />
     <Compile Include="Protocols\Http\HttpCustomServerProtocolSetup.cs" />
     <Compile Include="Protocols\Ipc\IpcBinaryClientProtocolSetup.cs" />

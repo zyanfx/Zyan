@@ -23,7 +23,7 @@ namespace Zyan.Communication
         public ComponentRegistration GetRegistration(Type interfaceType)
         {
             // Wenn kein Schnittstellentyp angegeben wurde ...
-            if (interfaceType == null)
+            if (interfaceType.Equals(null))
                 // Ausnahme werfen
                 throw new ArgumentNullException("interfaceType");
 

@@ -37,7 +37,7 @@ namespace Zyan.Communication
             : base(type)
         {
             // Wenn kein Typ angegeben wurde ...
-            if (type == null)
+            if (type.Equals(null))
                 // Ausnahme werfen
                 throw new ArgumentNullException("type");
 
