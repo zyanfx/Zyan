@@ -155,10 +155,7 @@ namespace Zyan.Communication
         private IMessage InvokeRemoteMethod(IMethodCallMessage methodCallMessage)
         {
             try
-            {
-                // Methodeninformationen ermitteln
-                MethodInfo info = (MethodInfo)methodCallMessage.MethodBase;
-
+            {                
                 // Variable für Rückgabewert
                 object returnValue = null;
 
