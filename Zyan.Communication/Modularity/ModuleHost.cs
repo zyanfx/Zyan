@@ -59,7 +59,7 @@ namespace Zyan.Communication.Modularity
             ModuleDirectory=moduleDirectory;
             
             // Ordnername des Modulverzeichnisses als Modulname übernehmen
-            string[] moduleNameParts = ModuleDirectory.Split('\\');
+            string[] moduleNameParts = ModuleDirectory.Split(Path.DirectorySeparatorChar);
             ModuleName = moduleNameParts[moduleNameParts.Length - 1];
 
             // Assembly-Dateinamen (*.dll) des Modulverzeichnisses abrufen
