@@ -32,10 +32,7 @@ namespace Zyan.Communication.Security
             // Wenn kein Token angegeben wurde ...
             if (identity==null)
                 // Ausnahme werfen
-                throw new SecurityException("Es wurde kein Windows-Sicherheitstoken übergeben.");
-                        
-            // Antwortnachricht erstellen 
-            AuthResponseMessage response = new AuthResponseMessage();
+                throw new SecurityException("Es wurde kein Windows-Sicherheitstoken übergeben.");                       
             
             // Wenn die Windows-Identität nicht authentifiziert ist ...
             if (!identity.IsAuthenticated)
