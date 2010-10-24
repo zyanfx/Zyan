@@ -5,6 +5,7 @@ using System.Security;
 using System.Security.Principal;
 using System.Collections.Generic;
 using System.Runtime.Remoting;
+using System.Runtime.Remoting.Services;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Serialization.Formatters;
@@ -21,6 +22,8 @@ namespace Zyan.Communication
     /// </summary>
     public class ZyanComponentHost : IDisposable
     {
+        #region Deklarationen
+
         // Felder
         private ComponentInvoker _invoker = null;
 
@@ -41,8 +44,10 @@ namespace Zyan.Communication
             get { return _hosts.ToList<ZyanComponentHost>(); }
         }
 
+        #endregion
+
         #region Konstruktor
-      
+
         /// <summary>
         /// Konstruktor.
         /// </summary>
@@ -386,6 +391,63 @@ namespace Zyan.Communication
 
         #endregion
 
+        #region Aufrufverfolgung
+
+        /// <summary>
+        /// Ereignis: Bevor ein Komponentenaufruf durchgeführt wird.
+        /// </summary>
+        public event EventHandler<BeforeInvokeEventArgs> BeforeInvoke;
+
+        /// <summary>
+        /// Ereignis: Nachdem ein Komponentenaufruf durchgeführt wurde.
+        /// </summary>
+        public event EventHandler<AfterInvokeEventArgs> AfterInvoke;
+
+        /// <summary>
+        /// Ereignis: Wenn ein Komponentenaufruf abgebrochen wurde.
+        /// </summary>
+        public event EventHandler<InvokeCanceledEventArgs> InvokeCanceled;
+
+        /// <summary>
+        /// Feuert das BeforeInvoke-Ereignis.
+        /// </summary>
+        /// <param name="e">Ereignisargumente</param>
+        protected internal virtual void OnBeforeInvoke(BeforeInvokeEventArgs e)
+        {
+            // Wenn für BeforeInvoke Ereignisprozeduren registriert sind ...
+            if (BeforeInvoke != null)
+                // Ereignis feuern
+                BeforeInvoke(this, e);
+        }
+
+        /// <summary>
+        /// Feuert das AfterInvoke-Ereignis.
+        /// </summary>
+        /// <param name="e">Ereignisargumente</param>
+        protected internal virtual void OnAfterInvoke(AfterInvokeEventArgs e)
+        {
+            // Wenn für AfterInvoke Ereignisprozeduren registriert sind ...
+            if (AfterInvoke != null)
+                // Ereignis feuern
+                AfterInvoke(this, e);
+        }
+
+        /// <summary>
+        /// Feuert das InvokeCanceled-Ereignis.
+        /// </summary>
+        /// <param name="e">Ereignisargumente</param>
+        protected internal virtual void OnInvokeCanceled(InvokeCanceledEventArgs e)
+        {
+            // Wenn für AfterInvoke Ereignisprozeduren registriert sind ...
+            if (InvokeCanceled != null)
+                // Ereignis feuern
+                InvokeCanceled(this, e);
+        }
+
+        #endregion
+
+        #region IDisposable Implementierung
+
         // Gibt an, ob Dispose bereits aufgerufen wurde, oder nicht
         private bool _isDisposed = false;
 
@@ -436,5 +498,7 @@ namespace Zyan.Communication
                 }
             }
         }
+        
+        #endregion
     }
 }

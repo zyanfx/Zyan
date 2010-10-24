@@ -45,6 +45,10 @@
   <ItemGroup>
     <Compile Include="ComponentCatalog.cs" />
     <Compile Include="InvalidSessionException.cs" />
+    <Compile Include="InvokeCanceledEventArgs.cs" />
+    <Compile Include="InvokeCanceledException.cs" />
+    <Compile Include="BeforeInvokeEventArgs.cs" />
+    <Compile Include="AfterInvokeEventArgs.cs" />
     <Compile Include="Modularity\IModuleControler.cs" />
     <Compile Include="Modularity\ModuleHost.cs" />
     <Compile Include="Modularity\ZyanApplication.cs" />
