@@ -92,14 +92,14 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 						_connectionAgeLimit = double.Parse((string)entry.Value);
                          
 						if (_connectionAgeLimit < 0)
-                            throw new ArgumentException("Einstellung 'connectionAgeLimit' muss 0 oder größer sein.", "_connectionAgeLimit");
+                            throw new ArgumentException(LanguageResource.ArgumentException_InvalidConnectionAgeLimitSetting, "_connectionAgeLimit");
 						break;
 
 					case "sweepFrequency":
 						_sweepFrequency = double.Parse((string)entry.Value);
  
 						if (_sweepFrequency < 0) 
-                            throw new ArgumentException("Einstellung 'sweepFrequency' muss 0 oder größer sein.", "_sweepFrequency");
+                            throw new ArgumentException(LanguageResource.ArgumentException_InvalidSweepFrequencySetting, "_sweepFrequency");
 						break;
 
                     case "requireCryptoClient":

@@ -85,7 +85,7 @@ namespace Zyan.Communication.ChannelSinks.Encryption
                         // Wenn die angegebene Anzahl kleiner 1 ist ...
                         if (_maxAttempts < 1) 
                             // Ausnahme werfen
-                            throw new ArgumentException("Anzahl der Wiederholungsversuche 'maxRetries' muss mindestens auf 1 eingestellt sein.", "maxAttempts");
+                            throw new ArgumentException(LanguageResource.ArgumentException_MaxAttempts, "maxAttempts");
 						
                         // Um eins hochzäjlen, da der erste Versuch auch gezählt wird
                         _maxAttempts++; 
@@ -93,7 +93,7 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 
 					default: // Ansonsten ...
                         // Ausnahme werfen
-						throw new ArgumentException(string.Format("Ungültige Konfigurationseinstellung: {0}",(String)entry.Key));
+						throw new ArgumentException(string.Format(LanguageResource.ArgumentException_InvalidConfigSetting,(String)entry.Key));
 				}
 			}
 		}
