@@ -183,12 +183,12 @@ namespace Zyan.Communication.ChannelSinks.Encryption
             // Wenn kein gemeinsamer Schlüssel übermittelt wurde ...
             if (encryptedKey == null || encryptedKey == string.Empty) 
                 // Ausnahme werfen
-                throw new CryptoRemotingException("Es wurde kein gemeinsamer Schlüssel vom Server übermittelt.");
+                throw new CryptoRemotingException(LanguageResource.CryptoRemotingException_KeyChanged);
 			
             // Wenn kein Inizialisierungsvektor übermittelt wurde ...
             if (encryptedIV == null || encryptedIV == string.Empty)
                 // Ausnahme werfen
-                throw new CryptoRemotingException("Es wurde kein Inizialisierungsvektor vom Server übermittelt.");
+                throw new CryptoRemotingException(LanguageResource.CryptoRemotingException_IVMissing);
 
 			// Gemeinsamen Schlüssel und Inizialisierungsvektor entschlüsseln
 			SymmetricAlgorithm sharedProvider = CryptoTools.CreateSymmetricCryptoProvider(_algorithm);
@@ -472,14 +472,14 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 							// Andernfalls ...
                             else 
                                 // Ausnahme werfen
-                                throw new CryptoRemotingException("The key has changed since the message was decrypted.");
+                                throw new CryptoRemotingException(LanguageResource.CryptoRemotingException_KeyChanged);
 						}
 						break;
 
 					case SecureTransactionStage.UnknownTransactionID: // Unbekannte Transaktionskennung
 						
                         // Ausnahme werfen
-                        throw new CryptoRemotingException("Ungültige Sicherheitstransaktionskennung. Möglicherweise wegen Zeitüberschreitung.");
+                        throw new CryptoRemotingException(LanguageResource.CryptoRemotingException_InvalidTransactionID);
 
 					default:
 					

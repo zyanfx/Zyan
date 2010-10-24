@@ -113,8 +113,8 @@ namespace Zyan.Communication.ChannelSinks.Encryption
             string publicKey = (string)requestHeaders[CommonHeaderNames.PUBLIC_KEY];
 
             // Wenn kein öffentlicher Schlüssel gefunden wurde ...
-            if (string.IsNullOrEmpty(publicKey)) 
-                throw new CryptoRemotingException("Kein öffentlicher Schlüssel gefunden.");
+            if (string.IsNullOrEmpty(publicKey))
+                throw new CryptoRemotingException(LanguageResource.CryptoRemotingException_PublicKeyNotFound);
             		
 			// Öffentlichen Schlüssel in den Kryptografieanbieter laden
 			rsaProvider.FromXmlString(publicKey);
@@ -162,7 +162,7 @@ namespace Zyan.Communication.ChannelSinks.Encryption
             // Wenn keine Verbindungsdaten zu dieser Sicherheitstransaktionskennung gefunden wurden ...
 			if (connectionData == null) 
                 // Ausnahme werfen
-                throw new CryptoRemotingException("Keine passenden Client-Verbindungsinformationen gefunden.");
+                throw new CryptoRemotingException(LanguageResource.CryptoRemotingException_ClientConnectionInfoMissing);
 			
             // Zeitstempel aktualisieren
             connectionData.UpdateTimestamp();
@@ -288,14 +288,14 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 						processingResult = _next.ProcessMessage(sinkStack, requestMsg, requestHeaders, requestStream,out responseMsg, out responseHeaders, out responseStream);
 					else 
                         // Ausnahme werfen
-                        throw new CryptoRemotingException("Der Server benötigt eine verschlüssekte Verbindung für diesen Client.");
+                        throw new CryptoRemotingException(LanguageResource.CryptoRemotingException_ServerRequiresEncryption);
 					
                     break;
 
 				default:
 					
                     // Ausnahme werfen
-					throw new CryptoRemotingException("Ungültige Anfrage vom Client: " + transactionStage + ".");
+					throw new CryptoRemotingException(string.Format(LanguageResource.CryptoRemotingException_InvalidClientRequest, transactionStage));
 			}
 			// Aktuelle Senke wieder vom Senkenstapel runternehmen
 			sinkStack.Pop(this);

@@ -107,7 +107,7 @@ namespace Zyan.Communication
             // Wenn kein Name angegeben wurde ...
             if (string.IsNullOrEmpty(name))
                 // Ausnahme werfen
-                throw new ArgumentException("Für den Komponentenhost wurde kein Name angegeben!","name");
+                throw new ArgumentException(LanguageResource.ArgumentException_ComponentHostNameMissing,"name");
 
             // Wenn keine Protokoll-Einstellungen angegeben wurde ...
             if (protocolSetup == null)
