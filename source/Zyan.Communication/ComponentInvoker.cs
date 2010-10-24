@@ -21,7 +21,7 @@ namespace Zyan.Communication
     {
         // Felder
         private ZyanComponentHost _host = null;
-
+        
         /// <summary>
         /// Konstruktor.
         /// </summary>
@@ -41,12 +41,13 @@ namespace Zyan.Communication
         /// Ruft eine bestimmte Methode einer Komponente auf und übergibt die angegebene Nachricht als Parameter.
         /// Für jeden Aufruf wird temporär eine neue Instanz der Komponente erstellt.
         /// </summary>
+        /// <param name="trackingID">Aufrufschlüssel zur Nachverfolgung</param>
         /// <param name="interfaceName">Name der Komponentenschnittstelle</param>
-        /// <param name="outputPinCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Ausgabe-Pins mit entfernten Methoden</param>
+        /// <param name="outputPinCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Ausgangs-Pins mit entfernten Methoden</param>
         /// <param name="methodName">Methodenname</param>
         /// <param name="args">Parameter</param>        
         /// <returns>Rückgabewert</returns>
-        public object Invoke(string interfaceName, ArrayList outputPinCorrelationSet, string methodName, params object[] args)
+        public object Invoke(Guid trackingID, string interfaceName, ArrayList outputPinCorrelationSet, string methodName, params object[] args)
         {
             // Wenn kein Schnittstellenname angegeben wurde ...
             if (string.IsNullOrEmpty(interfaceName))
@@ -63,11 +64,53 @@ namespace Zyan.Communication
                 // Leeren Korrelationssatz erstelen
                 outputPinCorrelationSet = new ArrayList();
 
+            // Ereignisargumente für BeforeInvoke erstellen
+            BeforeInvokeEventArgs cancelArgs=new BeforeInvokeEventArgs()
+            {
+                TrackingID = trackingID,
+                InterfaceName=interfaceName,
+                OutputPinCorrelationSet=outputPinCorrelationSet,
+                MethodName=methodName,
+                Arguments=args,
+                Cancel=false
+            };
+            // BeforeInvoke-Ereignis feuern
+            _host.OnBeforeInvoke(cancelArgs);
+
+            // Wenn der Aufruf abgebrochen werden soll ...
+            if (cancelArgs.Cancel)
+            {
+                // Wenn keine Abbruchausnahme definiert ist ...
+                if (cancelArgs.CancelException == null)
+                    // Standard-Abbruchausnahme erstellen
+                    cancelArgs.CancelException = new InvokeCanceledException();
+
+                // InvokeCanceled-Ereignis feuern
+                _host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = cancelArgs.CancelException });
+
+                // Abbruchausnahme werfen
+                throw cancelArgs.CancelException;
+            }
+            else // Wenn der Aufruf nicht abgebrochen werden soll ...
+            { 
+                // Einstellungen der Ereignisargumente übernehmen
+                interfaceName = cancelArgs.InterfaceName;
+                outputPinCorrelationSet = cancelArgs.OutputPinCorrelationSet;
+                methodName = cancelArgs.MethodName;
+                args = cancelArgs.Arguments;
+            }
             // Wenn für den angegebenen Schnittstellennamen keine Komponente registriert ist ...
             if (!_host.ComponentRegistry.ContainsKey(interfaceName))
+            {
+                // Ausnahme erzeugen
+                KeyNotFoundException ex = new KeyNotFoundException(string.Format("Für die angegebene Schnittstelle '{0}' ist keine Komponente registiert.", interfaceName));
+
+                // InvokeCanceled-Ereignis feuern
+                _host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
+
                 // Ausnahme werfen
-                throw new KeyNotFoundException(string.Format("Für die angegebene Schnittstelle '{0}' ist keine Komponente registiert.", interfaceName));
-                        
+                throw ex;
+            }
             // Komponentenregistrierung abrufen
             ComponentRegistration registration = _host.ComponentRegistry[interfaceName];
                         
@@ -114,8 +157,16 @@ namespace Zyan.Communication
                         ServerSession.CurrentSession = session;
                     }
                     else
+                    {
+                        // Ausnahme erzeugen
+                        InvalidSessionException ex = new InvalidSessionException(string.Format("Sitzungsschlüssel '{0}' ist ungültig! Bitte melden Sie sich erneut am Server an.", sessionID.ToString()));
+
+                        // InvokeCanceled-Ereignis feuern
+                        _host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
+
                         // Ausnahme werfen
-                        throw new InvalidSessionException(string.Format("Sitzungsschlüssel '{0}' ist ungültig! Bitte melden Sie sich erneut am Server an.", sessionID.ToString()));
+                        throw ex;
+                    }
                 }
                 // Wenn eine Transaktion übertragen wurde ...
                 if (data.Store.ContainsKey("transaction"))
@@ -123,9 +174,16 @@ namespace Zyan.Communication
                     scope = new TransactionScope((Transaction)data.Store["transaction"]);
             }
             else
-                // Ausnahme werfen
-                throw new SecurityException("Es wurden keine Kontextinformationen übertragen.");
+            {
+                // Ausnahme erzeugen
+                SecurityException ex = new SecurityException("Es wurden keine Kontextinformationen übertragen.");
 
+                // InvokeCanceled-Ereignis feuern
+                _host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
+
+                // Ausnahme werfen
+                throw ex; 
+            }
             // Rückgabewert
             object returnValue=null;
 
@@ -151,6 +209,9 @@ namespace Zyan.Communication
                 // Ausnahme-Schalter setzen
                 exceptionThrown = true;
 
+                // InvokeCanceled-Ereignis feuern
+                _host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
+                
                 // Ausnahme weiterwerfen
                 throw ex;
             }
@@ -168,6 +229,19 @@ namespace Zyan.Communication
                     scope.Dispose();
                 }
             }
+            // Ereignisargumente für AfterInvoke erstellen
+            AfterInvokeEventArgs afterInvokeArgs = new AfterInvokeEventArgs()
+            {
+                TrackingID = trackingID,
+                InterfaceName = interfaceName,
+                OutputPinCorrelationSet = outputPinCorrelationSet,
+                MethodName = methodName,
+                Arguments = args,
+                ReturnValue = returnValue
+            };
+            // AfterInvoke-Ereignis feuern
+            _host.OnAfterInvoke(afterInvokeArgs);
+
             // Rückgabewert zurückgeben
             return returnValue;
         }

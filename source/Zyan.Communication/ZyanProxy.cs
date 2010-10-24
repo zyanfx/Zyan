@@ -23,17 +23,19 @@ namespace Zyan.Communication
         private string _componentHostName = string.Empty;
         private bool _autoLoginOnExpiredSession = false;
         private Hashtable _autoLoginCredentials = null;
+        private ZyanConnection _connection = null;
                
         /// <summary>
         /// Konstruktor.
         /// </summary>
         /// <param name="type">Schnittstelle der entfernten Komponente</param>
+        /// <param name="connection">Verbindungsobjekt</param>
         /// <param name="remoteInvoker">Aufrufer für entfernte Komponenten</param>   
         /// <param name="implicitTransactionTransfer">Implizite Transaktionsübertragung</param>
         /// <param name="autoLoginOnExpiredSession">Gibt an, ob sich der Proxy automatisch neu anmelden soll, wenn die Sitzung abgelaufen ist</param>
         /// <param name="autoLogoninCredentials">Optional! Anmeldeinformationen, die nur benötigt werden, wenn autoLoginOnExpiredSession auf Wahr eingestellt ist</param>
         /// <param name="sessionID">Sitzungsschlüssel</param>
-        public ZyanProxy(Type type, IComponentInvoker remoteInvoker, bool implicitTransactionTransfer, Guid sessionID, string componentHostName, bool autoLoginOnExpiredSession, Hashtable autoLogoninCredentials)
+        public ZyanProxy(Type type, ZyanConnection connection, bool implicitTransactionTransfer, Guid sessionID, string componentHostName, bool autoLoginOnExpiredSession, Hashtable autoLogoninCredentials)
             : base(type)
         {
             // Wenn kein Typ angegeben wurde ...
@@ -41,22 +43,25 @@ namespace Zyan.Communication
                 // Ausnahme werfen
                 throw new ArgumentNullException("type");
 
-            // Wenn kein Wrapper angegeben wurde ...
-            if (remoteInvoker == null)
+            // Wenn kein Verbindungsobjekt angegeben wurde ...
+            if (connection == null)
                 // Ausnahme werfen
-                throw new ArgumentNullException("remoteInvoker");
-            
+                throw new ArgumentNullException("connection");
+
             // Sitzungsschlüssel übernehmen
             _sessionID = sessionID;
 
+            // Verbindungsobjekt übernehmen
+            _connection = connection;
+            
             // Name des Komponentenhosts übernehmen
             _componentHostName = componentHostName;
 
             // Schnittstellentyp übernehmen
             _interfaceType = type;
 
-            // Aufrufer übernehmen
-            _remoteInvoker = remoteInvoker;   
+            // Aufrufer von Verbindung übernehmen
+            _remoteInvoker = _connection.RemoteComponentFactory;
          
             // Schalter für implizite Transaktionsübertragung übernehmen
             _implicitTransactionTransfer = implicitTransactionTransfer;
@@ -154,15 +159,58 @@ namespace Zyan.Communication
         /// <returns>Remoting Antwortnachricht</returns>
         private IMessage InvokeRemoteMethod(IMethodCallMessage methodCallMessage)
         {
+            // Aufrufschlüssel vergeben
+            Guid trackingID = Guid.NewGuid();
+
             try
             {                
                 // Variable für Rückgabewert
                 object returnValue = null;
 
+                // Ereignisargumente für BeforeInvoke erstellen
+                BeforeInvokeEventArgs cancelArgs = new BeforeInvokeEventArgs()
+                {
+                    TrackingID = trackingID,
+                    InterfaceName = _interfaceType.FullName,
+                    OutputPinCorrelationSet = _outputMessageCorrelationSet,
+                    MethodName = methodCallMessage.MethodName,
+                    Arguments = methodCallMessage.Args,
+                    Cancel = false
+                };
+                // BeforeInvoke-Ereignis feuern
+                _connection.OnBeforeInvoke(cancelArgs);
+
+                // Wenn der Aufruf abgebrochen werden soll ...
+                if (cancelArgs.Cancel)
+                {
+                    // Wenn keine Abbruchausnahme definiert ist ...
+                    if (cancelArgs.CancelException == null)
+                        // Standard-Abbruchausnahme erstellen
+                        cancelArgs.CancelException = new InvokeCanceledException();
+
+                    // InvokeCanceled-Ereignis feuern
+                    _connection.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = cancelArgs.CancelException });
+
+                    // Abbruchausnahme werfen
+                    throw cancelArgs.CancelException;
+                }
                 try
                 {
                     // Entfernten Methodenaufruf durchführen
-                    returnValue = _remoteInvoker.Invoke(_interfaceType.FullName, _outputMessageCorrelationSet, methodCallMessage.MethodName, methodCallMessage.Args);
+                    returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, _outputMessageCorrelationSet, methodCallMessage.MethodName, methodCallMessage.Args);
+
+                    // Ereignisargumente für AfterInvoke erstellen
+                    AfterInvokeEventArgs afterInvokeArgs = new AfterInvokeEventArgs()
+                    {
+                        TrackingID = trackingID,
+                        InterfaceName = _interfaceType.FullName,
+                        OutputPinCorrelationSet = _outputMessageCorrelationSet,
+                        MethodName = methodCallMessage.MethodName,
+                        Arguments = methodCallMessage.Args,
+                        ReturnValue = returnValue
+                    };
+                    // AfterInvoke-Ereignis feuern
+                    _connection.OnAfterInvoke(afterInvokeArgs);
                 }
                 catch (InvalidSessionException)
                 {
@@ -173,7 +221,7 @@ namespace Zyan.Communication
                         _remoteInvoker.Logon(_sessionID, _autoLoginCredentials);
 
                         // Entfernten Methodenaufruf erneut versuchen                        
-                        returnValue = _remoteInvoker.Invoke(_interfaceType.FullName, _outputMessageCorrelationSet, methodCallMessage.MethodName, methodCallMessage.Args);
+                        returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, _outputMessageCorrelationSet, methodCallMessage.MethodName, methodCallMessage.Args);
                     }
                 }
                 // Remoting-Antwortnachricht erstellen und zurückgeben
