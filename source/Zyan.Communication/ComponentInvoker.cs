@@ -52,12 +52,12 @@ namespace Zyan.Communication
             // Wenn kein Schnittstellenname angegeben wurde ...
             if (string.IsNullOrEmpty(interfaceName))
                 // Ausnahme werfen
-                throw new ArgumentException("Kein Schnittstellenname angegeben!", "interfaceName");
+                throw new ArgumentException(LanguageResource.ArgumentException_InterfaceNameMissing, "interfaceName");
 
             // Wenn kein Methodenname angegben wurde ...
             if (string.IsNullOrEmpty(methodName))
                 // Ausnahme werfen
-                throw new ArgumentException("Kein Methodenname angegeben!", "methodName");
+                throw new ArgumentException(LanguageResource.ArgumentException_MethodNameMissing, "methodName");
 
             // Wenn kein Korrelationssatz angegeben wurde ...
             if (outputPinCorrelationSet == null)
@@ -176,7 +176,7 @@ namespace Zyan.Communication
             else
             {
                 // Ausnahme erzeugen
-                SecurityException ex = new SecurityException("Es wurden keine Kontextinformationen übertragen.");
+                SecurityException ex = new SecurityException(LanguageResource.SecurityException_ContextInfoMissing);
 
                 // InvokeCanceled-Ereignis feuern
                 _host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
@@ -266,7 +266,7 @@ namespace Zyan.Communication
             // Wenn kein eindeutiger Sitzungsschlüssel angegeben wurde ...
             if (sessionID == Guid.Empty)
                 // Ausnahme werfen
-                throw new ArgumentException("Leerer Sitzungsschlüssel is nicht erlaubt.", "sessionID");
+                throw new ArgumentException(LanguageResource.ArgumentException_EmptySessionIDIsNotAllowed, "sessionID");
 
             // Wenn noch keine Sitzung mit dem angegebenen Sitzungsschlüssel existiert ...
             if (!_host.SessionManager.ExistSession(sessionID))

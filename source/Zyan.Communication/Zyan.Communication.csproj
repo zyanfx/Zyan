@@ -49,6 +49,11 @@
     <Compile Include="InvokeCanceledException.cs" />
     <Compile Include="BeforeInvokeEventArgs.cs" />
     <Compile Include="AfterInvokeEventArgs.cs" />
+    <Compile Include="LanguageResource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LanguageResource.resx</DependentUpon>
+    </Compile>
     <Compile Include="Modularity\IModuleControler.cs" />
     <Compile Include="Modularity\ModuleHost.cs" />
     <Compile Include="Modularity\ZyanApplication.cs" />
@@ -95,7 +100,13 @@
     <Compile Include="Toolbox\SyncContextSwitcher.cs" />
     <Compile Include="Toolbox\TransactionStarter.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="LanguageResource.de.resx" />
+    <EmbeddedResource Include="LanguageResource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>LanguageResource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

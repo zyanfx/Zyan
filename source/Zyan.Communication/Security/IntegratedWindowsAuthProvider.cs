@@ -32,7 +32,7 @@ namespace Zyan.Communication.Security
             // Wenn kein Token angegeben wurde ...
             if (identity==null)
                 // Ausnahme werfen
-                throw new SecurityException("Es wurde kein Windows-Sicherheitstoken übergeben.");                       
+                throw new SecurityException(LanguageResource.SecurityException_WindowsTokenMissing);                       
             
             // Wenn die Windows-Identität nicht authentifiziert ist ...
             if (!identity.IsAuthenticated)
@@ -40,7 +40,7 @@ namespace Zyan.Communication.Security
                 return new AuthResponseMessage()
                 {
                     Success = false,
-                    ErrorMessage = "Benutzer wurde nicht von Windows authentifiziert.",
+                    ErrorMessage = LanguageResource.UserNotAuthenicatedByWindows,
                     AuthenticatedIdentity = null
                 };
 

@@ -59,17 +59,17 @@ namespace Zyan.Communication.Security
             // Wenn keine Anmeldeinformationen übergeben wurden ...
             if (authRequest.Credentials==null)
                 // Ausnahme werfen
-                throw new SecurityException("Es wurden keine Anmeldeinformationen angegeben.");
+                throw new SecurityException(LanguageResource.SecurityException_CredentialsMissing);
 
             // Wenn kein Benutzername angegeben wurde ...
             if (!authRequest.Credentials.ContainsKey("username"))
                 // Ausnahme werfen
-                throw new SecurityException("Kein Benutzername angegben.");
+                throw new SecurityException(LanguageResource.SecurityException_UserNameMissing);
 
             // Wenn kein Passwort angegeben wurde ...
             if (!authRequest.Credentials.ContainsKey("password"))
                 // Ausnahme werfen
-                throw new SecurityException("Kein Kennwort angegben.");
+                throw new SecurityException(LanguageResource.SecurityException_PasswordMissing);
             
             // Benutzer und Kennwort lesen
             string userName = authRequest.Credentials["username"] as string;

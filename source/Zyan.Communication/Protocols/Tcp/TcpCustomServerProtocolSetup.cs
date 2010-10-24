@@ -38,7 +38,7 @@ namespace Zyan.Communication.Protocols.Tcp
                 // Wenn keine gültige Anschlussnummer angegeben wurde...
                 if (_tcpPort < 0 || _tcpPort > 65535)
                     // Ausnahme werfen
-                    throw new ArgumentOutOfRangeException("tcpPort", "Die TCP-Anschlussnummer muss im Bereich 0-65535 liegen!");
+                    throw new ArgumentOutOfRangeException("tcpPort", LanguageResource.ArgumentOutOfRangeException_InvalidTcpPortRange);
                 
                 // Wert ändern
                 _tcpPort = value; 

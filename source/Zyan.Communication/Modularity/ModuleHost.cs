@@ -102,14 +102,14 @@ namespace Zyan.Communication.Modularity
                             // Wenn bereits ein Modul-Kontroller gesetzt wurde ...
                             if (ModuleControler != null)
                                 // Ausnahme werfen
-                                throw new ApplicationException("Mehrere Modulcontroller im selben Modul sind nicht zulässig.");
+                                throw new ApplicationException(LanguageResource.ApplicationException_MultipleModuleControlersNotAllowed);
 
                             // Modulkontroler für dieses Modul festlegen
                             ModuleControler = Activator.CreateInstance(foundControlerTypes.First()) as IModuleControler;
                         }
                         else if (foundControlerTypes.Count > 0) // Wenn mehrere Modul-Kontroller gefunden wurden ...
                             // Ausnahme werfen
-                            throw new ApplicationException("Mehrere Modulcontroller im selben Modul sind nicht zulässig.");
+                            throw new ApplicationException(LanguageResource.ApplicationException_MultipleModuleControlersNotAllowed);
                     }
                 }
             }

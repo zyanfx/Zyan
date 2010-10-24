@@ -113,7 +113,7 @@ namespace Zyan.Communication
             // Wenn kein Server-URL angegeben wurde ...
             if (string.IsNullOrEmpty(serverUrl))
                 // Ausnahme werfen
-                throw new ArgumentException("Es wurde kein Server-URL angegeben! Bitte geben Sie einen gültigen Server-URL an, da sonst keine Verbindung zum Komponentenhost aufgebaut werden kann.", "serverUrl");
+                throw new ArgumentException(LanguageResource.ArgumentException_ServerUrlMissing, "serverUrl");
 
             // Wenn keine Protokoll-Einstellungen angegeben wurde ...
             if (protocolSetup == null)

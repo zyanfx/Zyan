@@ -96,12 +96,12 @@ namespace Zyan.Communication
             // Wenn der Schnittstellentyp keine Schnittstelle ist ...
             if (!interfaceType.IsInterface)
                 // Ausnahme werfen
-                throw new ArgumentException("Der angegebene Schnittstellentyp ist keine Schnittstelle!", "interfaceType");
+                throw new ArgumentException(LanguageResource.ArgumentException_TypeIsNotAInterface, "interfaceType");
 
             // Wenn der Implementierungstyp keine Klasse ist ...
             if (!implementationType.IsClass)
                 // Ausnahme werfen
-                throw new ArgumentException("Der angegebene Implementierungstyp ist keine Klasse!", "interfaceType");
+                throw new ArgumentException(LanguageResource.ArgumentException_TypeIsNotAClass, "interfaceType");
 
             // Name der Schnittstelle abfragen
             string interfaceName = interfaceType.FullName;
@@ -130,12 +130,12 @@ namespace Zyan.Communication
             // Wenn der Schnittstellentyp keine Schnittstelle ist ...
             if (!interfaceType.IsInterface)
                 // Ausnahme werfen
-                throw new ApplicationException("Der angegebene Schnittstellentyp ist keine Schnittstelle!");
+                throw new ApplicationException(LanguageResource.ArgumentException_TypeIsNotAInterface);
 
             // Wenn kein Delegat auf eine Fabrikmethode angegeben wurde ...
             if (factoryMethod == null)
                 // Ausnahme werfen
-                throw new ArgumentException("Keinen Delegaten für Komponentenerzeugung angegeben.", "factoryMethod");
+                throw new ArgumentException(LanguageResource.ArgumentException_FactoryMethodDelegateMissing, "factoryMethod");
 
             // Name der Schnittstelle abfragen
             string interfaceName = interfaceType.FullName;
@@ -166,12 +166,12 @@ namespace Zyan.Communication
             // Wenn der Schnittstellentyp keine Schnittstelle ist ...
             if (!interfaceType.IsInterface)
                 // Ausnahme werfen
-                throw new ArgumentException("Der angegebene Schnittstellentyp ist keine Schnittstelle!", "interfaceType");
+                throw new ArgumentException(LanguageResource.ArgumentException_TypeIsNotAInterface, "interfaceType");
 
             // Wenn der Implementierungstyp keine Klasse ist ...
             if (!implementationType.IsClass)
                 // Ausnahme werfen
-                throw new ArgumentException("Der angegebene Implementierungstyp ist keine Klasse!", "interfaceType");
+                throw new ArgumentException(LanguageResource.ArgumentException_TypeIsNotAClass, "interfaceType");
 
             // Name der Schnittstelle abfragen
             string interfaceName = interfaceType.FullName;
@@ -202,12 +202,12 @@ namespace Zyan.Communication
             // Wenn der Schnittstellentyp keine Schnittstelle ist ...
             if (!interfaceType.IsInterface)
                 // Ausnahme werfen
-                throw new ArgumentException("Der angegebene Schnittstellentyp ist keine Schnittstelle!", "interfaceType");
+                throw new ArgumentException(LanguageResource.ArgumentException_TypeIsNotAInterface, "interfaceType");
 
             // Wenn der Implementierungstyp keine Klasse ist ...
             if (!implementationType.IsClass)
                 // Ausnahme werfen
-                throw new ArgumentException("Der angegebene Implementierungstyp ist keine Klasse!", "interfaceType");
+                throw new ArgumentException(LanguageResource.ArgumentException_TypeIsNotAClass, "interfaceType");
 
             // Name der Schnittstelle abfragen
             string interfaceName = interfaceType.FullName;
@@ -237,12 +237,12 @@ namespace Zyan.Communication
             // Wenn der Schnittstellentyp keine Schnittstelle ist ...
             if (!interfaceType.IsInterface)
                 // Ausnahme werfen
-                throw new ApplicationException("Der angegebene Schnittstellentyp ist keine Schnittstelle!");
+                throw new ApplicationException(LanguageResource.ArgumentException_TypeIsNotAInterface);
 
             // Wenn kein Delegat auf eine Fabrikmethode angegeben wurde ...
             if (factoryMethod == null)
                 // Ausnahme werfen
-                throw new ArgumentException("Keinen Delegaten für Komponentenerzeugung angegeben.", "factoryMethod");
+                throw new ArgumentException(LanguageResource.ArgumentException_FactoryMethodDelegateMissing, "factoryMethod");
 
             // Name der Schnittstelle abfragen
             string interfaceName = interfaceType.FullName;
@@ -274,12 +274,12 @@ namespace Zyan.Communication
             // Wenn der Schnittstellentyp keine Schnittstelle ist ...
             if (!interfaceType.IsInterface)
                 // Ausnahme werfen
-                throw new ArgumentException("Der angegebene Schnittstellentyp ist keine Schnittstelle!", "interfaceType");
+                throw new ArgumentException(LanguageResource.ArgumentException_TypeIsNotAInterface, "interfaceType");
 
             // Wenn der Implementierungstyp keine Klasse ist ...
             if (!implementationType.IsClass)
                 // Ausnahme werfen
-                throw new ArgumentException("Der angegebene Implementierungstyp ist keine Klasse!", "interfaceType");
+                throw new ArgumentException(LanguageResource.ArgumentException_TypeIsNotAClass, "interfaceType");
 
             // Name der Schnittstelle abfragen
             string interfaceName = interfaceType.FullName;

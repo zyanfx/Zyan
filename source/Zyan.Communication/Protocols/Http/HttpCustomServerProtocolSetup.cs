@@ -39,7 +39,7 @@ namespace Zyan.Communication.Protocols.Http
                 // Wenn keine gültige Anschlussnummer angegeben wurde...
                 if (_httpPort < 0 || _httpPort > 65535)
                     // Ausnahme werfen
-                    throw new ArgumentOutOfRangeException("_httpPort", "Die HTTP-Anschlussnummer muss im Bereich 0-65535 liegen!");
+                    throw new ArgumentOutOfRangeException("_httpPort", LanguageResource.ArgumentOutOfRangeException_InvalidHttpPortRange);
 
                 // Wert ändern
                 _httpPort = value;
