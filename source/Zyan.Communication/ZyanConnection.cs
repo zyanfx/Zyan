@@ -37,7 +37,7 @@ namespace Zyan.Communication
 
         // Anmeldeinformationen für automatisches Anmelden
         private Hashtable _autoLoginCredentials = null;
-
+        
         // Auflistung der bekannten Verbindungen
         private static List<ZyanConnection> _connections = new List<ZyanConnection>();
 
@@ -196,11 +196,8 @@ namespace Zyan.Communication
                 // Ausnahme werfne
                 throw new ApplicationException(string.Format("Für Schnittstelle '{0}' ist auf dem Server '{1}' keine Komponente registriert.", interfaceName, _serverUrl));
 
-            // Fabrik abrufen
-            IComponentInvoker factory=RemoteComponentFactory;
-            
             // Proxy erzeugen
-            ZyanProxy proxy = new ZyanProxy(typeof(T), factory,implicitTransactionTransfer,_sessionID,_componentHostName, _autoLoginOnExpiredSession, _autoLoginCredentials);
+            ZyanProxy proxy = new ZyanProxy(typeof(T), this, implicitTransactionTransfer,_sessionID,_componentHostName, _autoLoginOnExpiredSession, _autoLoginCredentials);
 
             // Proxy transparent machen und zurückgeben
             return (T)proxy.GetTransparentProxy();
@@ -212,7 +209,7 @@ namespace Zyan.Communication
         /// <summary>
         /// Gibt einen Proxy für den Zugriff auf die entfernte Komponentenfabrik des Komponentenhosts zurück.
         /// </summary>
-        private IComponentInvoker RemoteComponentFactory
+        protected internal IComponentInvoker RemoteComponentFactory
         {
             get
             { 
@@ -325,5 +322,60 @@ namespace Zyan.Communication
             // Ressourcen freigeben
             Dispose();
         }
+
+        #region Aufrufverfolgung
+
+        /// <summary>
+        /// Ereignis: Bevor ein Komponentenaufruf durchgeführt wird.
+        /// </summary>
+        public event EventHandler<BeforeInvokeEventArgs> BeforeInvoke;
+
+        /// <summary>
+        /// Ereignis: Nachdem ein Komponentenaufruf durchgeführt wurde.
+        /// </summary>
+        public event EventHandler<AfterInvokeEventArgs> AfterInvoke;
+
+        /// <summary>
+        /// Ereignis: Wenn ein Komponentenaufruf abgebrochen wurde.
+        /// </summary>
+        public event EventHandler<InvokeCanceledEventArgs> InvokeCanceled;
+
+        /// <summary>
+        /// Feuert das BeforeInvoke-Ereignis.
+        /// </summary>
+        /// <param name="e">Ereignisargumente</param>
+        protected internal virtual void OnBeforeInvoke(BeforeInvokeEventArgs e)
+        {
+            // Wenn für BeforeInvoke Ereignisprozeduren registriert sind ...
+            if (BeforeInvoke != null)
+                // Ereignis feuern
+                BeforeInvoke(this, e);
+        }
+
+        /// <summary>
+        /// Feuert das AfterInvoke-Ereignis.
+        /// </summary>
+        /// <param name="e">Ereignisargumente</param>
+        protected internal virtual void OnAfterInvoke(AfterInvokeEventArgs e)
+        {
+            // Wenn für AfterInvoke Ereignisprozeduren registriert sind ...
+            if (AfterInvoke != null)
+                // Ereignis feuern
+                AfterInvoke(this, e);
+        }
+
+        /// <summary>
+        /// Feuert das InvokeCanceled-Ereignis.
+        /// </summary>
+        /// <param name="e">Ereignisargumente</param>
+        protected internal virtual void OnInvokeCanceled(InvokeCanceledEventArgs e)
+        {
+            // Wenn für AfterInvoke Ereignisprozeduren registriert sind ...
+            if (InvokeCanceled != null)
+                // Ereignis feuern
+                InvokeCanceled(this, e);
+        }
+
+        #endregion
     }
 }
