@@ -81,6 +81,7 @@
     <Compile Include="Security\WindowsSecurityTools.cs" />
     <Compile Include="SessionMgmt\InProcSessionManager.cs" />
     <Compile Include="SessionMgmt\ISessionManager.cs" />
+    <Compile Include="SessionMgmt\SqlSessionManager.cs" />
     <Compile Include="Version.cs" />
     <Compile Include="ZyanComponentHost.cs" />
     <Compile Include="ZyanConnection.cs" />
