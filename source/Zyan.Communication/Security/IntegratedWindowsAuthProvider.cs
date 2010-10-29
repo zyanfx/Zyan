@@ -59,7 +59,7 @@ namespace Zyan.Communication.Security
             {
                 Success = true,
                 ErrorMessage = string.Empty,        
-                AuthenticatedIdentity = identity
+                AuthenticatedIdentity = new GenericIdentity(identity.Name)
             };
         }
     }

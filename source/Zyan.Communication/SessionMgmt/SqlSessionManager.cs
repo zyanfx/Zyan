@@ -1,37 +1,259 @@
 ﻿using System;
+using System.Data;
+using System.Data.SqlClient;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Timers;
+using System.Security.Principal;
 
 namespace Zyan.Communication.SessionMgmt
 {
     /// <summary>
-    /// Komponenten für prozessinterne Sitzungsverwaltung.
+    /// Komponenten für Sitzungsverwaltung in einer SQL Server-Datenbank.
+    /// <remarks>
+    /// Folgendes Tabellenschema wird vorausgesetzt:
+    /// 
+    /// SessionID           uniqueidentifier
+    /// SessionTimestamp    datetime
+    /// IdentityName        nvarchar(255)
+    /// </remarks>
     /// </summary>
     public class SqlSessionManager : ISessionManager, IDisposable
     {
-        // Sitzungsauflistung
-        private Dictionary<Guid, ServerSession> _sessions = null;
-
         // Verbindungszeichenfolge
         private string _connectionString = string.Empty;
 
+        // SQL-Schema
+        private string _sqlSchema = string.Empty;
+
+        // Tabellenname
+        private string _sqlTableName = string.Empty;
+        
         /// <summary>
         /// Erzeugt eine neue Instanz von InProcSessionManager.
         /// </summary>
         /// <param name="connectionString">Verbindungszeichenfolge zur SQL Server Datenbank</param>
-        public SqlSessionManager(string connectionString)
+        /// <param name="sqlSchema">Name des Datenbankschemas (z.B.: "dbo")</param>
+        /// <param name="sqlTableName">Name der Sitzungstabelle</param>
+        public SqlSessionManager(string connectionString, string sqlSchema, string sqlTableName)
         {
-            // Verbindungszeichenfolge übernehmen
+            // Felder füllen
             _connectionString = connectionString;
+            _sqlSchema = sqlSchema;
+            _sqlTableName = sqlTableName;
 
-            // Sitzungsliste erzeugen
-            _sessions = new Dictionary<Guid, ServerSession>();
+            // Sicherstellen, dass die Sitzungstabelle existier
+            EnsureSessionTableCreated();
 
             // Aufräumvorgang starten
             StartSessionSweeper();
         }
+
+        #region SQL Server-Persistenz
+
+        private bool ExistSessionTable()
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                StringBuilder sqlBuilder = new StringBuilder();
+                sqlBuilder.Append("SELECT @tableCount=COUNT([object_id]) ");
+                sqlBuilder.Append("FROM sys.tables ");
+                sqlBuilder.Append("WHERE name = @tableName AND schema_id = SCHEMA_ID(@schemaName)");
+                
+                using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(),connection))
+                {
+                    // Ausgbeparamater erzeugen
+                    SqlParameter tableCountParam = new SqlParameter("@tableCount", SqlDbType.Int);
+                    tableCountParam.Direction = ParameterDirection.Output;
+                    command.Parameters.Add(tableCountParam);
+
+                    // Eingabeparameter erzeugen
+                    command.Parameters.Add("@tableName", SqlDbType.NVarChar, 255).Value = _sqlTableName;
+                    command.Parameters.Add("@schemaName", SqlDbType.NVarChar, 255).Value = _sqlSchema;
+
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                    connection.Close();
+
+                    return ((int)tableCountParam.Value) == 1;
+                }
+            }
+        }
+
+        private void EnsureSessionTableCreated()
+        {
+            if (!ExistSessionTable())
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    StringBuilder sqlBuilder = new StringBuilder();
+                    sqlBuilder.Append("CREATE TABLE ");
+                    sqlBuilder.AppendFormat("[{0}].[{1}] (", _sqlSchema, _sqlTableName);                    
+                    sqlBuilder.Append("[AutoID] int IDENTITY(1,1) NOT NULL,");
+                    sqlBuilder.Append("[SessionID] uniqueidentifier NOT NULL,");
+                    sqlBuilder.Append("[SessionTimestamp] datetime NOT NULL,");
+                    sqlBuilder.Append("[IdentityName] nvarchar(255) NOT NULL,");
+                    sqlBuilder.AppendFormat("CONSTRAINT [PK_{0}_SessionID] PRIMARY KEY NONCLUSTERED ",_sqlTableName);
+                    sqlBuilder.Append("([SessionID] ASC),");
+                    sqlBuilder.AppendFormat("CONSTRAINT [IX_{0}] UNIQUE CLUSTERED ",_sqlTableName);
+                    sqlBuilder.Append("([AutoID] ASC))");
+
+                    using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(), connection))
+                    {
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                        connection.Close();
+                    }
+                }
+            }
+        }
+
+        private ServerSession GetSessionFromSqlServer(Guid sessionID)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                StringBuilder sqlBuilder = new StringBuilder();
+                sqlBuilder.Append("SELECT SessionID,SessionTimestamp,IdentityName ");
+                sqlBuilder.AppendFormat("FROM [{0}].[{1}] ",_sqlSchema,_sqlTableName);
+                sqlBuilder.Append("WHERE SessionID=@sessionID");
+
+                using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(), connection))
+                {
+                    // Eingabeparameter erzeugen
+                    command.Parameters.Add("@sessionID", SqlDbType.UniqueIdentifier).Value = sessionID;
+
+                    try
+                    {
+                        connection.Open();
+
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                // Sitzung vom SQL Server lesen und zurückgeben
+                                return new ServerSession(reader.GetGuid(0),
+                                                         reader.GetDateTime(1),
+                                                         new GenericIdentity(reader.GetString(2)));
+                            }
+                            else
+                                // Nichts zurückgeben
+                                return null;
+                        }
+                    }
+                    finally
+                    {   
+                        connection.Close();
+                    }
+                }
+            }            
+        }
+
+        private bool ExistSessionOnSqlServer(Guid sessionID)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                StringBuilder sqlBuilder = new StringBuilder();
+                sqlBuilder.Append("SELECT @sessionCount=COUNT(SessionID)");
+                sqlBuilder.AppendFormat("FROM [{0}].[{1}] ", _sqlSchema, _sqlTableName);
+                sqlBuilder.Append("WHERE SessionID=@sessionID");
+
+                using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(), connection))
+                {
+                    // Eingabeparameter erzeugen
+                    command.Parameters.Add("@sessionID", SqlDbType.UniqueIdentifier).Value = sessionID;
+
+                    // Ausgabeparameter erzeugen
+                    SqlParameter sessionCountParam = new SqlParameter()
+                    {
+                        ParameterName = "@sessionCount",
+                        SqlDbType = SqlDbType.Int,
+                        Direction = ParameterDirection.Output
+                    };
+                    command.Parameters.Add(sessionCountParam);
+
+                    // SQL-Befehl ausführen
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                    connection.Close();
+
+                    // Ergebnis zurückgeben
+                    return ((int)sessionCountParam.Value) == 1;
+                }
+            }            
+        }
+
+        private void StoreSessionOnSqlServer(ServerSession session)
+        {
+            // Wenn keine Sitzung angegeben wurde ...
+            if (session == null)
+                // Ausnahme werfen
+                throw new ArgumentNullException("session");
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                StringBuilder sqlBuilder = new StringBuilder();
+                sqlBuilder.AppendFormat("DELETE FROM [{0}].[{1}] WHERE SessionID=@sessionID; ", _sqlSchema, _sqlTableName);
+                sqlBuilder.AppendFormat("INSERT [{0}].[{1}] (SessionID,SessionTimestamp,IdentityName) ", _sqlSchema, _sqlTableName);
+                sqlBuilder.Append("VALUES (@sessionID,@sessionTimestamp,@identityName)");
+                
+                using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(), connection))
+                {
+                    // Eingabeparameter erzeugen
+                    command.Parameters.Add("@sessionID", SqlDbType.UniqueIdentifier).Value = session.SessionID;
+                    command.Parameters.Add("@sessionTimestamp", SqlDbType.DateTime).Value = session.Timestamp;
+                    command.Parameters.Add("@identityName", SqlDbType.NVarChar,255).Value = session.Identity.Name;
+
+                    // Sitzung speichern
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                    connection.Close();
+                }
+            }            
+        }
+
+        private void RemoveSessionFromSqlServer(Guid sessionID)
+        {            
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                StringBuilder sqlBuilder = new StringBuilder();
+                sqlBuilder.AppendFormat("DELETE FROM [{0}].[{1}] WHERE SessionID=@sessionID", _sqlSchema, _sqlTableName);
+                
+                using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(), connection))
+                {
+                    // Eingabeparameter erzeugen
+                    command.Parameters.Add("@sessionID", SqlDbType.UniqueIdentifier).Value = sessionID;
+                    
+                    // Sitzung speichern
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                    connection.Close();
+                }
+            }
+        }
+
+        private void SweepExpiredSessionsFromSqlServer()
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                StringBuilder sqlBuilder = new StringBuilder();
+                sqlBuilder.AppendFormat("DELETE FROM [{0}].[{1}] ", _sqlSchema, _sqlTableName);
+                sqlBuilder.Append("WHERE DATEDIFF(minute,SessionTimestamp,GETDATE())>@sessionAgeLimit");
+
+                using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(), connection))
+                {
+                    // Eingabeparameter erzeugen
+                    command.Parameters.Add("@sessionAgeLimit", SqlDbType.Int).Value = _sessionAgeLimit;
+
+                    // Sitzung speichern
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                    connection.Close();
+                }
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// Prüft, ob eine Sitzung mit einer bestimmten Sitzungskennung.
@@ -40,7 +262,7 @@ namespace Zyan.Communication.SessionMgmt
         /// <returns>Wahr, wenn die Sitzung existiert, ansonsten Falsch</returns>
         public bool ExistSession(Guid sessionID)
         {
-            return _sessions.ContainsKey(sessionID);
+            return ExistSessionOnSqlServer(sessionID);
         }
 
         /// <summary>
@@ -49,14 +271,9 @@ namespace Zyan.Communication.SessionMgmt
         /// <param name="sessionID">Sitzungskennung</param>
         /// <returns>Sitzung</returns>
         public ServerSession GetSessionBySessionID(Guid sessionID)
-        {
-            // Wenn eine Sitzung mit der angegebenen Sitzungskennung
-            if (ExistSession(sessionID))
-                // Sitzung abrufen und zurückgeben
-                return _sessions[sessionID];
-
-            // Nichts zurückgeben
-            return null;
+        {            
+            // Sitzung abrufen und zurückgeben
+            return GetSessionFromSqlServer(sessionID);
         }
 
         /// <summary>
@@ -64,16 +281,9 @@ namespace Zyan.Communication.SessionMgmt
         /// </summary>
         /// <param name="session">Sitzungsdaten</param>
         public void StoreSession(ServerSession session)
-        {
-            // Wenn die Sitzung noch nicht gespeichert ist ...
-            if (!ExistSession(session.SessionID))
-            {
-                lock (_sessionLock)
-                {
-                    // Sitzung der Sitzungsliste zufüen
-                    _sessions.Add(session.SessionID, session);
-                }
-            }
+        {   
+            // Sitzung der Sitzungsliste zufüen
+            StoreSessionOnSqlServer(session);                            
         }
 
         /// <summary>
@@ -81,16 +291,9 @@ namespace Zyan.Communication.SessionMgmt
         /// </summary>
         /// <param name="sessionID">Sitzungskennung</param>
         public void RemoveSession(Guid sessionID)
-        {
-            // Wenn die Sitzung existiert ...
-            if (ExistSession(sessionID))
-            {
-                lock (_sessionLock)
-                {
-                    // Sitzung aus der Sitzungsliste entfernen
-                    _sessions.Remove(sessionID);
-                }
-            }
+        {   
+            // Sitzung aus der Sitzungsliste entfernen
+            RemoveSessionFromSqlServer(sessionID);            
         }
 
         #region Aufräumvorgang
@@ -98,8 +301,7 @@ namespace Zyan.Communication.SessionMgmt
         // Zeitgeber für Sitzungs-Aufräumvorgang
         private System.Timers.Timer _sessionSweeper = null;
 
-        // Sperrobjekte für Thread-Synchronisierung
-        private object _sessionLock = new object();
+        // Sperrobjekte für Thread-Synchronisierung        
         private object _sessionSweeperLock = new object();
 
         // Maximale Sitzungslebensdauer in Minuten
@@ -187,20 +389,8 @@ namespace Zyan.Communication.SessionMgmt
         /// <param name="e">Ereignisargumente</param>
         private void _sessionSweeper_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            lock (_sessionLock)
-            {
-                // Abgelaufene Sitzung abrufen
-                Guid[] expiredSessions = (from session in _sessions.Values
-                                          where session.Timestamp.ToUniversalTime().AddMinutes(_sessionAgeLimit) < DateTime.Now.ToUniversalTime()
-                                          select session.SessionID).ToArray();
-
-                // Alle abgelaufenen Sitzungen durchlaufen
-                foreach (Guid expiredSessionID in expiredSessions)
-                {
-                    // Sitzung entfernen
-                    _sessions.Remove(expiredSessionID);
-                }
-            }
+            // Abgelaufene Sitzungen auf dem SQL Server bereinigen
+            SweepExpiredSessionsFromSqlServer();
         }
 
         #endregion
@@ -229,14 +419,7 @@ namespace Zyan.Communication.SessionMgmt
 
                     // Zeitgeber entsorgen
                     _sessionSweeper.Dispose();
-                }
-                // Wenn die Sitzungsliste noch existiert ...
-                if (_sessions != null)
-                {
-                    // Sitzungsliste entsorgen
-                    _sessions.Clear();
-                    _sessions = null;
-                }
+                }                
             }
         }
     }
