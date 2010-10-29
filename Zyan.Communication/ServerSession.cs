@@ -23,6 +23,13 @@ namespace Zyan.Communication
             _identity=identity;
 	    }
 
+        internal ServerSession(Guid sessionID, DateTime timestamp, IIdentity identity)
+        {
+            _timestamp = timestamp;
+            _sessionID = sessionID;
+            _identity = identity;
+        }
+
         public Guid SessionID
         {
             get { return _sessionID; }
