@@ -204,4 +204,7 @@
   <data name="UserNotAuthenicatedByWindows" xml:space="preserve">
     <value>Benutzer wurde nicht von Windows authentifiziert.</value>
   </data>
+  <data name="ArgumentException_OutPutPinNameMissing" xml:space="preserve">
+    <value>Es wurde kein Eigenschaftsname eines Ausgangs-Pins angegeben.</value>
+  </data>
 </root>

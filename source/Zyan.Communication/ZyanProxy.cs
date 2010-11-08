@@ -6,6 +6,7 @@ using System.Runtime.Remoting.Messaging;
 using System.Runtime.Remoting.Proxies;
 using System.Reflection;
 using System.Transactions;
+using System.Threading.Tasks;
 
 namespace Zyan.Communication
 {
@@ -166,7 +167,7 @@ namespace Zyan.Communication
             {                
                 // Variable für Rückgabewert
                 object returnValue = null;
-
+                
                 // Ereignisargumente für BeforeInvoke erstellen
                 BeforeInvokeEventArgs cancelArgs = new BeforeInvokeEventArgs()
                 {
@@ -198,7 +199,7 @@ namespace Zyan.Communication
                 {
                     // Entfernten Methodenaufruf durchführen
                     returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, _outputMessageCorrelationSet, methodCallMessage.MethodName, methodCallMessage.Args);
-
+                                                                
                     // Ereignisargumente für AfterInvoke erstellen
                     AfterInvokeEventArgs afterInvokeArgs = new AfterInvokeEventArgs()
                     {
@@ -210,7 +211,7 @@ namespace Zyan.Communication
                         ReturnValue = returnValue
                     };
                     // AfterInvoke-Ereignis feuern
-                    _connection.OnAfterInvoke(afterInvokeArgs);
+                    _connection.OnAfterInvoke(afterInvokeArgs);                    
                 }
                 catch (InvalidSessionException)
                 {

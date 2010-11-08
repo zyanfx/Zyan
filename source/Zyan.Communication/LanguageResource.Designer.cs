@@ -151,6 +151,15 @@ namespace Zyan.Communication {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Outpit pin property name missing. ähnelt.
+        /// </summary>
+        internal static string ArgumentException_OutPutPinNameMissing {
+            get {
+                return ResourceManager.GetString("ArgumentException_OutPutPinNameMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Server URL missing. ähnelt.
         /// </summary>
         internal static string ArgumentException_ServerUrlMissing {
