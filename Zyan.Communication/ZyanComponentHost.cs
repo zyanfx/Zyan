@@ -409,6 +409,33 @@ namespace Zyan.Communication
         public event EventHandler<InvokeCanceledEventArgs> InvokeCanceled;
 
         /// <summary>
+        /// Gibt zurück, ob für das BeforeInvoke-Ereignis Abos registriert wurden.
+        /// </summary>
+        /// <returns>Wahr, wenn Abos vorhanden, ansonsten Falsch</returns>
+        protected internal bool HasBeforeInvokeSubscriptions()
+        { 
+            return (BeforeInvoke != null);
+        }
+
+        /// <summary>
+        /// Gibt zurück, ob für das AfterInvoke-Ereignis Abos registriert wurden.
+        /// </summary>
+        /// <returns>Wahr, wenn Abos vorhanden, ansonsten Falsch</returns>
+        protected internal bool HasAfterInvokeSubscriptions()
+        {
+            return (AfterInvoke != null);
+        }
+
+        /// <summary>
+        /// Gibt zurück, ob für das InvokeCanceled-Ereignis Abos registriert wurden.
+        /// </summary>
+        /// <returns>Wahr, wenn Abos vorhanden, ansonsten Falsch</returns>
+        protected internal bool HasInvokeCanceledSubscriptions()
+        {
+            return (InvokeCanceled != null);
+        }
+
+        /// <summary>
         /// Feuert das BeforeInvoke-Ereignis.
         /// </summary>
         /// <param name="e">Ereignisargumente</param>

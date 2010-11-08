@@ -39,26 +39,145 @@ namespace Zyan.Communication
             _host = host;
         }
 
-        //private Delegate CreateDynamicWire(Type serverOutPinType)
-        //{
-        //    if (serverOutPinType == null)
-        //        throw new ArgumentNullException("serverOutPinType");
+        /// <summary>
+        /// Erstellt Drähte zwischen Client- und Server-Komponente (wenn im Korrelationssatz angegeben).
+        /// </summary>
+        /// <param name="type">Implementierungstyp der Server-Komponente</param>
+        /// <param name="instance">Instanz der Serverkomponente</param>
+        /// <param name="outputPinCorrelationSet">Korrelationssatz mit Verdrahtungsinformationen</param>
+        private void CreateClientServerWires(Type type, object instance, ArrayList outputPinCorrelationSet)
+        {
+            // Wenn kein Korrelationssatz angegeben wurde ...
+            if (outputPinCorrelationSet == null)
+                // Prozedur abbrechen
+                return;
 
-            
-            
+            // Alle Einträge des Korrelationssatzes durchlaufen
+            foreach (RemoteOutputPinWiring correlationInfo in outputPinCorrelationSet)
+            {
+                // Dynamischen Draht erzeugen
+                object dynamicWire = DynamicWireFactory.Instance.CreateDynamicWire(type, correlationInfo.ServerPropertyName);
 
-        //    StringBuilder code = new StringBuilder();
-        //    code.AppendLine("public class DynWire");
-        //    code.AppendLine("{");
-        //    code.AppendLine("   public Zyan.Communication.RemoteOutputPinWiring ClientPinWiring { get; set; }");
-        //    code.AppendLine("   public decimal In(decimal p1,decimal p2)");
-        //    code.AppendLine("   {");
-        //    code.AppendLine("       return (decimal)ClientPinWiring.InvokeDynamicClientPin(p1,p2);");
-        //    code.AppendLine("   }");
-        //    code.AppendLine("}");
-        
+                // Typ des dynamischen Drahtes ermitteln
+                Type dynamicWireType = dynamicWire.GetType();
 
-        //}
+                // Dynamischen Draht mit Client-Fernsteuerung verdrahten
+                dynamicWireType.GetProperty("ClientPinWiring").SetValue(dynamicWire, correlationInfo, null);
+
+                // Metadaten des aktuellen Ausgabe-Pins abufen                
+                PropertyInfo outputPinMetaData = type.GetProperty(correlationInfo.ServerPropertyName);
+
+                // Delegat zu dynamischem Draht erzeugen
+                Delegate dynamicWireDelegate = Delegate.CreateDelegate(outputPinMetaData.PropertyType, dynamicWire, dynamicWireType.GetMethod("In"));
+
+                // Ausgehende Nachrichten mit passender Abfangvorrichtung verdrahten 
+                outputPinMetaData.SetValue(instance, dynamicWireDelegate, null);
+            }            
+        }
+
+        /// <summary>
+        /// Entfernt Drähte zwischen Client- und Server-Komponente (wenn im Korrelationssatz angegeben).
+        /// </summary>
+        /// <param name="type">Implementierungstyp der Server-Komponente</param>
+        /// <param name="instance">Instanz der Serverkomponente</param>
+        /// <param name="outputPinCorrelationSet">Korrelationssatz mit Verdrahtungsinformationen</param>
+        private void RemoveClientServerWires(Type type, object instance, ArrayList outputPinCorrelationSet)
+        {
+            // Wenn kein Korrelationssatz angegeben wurde ...
+            if (outputPinCorrelationSet == null)
+                // Prozedur abbrechen
+                return;
+
+            // Alle Einträge des Korrelationssatzes durchlaufen
+            foreach (RemoteOutputPinWiring correlationInfo in outputPinCorrelationSet)
+            {
+                // Metadaten des aktuellen Ausgabe-Pins abufen                
+                PropertyInfo outputPinMetaData = type.GetProperty(correlationInfo.ServerPropertyName);
+
+                // Verdrahtung aufheben
+                outputPinMetaData.SetValue(instance, null, null);
+            }
+        }
+
+        /// <summary>
+        /// Verarbeitet BeforeInvoke-Abos (falls welche registriert sind).
+        /// </summary>
+        /// <param name="trackingID">Aufrufschlüssel zur Nachverfolgung</param>
+        /// <param name="interfaceName">Name der Komponentenschnittstelle</param>
+        /// <param name="outputPinCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Ausgangs-Pins mit entfernten Methoden</param>
+        /// <param name="methodName">Methodenname</param>
+        /// <param name="args">Parameter</param>   
+        private void ProcessBeforeInvoke(Guid trackingID, ref string interfaceName,  ref ArrayList outputPinCorrelationSet, ref string methodName, ref object[] args)
+        {
+            // Wenn BeforeInvoke-Abos vorhanden sind ...
+            if (_host.HasBeforeInvokeSubscriptions())
+            {
+                // Ereignisargumente für BeforeInvoke erstellen
+                BeforeInvokeEventArgs cancelArgs = new BeforeInvokeEventArgs()
+                {
+                    TrackingID = trackingID,
+                    InterfaceName = interfaceName,
+                    OutputPinCorrelationSet = outputPinCorrelationSet,
+                    MethodName = methodName,
+                    Arguments = args,
+                    Cancel = false
+                };
+                // BeforeInvoke-Ereignis feuern
+                _host.OnBeforeInvoke(cancelArgs);
+
+                // Wenn der Aufruf abgebrochen werden soll ...
+                if (cancelArgs.Cancel)
+                {
+                    // Wenn keine Abbruchausnahme definiert ist ...
+                    if (cancelArgs.CancelException == null)
+                        // Standard-Abbruchausnahme erstellen
+                        cancelArgs.CancelException = new InvokeCanceledException();
+
+                    // InvokeCanceled-Ereignis feuern
+                    _host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = cancelArgs.CancelException });
+
+                    // Abbruchausnahme werfen
+                    throw cancelArgs.CancelException;
+                }
+                else // Wenn der Aufruf nicht abgebrochen werden soll ...
+                {
+                    // Einstellungen der Ereignisargumente übernehmen
+                    interfaceName = cancelArgs.InterfaceName;
+                    outputPinCorrelationSet = cancelArgs.OutputPinCorrelationSet;
+                    methodName = cancelArgs.MethodName;
+                    args = cancelArgs.Arguments;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Verarbeitet AfterInvoke-Abos (falls welche registriert sind).
+        /// </summary>
+        /// <param name="trackingID">Aufrufschlüssel zur Nachverfolgung</param>
+        /// <param name="interfaceName">Name der Komponentenschnittstelle</param>
+        /// <param name="outputPinCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Ausgangs-Pins mit entfernten Methoden</param>
+        /// <param name="methodName">Methodenname</param>
+        /// <param name="args">Parameter</param>   
+        /// <param name="returnValue">Rückgabewert</param>
+        private void ProcessAfterInvoke(Guid trackingID, ref string interfaceName, ref ArrayList outputPinCorrelationSet, ref string methodName, ref object[] args, ref object returnValue)
+        {
+            // Wenn AfterInvoke-Abos registriert sind ...
+            if (_host.HasAfterInvokeSubscriptions())
+            {
+                // Ereignisargumente für AfterInvoke erstellen
+                AfterInvokeEventArgs afterInvokeArgs = new AfterInvokeEventArgs()
+                {
+                    TrackingID = trackingID,
+                    InterfaceName = interfaceName,
+                    OutputPinCorrelationSet = outputPinCorrelationSet,
+                    MethodName = methodName,
+                    Arguments = args,
+                    ReturnValue = returnValue
+                };
+                // AfterInvoke-Ereignis feuern
+                _host.OnAfterInvoke(afterInvokeArgs);
+            }
+        }
 
         /// <summary>
         /// Ruft eine bestimmte Methode einer Komponente auf und übergibt die angegebene Nachricht als Parameter.
@@ -82,46 +201,9 @@ namespace Zyan.Communication
                 // Ausnahme werfen
                 throw new ArgumentException(LanguageResource.ArgumentException_MethodNameMissing, "methodName");
 
-            // Wenn kein Korrelationssatz angegeben wurde ...
-            if (outputPinCorrelationSet == null)
-                // Leeren Korrelationssatz erstelen
-                outputPinCorrelationSet = new ArrayList();
-
-            // Ereignisargumente für BeforeInvoke erstellen
-            BeforeInvokeEventArgs cancelArgs = new BeforeInvokeEventArgs()
-            {
-                TrackingID = trackingID,
-                InterfaceName = interfaceName,
-                OutputPinCorrelationSet = outputPinCorrelationSet,
-                MethodName = methodName,
-                Arguments = args,
-                Cancel = false
-            };
-            // BeforeInvoke-Ereignis feuern
-            _host.OnBeforeInvoke(cancelArgs);
-
-            // Wenn der Aufruf abgebrochen werden soll ...
-            if (cancelArgs.Cancel)
-            {
-                // Wenn keine Abbruchausnahme definiert ist ...
-                if (cancelArgs.CancelException == null)
-                    // Standard-Abbruchausnahme erstellen
-                    cancelArgs.CancelException = new InvokeCanceledException();
-
-                // InvokeCanceled-Ereignis feuern
-                _host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = cancelArgs.CancelException });
-
-                // Abbruchausnahme werfen
-                throw cancelArgs.CancelException;
-            }
-            else // Wenn der Aufruf nicht abgebrochen werden soll ...
-            {
-                // Einstellungen der Ereignisargumente übernehmen
-                interfaceName = cancelArgs.InterfaceName;
-                outputPinCorrelationSet = cancelArgs.OutputPinCorrelationSet;
-                methodName = cancelArgs.MethodName;
-                args = cancelArgs.Arguments;
-            }
+            // Ggf. BeforeInvoke-Abos verarbeiten
+            ProcessBeforeInvoke(trackingID, ref interfaceName, ref outputPinCorrelationSet, ref methodName, ref args);
+            
             // Wenn für den angegebenen Schnittstellennamen keine Komponente registriert ist ...
             if (!_host.ComponentRegistry.ContainsKey(interfaceName))
             {
@@ -143,27 +225,9 @@ namespace Zyan.Communication
             // Implementierungstyp abrufen
             Type type = instance.GetType();
 
-            // Alle Einträge des Korrelationssatzes durchlaufen
-            foreach (RemoteOutputPinWiring correlationInfo in outputPinCorrelationSet)
-            {
-                // Dynamischen Draht erzeugen
-                object dynamicWire = DynamicWireFactory.Instance.CreateDynamicWire(type, correlationInfo.ServerPropertyName);
-                
-                // Typ des dynamischen Drahtes ermitteln
-                Type dynamicWireType = dynamicWire.GetType();
+            // Bei Bedarf Client- und Server-Komponente miteinander verdrahten
+            CreateClientServerWires(type, instance, outputPinCorrelationSet);            
 
-                // Dynamischen Draht mit Client-Fernsteuerung verdrahten
-                dynamicWireType.GetProperty("ClientPinWiring").SetValue(dynamicWire, correlationInfo, null);
-
-                // Metadaten des aktuellen Ausgabe-Pins abufen                
-                PropertyInfo outputPinMetaData = type.GetProperty(correlationInfo.ServerPropertyName);
-                
-                // Delegat zu dynamischem Draht erzeugen
-                Delegate dynamicWireDelegate = Delegate.CreateDelegate(outputPinMetaData.PropertyType, dynamicWire, dynamicWireType.GetMethod("In"));
-
-                // Ausgehende Nachrichten mit passender Abfangvorrichtung verdrahten 
-                outputPinMetaData.SetValue(instance, dynamicWireDelegate, null);
-            }
             // Transaktionsbereich
             TransactionScope scope = null;
 
@@ -263,29 +327,12 @@ namespace Zyan.Communication
                     // Transaktionsbereich entsorgen
                     scope.Dispose();
                 }
-                // Alle Einträge des Korrelationssatzes durchlaufen
-                foreach (RemoteOutputPinWiring correlationInfo in outputPinCorrelationSet)
-                {
-                    // Metadaten des aktuellen Ausgabe-Pins abufen                
-                    PropertyInfo outputPinMetaData = type.GetProperty(correlationInfo.ServerPropertyName);
-
-                    // Verdrahtung aufheben
-                    outputPinMetaData.SetValue(instance, null, null);
-                }
+                // Verdrahtung aufheben
+                RemoveClientServerWires(type, instance, outputPinCorrelationSet);
             }
-            // Ereignisargumente für AfterInvoke erstellen
-            AfterInvokeEventArgs afterInvokeArgs = new AfterInvokeEventArgs()
-            {
-                TrackingID = trackingID,
-                InterfaceName = interfaceName,
-                OutputPinCorrelationSet = outputPinCorrelationSet,
-                MethodName = methodName,
-                Arguments = args,
-                ReturnValue = returnValue
-            };
-            // AfterInvoke-Ereignis feuern
-            _host.OnAfterInvoke(afterInvokeArgs);
-
+            // Ggf. AfterInvoke-Abos verarbeiten
+            ProcessAfterInvoke(trackingID, ref interfaceName, ref outputPinCorrelationSet, ref methodName, ref args, ref returnValue);
+            
             // Rückgabewert zurückgeben
             return returnValue;
         }

@@ -9,11 +9,10 @@ namespace Zyan.Communication.Toolbox
     /// <summary>
     /// Stellt sicher, dass die durchlaufende Nachricht innerhalb einer Transaktion verarbeitet wird.
     /// </summary>
-    /// <typeparam name="T">Nachichtentyp</typeparam>
-    public class TransactionStarter<T>
+    public class TransactionStarter <T>
     {
         /// <summary>
-        /// Erzeugt eine neue Instanz von TransactionStarter<T>.
+        /// Erzeugt eine neue Instanz von TransactionStarter.
         /// </summary>
         public TransactionStarter()
         {
@@ -24,7 +23,7 @@ namespace Zyan.Communication.Toolbox
         }
 
         /// <summary>
-        /// Erzeugt eine neue Instanz von TransactionStarter<T>.
+        /// Erzeugt eine neue Instanz von TransactionStarter
         /// </summary>
         /// <param name="isolationLevel">Isolationsstufe</param>
         /// <param name="scopeOption">bereichsoption</param>
@@ -105,5 +104,22 @@ namespace Zyan.Communication.Toolbox
         /// Ausgangs-Pin, bei Transaktionsabbruch.
         /// </summary>
         public Action Out_TransactionAborted;
+
+        /// <summary>
+        /// Erstellt eine neue Instanz und verdrahtet damit zwei Pins.
+        /// </summary>
+        /// <param name="inputPin">Eingangs-Pin</param>
+        /// <returns>Ausgangs-Pin</returns>
+        public static Action<T> WireUp(Action<T> inputPin)
+        {
+            // Neue Instanz erzeugen
+            TransactionStarter<T> instance = new TransactionStarter<T>();
+
+            // Ausgang-Pin der Instanz mit dem angegebenen Eigangs-Pin verdraten
+            instance.Out = inputPin;
+
+            // Delegat auf den Eingangs-Pin der Instanz zurückgeben
+            return new Action<T>(instance.In);
+        }
     }
 }

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Threading;
+using System.Reflection;
 
 namespace Zyan.Communication.Toolbox
 {
     /// <summary>
     /// Stellt sicher, dass die Verarbeitung von Nachrichten im ursprünglichen Thread stattfinden.
-    /// </summary>
-    /// <typeparam name="T">Nachrichtentyp</typeparam>
-    public class SyncContextSwitcher<T>
+    /// </summary>    
+    public class SyncContextSwitcher <T>
     {
         // Bei Erstellung den aktuellen Synchronisierungskontext merken
         private readonly SynchronizationContext syncContext = SynchronizationContext.Current;
@@ -32,10 +32,20 @@ namespace Zyan.Communication.Toolbox
                 Out(message);
         }
 
+        /// <summary>
+        /// Erstellt eine neue Instanz und verdrahtet damit zwei Pins.
+        /// </summary>
+        /// <param name="inputPin">Eingangs-Pin</param>
+        /// <returns>Ausgangs-Pin</returns>
         public static Action<T> WireUp(Action<T> inputPin)
         {
+            // Neue Instanz erzeugen
             SyncContextSwitcher<T> instance = new SyncContextSwitcher<T>();
+           
+            // Eingangs-Pin mit Ausgangs-Pin der Instanz verdrahten
             instance.Out = inputPin;
+
+            // Delegat auf Eingangs-Pin der Instanz zurückgeben
             return new Action<T>(instance.In);
         }
     }
