@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Threading;
 
 namespace Zyan.Communication
 {
@@ -7,7 +8,7 @@ namespace Zyan.Communication
     /// Beschreibt die Verdrahtung eines entfernten Ausgabe-Pins.
     /// </summary>
     public class RemoteOutputPinWiring : MarshalByRefObject
-    {
+    {        
         /// <summary>
         /// Gibt den clientseitigen Empfängerdelegaten zurück, oder legt ihn fest.
         /// </summary>
@@ -27,13 +28,16 @@ namespace Zyan.Communication
         }
                 
         /// <summary>
-        /// Ruft den verdrahteten Client-Pin auf.
+        /// Ruft den verdrahteten Client-Pin dynamisch auf.
         /// </summary>
-        /// <param name="message">Nachricht</param>
-        public void InvokeClientPin(object message)
+        /// <param name="args">Argumente</param>
+        public object InvokeDynamicClientPin(params object[] args)
         {
-            // Nachricht weiterleiten
-            ((Delegate)ClientReceiver).DynamicInvoke(message);
+            // Clientempfänger als Delegat casten
+            Delegate clientReceiver = (Delegate)ClientReceiver;
+
+            // Aufruf ausführen
+            return clientReceiver.DynamicInvoke(args);            
         }
     }
 }

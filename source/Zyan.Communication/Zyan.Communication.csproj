@@ -36,6 +36,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Transactions" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComponentCatalog.cs" />
+    <Compile Include="DynamicWireFactory.cs" />
     <Compile Include="InvalidSessionException.cs" />
     <Compile Include="InvokeCanceledEventArgs.cs" />
     <Compile Include="InvokeCanceledException.cs" />
@@ -77,6 +79,7 @@
     <Compile Include="ChannelSinks\Encryption\CryptoServerChannelSinkProvider.cs" />
     <Compile Include="Protocols\IClientProtocolSetup.cs" />
     <Compile Include="Protocols\IServerProtocolSetup.cs" />
+    <Compile Include="Scripting\ScriptEngine.cs" />
     <Compile Include="Security\BasicWindowsAuthProvider.cs" />
     <Compile Include="Security\WindowsSecurityTools.cs" />
     <Compile Include="SessionMgmt\InProcSessionManager.cs" />

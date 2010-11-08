@@ -204,4 +204,7 @@
   <data name="UserNotAuthenicatedByWindows" xml:space="preserve">
     <value>User is not authenticated by operating system.</value>
   </data>
+  <data name="ArgumentException_OutPutPinNameMissing" xml:space="preserve">
+    <value>Outpit pin property name missing.</value>
+  </data>
 </root>
