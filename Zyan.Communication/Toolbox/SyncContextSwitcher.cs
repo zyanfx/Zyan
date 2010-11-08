@@ -31,5 +31,12 @@ namespace Zyan.Communication.Toolbox
                 // Aufruf direkt ausführen
                 Out(message);
         }
+
+        public static Action<T> WireUp(Action<T> inputPin)
+        {
+            SyncContextSwitcher<T> instance = new SyncContextSwitcher<T>();
+            instance.Out = inputPin;
+            return new Action<T>(instance.In);
+        }
     }
 }

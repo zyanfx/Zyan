@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Timers;
 using System.Security.Principal;
+using System.Transactions;
 
 namespace Zyan.Communication.SessionMgmt
 {
@@ -52,203 +53,309 @@ namespace Zyan.Communication.SessionMgmt
 
         #region SQL Server-Persistenz
 
+        /// <summary>
+        /// Gibt zurück, ob die Sitzungstabelle in der Verbundenen SQL Server Datenbank bereits angelegt wurde, oder nicht.
+        /// </summary>
+        /// <returns>Wahr, wenn die Sitzungstabelle existiert, ansonsten Falsch</returns>
         private bool ExistSessionTable()
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            // Transaktion erzwingen
+            using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() {IsolationLevel=System.Transactions.IsolationLevel.RepeatableRead}))
             {
-                StringBuilder sqlBuilder = new StringBuilder();
-                sqlBuilder.Append("SELECT @tableCount=COUNT([object_id]) ");
-                sqlBuilder.Append("FROM sys.tables ");
-                sqlBuilder.Append("WHERE name = @tableName AND schema_id = SCHEMA_ID(@schemaName)");
-                
-                using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(),connection))
-                {
-                    // Ausgbeparamater erzeugen
-                    SqlParameter tableCountParam = new SqlParameter("@tableCount", SqlDbType.Int);
-                    tableCountParam.Direction = ParameterDirection.Output;
-                    command.Parameters.Add(tableCountParam);
-
-                    // Eingabeparameter erzeugen
-                    command.Parameters.Add("@tableName", SqlDbType.NVarChar, 255).Value = _sqlTableName;
-                    command.Parameters.Add("@schemaName", SqlDbType.NVarChar, 255).Value = _sqlSchema;
-
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                    connection.Close();
-
-                    return ((int)tableCountParam.Value) == 1;
-                }
-            }
-        }
-
-        private void EnsureSessionTableCreated()
-        {
-            if (!ExistSessionTable())
-            {
+                // Verbindung zum SQL Server herstellen
                 using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
+                    // SQL-Abfrage zusammenbauen
                     StringBuilder sqlBuilder = new StringBuilder();
-                    sqlBuilder.Append("CREATE TABLE ");
-                    sqlBuilder.AppendFormat("[{0}].[{1}] (", _sqlSchema, _sqlTableName);                    
-                    sqlBuilder.Append("[AutoID] int IDENTITY(1,1) NOT NULL,");
-                    sqlBuilder.Append("[SessionID] uniqueidentifier NOT NULL,");
-                    sqlBuilder.Append("[SessionTimestamp] datetime NOT NULL,");
-                    sqlBuilder.Append("[IdentityName] nvarchar(255) NOT NULL,");
-                    sqlBuilder.AppendFormat("CONSTRAINT [PK_{0}_SessionID] PRIMARY KEY NONCLUSTERED ",_sqlTableName);
-                    sqlBuilder.Append("([SessionID] ASC),");
-                    sqlBuilder.AppendFormat("CONSTRAINT [IX_{0}] UNIQUE CLUSTERED ",_sqlTableName);
-                    sqlBuilder.Append("([AutoID] ASC))");
+                    sqlBuilder.Append("SELECT @tableCount=COUNT([object_id]) ");
+                    sqlBuilder.Append("FROM sys.tables ");
+                    sqlBuilder.Append("WHERE name = @tableName AND schema_id = SCHEMA_ID(@schemaName)");
 
+                    // SQL-Befehl erzeugen
                     using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(), connection))
                     {
+                        // Ausgbeparamater erzeugen
+                        SqlParameter tableCountParam = new SqlParameter("@tableCount", SqlDbType.Int);
+                        tableCountParam.Direction = ParameterDirection.Output;
+                        command.Parameters.Add(tableCountParam);
+
+                        // Eingabeparameter erzeugen
+                        command.Parameters.Add("@tableName", SqlDbType.NVarChar, 255).Value = _sqlTableName;
+                        command.Parameters.Add("@schemaName", SqlDbType.NVarChar, 255).Value = _sqlSchema;
+
+                        // SQL-Abfrage ausfphren
                         connection.Open();
                         command.ExecuteNonQuery();
                         connection.Close();
+
+                        // Transaktion abschließen
+                        scope.Complete();
+
+                        // Ausgabeparameter auswerten und Ergebnis zurückgeben
+                        return ((int)tableCountParam.Value) == 1;
                     }
                 }
             }
         }
 
-        private ServerSession GetSessionFromSqlServer(Guid sessionID)
+        /// <summary>
+        /// Stellt sicher, dass die Sitzungstabelle in der SQL Server Datenbank existiert.
+        /// </summary>
+        private void EnsureSessionTableCreated()
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            // Transaktion erzwingen
+            using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead }))
             {
-                StringBuilder sqlBuilder = new StringBuilder();
-                sqlBuilder.Append("SELECT SessionID,SessionTimestamp,IdentityName ");
-                sqlBuilder.AppendFormat("FROM [{0}].[{1}] ",_sqlSchema,_sqlTableName);
-                sqlBuilder.Append("WHERE SessionID=@sessionID");
-
-                using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(), connection))
+                // Wenn die Tabelle nicht existiert ...
+                if (!ExistSessionTable())
                 {
-                    // Eingabeparameter erzeugen
-                    command.Parameters.Add("@sessionID", SqlDbType.UniqueIdentifier).Value = sessionID;
-
-                    try
+                    using (SqlConnection connection = new SqlConnection(_connectionString))
                     {
-                        connection.Open();
+                        StringBuilder sqlBuilder = new StringBuilder();
+                        sqlBuilder.Append("CREATE TABLE ");
+                        sqlBuilder.AppendFormat("[{0}].[{1}] (", _sqlSchema, _sqlTableName);
+                        sqlBuilder.Append("[AutoID] int IDENTITY(1,1) NOT NULL,");
+                        sqlBuilder.Append("[SessionID] uniqueidentifier NOT NULL,");
+                        sqlBuilder.Append("[SessionTimestamp] datetime NOT NULL,");
+                        sqlBuilder.Append("[IdentityName] nvarchar(255) NOT NULL,");
+                        sqlBuilder.AppendFormat("CONSTRAINT [PK_{0}_SessionID] PRIMARY KEY NONCLUSTERED ", _sqlTableName);
+                        sqlBuilder.Append("([SessionID] ASC),");
+                        sqlBuilder.AppendFormat("CONSTRAINT [IX_{0}] UNIQUE CLUSTERED ", _sqlTableName);
+                        sqlBuilder.Append("([AutoID] ASC))");
 
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(), connection))
                         {
-                            if (reader.Read())
-                            {
-                                // Sitzung vom SQL Server lesen und zurückgeben
-                                return new ServerSession(reader.GetGuid(0),
-                                                         reader.GetDateTime(1),
-                                                         new GenericIdentity(reader.GetString(2)));
-                            }
-                            else
-                                // Nichts zurückgeben
-                                return null;
+                            connection.Open();
+                            command.ExecuteNonQuery();
+                            connection.Close();
                         }
                     }
-                    finally
-                    {   
-                        connection.Close();
-                    }
                 }
-            }            
+                // Transaktion abschließen
+                scope.Complete();
+            }
         }
 
-        private bool ExistSessionOnSqlServer(Guid sessionID)
+        /// <summary>
+        /// Ruft eine bestimmte Sitzung aus der SQL Server Datenbank ab.
+        /// </summary>
+        /// <param name="sessionID">Sitzungsschlüssel</param>
+        /// <returns>Sitzungsobjekt</returns>
+        private ServerSession GetSessionFromSqlServer(Guid sessionID)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            // Transaktion erzwingen
+            using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead }))
             {
-                StringBuilder sqlBuilder = new StringBuilder();
-                sqlBuilder.Append("SELECT @sessionCount=COUNT(SessionID)");
-                sqlBuilder.AppendFormat("FROM [{0}].[{1}] ", _sqlSchema, _sqlTableName);
-                sqlBuilder.Append("WHERE SessionID=@sessionID");
-
-                using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(), connection))
+                // Verbindung zum SQL Server herstellen
+                using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    // Eingabeparameter erzeugen
-                    command.Parameters.Add("@sessionID", SqlDbType.UniqueIdentifier).Value = sessionID;
+                    // SQL-Abfrage zusammenstellen
+                    StringBuilder sqlBuilder = new StringBuilder();
+                    sqlBuilder.Append("SELECT SessionID,SessionTimestamp,IdentityName ");
+                    sqlBuilder.AppendFormat("FROM [{0}].[{1}] ", _sqlSchema, _sqlTableName);
+                    sqlBuilder.Append("WHERE SessionID=@sessionID");
 
-                    // Ausgabeparameter erzeugen
-                    SqlParameter sessionCountParam = new SqlParameter()
+                    // SQL-Befehl erzeugen
+                    using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(), connection))
                     {
-                        ParameterName = "@sessionCount",
-                        SqlDbType = SqlDbType.Int,
-                        Direction = ParameterDirection.Output
-                    };
-                    command.Parameters.Add(sessionCountParam);
+                        // Eingabeparameter erzeugen
+                        command.Parameters.Add("@sessionID", SqlDbType.UniqueIdentifier).Value = sessionID;
 
-                    // SQL-Befehl ausführen
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                    connection.Close();
+                        try
+                        {
+                            // Verbindung öffnen
+                            connection.Open();
 
-                    // Ergebnis zurückgeben
-                    return ((int)sessionCountParam.Value) == 1;
-                }
-            }            
-        }
+                            // SQL-Abfrag ausführen
+                            using (SqlDataReader reader = command.ExecuteReader())
+                            {
+                                // Wenn Abfrageergebnisse vorhanden sind ...
+                                if (reader.Read())
+                                {
+                                    // Sitzung vom SQL Server lesen
+                                    ServerSession session = new ServerSession(reader.GetGuid(0),
+                                                                              reader.GetDateTime(1),
+                                                                              new GenericIdentity(reader.GetString(2)));
 
-        private void StoreSessionOnSqlServer(ServerSession session)
-        {
-            // Wenn keine Sitzung angegeben wurde ...
-            if (session == null)
-                // Ausnahme werfen
-                throw new ArgumentNullException("session");
+                                    // Transaktion abschließen
+                                    scope.Complete();
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                StringBuilder sqlBuilder = new StringBuilder();
-                sqlBuilder.AppendFormat("DELETE FROM [{0}].[{1}] WHERE SessionID=@sessionID; ", _sqlSchema, _sqlTableName);
-                sqlBuilder.AppendFormat("INSERT [{0}].[{1}] (SessionID,SessionTimestamp,IdentityName) ", _sqlSchema, _sqlTableName);
-                sqlBuilder.Append("VALUES (@sessionID,@sessionTimestamp,@identityName)");
-                
-                using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(), connection))
-                {
-                    // Eingabeparameter erzeugen
-                    command.Parameters.Add("@sessionID", SqlDbType.UniqueIdentifier).Value = session.SessionID;
-                    command.Parameters.Add("@sessionTimestamp", SqlDbType.DateTime).Value = session.Timestamp;
-                    command.Parameters.Add("@identityName", SqlDbType.NVarChar,255).Value = session.Identity.Name;
-
-                    // Sitzung speichern
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                    connection.Close();
-                }
-            }            
-        }
-
-        private void RemoveSessionFromSqlServer(Guid sessionID)
-        {            
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                StringBuilder sqlBuilder = new StringBuilder();
-                sqlBuilder.AppendFormat("DELETE FROM [{0}].[{1}] WHERE SessionID=@sessionID", _sqlSchema, _sqlTableName);
-                
-                using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(), connection))
-                {
-                    // Eingabeparameter erzeugen
-                    command.Parameters.Add("@sessionID", SqlDbType.UniqueIdentifier).Value = sessionID;
-                    
-                    // Sitzung speichern
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                    connection.Close();
+                                    // Sitzung zurückgeben
+                                    return session;
+                                }
+                                // Transaktion abschließen
+                                scope.Complete();
+                                
+                                // Nichts zurückgeben
+                                return null;
+                            }
+                            
+                        }
+                        finally
+                        {
+                            // Verbindung schließen
+                            connection.Close();
+                        }
+                    }
                 }
             }
         }
 
+        /// <summary>
+        /// Gibt zurück, ob eine bestimmte Sitzung in der SQL Server Datenbank existiert, oder nicht.
+        /// </summary>
+        /// <param name="sessionID">Sitzungsschlüssel</param>
+        /// <returns>Wahr, wenn die Sitzung existiert, ansonsten Falsch</returns>
+        private bool ExistSessionOnSqlServer(Guid sessionID)
+        {
+            // Transaktion erzwingen
+            using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead }))
+            {
+                // Verbindung zum SQL Server herstellen
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    // SQL-Abfrage zusammenstellen
+                    StringBuilder sqlBuilder = new StringBuilder();
+                    sqlBuilder.Append("SELECT @sessionCount=COUNT(SessionID)");
+                    sqlBuilder.AppendFormat("FROM [{0}].[{1}] ", _sqlSchema, _sqlTableName);
+                    sqlBuilder.Append("WHERE SessionID=@sessionID");
+
+                    // SQL-Befehl erzeugen
+                    using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(), connection))
+                    {
+                        // Eingabeparameter erzeugen
+                        command.Parameters.Add("@sessionID", SqlDbType.UniqueIdentifier).Value = sessionID;
+
+                        // Ausgabeparameter erzeugen
+                        SqlParameter sessionCountParam = new SqlParameter()
+                        {
+                            ParameterName = "@sessionCount",
+                            SqlDbType = SqlDbType.Int,
+                            Direction = ParameterDirection.Output
+                        };
+                        command.Parameters.Add(sessionCountParam);
+
+                        // SQL-Befehl ausführen
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                        connection.Close();
+
+                        // Transaktion abschließen
+                        scope.Complete();
+
+                        // Ergebnis zurückgeben
+                        return ((int)sessionCountParam.Value) == 1;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Speichert eine Sitzung in der SQL Server Datenbank ab.
+        /// </summary>
+        /// <param name="session">Sitzungsobjekt</param>
+        private void StoreSessionOnSqlServer(ServerSession session)
+        {
+            // Transaktion erzwingen
+            using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead }))
+            {
+                // Wenn keine Sitzung angegeben wurde ...
+                if (session == null)
+                    // Ausnahme werfen
+                    throw new ArgumentNullException("session");
+
+                // Verbindung zum SQL Server herstellen
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    // SQL-Stapel zum Löschen und Neuanlegen der Sitzung zusammenstellen
+                    StringBuilder sqlBuilder = new StringBuilder();
+                    sqlBuilder.AppendFormat("DELETE FROM [{0}].[{1}] WHERE SessionID=@sessionID; ", _sqlSchema, _sqlTableName);
+                    sqlBuilder.AppendFormat("INSERT [{0}].[{1}] (SessionID,SessionTimestamp,IdentityName) ", _sqlSchema, _sqlTableName);
+                    sqlBuilder.Append("VALUES (@sessionID,@sessionTimestamp,@identityName)");
+
+                    // SQL-Befehl erzeugen
+                    using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(), connection))
+                    {
+                        // Eingabeparameter erzeugen
+                        command.Parameters.Add("@sessionID", SqlDbType.UniqueIdentifier).Value = session.SessionID;
+                        command.Parameters.Add("@sessionTimestamp", SqlDbType.DateTime).Value = session.Timestamp;
+                        command.Parameters.Add("@identityName", SqlDbType.NVarChar, 255).Value = session.Identity.Name;
+
+                        // Sitzung speichern
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                        connection.Close();
+
+                        // Transaktion abschließen
+                        scope.Complete();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Löscht eine bestimmte Sitzung aus der SQL Server Datenbank.
+        /// </summary>
+        /// <param name="sessionID">Sitzungsschlüssel</param>
+        private void RemoveSessionFromSqlServer(Guid sessionID)        
+        {
+            // Transaktion erzwingen
+            using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead }))
+            {
+                // Verbindung zum SQL Server herstellen
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    // SQL-DELETE-Anweisung 
+                    StringBuilder sqlBuilder = new StringBuilder();
+                    sqlBuilder.AppendFormat("DELETE FROM [{0}].[{1}] WHERE SessionID=@sessionID", _sqlSchema, _sqlTableName);
+
+                    using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(), connection))
+                    {
+                        // Eingabeparameter erzeugen
+                        command.Parameters.Add("@sessionID", SqlDbType.UniqueIdentifier).Value = sessionID;
+
+                        // Sitzung speichern
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                        connection.Close();
+
+                        // Transaktion abschließen
+                        scope.Complete();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Entfernt abgelaufene Sitzungen aus der SQL Server Datenbank.
+        /// </summary>
         private void SweepExpiredSessionsFromSqlServer()
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            // Transaktion erzwingen
+            using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead }))
             {
-                StringBuilder sqlBuilder = new StringBuilder();
-                sqlBuilder.AppendFormat("DELETE FROM [{0}].[{1}] ", _sqlSchema, _sqlTableName);
-                sqlBuilder.Append("WHERE DATEDIFF(minute,SessionTimestamp,GETDATE())>@sessionAgeLimit");
-
-                using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(), connection))
+                // Verbindung zum SQL Server herstellen
+                using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    // Eingabeparameter erzeugen
-                    command.Parameters.Add("@sessionAgeLimit", SqlDbType.Int).Value = _sessionAgeLimit;
+                    // SQL-Löschanweisung zusammenstellen
+                    StringBuilder sqlBuilder = new StringBuilder();
+                    sqlBuilder.AppendFormat("DELETE FROM [{0}].[{1}] ", _sqlSchema, _sqlTableName);
+                    sqlBuilder.Append("WHERE DATEDIFF(minute,SessionTimestamp,GETDATE())>@sessionAgeLimit");
 
-                    // Sitzung speichern
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                    connection.Close();
+                    // SQL-Befehl erzeugen
+                    using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(), connection))
+                    {
+                        // Eingabeparameter erzeugen
+                        command.Parameters.Add("@sessionAgeLimit", SqlDbType.Int).Value = _sessionAgeLimit;
+
+                        // Abgelaufene Sitzungen entfernen
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                        connection.Close();
+
+                        // Transaktion abschließen
+                        scope.Complete();
+                    }
                 }
             }
         }

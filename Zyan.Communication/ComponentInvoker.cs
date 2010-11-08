@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Security;
 using System.Security.Principal;
 using System.Security.Authentication;
@@ -8,6 +9,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using System.Transactions;
+using System.Dynamic;
 using Zyan.Communication.Security;
 
 namespace Zyan.Communication
@@ -21,7 +23,7 @@ namespace Zyan.Communication
     {
         // Felder
         private ZyanComponentHost _host = null;
-        
+
         /// <summary>
         /// Konstruktor.
         /// </summary>
@@ -36,6 +38,27 @@ namespace Zyan.Communication
             // Host übernehmen
             _host = host;
         }
+
+        //private Delegate CreateDynamicWire(Type serverOutPinType)
+        //{
+        //    if (serverOutPinType == null)
+        //        throw new ArgumentNullException("serverOutPinType");
+
+            
+            
+
+        //    StringBuilder code = new StringBuilder();
+        //    code.AppendLine("public class DynWire");
+        //    code.AppendLine("{");
+        //    code.AppendLine("   public Zyan.Communication.RemoteOutputPinWiring ClientPinWiring { get; set; }");
+        //    code.AppendLine("   public decimal In(decimal p1,decimal p2)");
+        //    code.AppendLine("   {");
+        //    code.AppendLine("       return (decimal)ClientPinWiring.InvokeDynamicClientPin(p1,p2);");
+        //    code.AppendLine("   }");
+        //    code.AppendLine("}");
+        
+
+        //}
 
         /// <summary>
         /// Ruft eine bestimmte Methode einer Komponente auf und übergibt die angegebene Nachricht als Parameter.
@@ -65,14 +88,14 @@ namespace Zyan.Communication
                 outputPinCorrelationSet = new ArrayList();
 
             // Ereignisargumente für BeforeInvoke erstellen
-            BeforeInvokeEventArgs cancelArgs=new BeforeInvokeEventArgs()
+            BeforeInvokeEventArgs cancelArgs = new BeforeInvokeEventArgs()
             {
                 TrackingID = trackingID,
-                InterfaceName=interfaceName,
-                OutputPinCorrelationSet=outputPinCorrelationSet,
-                MethodName=methodName,
-                Arguments=args,
-                Cancel=false
+                InterfaceName = interfaceName,
+                OutputPinCorrelationSet = outputPinCorrelationSet,
+                MethodName = methodName,
+                Arguments = args,
+                Cancel = false
             };
             // BeforeInvoke-Ereignis feuern
             _host.OnBeforeInvoke(cancelArgs);
@@ -92,7 +115,7 @@ namespace Zyan.Communication
                 throw cancelArgs.CancelException;
             }
             else // Wenn der Aufruf nicht abgebrochen werden soll ...
-            { 
+            {
                 // Einstellungen der Ereignisargumente übernehmen
                 interfaceName = cancelArgs.InterfaceName;
                 outputPinCorrelationSet = cancelArgs.OutputPinCorrelationSet;
@@ -113,9 +136,9 @@ namespace Zyan.Communication
             }
             // Komponentenregistrierung abrufen
             ComponentRegistration registration = _host.ComponentRegistry[interfaceName];
-                        
+
             // Komponenteninstanz erzeugen
-            object instance =  _host.GetComponentInstance(registration);
+            object instance = _host.GetComponentInstance(registration);
 
             // Implementierungstyp abrufen
             Type type = instance.GetType();
@@ -123,17 +146,29 @@ namespace Zyan.Communication
             // Alle Einträge des Korrelationssatzes durchlaufen
             foreach (RemoteOutputPinWiring correlationInfo in outputPinCorrelationSet)
             {
+                // Dynamischen Draht erzeugen
+                object dynamicWire = DynamicWireFactory.Instance.CreateDynamicWire(type, correlationInfo.ServerPropertyName);
+                
+                // Typ des dynamischen Drahtes ermitteln
+                Type dynamicWireType = dynamicWire.GetType();
+
+                // Dynamischen Draht mit Client-Fernsteuerung verdrahten
+                dynamicWireType.GetProperty("ClientPinWiring").SetValue(dynamicWire, correlationInfo, null);
+
                 // Metadaten des aktuellen Ausgabe-Pins abufen                
                 PropertyInfo outputPinMetaData = type.GetProperty(correlationInfo.ServerPropertyName);
-                                
+                
+                // Delegat zu dynamischem Draht erzeugen
+                Delegate dynamicWireDelegate = Delegate.CreateDelegate(outputPinMetaData.PropertyType, dynamicWire, dynamicWireType.GetMethod("In"));
+
                 // Ausgehende Nachrichten mit passender Abfangvorrichtung verdrahten 
-                outputPinMetaData.SetValue(instance, new Action<object>(correlationInfo.InvokeClientPin), null);
+                outputPinMetaData.SetValue(instance, dynamicWireDelegate, null);
             }
             // Transaktionsbereich
             TransactionScope scope = null;
-            
+
             // Kontextdaten aus dem Aufrufkontext lesen (Falls welche hinterlegt sind)
-            LogicalCallContextData data=CallContext.GetData("__ZyanContextData_" + _host.Name) as LogicalCallContextData;
+            LogicalCallContextData data = CallContext.GetData("__ZyanContextData_" + _host.Name) as LogicalCallContextData;
 
             // Wenn Kontextdaten übertragen wurden ...
             if (data != null)
@@ -182,17 +217,17 @@ namespace Zyan.Communication
                 _host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
 
                 // Ausnahme werfen
-                throw ex; 
+                throw ex;
             }
             // Rückgabewert
-            object returnValue=null;
+            object returnValue = null;
 
             // Typen-Array (zur Ermittlung der passenden Signatur) erzeugen
             Type[] types = new Type[args.Length];
 
             // Alle Parameter durchlaufen
             for (int i = 0; i < args.Length; i++)
-            { 
+            {
                 // Typ in Array einfügen
                 types[i] = args[i].GetType();
             }
@@ -205,18 +240,18 @@ namespace Zyan.Communication
                 returnValue = type.GetMethod(methodName, types).Invoke(instance, args);
             }
             catch (Exception ex)
-            { 
+            {
                 // Ausnahme-Schalter setzen
                 exceptionThrown = true;
 
                 // InvokeCanceled-Ereignis feuern
                 _host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
-                
+
                 // Ausnahme weiterwerfen
                 throw ex;
             }
             finally
-            { 
+            {
                 // Wenn ein Transaktionsbereich existiert ...
                 if (scope != null)
                 {
@@ -227,6 +262,15 @@ namespace Zyan.Communication
 
                     // Transaktionsbereich entsorgen
                     scope.Dispose();
+                }
+                // Alle Einträge des Korrelationssatzes durchlaufen
+                foreach (RemoteOutputPinWiring correlationInfo in outputPinCorrelationSet)
+                {
+                    // Metadaten des aktuellen Ausgabe-Pins abufen                
+                    PropertyInfo outputPinMetaData = type.GetProperty(correlationInfo.ServerPropertyName);
+
+                    // Verdrahtung aufheben
+                    outputPinMetaData.SetValue(instance, null, null);
                 }
             }
             // Ereignisargumente für AfterInvoke erstellen
@@ -251,7 +295,7 @@ namespace Zyan.Communication
         /// </summary>
         /// <returns>Liste mit Namen der registrierten Komponenten</returns>
         public string[] GetRegisteredComponents()
-        { 
+        {
             // Daten vom Host abrufen
             return _host.GetRegisteredComponents().ToArray();
         }
@@ -262,7 +306,7 @@ namespace Zyan.Communication
         /// <param name="sessionID">Sitzungsschlüssel (wird vom Client erstellt)</param>
         /// <param name="credentials">Anmeldeinformationen</param>
         public void Logon(Guid sessionID, Hashtable credentials)
-        { 
+        {
             // Wenn kein eindeutiger Sitzungsschlüssel angegeben wurde ...
             if (sessionID == Guid.Empty)
                 // Ausnahme werfen
@@ -270,7 +314,7 @@ namespace Zyan.Communication
 
             // Wenn noch keine Sitzung mit dem angegebenen Sitzungsschlüssel existiert ...
             if (!_host.SessionManager.ExistSession(sessionID))
-            { 
+            {
                 // Authentifizieren
                 AuthResponseMessage authResponse = _host.Authenticate(new AuthRequestMessage() { Credentials = credentials });
 
@@ -313,5 +357,15 @@ namespace Zyan.Communication
         }
 
         #endregion
+    }
+
+    public class Dummy
+    {
+        public RemoteOutputPinWiring ClientPinWiring { get; set; }
+
+        public decimal In(decimal p1,decimal p2)
+        {
+            return (decimal)ClientPinWiring.InvokeDynamicClientPin(p1,p2);
+        }
     }
 }
