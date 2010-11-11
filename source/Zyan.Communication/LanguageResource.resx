@@ -207,4 +207,7 @@
   <data name="ArgumentException_OutPutPinNameMissing" xml:space="preserve">
     <value>Outpit pin property name missing.</value>
   </data>
+  <data name="ApplicationException_NotificationServiceNotRunning" xml:space="preserve">
+    <value>Notification service is not running on the host.</value>
+  </data>
 </root>

@@ -14,6 +14,7 @@ using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp;
 using Zyan.Communication.SessionMgmt;
 using Zyan.Communication.Modularity;
+using Zyan.Communication.Notification;
 
 namespace Zyan.Communication
 {    
@@ -469,6 +470,98 @@ namespace Zyan.Communication
             if (InvokeCanceled != null)
                 // Ereignis feuern
                 InvokeCanceled(this, e);
+        }
+
+        #endregion
+
+        #region Benachrichtigungen
+
+        // Benachrichtigungsdienst
+        private volatile NotificationService _notificationService = null;
+                
+        // Sperrobjekt für Instanzerstellung des Benachrichtigungsdienstes 
+        private object _notificationServiceLockObject = new object();
+
+        /// <summary>
+        /// Gibt zurück, ob der Benachrichtigungsdienst läuft, oder nicht.
+        /// </summary>
+        public bool IsNotificationServiceRunning
+        {
+            get
+            {
+                lock (_notificationServiceLockObject)
+                {
+                    return _notificationService != null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Startet den Benachrichtigungsdienst.
+        /// </summary>
+        public void StartNotificationService()
+        {
+            lock (_notificationServiceLockObject)
+            { 
+                // Wenn der Dienst nicht bereits läuft ...
+                if (_notificationService == null)
+                { 
+                    // Instanz erzeugen
+                    _notificationService = new NotificationService();
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Beendet den Benachrichtigungsdienst.
+        /// </summary>
+        public void StopNotificationService()
+        {
+            lock (_notificationServiceLockObject)
+            {
+                // Wenn der Dienst läuft ...
+                if (_notificationService != null)
+                {
+                    // Instanz löschen
+                    _notificationService = null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gibt den Benachrichtigungsdienst zurück.
+        /// </summary>
+        public NotificationService NotificationService
+        {
+            get
+            {
+                lock (_notificationServiceLockObject)
+                {
+                    return _notificationService;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Veröffentlicht ein Ereignis einer Serverkomponente.
+        /// </summary>
+        /// <param name="eventName">Ereignisname</param>
+        /// <returns>Delegat für Benachrichtigungsversand an registrierte Clients</returns>
+        public EventHandler<NotificationEventArgs> PublishEvent(string eventName)
+        {
+            // Wenn kein Benachrichtigungsdienst läuft ...
+            if (!IsNotificationServiceRunning)
+                // Ausnahme werfen
+                throw new ApplicationException(LanguageResource.ApplicationException_NotificationServiceNotRunning);
+
+            // Sendevorrichtung erstellen
+            NotificationSender sender = new NotificationSender(NotificationService, eventName);
+
+            // Delegat auf Methode zum Benachrichtigungsversand erzeugen
+            EventHandler<NotificationEventArgs> sendHandler = new EventHandler<NotificationEventArgs>(sender.HandleServerEvent);
+
+            // Delegat zurückgeben
+            return sendHandler;
         }
 
         #endregion

@@ -207,4 +207,7 @@
   <data name="ArgumentException_OutPutPinNameMissing" xml:space="preserve">
     <value>Es wurde kein Eigenschaftsname eines Ausgangs-Pins angegeben.</value>
   </data>
+  <data name="ApplicationException_NotificationServiceNotRunning" xml:space="preserve">
+    <value>Benachrichtigungsdienst ist auf dem Host nicht gestartet.</value>
+  </data>
 </root>
