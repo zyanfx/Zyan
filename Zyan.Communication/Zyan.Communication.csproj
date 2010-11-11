@@ -61,6 +61,10 @@
     <Compile Include="Modularity\ZyanApplication.cs" />
     <Compile Include="Modularity\ZyanModuleControlerAttribute.cs" />
     <Compile Include="MonoCheck.cs" />
+    <Compile Include="Notification\NotificationEventArgs.cs" />
+    <Compile Include="Notification\NotificationReceiver.cs" />
+    <Compile Include="Notification\NotificationSender.cs" />
+    <Compile Include="Notification\NotificationService.cs" />
     <Compile Include="Protocols\Http\HttpCustomClientProtocolSetup.cs" />
     <Compile Include="Protocols\Http\HttpCustomServerProtocolSetup.cs" />
     <Compile Include="Protocols\Ipc\IpcBinaryClientProtocolSetup.cs" />

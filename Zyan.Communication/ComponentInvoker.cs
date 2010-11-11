@@ -11,6 +11,7 @@ using System.Runtime.Remoting.Messaging;
 using System.Transactions;
 using System.Dynamic;
 using Zyan.Communication.Security;
+using Zyan.Communication.Notification;
 
 namespace Zyan.Communication
 {
@@ -21,8 +22,7 @@ namespace Zyan.Communication
     /// </summary>
     public class ComponentInvoker : MarshalByRefObject, IComponentInvoker
     {
-        // Felder
-        private ZyanComponentHost _host = null;
+        #region Konstruktor
 
         /// <summary>
         /// Konstruktor.
@@ -38,6 +38,13 @@ namespace Zyan.Communication
             // Host übernehmen
             _host = host;
         }
+
+        #endregion
+
+        #region Komponentenaufruf
+
+        // Felder
+        private ZyanComponentHost _host = null;
 
         /// <summary>
         /// Erstellt Drähte zwischen Client- und Server-Komponente (wenn im Korrelationssatz angegeben).
@@ -337,6 +344,10 @@ namespace Zyan.Communication
             return returnValue;
         }
 
+        #endregion
+
+        #region Metadaten abfragen
+
         /// <summary>
         /// Gibt eine Liste mit allen registrierten Komponenten zurück.
         /// </summary>
@@ -346,6 +357,10 @@ namespace Zyan.Communication
             // Daten vom Host abrufen
             return _host.GetRegisteredComponents().ToArray();
         }
+
+        #endregion
+
+        #region An- und Abmelden
 
         /// <summary>
         /// Meldet einen Client am Applikationserver an.
@@ -391,6 +406,44 @@ namespace Zyan.Communication
             _host.SessionManager.RemoveSession(sessionID);
         }
 
+        #endregion
+
+        #region Benachrichtigungen
+
+        /// <summary>
+        /// Registriert einen Client für den Empfang von Benachrichtigungen bei einem bestimmten Ereignis.
+        /// </summary>
+        /// <param name="eventName">Ereignisname</param>
+        /// <param name="handler">Delegat auf Client-Ereignisprozedur</param>
+        public void Subscribe(string eventName, EventHandler<NotificationEventArgs> handler)
+        { 
+            // Wenn auf dem Host kein Benachrichtigungsdienst läuft ...
+            if (!_host.IsNotificationServiceRunning)
+                // Ausnahme werfen
+                throw new ApplicationException(LanguageResource.ApplicationException_NotificationServiceNotRunning);
+
+            // Für Benachrichtigung registrieren
+            _host.NotificationService.Subscribe(eventName, handler);
+        }
+
+        /// <summary>
+        /// Hebt eine Registrierung für den Empfang von Benachrichtigungen eines bestimmten Ereignisses auf.
+        /// </summary>
+        /// <param name="eventName">Ereignisname</param>
+        /// <param name="handler">Delegat auf Client-Ereignisprozedur</param>
+        public void Unsubscribe(string eventName, EventHandler<NotificationEventArgs> handler)
+        {
+            // Wenn auf dem Host kein Benachrichtigungsdienst läuft ...
+            if (!_host.IsNotificationServiceRunning)
+                // Ausnahme werfen
+                throw new ApplicationException(LanguageResource.ApplicationException_NotificationServiceNotRunning);
+
+            // Registrierung aufheben
+            _host.NotificationService.Unsubscribe(eventName, handler);
+        }
+
+        #endregion
+
         #region Lebenszeitsteuerung
 
         /// <summary>
@@ -404,15 +457,5 @@ namespace Zyan.Communication
         }
 
         #endregion
-    }
-
-    public class Dummy
-    {
-        public RemoteOutputPinWiring ClientPinWiring { get; set; }
-
-        public decimal In(decimal p1,decimal p2)
-        {
-            return (decimal)ClientPinWiring.InvokeDynamicClientPin(p1,p2);
-        }
     }
 }

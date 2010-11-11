@@ -70,6 +70,15 @@ namespace Zyan.Communication {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Notification service is not running on the host. ähnelt.
+        /// </summary>
+        internal static string ApplicationException_NotificationServiceNotRunning {
+            get {
+                return ResourceManager.GetString("ApplicationException_NotificationServiceNotRunning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Component host name missing. ähnelt.
         /// </summary>
         internal static string ArgumentException_ComponentHostNameMissing {

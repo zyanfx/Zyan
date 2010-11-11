@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Zyan.Communication.Security;
+using Zyan.Communication.Notification;
 
 namespace Zyan.Communication
 {
@@ -40,5 +41,19 @@ namespace Zyan.Communication
         /// </summary>
         /// <param name="sessionID">Sitzungsschlüssel</param>
         void Logoff(Guid sessionID);
+
+        /// <summary>
+        /// Registriert einen Client für den Empfang von Benachrichtigungen bei einem bestimmten Ereignis.
+        /// </summary>
+        /// <param name="eventName">Ereignisname</param>
+        /// <param name="handler">Delegat auf Client-Ereignisprozedur</param>
+        void Subscribe(string eventName, EventHandler<NotificationEventArgs> handler);
+
+        /// <summary>
+        /// Hebt eine Registrierung für den Empfang von Benachrichtigungen eines bestimmten Ereignisses auf.
+        /// </summary>
+        /// <param name="eventName">Ereignisname</param>
+        /// <param name="handler">Delegat auf Client-Ereignisprozedur</param>
+        void Unsubscribe(string eventName, EventHandler<NotificationEventArgs> handler);
     }
 }
