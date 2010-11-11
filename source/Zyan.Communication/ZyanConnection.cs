@@ -9,6 +9,8 @@ using System.Runtime.Serialization.Formatters;
 using Zyan.Communication.Security;
 using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp;
+using Zyan.Communication.Notification;
+using System.Net.Sockets;
 
 namespace Zyan.Communication
 {
@@ -151,6 +153,9 @@ namespace Zyan.Communication
                 // Kanal registrieren
                 ChannelServices.RegisterChannel(channel, false);
 
+            // Wörterbuch für Benachrichtigungs-Registrierungen erzeugen
+            _subscriptions = new Dictionary<Guid, NotificationReceiver>();
+
             // Am Server anmelden
             RemoteComponentFactory.Logon(_sessionID, credentials);
 
@@ -222,61 +227,7 @@ namespace Zyan.Communication
                 // Fabrik-Proxy zurückgeben
                 return _remoteComponentFactory;
             }
-        }
-
-        /// <summary>
-        /// Öffnet einen TCP-Kanal zum senden von Nachrichten an einen Komponentenhost.
-        /// </remarks>
-        /// </summary>      
-        /// <param name="enableSecurity">Schalter für Sicherheit</param>
-        /// <param name="impersonate">Schalter für Impersonierung</param>
-        private void OpenTcpChannel(bool enableSecurity, bool impersonate)
-        {
-            // Kanalnamen erzeugen
-            string channelName = _serverUrl;
-
-            // Kanal suchen
-            IChannel channel = ChannelServices.GetChannel(channelName);
-
-            // Wenn der Kanal nicht gefunden wurde ...
-            if (channel == null)
-            {
-                // Konfiguration für den TCP-Kanal erstellen
-                System.Collections.IDictionary channelSettings = new System.Collections.Hashtable();
-                channelSettings["name"] = channelName;
-                channelSettings["port"] = 0;
-                channelSettings["secure"] = enableSecurity;
-                channelSettings["socketCacheTimeout"] = 0;
-                channelSettings["socketCachePolicy"] = SocketCachePolicy.Default;
-                                
-                // Wenn Sicherheit aktiviert ist ...
-                if (enableSecurity)
-                {
-                    // Impersonierung entsprechend der Einstellung aktivieren oder deaktivieren
-                    channelSettings["tokenImpersonationLevel"] = impersonate ? System.Security.Principal.TokenImpersonationLevel.Impersonation : System.Security.Principal.TokenImpersonationLevel.Identification;
-
-                    // Signatur und Verschlüssung explizit aktivieren
-                    channelSettings["protectionLevel"] = System.Net.Security.ProtectionLevel.EncryptAndSign;
-                }
-                // Binäre Serialisierung von komplexen Objekten aktivieren
-                BinaryServerFormatterSinkProvider provider = new BinaryServerFormatterSinkProvider();
-                provider.TypeFilterLevel = TypeFilterLevel.Full;
-                BinaryClientFormatterSinkProvider clientFormatter = new BinaryClientFormatterSinkProvider();
-                
-                // Neuen TCP-Kanal erzeugen
-                channel = new TcpChannel(channelSettings, clientFormatter, provider);
-
-                // Wenn Zyan nicht mit mono ausgeführt wird ...
-                if (!MonoCheck.IsRunningOnMono)
-                {
-                    // Sicherstellen, dass vollständige Ausnahmeinformationen übertragen werden
-                    if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
-                        RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
-                }
-                // Kanal registrieren
-                ChannelServices.RegisterChannel(channel, enableSecurity);
-            }
-        }
+        }               
 
         // Schalter der angibt, ob Dispose bereits aufgerufen wurde
         private bool _isDisposed = false;
@@ -294,7 +245,7 @@ namespace Zyan.Communication
 
                 // Verbindung aus der Auflistung entfernen
                 _connections.Remove(this);
-                
+
                 try
                 {
                     // Vom Server abmelden
@@ -302,7 +253,8 @@ namespace Zyan.Communication
                 }
                 catch (RemotingException)
                 { }
-
+                catch (SocketException)
+                { }
                 // Variablen freigeben
                 _registeredComponents = null;
                 _remoteComponentFactory = null;
@@ -374,6 +326,67 @@ namespace Zyan.Communication
             if (InvokeCanceled != null)
                 // Ereignis feuern
                 InvokeCanceled(this, e);
+        }
+
+        #endregion
+
+        #region Benachrichtigungen
+
+        // Wörterbuch für Benachrichtigungs-Registrierungen
+        private volatile Dictionary<Guid,NotificationReceiver> _subscriptions = null;               
+
+        // Sperrobjekt für Threadsynchronisierung
+        private object _subscriptionsLockObject = new object();
+
+        /// <summary>
+        /// Registriert einen Client für den Empfang von Benachrichtigungen bei einem bestimmten Ereignis.
+        /// </summary>
+        /// <param name="eventName">Ereignisname</param>
+        /// <param name="handler">Delegat auf Client-Ereignisprozedur</param>
+        public Guid SubscribeEvent(string eventName, EventHandler<NotificationEventArgs> handler)
+        {
+            // Empfangsvorrichtung für Benachrichtigung erzeugen
+            NotificationReceiver receiver = new NotificationReceiver(eventName, handler);
+
+            // Für Benachrichtigung beim entfernten Komponentenhost registrieren
+            RemoteComponentFactory.Subscribe(eventName, receiver.FireNotifyEvent);
+
+            // Registrerungsschlüssel erzeugen
+            Guid subscriptionID = Guid.NewGuid();
+
+            lock (_subscriptionsLockObject)
+            {
+                // Empfangsvorrichtung in Wörterbuch speichern
+                _subscriptions.Add(subscriptionID, receiver);
+            }
+            // Registrerungsschlüssel zurückgeben
+            return subscriptionID;
+        }
+
+        /// <summary>
+        /// Hebt eine Registrierung für den Empfang von Benachrichtigungen eines bestimmten Ereignisses auf.
+        /// </summary>
+        /// <param name="subscriptionID">Registrerungsschlüssel</param>
+        public void UnsubscribeEvent(Guid subscriptionID)
+        {
+            lock (_subscriptionsLockObject)
+            {
+                // Wenn die angegebene Registrerungsschlüssel bekannt ist ...
+                if (_subscriptions.ContainsKey(subscriptionID))
+                {
+                    // Empfangsvorrichtung abrufen
+                    NotificationReceiver receiver = _subscriptions[subscriptionID];
+
+                    // Für Benachrichtigung beim entfernten Komponentenhost registrieren
+                    RemoteComponentFactory.Unsubscribe(receiver.EventName, receiver.FireNotifyEvent);
+
+                    // Empfängervorrichtung aus Wörterbuch löschen
+                    _subscriptions.Remove(subscriptionID);
+
+                    // Empfängervorrichtung entsorgen
+                    receiver.Dispose();
+                }
+            }
         }
 
         #endregion
