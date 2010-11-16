@@ -41,10 +41,6 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Zyan.Communication, Version=0.9.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\bin\Release\Zyan.Communication.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Calculator.cs" />
@@ -52,6 +48,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\source\Zyan.Communication\Zyan.Communication.csproj">
+      <Project>{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}</Project>
+      <Name>Zyan.Communication</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Zyan.Examples.EbcCalculator.Shared\Zyan.Examples.EbcCalculator.Shared.csproj">
       <Project>{54676D41-68F5-415A-9F79-06D015A73354}</Project>
       <Name>Zyan.Examples.EbcCalculator.Shared</Name>

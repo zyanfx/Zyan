@@ -210,4 +210,7 @@
   <data name="ApplicationException_NotificationServiceNotRunning" xml:space="preserve">
     <value>Notification service is not running on the host.</value>
   </data>
+  <data name="InvalidCredentials" xml:space="preserve">
+    <value>Invalid user name or password.</value>
+  </data>
 </root>

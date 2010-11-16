@@ -210,4 +210,7 @@
   <data name="ApplicationException_NotificationServiceNotRunning" xml:space="preserve">
     <value>Benachrichtigungsdienst ist auf dem Host nicht gestartet.</value>
   </data>
+  <data name="InvalidCredentials" xml:space="preserve">
+    <value>Benutzername und/oder Kennwort sind nicht korrekt.</value>
+  </data>
 </root>
