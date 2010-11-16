@@ -286,6 +286,15 @@ namespace Zyan.Communication {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Invalid user name or password. ähnelt.
+        /// </summary>
+        internal static string InvalidCredentials {
+            get {
+                return ResourceManager.GetString("InvalidCredentials", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Es wurden keine Kontextinformationen übertragen. ähnelt.
         /// </summary>
         internal static string SecurityException_ContextInfoMissing {

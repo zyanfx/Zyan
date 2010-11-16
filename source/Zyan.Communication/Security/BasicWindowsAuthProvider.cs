@@ -27,15 +27,25 @@ namespace Zyan.Communication.Security
             try
             {
                 // Windows-Anmeldung durchführen
-                WindowsSecurityTools.LogonUser(
-                    username,
-                    domain,
-                    password,
-                    WindowsSecurityTools.LogonType.LOGON32_LOGON_NETWORK, WindowsSecurityTools.ProviderType.LOGON32_PROVIDER_DEFAULT,
-                    out token);
+                bool success = WindowsSecurityTools.LogonUser(
+                       username,
+                       domain,
+                       password,
+                       WindowsSecurityTools.LogonType.LOGON32_LOGON_NETWORK, 
+                       WindowsSecurityTools.ProviderType.LOGON32_PROVIDER_DEFAULT,
+                       out token)!=0;
 
-                // Falsch zurückgeben, wenn kein Windows-Sicherheitstoken erzeugt wurde
-                return token != IntPtr.Zero;
+                // Wenn die Anmeldefunktion erfolgreich verarbeitet wurde ...
+                if (success && token != IntPtr.Zero)
+                {
+                    // Authentifizierte Identität abfragen
+                    WindowsIdentity identity = new WindowsIdentity(token);
+
+                    // Wahr zurückgeben, wenn die Identität weder ein Gast noch anonym ist
+                    return identity.IsAuthenticated && !(identity.IsGuest || identity.IsAnonymous);
+                }
+                // Falsch zurückgeben
+                return false;
             }
             finally
             {
@@ -62,21 +72,29 @@ namespace Zyan.Communication.Security
                 throw new SecurityException(LanguageResource.SecurityException_CredentialsMissing);
 
             // Wenn kein Benutzername angegeben wurde ...
-            if (!authRequest.Credentials.ContainsKey("username"))
+            if (!authRequest.Credentials.ContainsKey(AuthRequestMessage.CREDENTIAL_USERNAME))
                 // Ausnahme werfen
                 throw new SecurityException(LanguageResource.SecurityException_UserNameMissing);
 
             // Wenn kein Passwort angegeben wurde ...
-            if (!authRequest.Credentials.ContainsKey("password"))
+            if (!authRequest.Credentials.ContainsKey(AuthRequestMessage.CREDENTIAL_PASSWORD))
                 // Ausnahme werfen
                 throw new SecurityException(LanguageResource.SecurityException_PasswordMissing);
             
             // Benutzer und Kennwort lesen
-            string userName = authRequest.Credentials["username"] as string;
-            string password = authRequest.Credentials["password"] as string;
+            string userName = authRequest.Credentials[AuthRequestMessage.CREDENTIAL_USERNAME] as string;
+            string password = authRequest.Credentials[AuthRequestMessage.CREDENTIAL_PASSWORD] as string;
+            
+            // Variable für Domäne
+            string domain = ".";
+
+            // Wenn eine Domäne angegeben wurde ...
+            if (authRequest.Credentials.ContainsKey(AuthRequestMessage.CREDENTIAL_DOMAIN))
+                // Domäne übernehmen
+                domain = authRequest.Credentials[AuthRequestMessage.CREDENTIAL_DOMAIN] as string;
 
             // Wenn der Benutzer bekannt ist und das Kennwort stimmt ...
-            if (ValidateWindowsCredentials(userName,password,string.Empty))              
+            if (ValidateWindowsCredentials(userName,password,domain))              
                 // Erfolgsmeldung zurückgeben
                 return new AuthResponseMessage()
                 {
@@ -89,7 +107,7 @@ namespace Zyan.Communication.Security
             return new AuthResponseMessage()
             {
                 Success = false,
-                ErrorMessage = "Benutzername und/oder Kennwort sind nicht korrekt.",
+                ErrorMessage = LanguageResource.InvalidCredentials,
                 AuthenticatedIdentity = null
             };
         }
