@@ -11,6 +11,7 @@ using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp;
 using Zyan.Communication.Notification;
 using System.Net.Sockets;
+using System.Net;
 
 namespace Zyan.Communication
 {
@@ -254,6 +255,8 @@ namespace Zyan.Communication
                 catch (RemotingException)
                 { }
                 catch (SocketException)
+                { }
+                catch (WebException)
                 { }
                 // Variablen freigeben
                 _registeredComponents = null;

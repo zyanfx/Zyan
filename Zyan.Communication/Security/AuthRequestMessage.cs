@@ -23,6 +23,11 @@ namespace Zyan.Communication.Security
         public const string CREDENTIAL_PASSWORD = "Password";
 
         /// <summary>
+        /// Konstante für Anmeldeinformation Domäne.
+        /// </summary>
+        public const string CREDENTIAL_DOMAIN = "Domain";
+
+        /// <summary>
         /// Konstante für Anmeldeinformation Windows-Sicherheitstoken.
         /// </summary>
         public const string CREDENTIAL_WINDOWS_SECURITY_TOKEN = "WindowsSecurityToken";
