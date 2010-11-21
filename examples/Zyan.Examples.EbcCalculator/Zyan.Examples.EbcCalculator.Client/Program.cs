@@ -72,7 +72,7 @@ namespace Zyan.Examples.EbcCalculator
 
                     try
                     {
-                        connection = new ZyanConnection("http://localhost:80/EbcCalc", protocol, credentials, false);
+                        connection = new ZyanConnection("http://localhost:8081/EbcCalc", protocol, credentials, false);
                         success = true;
                     }
                     catch (Exception ex)
