@@ -31,8 +31,8 @@ namespace Zyan.Examples.EbcCalculator
                     CalcForm form = new CalcForm();
                     ICalculator proxy = connection.CreateProxy<ICalculator>();
 
-                    form.Out_AddNumbers = Asynchronizer<AdditionRequest>.WireUp(new Action<AdditionRequest>(proxy.In_AddNumbers));
-                    proxy.Out_SendResult = SyncContextSwitcher<decimal>.WireUp(new Action<decimal>(form.In_ReceiveResult));
+                    form.Out_AddNumbers = Asynchronizer<AdditionRequest>.WireUp(proxy.In_AddNumbers);
+                    proxy.Out_SendResult = SyncContextSwitcher<decimal>.WireUp(form.In_ReceiveResult);
 
                     Application.Run(form);
                 }
@@ -72,7 +72,7 @@ namespace Zyan.Examples.EbcCalculator
 
                     try
                     {
-                        connection = new ZyanConnection("http://localhost:8081/EbcCalc", protocol, credentials, false);
+                        connection = new ZyanConnection("http://localhost:80/EbcCalc", protocol, credentials, false);
                         success = true;
                     }
                     catch (Exception ex)
