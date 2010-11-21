@@ -12,7 +12,7 @@ namespace Zyan.Examples.EbcCalculator
     {
         static void Main(string[] args)
         {
-            HttpCustomServerProtocolSetup protocol = new HttpCustomServerProtocolSetup(8081, new BasicWindowsAuthProvider(), true);
+            HttpCustomServerProtocolSetup protocol = new HttpCustomServerProtocolSetup(80, new BasicWindowsAuthProvider(), true);
 
             using (ZyanComponentHost host = new ZyanComponentHost("EbcCalc", protocol))
             {
