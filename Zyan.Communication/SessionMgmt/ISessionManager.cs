@@ -55,6 +55,22 @@ namespace Zyan.Communication.SessionMgmt
         void RemoveSession(Guid sessionID);
 
         /// <summary>
+        /// Legt den Wert einer Sitzungsvariablen fest.
+        /// </summary>
+        /// <param name="sessionID">Sitzungskennung</param>
+        /// <param name="name">Variablenname</param>
+        /// <param name="value">Wert</param>
+        void SetSessionVariable(Guid sessionID, string name, object value);
+
+        /// <summary>
+        /// Gibt den Wert einer Sitzungsvariablen zurück.
+        /// </summary>
+        /// <param name="sessionID">Sitzungskennung</param>
+        /// <param name="name">Variablenname</param>
+        /// <returns>Wert</returns>
+        object GetSessionVariable(Guid sessionID, string name);
+
+        /// <summary>
         /// Verwaltete Ressourcen freigeben.
         /// </summary>
         void Dispose();

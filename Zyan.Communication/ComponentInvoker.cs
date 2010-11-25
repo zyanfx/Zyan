@@ -12,6 +12,7 @@ using System.Transactions;
 using System.Dynamic;
 using Zyan.Communication.Security;
 using Zyan.Communication.Notification;
+using Zyan.Communication.SessionMgmt;
 
 namespace Zyan.Communication
 {
@@ -385,8 +386,11 @@ namespace Zyan.Communication
                     // Ausnahme werfen
                     throw new SecurityException(authResponse.ErrorMessage);
 
+                // Sitzungsvariablen-Adapter erzeugen
+                SessionVariableAdapter sessionVariableAdapter = new SessionVariableAdapter(_host.SessionManager, sessionID);
+
                 // Neue Sitzung erstellen
-                ServerSession session = new ServerSession(sessionID, authResponse.AuthenticatedIdentity);
+                ServerSession session = new ServerSession(sessionID, authResponse.AuthenticatedIdentity, sessionVariableAdapter);
 
                 // Sitzung speichern
                 _host.SessionManager.StoreSession(session);

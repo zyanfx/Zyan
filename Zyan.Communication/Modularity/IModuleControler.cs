@@ -12,9 +12,8 @@ namespace Zyan.Communication.Modularity
     {
         /// <summary>
         /// Wird beim Starten vom Modul Host aufgerufen.
-        /// </summary>
-        /// <param name="application">Anwendungs-Stammobjekt</param>
-        void OnStart(ZyanApplication application);
+        /// </summary>        
+        void OnStart();
 
         /// <summary>
         /// Wird beim Stoppen vom Modul Host aufgerufen.

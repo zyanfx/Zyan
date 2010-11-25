@@ -232,5 +232,114 @@ namespace Zyan.Communication.SessionMgmt
                 }
             }
         }
+
+        #region Sitzungsvariablen
+
+        // Variablenspeicher
+        private volatile Dictionary<Guid, Dictionary<string, object>> _sessionVarStore = null;
+
+        // Sperrobjekt zur Threadsynchronisierunf für den Zugriff Variablenspeicher 
+        private object _sessionVarsLockObject = new object();
+
+        /// <summary>
+        /// Gibt den Variablenspeicher zurück.
+        /// <remarks>Zugriff ist threadsicher.</remarks>
+        /// </summary>
+        private Dictionary<Guid, Dictionary<string, object>> SessionVarStore
+        {
+            get
+            {
+                // Wenn noch kein Variablenspeicher existiert ...
+                if (_sessionVarStore == null)
+                {
+                    lock (_sessionVarsLockObject)
+                    {
+                        // Wenn in der Zwischenzeit nicht durch einen anderen Thread ein Variablenspeicher erzeugt wurde ...
+                        if (_sessionVarStore == null)
+                            // Variablenspeicher erzeugen
+                            _sessionVarStore = new Dictionary<Guid, Dictionary<string, object>>();
+                    }
+                }
+                // Variablenspeicher zurückgeben
+                return _sessionVarStore;
+            }
+        }
+
+        /// <summary>
+        /// Gibt die Variablen einer bestimmten Sitzung zurück.
+        /// </summary>
+        /// <param name="sessionID">Sitzungsschlüssel</param>
+        /// <returns>Wörterbuch mit Variablen einer bestimmten Sitzung</returns>
+        private Dictionary<string, object> GetSessionVars(Guid sessionID)
+        {
+            // Wenn noch keine Variablenauflistung existiert ...
+            if (!SessionVarStore.ContainsKey(sessionID))
+            {
+                lock (_sessionVarsLockObject)
+                {
+                    // Wenn in der Zwischenzeit nicht durch einen anderen Thread eine Variablenauflistung erzeugt wurde ...
+                    if (!SessionVarStore.ContainsKey(sessionID))
+                        // Variablen-Auflistung erzeugen
+                        SessionVarStore.Add(sessionID,new Dictionary<string, object>());
+                }
+            }
+            // Variablenliste zurückgeben
+            return SessionVarStore[sessionID];
+        }
+
+        /// <summary>
+        /// Legt den Wert einer Sitzungsvariablen fest.
+        /// </summary>
+        /// <param name="sessionID">Sitzungskennung</param>
+        /// <param name="name">Variablenname</param>
+        /// <param name="value">Wert</param>
+        public void SetSessionVariable(Guid sessionID, string name, object value)
+        {
+            // Wenn die angegebene Sitzung existiert ...
+            if (ExistSession(sessionID))
+            {
+                lock (_sessionVarsLockObject)
+                {
+                    // Variablen-Auflistung abrufen
+                    Dictionary<string, object> sessionVars = GetSessionVars(sessionID);
+
+                    // Wenn bereits eine Variable mit dem angegebenen Namen existiert ...
+                    if (sessionVars.ContainsKey(name))
+                        // Wert ändern
+                        sessionVars[name] = value;
+                    else
+                        // Neue Variable anlegen
+                        sessionVars.Add(name, value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gibt den Wert einer Sitzungsvariablen zurück.
+        /// </summary>
+        /// <param name="sessionID">Sitzungskennung</param>
+        /// <param name="name">Variablenname</param>
+        /// <returns>Wert</returns>
+        public object GetSessionVariable(Guid sessionID, string name)
+        {
+            // Wenn die angegebene Sitzung existiert ...
+            if (ExistSession(sessionID))
+            {
+                lock (_sessionVarsLockObject)
+                {
+                    // Variablen-Auflistung abrufen
+                    Dictionary<string, object> sessionVars = GetSessionVars(sessionID);
+
+                    // Wenn bereits eine Variable mit dem angegebenen Namen existiert ...
+                    if (sessionVars.ContainsKey(name))
+                        // Wert zurückgeben
+                        return sessionVars[name];             
+                }
+            }
+            // null zurückgeben
+            return null;
+        }
+
+        #endregion
     }
 }
