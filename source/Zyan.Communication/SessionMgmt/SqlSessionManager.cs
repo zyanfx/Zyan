@@ -1,7 +1,12 @@
 ﻿using System;
+using System.IO;
 using System.Data;
 using System.Data.SqlClient;
+using System.Data.SqlTypes;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Linq;
 using System.Text;
 using System.Timers;
@@ -28,24 +33,28 @@ namespace Zyan.Communication.SessionMgmt
         // SQL-Schema
         private string _sqlSchema = string.Empty;
 
-        // Tabellenname
-        private string _sqlTableName = string.Empty;
+        // Tabellennamen
+        private string _sqlSessionTableName = string.Empty;
+        private string _sqlVariablesTableName = string.Empty;
         
         /// <summary>
         /// Erzeugt eine neue Instanz von InProcSessionManager.
         /// </summary>
         /// <param name="connectionString">Verbindungszeichenfolge zur SQL Server Datenbank</param>
         /// <param name="sqlSchema">Name des Datenbankschemas (z.B.: "dbo")</param>
-        /// <param name="sqlTableName">Name der Sitzungstabelle</param>
-        public SqlSessionManager(string connectionString, string sqlSchema, string sqlTableName)
+        /// <param name="sqlSessionTableName">Name der Sitzungstabelle</param>
+        /// <param name="sqlVariablesTableName">Name der Tabelle für Sitzungsvariablen</param>
+        public SqlSessionManager(string connectionString, string sqlSchema, string sqlSessionTableName, string sqlVariablesTableName)
         {
             // Felder füllen
             _connectionString = connectionString;
             _sqlSchema = sqlSchema;
-            _sqlTableName = sqlTableName;
+            _sqlSessionTableName = sqlSessionTableName;
+            _sqlVariablesTableName = sqlVariablesTableName;
 
-            // Sicherstellen, dass die Sitzungstabelle existier
+            // Sicherstellen, dass die Tabellen auf dem SQL Server existieren
             EnsureSessionTableCreated();
+            EnsureVariablesTableCreated();
 
             // Aufräumvorgang starten
             StartSessionSweeper();
@@ -54,10 +63,12 @@ namespace Zyan.Communication.SessionMgmt
         #region SQL Server-Persistenz
 
         /// <summary>
-        /// Gibt zurück, ob die Sitzungstabelle in der Verbundenen SQL Server Datenbank bereits angelegt wurde, oder nicht.
+        /// Gibt zurück, ob eine bestimmte Tabelle in der Verbundenen SQL Server Datenbank bereits angelegt wurde, oder nicht.
         /// </summary>
-        /// <returns>Wahr, wenn die Sitzungstabelle existiert, ansonsten Falsch</returns>
-        private bool ExistSessionTable()
+        /// <param name="schema">SQL Server-Schema (z.B. dbo)</param>
+        /// <param name="tableName">Tabellenname</param>
+        /// <returns>Wahr, wenn die Tabelle existiert, ansonsten Falsch</returns>
+        private bool ExistSqlTable(string schema, string tableName)
         {
             // Transaktion erzwingen
             using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() {IsolationLevel=System.Transactions.IsolationLevel.RepeatableRead}))
@@ -80,8 +91,8 @@ namespace Zyan.Communication.SessionMgmt
                         command.Parameters.Add(tableCountParam);
 
                         // Eingabeparameter erzeugen
-                        command.Parameters.Add("@tableName", SqlDbType.NVarChar, 255).Value = _sqlTableName;
-                        command.Parameters.Add("@schemaName", SqlDbType.NVarChar, 255).Value = _sqlSchema;
+                        command.Parameters.Add("@tableName", SqlDbType.NVarChar, 255).Value = tableName;
+                        command.Parameters.Add("@schemaName", SqlDbType.NVarChar, 255).Value = schema;
 
                         // SQL-Abfrage ausfphren
                         connection.Open();
@@ -97,7 +108,7 @@ namespace Zyan.Communication.SessionMgmt
                 }
             }
         }
-
+        
         /// <summary>
         /// Stellt sicher, dass die Sitzungstabelle in der SQL Server Datenbank existiert.
         /// </summary>
@@ -107,22 +118,57 @@ namespace Zyan.Communication.SessionMgmt
             using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead }))
             {
                 // Wenn die Tabelle nicht existiert ...
-                if (!ExistSessionTable())
+                if (!ExistSqlTable(_sqlSchema,_sqlSessionTableName))
                 {
                     using (SqlConnection connection = new SqlConnection(_connectionString))
                     {
                         StringBuilder sqlBuilder = new StringBuilder();
                         sqlBuilder.Append("CREATE TABLE ");
-                        sqlBuilder.AppendFormat("[{0}].[{1}] (", _sqlSchema, _sqlTableName);
+                        sqlBuilder.AppendFormat("[{0}].[{1}] (", _sqlSchema, _sqlSessionTableName);
                         sqlBuilder.Append("[AutoID] int IDENTITY(1,1) NOT NULL,");
                         sqlBuilder.Append("[SessionID] uniqueidentifier NOT NULL,");
                         sqlBuilder.Append("[SessionTimestamp] datetime NOT NULL,");
                         sqlBuilder.Append("[IdentityName] nvarchar(255) NOT NULL,");
-                        sqlBuilder.AppendFormat("CONSTRAINT [PK_{0}_SessionID] PRIMARY KEY NONCLUSTERED ", _sqlTableName);
+                        sqlBuilder.AppendFormat("CONSTRAINT [PK_{0}_SessionID] PRIMARY KEY NONCLUSTERED ", _sqlSessionTableName);
                         sqlBuilder.Append("([SessionID] ASC),");
-                        sqlBuilder.AppendFormat("CONSTRAINT [IX_{0}] UNIQUE CLUSTERED ", _sqlTableName);
+                        sqlBuilder.AppendFormat("CONSTRAINT [IX_{0}] UNIQUE CLUSTERED ", _sqlSessionTableName);
                         sqlBuilder.Append("([AutoID] ASC))");
 
+                        using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(), connection))
+                        {
+                            connection.Open();
+                            command.ExecuteNonQuery();
+                            connection.Close();
+                        }
+                    }
+                }
+                // Transaktion abschließen
+                scope.Complete();
+            }
+        }
+
+        /// <summary>
+        /// Stellt sicher, dass die Variablentabelle in der SQL Server Datenbank existiert.
+        /// </summary>
+        private void EnsureVariablesTableCreated()
+        {
+            // Transaktion erzwingen
+            using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead }))
+            {
+                // Wenn die Tabelle nicht existiert ...
+                if (!ExistSqlTable(_sqlSchema, _sqlVariablesTableName))
+                {
+                    using (SqlConnection connection = new SqlConnection(_connectionString))
+                    {
+                        StringBuilder sqlBuilder = new StringBuilder();
+                        sqlBuilder.Append("CREATE TABLE ");
+                        sqlBuilder.AppendFormat("[{0}].[{1}] (", _sqlSchema, _sqlVariablesTableName);                        
+                        sqlBuilder.Append("[SessionID] uniqueidentifier NOT NULL,");
+                        sqlBuilder.Append("[VariableName] nvarchar(255) NOT NULL,");
+                        sqlBuilder.Append("[VariableValue] varbinary(MAX) NULL,");
+                        sqlBuilder.AppendFormat("CONSTRAINT [PK_{0}_SessionID_VariableName] PRIMARY KEY ", _sqlSessionTableName);
+                        sqlBuilder.Append("([SessionID], [VariableName]))");
+                        
                         using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(), connection))
                         {
                             connection.Open();
@@ -152,7 +198,7 @@ namespace Zyan.Communication.SessionMgmt
                     // SQL-Abfrage zusammenstellen
                     StringBuilder sqlBuilder = new StringBuilder();
                     sqlBuilder.Append("SELECT SessionID,SessionTimestamp,IdentityName ");
-                    sqlBuilder.AppendFormat("FROM [{0}].[{1}] ", _sqlSchema, _sqlTableName);
+                    sqlBuilder.AppendFormat("FROM [{0}].[{1}] ", _sqlSchema, _sqlSessionTableName);
                     sqlBuilder.Append("WHERE SessionID=@sessionID");
 
                     // SQL-Befehl erzeugen
@@ -172,10 +218,14 @@ namespace Zyan.Communication.SessionMgmt
                                 // Wenn Abfrageergebnisse vorhanden sind ...
                                 if (reader.Read())
                                 {
+                                    // Sitzungsschlüssel lesen
+                                    Guid sqlSessionID = reader.GetGuid(0);
+
                                     // Sitzung vom SQL Server lesen
-                                    ServerSession session = new ServerSession(reader.GetGuid(0),
+                                    ServerSession session = new ServerSession(sqlSessionID,
                                                                               reader.GetDateTime(1),
-                                                                              new GenericIdentity(reader.GetString(2)));
+                                                                              new GenericIdentity(reader.GetString(2)),
+                                                                              new SessionVariableAdapter(this,sqlSessionID));
 
                                     // Transaktion abschließen
                                     scope.Complete();
@@ -202,6 +252,157 @@ namespace Zyan.Communication.SessionMgmt
         }
 
         /// <summary>
+        /// Ruft den Wert einer bestimmten Sitzungsvariable aus der SQL Server Datenbank ab.
+        /// </summary>
+        /// <param name="sessionID">Sitzungsschlüssel</param>
+        /// <param name="variableName">Variablenname</param>
+        /// <returns>Wert der Variable</returns>
+        private object GetVariableFromSqlServer(Guid sessionID, string variableName)
+        {
+            // Transaktion erzwingen
+            using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead }))
+            {
+                // Verbindung zum SQL Server herstellen
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    // SQL-Abfrage zusammenstellen
+                    StringBuilder sqlBuilder = new StringBuilder();
+                    sqlBuilder.Append("SELECT VariableValue ");
+                    sqlBuilder.AppendFormat("FROM [{0}].[{1}] ", _sqlSchema, _sqlVariablesTableName);
+                    sqlBuilder.Append("WHERE SessionID=@sessionID AND VariableName=@variableName");
+
+                    // SQL-Befehl erzeugen
+                    using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(), connection))
+                    {
+                        // Eingabeparameter erzeugen
+                        command.Parameters.Add("@sessionID", SqlDbType.UniqueIdentifier).Value = sessionID;
+                        command.Parameters.Add("@variableName", SqlDbType.NVarChar,255).Value = variableName;
+
+                        try
+                        {
+                            // Verbindung öffnen
+                            connection.Open();
+
+                            // SQL-Abfrag ausführen
+                            using (SqlDataReader reader = command.ExecuteReader())
+                            {
+                                // Wenn Abfrageergebnisse vorhanden sind ...
+                                if (reader.Read())
+                                {
+                                    // Rohdaten lesen
+                                    SqlBytes raw = reader.GetSqlBytes(0);
+                                    
+                                    // Transaktion abschließen
+                                    scope.Complete();
+
+                                    // Wenn kein Wert hinterlegt ist ...
+                                    if (raw.IsNull)
+                                        // Nichts zurückgeben
+                                        return null;
+
+                                    // Binären-Serialisierer erzeugen
+                                    BinaryFormatter formatter = new BinaryFormatter();
+                                    
+                                    // Speicherdatenstrom erzeugen
+                                    MemoryStream stream=new MemoryStream(raw.Value);
+
+                                    // Wert aus Rohdaten deserialisieren
+                                    object managedValue = formatter.Deserialize(stream);
+
+                                    // Speicherdatenstrom schließen
+                                    stream.Close();
+
+                                    // Wert zurückgeben
+                                    return managedValue;
+                                }
+                                // Transaktion abschließen
+                                scope.Complete();
+
+                                // Nichts zurückgeben
+                                return null;
+                            }
+
+                        }
+                        finally
+                        {
+                            // Verbindung schließen
+                            connection.Close();
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Legt den Wert einer bestimmten Sitzungsvariable in der SQL Server Datenbank fest.
+        /// </summary>
+        /// <param name="sessionID">Sitzungsschlüssel</param>
+        /// <param name="variableName">Variablenname</param>
+        /// <param name="variableValue">Wert der Variable</param>        
+        private void SetVariableOnSqlServer(Guid sessionID, string variableName, object variableValue)
+        {
+            // Transaktion erzwingen
+            using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead }))
+            {
+                // Verbindung zum SQL Server herstellen
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    // SQL-Abfrage zusammenstellen
+                    StringBuilder sqlBuilder = new StringBuilder();
+                    sqlBuilder.AppendFormat("DELETE FROM [{0}].[{1}] ", _sqlSchema, _sqlVariablesTableName);
+                    sqlBuilder.Append("WHERE SessionID=@sessionID AND VariableName=@variableName; ");                    
+                    sqlBuilder.AppendFormat("INSERT [{0}].[{1}] (SessionID,VariableName,VariableValue) ", _sqlSchema, _sqlVariablesTableName);
+                    sqlBuilder.Append("VALUES (@sessionID,@variableName,@variableValue) ");
+                    
+                    // SQL-Befehl erzeugen
+                    using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(), connection))
+                    {
+                        // Eingabeparameter erzeugen
+                        command.Parameters.Add("@sessionID", SqlDbType.UniqueIdentifier).Value = sessionID;
+                        command.Parameters.Add("@variableName", SqlDbType.NVarChar, 255).Value = variableName;
+
+                        // Wenn kein Variablenwert angegeben wurde ...
+                        if (variableValue == null)
+                            // Leeren Wert als Parameter anfügen
+                            command.Parameters.Add("@variableValue", SqlDbType.VarBinary, -1).Value = DBNull.Value;
+                        else
+                        {
+                            // Binären-Serialisierer erzeugen
+                            BinaryFormatter formatter = new BinaryFormatter();
+
+                            // Speicherdatenstrom erzeugen
+                            MemoryStream stream = new MemoryStream();
+
+                            // Wert serialisieren
+                            formatter.Serialize(stream, variableValue);
+
+                            // Wert als Parameter anfügen
+                            command.Parameters.Add("@variableValue", SqlDbType.VarBinary, -1).Value = stream.ToArray();
+
+                            // Speicherdatenstrom schließen
+                            stream.Close();
+                        }
+                        try
+                        {
+                            // Verbindung öffnen
+                            connection.Open();
+
+                            // Befehl ausführen
+                            command.ExecuteNonQuery();
+                        }                        
+                        finally
+                        {
+                            // Verbindung schließen
+                            connection.Close();
+                        }
+                    }
+                }
+                // Transaktion abschließen
+                scope.Complete();
+            }
+        }
+
+        /// <summary>
         /// Gibt zurück, ob eine bestimmte Sitzung in der SQL Server Datenbank existiert, oder nicht.
         /// </summary>
         /// <param name="sessionID">Sitzungsschlüssel</param>
@@ -217,7 +418,7 @@ namespace Zyan.Communication.SessionMgmt
                     // SQL-Abfrage zusammenstellen
                     StringBuilder sqlBuilder = new StringBuilder();
                     sqlBuilder.Append("SELECT @sessionCount=COUNT(SessionID)");
-                    sqlBuilder.AppendFormat("FROM [{0}].[{1}] ", _sqlSchema, _sqlTableName);
+                    sqlBuilder.AppendFormat("FROM [{0}].[{1}] ", _sqlSchema, _sqlSessionTableName);
                     sqlBuilder.Append("WHERE SessionID=@sessionID");
 
                     // SQL-Befehl erzeugen
@@ -269,8 +470,8 @@ namespace Zyan.Communication.SessionMgmt
                 {
                     // SQL-Stapel zum Löschen und Neuanlegen der Sitzung zusammenstellen
                     StringBuilder sqlBuilder = new StringBuilder();
-                    sqlBuilder.AppendFormat("DELETE FROM [{0}].[{1}] WHERE SessionID=@sessionID; ", _sqlSchema, _sqlTableName);
-                    sqlBuilder.AppendFormat("INSERT [{0}].[{1}] (SessionID,SessionTimestamp,IdentityName) ", _sqlSchema, _sqlTableName);
+                    sqlBuilder.AppendFormat("DELETE FROM [{0}].[{1}] WHERE SessionID=@sessionID; ", _sqlSchema, _sqlSessionTableName);
+                    sqlBuilder.AppendFormat("INSERT [{0}].[{1}] (SessionID,SessionTimestamp,IdentityName) ", _sqlSchema, _sqlSessionTableName);
                     sqlBuilder.Append("VALUES (@sessionID,@sessionTimestamp,@identityName)");
 
                     // SQL-Befehl erzeugen
@@ -307,7 +508,7 @@ namespace Zyan.Communication.SessionMgmt
                 {
                     // SQL-DELETE-Anweisung 
                     StringBuilder sqlBuilder = new StringBuilder();
-                    sqlBuilder.AppendFormat("DELETE FROM [{0}].[{1}] WHERE SessionID=@sessionID", _sqlSchema, _sqlTableName);
+                    sqlBuilder.AppendFormat("DELETE FROM [{0}].[{1}] WHERE SessionID=@sessionID", _sqlSchema, _sqlSessionTableName);
 
                     using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(), connection))
                     {
@@ -339,7 +540,7 @@ namespace Zyan.Communication.SessionMgmt
                 {
                     // SQL-Löschanweisung zusammenstellen
                     StringBuilder sqlBuilder = new StringBuilder();
-                    sqlBuilder.AppendFormat("DELETE FROM [{0}].[{1}] ", _sqlSchema, _sqlTableName);
+                    sqlBuilder.AppendFormat("DELETE FROM [{0}].[{1}] ", _sqlSchema, _sqlSessionTableName);
                     sqlBuilder.Append("WHERE DATEDIFF(minute,SessionTimestamp,GETDATE())>@sessionAgeLimit");
 
                     // SQL-Befehl erzeugen
@@ -529,5 +730,40 @@ namespace Zyan.Communication.SessionMgmt
                 }                
             }
         }
+
+        #region Sitzungsvariablen
+
+        /// <summary>
+        /// Legt den Wert einer Sitzungsvariablen fest.
+        /// </summary>
+        /// <param name="sessionID">Sitzungskennung</param>
+        /// <param name="name">Variablenname</param>
+        /// <param name="value">Wert</param>
+        public void SetSessionVariable(Guid sessionID, string name, object value)
+        { 
+            // Wenn die angegebene Sitzung existiert ...
+            if (ExistSession(sessionID))
+                // Variablenwert setzen
+                SetVariableOnSqlServer(sessionID, name, value);
+        }
+
+        /// <summary>
+        /// Gibt den Wert einer Sitzungsvariablen zurück.
+        /// </summary>
+        /// <param name="sessionID">Sitzungskennung</param>
+        /// <param name="name">Variablenname</param>
+        /// <returns>Wert</returns>
+        public object GetSessionVariable(Guid sessionID, string name)
+        {
+            // Wenn die angegebene Sitzung existiert ...
+            if (ExistSession(sessionID))
+                // Variable lesen
+                return GetVariableFromSqlServer(sessionID, name);
+
+            // Nichts zurückgeben
+            return null;
+        }
+
+        #endregion
     }
 }
