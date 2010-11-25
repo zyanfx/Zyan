@@ -28,22 +28,11 @@ namespace Zyan.Communication.Modularity
         private IModuleControler ModuleControler { get; set; }
 
         /// <summary>
-        /// Gibt das Anwendungs-Stammobjekt zurück, oder legt es fest.
-        /// </summary>
-        public ZyanApplication Application { get; private set; }
-
-        /// <summary>
         /// Erzeugt eine neue Instanz von ModuleHost.
-        /// </summary>
-        /// <param name="application">Anwendungs-Stammobjekt</param>
+        /// </summary>        
         /// <param name="moduleDirectory">Absoulter Pfad zum Modulverzeichnis</param>
-        public ModuleHost(ZyanApplication application, string moduleDirectory)
+        public ModuleHost(string moduleDirectory)
         {
-            // Wenn kein Anwendungs-Stammobjekt übergeben wurde ...
-            if (application == null)
-                // Ausnahme werfen
-                throw new ArgumentNullException("application");
-
             // Wenn kein Modulverzeichnis angegeben wurde ...
             if (string.IsNullOrEmpty(moduleDirectory))
                 // Ausnahme werfen
@@ -54,8 +43,7 @@ namespace Zyan.Communication.Modularity
                 // Ausnahme werfen
                 throw new DirectoryNotFoundException(moduleDirectory);
 
-            // Werte übernehmen
-            Application = application;
+            // Werte übernehmen            
             ModuleDirectory=moduleDirectory;
             
             // Ordnername des Modulverzeichnisses als Modulname übernehmen
@@ -155,7 +143,7 @@ namespace Zyan.Communication.Modularity
             // Wenn ein Modul-Kontroller festgelgt ist ...
             if (ModuleControler!=null)
                 // OnStart-Methode des Modul-Kontrollers aufrufen
-                ModuleControler.OnStart(Application);
+                ModuleControler.OnStart();
         }
 
         /// <summary>

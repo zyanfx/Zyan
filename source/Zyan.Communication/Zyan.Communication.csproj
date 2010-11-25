@@ -58,7 +58,7 @@
     </Compile>
     <Compile Include="Modularity\IModuleControler.cs" />
     <Compile Include="Modularity\ModuleHost.cs" />
-    <Compile Include="Modularity\ZyanApplication.cs" />
+    <Compile Include="Modularity\ModuleManager.cs" />
     <Compile Include="Modularity\ZyanModuleControlerAttribute.cs" />
     <Compile Include="MonoCheck.cs" />
     <Compile Include="Notification\NotificationEventArgs.cs" />
@@ -88,6 +88,7 @@
     <Compile Include="Security\WindowsSecurityTools.cs" />
     <Compile Include="SessionMgmt\InProcSessionManager.cs" />
     <Compile Include="SessionMgmt\ISessionManager.cs" />
+    <Compile Include="SessionMgmt\SessionVariableAdapter.cs" />
     <Compile Include="SessionMgmt\SqlSessionManager.cs" />
     <Compile Include="Version.cs" />
     <Compile Include="ZyanComponentHost.cs" />
