@@ -167,7 +167,8 @@ namespace Zyan.Communication
             code.AppendLine("{");
             code.AppendLine("   public class DynamicWire");
             code.AppendLine("   {");
-            code.AppendLine("       public RemoteOutputPinWiring ClientPinWiring { get; set; }");
+            code.AppendLine("       private RemoteOutputPinWiring _clientPinWiring = null;");
+            code.AppendLine("       public RemoteOutputPinWiring ClientPinWiring { get {return _clientPinWiring;} set { _clientPinWiring = value; } }");
 
             // Ermitteln, ob der Delegat einen Rückgabewert bescheibt
             bool hasReturnValue = !outPinMethod.ReturnType.Name.Equals("Void");
