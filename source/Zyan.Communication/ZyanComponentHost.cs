@@ -13,7 +13,6 @@ using Zyan.Communication.Security;
 using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp;
 using Zyan.Communication.SessionMgmt;
-using Zyan.Communication.Modularity;
 using Zyan.Communication.Notification;
 
 namespace Zyan.Communication
