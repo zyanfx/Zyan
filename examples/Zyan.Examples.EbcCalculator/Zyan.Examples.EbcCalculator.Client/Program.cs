@@ -7,7 +7,6 @@ using Zyan.Communication;
 using Zyan.Communication.Toolbox;
 using Zyan.Communication.Security;
 using Zyan.Communication.Protocols.Http;
-using System.Threading.Tasks;
 
 namespace Zyan.Examples.EbcCalculator
 {
