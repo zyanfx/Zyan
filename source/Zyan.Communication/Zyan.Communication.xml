@@ -303,16 +303,17 @@
             Schnittstelle für Fabriken zur Produktion verteilbarer Komponenten. 
             </summary>
         </member>
-        <member name="M:Zyan.Communication.IComponentInvoker.Invoke(System.Guid,System.String,System.Collections.ArrayList,System.String,System.Object[])">
+        <member name="M:Zyan.Communication.IComponentInvoker.Invoke(System.Guid,System.String,System.Collections.ArrayList,System.String,System.Reflection.ParameterInfo[],System.Object[])">
             <summary>
             Ruft eine bestimmte Methode einer Komponente auf und übergibt die angegebene Nachricht als Parameter.
             Für jeden Aufruf wird temporär eine neue Instanz der Komponente erstellt.
             </summary>
             <param name="trackingID">Aufrufschlüssel zur Nachverfolgung</param>
             <param name="interfaceName">Name der Komponentenschnittstelle</param>
-            <param name="outputPinCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Ausgabe-Pins mit entfernten Methoden</param>
+            <param name="outputPinCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Ausgangs-Pins mit entfernten Methoden</param>
             <param name="methodName">Methodenname</param>
-            <param name="args">Parameter</param>
+            <param name="paramDefs">Parameter-Definitionen</param>
+            <param name="args">Parameter</param>        
             <returns>Rückgabewert</returns>
         </member>
         <member name="M:Zyan.Communication.IComponentInvoker.GetRegisteredComponents">
@@ -391,7 +392,7 @@
             <param name="args">Parameter</param>   
             <param name="returnValue">Rückgabewert</param>
         </member>
-        <member name="M:Zyan.Communication.ComponentInvoker.Invoke(System.Guid,System.String,System.Collections.ArrayList,System.String,System.Object[])">
+        <member name="M:Zyan.Communication.ComponentInvoker.Invoke(System.Guid,System.String,System.Collections.ArrayList,System.String,System.Reflection.ParameterInfo[],System.Object[])">
             <summary>
             Ruft eine bestimmte Methode einer Komponente auf und übergibt die angegebene Nachricht als Parameter.
             Für jeden Aufruf wird temporär eine neue Instanz der Komponente erstellt.
@@ -400,6 +401,7 @@
             <param name="interfaceName">Name der Komponentenschnittstelle</param>
             <param name="outputPinCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Ausgangs-Pins mit entfernten Methoden</param>
             <param name="methodName">Methodenname</param>
+            <param name="paramDefs">Parameter-Definitionen</param>
             <param name="args">Parameter</param>        
             <returns>Rückgabewert</returns>
         </member>
