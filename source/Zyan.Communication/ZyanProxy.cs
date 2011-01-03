@@ -95,7 +95,7 @@ namespace Zyan.Communication
 
             // Methoden-Metadaten abrufen
             MethodInfo methodInfo = (MethodInfo)methodCallMessage.MethodBase;
-
+            methodInfo.GetParameters();
             // Wenn die Methode ein Ausgabe-Pin ist ...
             if (methodInfo.ReturnType.Equals(typeof(void)) && 
                 methodCallMessage.InArgCount==1 &&
@@ -197,7 +197,7 @@ namespace Zyan.Communication
                 try
                 {
                     // Entfernten Methodenaufruf durchführen
-                    returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, _outputMessageCorrelationSet, methodCallMessage.MethodName, methodCallMessage.Args);
+                    returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, _outputMessageCorrelationSet, methodCallMessage.MethodName,methodCallMessage.MethodBase.GetParameters(), methodCallMessage.Args);
                                                                 
                     // Ereignisargumente für AfterInvoke erstellen
                     AfterInvokeEventArgs afterInvokeArgs = new AfterInvokeEventArgs()
@@ -221,7 +221,7 @@ namespace Zyan.Communication
                         _remoteInvoker.Logon(_sessionID, _autoLoginCredentials);
 
                         // Entfernten Methodenaufruf erneut versuchen                        
-                        returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, _outputMessageCorrelationSet, methodCallMessage.MethodName, methodCallMessage.Args);
+                        returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, _outputMessageCorrelationSet, methodCallMessage.MethodName,methodCallMessage.MethodBase.GetParameters(), methodCallMessage.Args);
                     }
                 }
                 // Remoting-Antwortnachricht erstellen und zurückgeben

@@ -194,9 +194,10 @@ namespace Zyan.Communication
         /// <param name="interfaceName">Name der Komponentenschnittstelle</param>
         /// <param name="outputPinCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Ausgangs-Pins mit entfernten Methoden</param>
         /// <param name="methodName">Methodenname</param>
+        /// <param name="paramDefs">Parameter-Definitionen</param>
         /// <param name="args">Parameter</param>        
         /// <returns>Rückgabewert</returns>
-        public object Invoke(Guid trackingID, string interfaceName, ArrayList outputPinCorrelationSet, string methodName, params object[] args)
+        public object Invoke(Guid trackingID, string interfaceName, ArrayList outputPinCorrelationSet, string methodName, ParameterInfo[] paramDefs, params object[] args)
         {
             // Wenn kein Schnittstellenname angegeben wurde ...
             if (string.IsNullOrEmpty(interfaceName))
@@ -294,17 +295,17 @@ namespace Zyan.Communication
             object returnValue = null;
 
             // Typen-Array (zur Ermittlung der passenden Signatur) erzeugen
-            Type[] types = new Type[args.Length];
+            Type[] types = new Type[paramDefs.Length];
 
             // Alle Parameter durchlaufen
-            for (int i = 0; i < args.Length; i++)
-            {
+            for (int i = 0; i < paramDefs.Length; i++)
+            {                
                 // Typ in Array einfügen
-                types[i] = args[i].GetType();
+                types[i] = paramDefs[i].ParameterType;
             }
             // Ausnahme-Schalter
             bool exceptionThrown = false;
-
+            
             try
             {
                 // Methode aufrufen
