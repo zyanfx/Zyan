@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 using Zyan.Communication.Security;
@@ -17,11 +18,12 @@ namespace Zyan.Communication
         /// </summary>
         /// <param name="trackingID">Aufrufschlüssel zur Nachverfolgung</param>
         /// <param name="interfaceName">Name der Komponentenschnittstelle</param>
-        /// <param name="outputPinCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Ausgabe-Pins mit entfernten Methoden</param>
+        /// <param name="outputPinCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Ausgangs-Pins mit entfernten Methoden</param>
         /// <param name="methodName">Methodenname</param>
-        /// <param name="args">Parameter</param>
+        /// <param name="paramDefs">Parameter-Definitionen</param>
+        /// <param name="args">Parameter</param>        
         /// <returns>Rückgabewert</returns>
-        object Invoke(Guid trackingID, string interfaceName, ArrayList outputPinCorrelationSet, string methodName, params object[] args);
+        object Invoke(Guid trackingID, string interfaceName, ArrayList outputPinCorrelationSet, string methodName, ParameterInfo[] paramDefs, params object[] args);
 
         /// <summary>
         /// Gibt eine Liste mit allen registrierten Komponenten zurück.
