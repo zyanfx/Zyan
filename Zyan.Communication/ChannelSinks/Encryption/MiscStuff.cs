@@ -92,10 +92,10 @@ namespace Zyan.Communication.ChannelSinks.Encryption
         #endregion
 
 		#region Konstruktor und Desktruktor
-		
-        /// <summary>Initialize the ClientConnectionData object.</summary>
-		/// <param name="secureTransactionID">The client's identification.</param>
-		/// <param name="serverFormatter">The serverFormatter used to encrypt communication with this client.</param>
+
+        /// <summary>Erstellt eine neue Instanz von ClientConnectionData</summary>
+        /// <param name="secureTransactionID">Sicherheitstransaktionskennung</param>
+		/// <param name="cryptoProvider">Verschlüsselungsanbieter</param>
 		public ClientConnectionData(Guid secureTransactionID, SymmetricAlgorithm cryptoProvider) 
 		{
             // Wenn kein Kryptografieanbieter übergeben wurde ...

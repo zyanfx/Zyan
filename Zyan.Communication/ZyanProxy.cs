@@ -24,17 +24,17 @@ namespace Zyan.Communication
         private bool _autoLoginOnExpiredSession = false;
         private Hashtable _autoLoginCredentials = null;
         private ZyanConnection _connection = null;
-               
+
         /// <summary>
         /// Konstruktor.
         /// </summary>
         /// <param name="type">Schnittstelle der entfernten Komponente</param>
         /// <param name="connection">Verbindungsobjekt</param>
-        /// <param name="remoteInvoker">Aufrufer für entfernte Komponenten</param>   
         /// <param name="implicitTransactionTransfer">Implizite Transaktionsübertragung</param>
-        /// <param name="autoLoginOnExpiredSession">Gibt an, ob sich der Proxy automatisch neu anmelden soll, wenn die Sitzung abgelaufen ist</param>
-        /// <param name="autoLogoninCredentials">Optional! Anmeldeinformationen, die nur benötigt werden, wenn autoLoginOnExpiredSession auf Wahr eingestellt ist</param>
         /// <param name="sessionID">Sitzungsschlüssel</param>
+        /// <param name="componentHostName">Name des entfernten Komponentenhosts</param>
+        /// <param name="autoLoginOnExpiredSession">Gibt an, ob sich der Proxy automatisch neu anmelden soll, wenn die Sitzung abgelaufen ist</param>
+        /// <param name="autoLogoninCredentials">Optional! Anmeldeinformationen, die nur benötigt werden, wenn autoLoginOnExpiredSession auf Wahr eingestellt ist</param>              
         public ZyanProxy(Type type, ZyanConnection connection, bool implicitTransactionTransfer, Guid sessionID, string componentHostName, bool autoLoginOnExpiredSession, Hashtable autoLogoninCredentials)
             : base(type)
         {
@@ -53,7 +53,7 @@ namespace Zyan.Communication
 
             // Verbindungsobjekt übernehmen
             _connection = connection;
-            
+
             // Name des Komponentenhosts übernehmen
             _componentHostName = componentHostName;
 
@@ -62,7 +62,7 @@ namespace Zyan.Communication
 
             // Aufrufer von Verbindung übernehmen
             _remoteInvoker = _connection.RemoteComponentFactory;
-         
+
             // Schalter für implizite Transaktionsübertragung übernehmen
             _implicitTransactionTransfer = implicitTransactionTransfer;
 
@@ -75,7 +75,7 @@ namespace Zyan.Communication
                 _autoLoginCredentials = autoLogoninCredentials;
 
             // Sammlung für Korrelationssatz erzeugen
-            _outputMessageCorrelationSet = new ArrayList();            
+            _outputMessageCorrelationSet = new ArrayList();
         }
 
         /// <summary>
@@ -97,12 +97,12 @@ namespace Zyan.Communication
             MethodInfo methodInfo = (MethodInfo)methodCallMessage.MethodBase;
             methodInfo.GetParameters();
             // Wenn die Methode ein Ausgabe-Pin ist ...
-            if (methodInfo.ReturnType.Equals(typeof(void)) && 
-                methodCallMessage.InArgCount==1 &&
-                methodCallMessage.ArgCount==1 &&
-                methodCallMessage.Args[0]!=null &&
+            if (methodInfo.ReturnType.Equals(typeof(void)) &&
+                methodCallMessage.InArgCount == 1 &&
+                methodCallMessage.ArgCount == 1 &&
+                methodCallMessage.Args[0] != null &&
                 typeof(Delegate).IsAssignableFrom(methodCallMessage.Args[0].GetType()) &&
-                methodCallMessage.MethodName.StartsWith("set_")) 
+                methodCallMessage.MethodName.StartsWith("set_"))
             {
                 // EBC-Eingangsnachricht abrufen
                 object inputMessage = methodCallMessage.GetArg(0);
@@ -114,11 +114,11 @@ namespace Zyan.Communication
                 RemoteOutputPinWiring wiring = new RemoteOutputPinWiring()
                 {
                     ClientReceiver = inputMessage,
-                    ServerPropertyName = propertyName,                    
+                    ServerPropertyName = propertyName,
                 };
                 // Verdrahtung in der Sammlung ablegen
                 _outputMessageCorrelationSet.Add(wiring);
-                
+
                 // Leere Remoting-Antwortnachricht erstellen und zurückgeben
                 return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
             }
@@ -137,18 +137,18 @@ namespace Zyan.Communication
                     Transaction transaction = Transaction.Current;
 
                     // Wenn die Transaktion noch aktiv ist ...
-                    if (transaction.TransactionInformation.Status == TransactionStatus.InDoubt || 
+                    if (transaction.TransactionInformation.Status == TransactionStatus.InDoubt ||
                         transaction.TransactionInformation.Status == TransactionStatus.Active)
                     {
                         // Transaktion im Transferobjekt ablegen                        
-                        data.Store.Add("transaction",transaction);                        
+                        data.Store.Add("transaction", transaction);
                     }
                 }
                 // Transferobjekt in den Aufrufkontext einhängen
                 CallContext.SetData("__ZyanContextData_" + _componentHostName, data);
 
                 // Entfernten Methodenaufruf durchführen und jede Antwortnachricht sofort über einen Rückkanal empfangen
-                return InvokeRemoteMethod(methodCallMessage);                
+                return InvokeRemoteMethod(methodCallMessage);
             }
         }
 
@@ -163,10 +163,10 @@ namespace Zyan.Communication
             Guid trackingID = Guid.NewGuid();
 
             try
-            {                
+            {
                 // Variable für Rückgabewert
                 object returnValue = null;
-                
+
                 // Ereignisargumente für BeforeInvoke erstellen
                 BeforeInvokeEventArgs cancelArgs = new BeforeInvokeEventArgs()
                 {
@@ -197,8 +197,8 @@ namespace Zyan.Communication
                 try
                 {
                     // Entfernten Methodenaufruf durchführen
-                    returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, _outputMessageCorrelationSet, methodCallMessage.MethodName,methodCallMessage.MethodBase.GetParameters(), methodCallMessage.Args);
-                                                                
+                    returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, _outputMessageCorrelationSet, methodCallMessage.MethodName, methodCallMessage.MethodBase.GetParameters(), methodCallMessage.Args);
+
                     // Ereignisargumente für AfterInvoke erstellen
                     AfterInvokeEventArgs afterInvokeArgs = new AfterInvokeEventArgs()
                     {
@@ -210,7 +210,7 @@ namespace Zyan.Communication
                         ReturnValue = returnValue
                     };
                     // AfterInvoke-Ereignis feuern
-                    _connection.OnAfterInvoke(afterInvokeArgs);                    
+                    _connection.OnAfterInvoke(afterInvokeArgs);
                 }
                 catch (InvalidSessionException)
                 {
@@ -221,7 +221,7 @@ namespace Zyan.Communication
                         _remoteInvoker.Logon(_sessionID, _autoLoginCredentials);
 
                         // Entfernten Methodenaufruf erneut versuchen                        
-                        returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, _outputMessageCorrelationSet, methodCallMessage.MethodName,methodCallMessage.MethodBase.GetParameters(), methodCallMessage.Args);
+                        returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, _outputMessageCorrelationSet, methodCallMessage.MethodName, methodCallMessage.MethodBase.GetParameters(), methodCallMessage.Args);
                     }
                 }
                 // Remoting-Antwortnachricht erstellen und zurückgeben

@@ -79,7 +79,7 @@ namespace Zyan.Communication
 
                 // Ausgehende Nachrichten mit passender Abfangvorrichtung verdrahten 
                 outputPinMetaData.SetValue(instance, dynamicWireDelegate, null);
-            }            
+            }
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace Zyan.Communication
         /// <param name="outputPinCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Ausgangs-Pins mit entfernten Methoden</param>
         /// <param name="methodName">Methodenname</param>
         /// <param name="args">Parameter</param>   
-        private void ProcessBeforeInvoke(Guid trackingID, ref string interfaceName,  ref ArrayList outputPinCorrelationSet, ref string methodName, ref object[] args)
+        private void ProcessBeforeInvoke(Guid trackingID, ref string interfaceName, ref ArrayList outputPinCorrelationSet, ref string methodName, ref object[] args)
         {
             // Wenn BeforeInvoke-Abos vorhanden sind ...
             if (_host.HasBeforeInvokeSubscriptions())
@@ -211,7 +211,7 @@ namespace Zyan.Communication
 
             // Ggf. BeforeInvoke-Abos verarbeiten
             ProcessBeforeInvoke(trackingID, ref interfaceName, ref outputPinCorrelationSet, ref methodName, ref args);
-            
+
             // Wenn für den angegebenen Schnittstellennamen keine Komponente registriert ist ...
             if (!_host.ComponentRegistry.ContainsKey(interfaceName))
             {
@@ -234,7 +234,7 @@ namespace Zyan.Communication
             Type type = instance.GetType();
 
             // Bei Bedarf Client- und Server-Komponente miteinander verdrahten
-            CreateClientServerWires(type, instance, outputPinCorrelationSet);            
+            CreateClientServerWires(type, instance, outputPinCorrelationSet);
 
             // Transaktionsbereich
             TransactionScope scope = null;
@@ -299,13 +299,13 @@ namespace Zyan.Communication
 
             // Alle Parameter durchlaufen
             for (int i = 0; i < paramDefs.Length; i++)
-            {                
+            {
                 // Typ in Array einfügen
                 types[i] = paramDefs[i].ParameterType;
             }
             // Ausnahme-Schalter
             bool exceptionThrown = false;
-            
+
             try
             {
                 // Methode aufrufen
@@ -340,7 +340,7 @@ namespace Zyan.Communication
             }
             // Ggf. AfterInvoke-Abos verarbeiten
             ProcessAfterInvoke(trackingID, ref interfaceName, ref outputPinCorrelationSet, ref methodName, ref args, ref returnValue);
-            
+
             // Rückgabewert zurückgeben
             return returnValue;
         }
@@ -420,7 +420,7 @@ namespace Zyan.Communication
         /// <param name="eventName">Ereignisname</param>
         /// <param name="handler">Delegat auf Client-Ereignisprozedur</param>
         public void Subscribe(string eventName, EventHandler<NotificationEventArgs> handler)
-        { 
+        {
             // Wenn auf dem Host kein Benachrichtigungsdienst läuft ...
             if (!_host.IsNotificationServiceRunning)
                 // Ausnahme werfen
@@ -444,6 +444,70 @@ namespace Zyan.Communication
 
             // Registrierung aufheben
             _host.NotificationService.Unsubscribe(eventName, handler);
+        }
+
+        #endregion
+
+        #region Sitzungsverwaltung
+
+        /// <summary>
+        /// Gibt die maximale Sitzungslebensdauer (in Minuten) zurück.
+        /// </summary>
+        public int SessionAgeLimit
+        {
+            get { return _host.SessionManager.SessionAgeLimit; }
+        }
+
+        /// <summary>
+        /// Verlängert die Sitzung des Aufrufers und gibt die aktuelle Sitzungslebensdauer zurück.
+        /// </summary>
+        /// <returns>Sitzungslebensdauer (in Minuten)</returns>
+        public int RenewSession()
+        {
+            // Kontextdaten aus dem Aufrufkontext lesen (Falls welche hinterlegt sind)
+            LogicalCallContextData data = CallContext.GetData("__ZyanContextData_" + _host.Name) as LogicalCallContextData;
+
+            // Wenn Kontextdaten übertragen wurden ...
+            if (data != null)
+            {
+                // Wenn ein Sitzungsschlüssel übertragen wurde ...
+                if (data.Store.ContainsKey("sessionid"))
+                {
+                    // Sitzungsschlüssel lesen
+                    Guid sessionID = (Guid)data.Store["sessionid"];
+
+                    // Wenn eine Sitzung mit dem angegebenen Schlüssel existiert ...
+                    if (_host.SessionManager.ExistSession(sessionID))
+                    {
+                        // Sitzung abrufen
+                        ServerSession session = _host.SessionManager.GetSessionBySessionID(sessionID);
+
+                        // Sitzung verlängern
+                        session.Timestamp = DateTime.Now;
+
+                        // Aktuelle Sitzung im Threadspeicher ablegen
+                        ServerSession.CurrentSession = session;
+                    }
+                    else
+                    {
+                        // Ausnahme erzeugen
+                        InvalidSessionException ex = new InvalidSessionException(string.Format("Sitzungsschlüssel '{0}' ist ungültig! Bitte melden Sie sich erneut am Server an.", sessionID.ToString()));
+
+                        // Ausnahme werfen
+                        throw ex;
+                    }
+                }
+            }
+            else
+            {
+                // Ausnahme erzeugen
+                SecurityException ex = new SecurityException(LanguageResource.SecurityException_ContextInfoMissing);
+
+                // Ausnahme werfen
+                throw ex;
+            }
+            // Sitzungslebensdauer zurückgeben
+            return SessionAgeLimit;
         }
 
         #endregion

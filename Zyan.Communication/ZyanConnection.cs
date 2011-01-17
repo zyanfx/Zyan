@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace Zyan.Communication
     {
         // URL zum Server-Prozess
         private string _serverUrl = string.Empty;
-        
+
         // Liste mit allen registrierten Komponenten des verbundenen Servers
         private List<string> _registeredComponents = null;
 
@@ -40,9 +41,18 @@ namespace Zyan.Communication
 
         // Anmeldeinformationen für automatisches Anmelden
         private Hashtable _autoLoginCredentials = null;
-        
+
         // Auflistung der bekannten Verbindungen
         private static List<ZyanConnection> _connections = new List<ZyanConnection>();
+
+        // Schalter für automatische Sitzungsverlängerung
+        private bool _keepSessionAlive = true;
+
+        // Zeitgeber
+        private Timer _keepSessionAliveTimer = null;
+
+        // Maximale Sitzungslebensdauer in Minuten
+        private int _sessionAgeLimit = 0;
 
         /// <summary>
         /// Gibt eine Auflistung aller bekanten Verbindungen Hosts zurück.
@@ -57,7 +67,7 @@ namespace Zyan.Communication
         /// </summary>
         public string ServerUrl
         {
-            get { return _serverUrl; }           
+            get { return _serverUrl; }
         }
 
         /// <summary>
@@ -71,9 +81,17 @@ namespace Zyan.Communication
         /// <summary>
         /// Konstruktor.
         /// </summary>
+        /// <param name="setup">Objekt mit Konfigurationseinstellungen für die Verbindung</param>
+        public ZyanConnection(ZyanConnectionSetup setup)
+            : this(setup.ServerUrl, setup.ProtocolSetup,setup.Credentials,setup.AutoLoginOnExpiredSession,setup.KeepSessionAlive)
+        { }
+
+        /// <summary>
+        /// Konstruktor.
+        /// </summary>
         /// <param name="serverUrl">Server-URL (z.B. "tcp://server1:46123/ebcserver")</param>                
         public ZyanConnection(string serverUrl)
-            : this(serverUrl, new TcpBinaryClientProtocolSetup() ,null, false)
+            : this(serverUrl, new TcpBinaryClientProtocolSetup(), null, false, true)
         { }
 
         /// <summary>
@@ -82,7 +100,7 @@ namespace Zyan.Communication
         /// <param name="serverUrl">Server-URL (z.B. "tcp://server1:46123/ebcserver")</param>                
         /// <param name="autoLoginOnExpiredSession">Gibt an, ob sich der Proxy automatisch neu anmelden soll, wenn die Sitzung abgelaufen ist</param>
         public ZyanConnection(string serverUrl, bool autoLoginOnExpiredSession)
-            : this(serverUrl, new TcpBinaryClientProtocolSetup(), null, autoLoginOnExpiredSession)
+            : this(serverUrl, new TcpBinaryClientProtocolSetup(), null, autoLoginOnExpiredSession, !autoLoginOnExpiredSession)
         { }
 
         /// <summary>
@@ -91,7 +109,7 @@ namespace Zyan.Communication
         /// <param name="serverUrl">Server-URL (z.B. "tcp://server1:46123/ebcserver")</param>                
         /// <param name="protocolSetup">Protokoll-Einstellungen</param>
         public ZyanConnection(string serverUrl, IClientProtocolSetup protocolSetup)
-            : this(serverUrl, protocolSetup, null, false)
+            : this(serverUrl, protocolSetup, null, false, true)
         { }
 
         /// <summary>
@@ -101,7 +119,7 @@ namespace Zyan.Communication
         /// <param name="protocolSetup">Protokoll-Einstellungen</param>
         /// <param name="autoLoginOnExpiredSession">Gibt an, ob sich der Proxy automatisch neu anmelden soll, wenn die Sitzung abgelaufen ist</param>
         public ZyanConnection(string serverUrl, IClientProtocolSetup protocolSetup, bool autoLoginOnExpiredSession)
-            : this(serverUrl, protocolSetup, null, autoLoginOnExpiredSession)
+            : this(serverUrl, protocolSetup, null, autoLoginOnExpiredSession, true)
         { }
 
         /// <summary>
@@ -111,7 +129,8 @@ namespace Zyan.Communication
         /// <param name="protocolSetup">Protokoll-Einstellungen</param>
         /// <param name="credentials">Anmeldeinformationen</param>
         /// <param name="autoLoginOnExpiredSession">Gibt an, ob sich der Proxy automatisch neu anmelden soll, wenn die Sitzung abgelaufen ist</param>
-        public ZyanConnection(string serverUrl, IClientProtocolSetup protocolSetup, Hashtable credentials, bool autoLoginOnExpiredSession)
+        /// <param name="keepSessionAlive">Gib an, ob die Sitzung automatisch verlängert werden soll</param>
+        public ZyanConnection(string serverUrl, IClientProtocolSetup protocolSetup, Hashtable credentials, bool autoLoginOnExpiredSession, bool keepSessionAlive)
         {
             // Wenn kein Server-URL angegeben wurde ...
             if (string.IsNullOrEmpty(serverUrl))
@@ -135,17 +154,20 @@ namespace Zyan.Communication
             // Einstellung für automatisches Anmelden bei abgelaufener Sitzung übernehmen
             _autoLoginOnExpiredSession = autoLoginOnExpiredSession;
 
+            // Einstellung für automatische Sitzungsverlängung übernehmen
+            _keepSessionAlive = keepSessionAlive;
+
             // Wenn automatisches Anmelden aktiv ist ...
             if (_autoLoginOnExpiredSession)
                 // Anmeldedaten speichern
                 _autoLoginCredentials = credentials;
 
             // Server-URL in Bestandteile zerlegen
-            string[] addressParts=_serverUrl.Split('/');
+            string[] addressParts = _serverUrl.Split('/');
 
             // Name des Komponentenhots speichern
-            _componentHostName = addressParts[addressParts.Length-1];
-                        
+            _componentHostName = addressParts[addressParts.Length - 1];
+
             // TCP-Kommunikationskanal öffnen
             IChannel channel = (IChannel)_protocolSetup.CreateChannel();
 
@@ -157,14 +179,69 @@ namespace Zyan.Communication
             // Wörterbuch für Benachrichtigungs-Registrierungen erzeugen
             _subscriptions = new Dictionary<Guid, NotificationReceiver>();
 
+            // Wenn leere Anmeldeinformationen angegben wurden ...
+            if (credentials != null && credentials.Count == 0)
+                // Auflistung löschen
+                credentials = null;
+
             // Am Server anmelden
             RemoteComponentFactory.Logon(_sessionID, credentials);
 
             // Registrierte Komponenten vom Server abrufen
             _registeredComponents = new List<string>(RemoteComponentFactory.GetRegisteredComponents());
 
+            // Sitzungslimit abrufen
+            _sessionAgeLimit = RemoteComponentFactory.SessionAgeLimit;
+
+            // Zeitgeber starten (Wenn die automatische Sitzungsverlängerung aktiv ist)
+            StartKeepSessionAliveTimer();
+
             // Verbindung der Auflistung zufügen
             _connections.Add(this);
+        }
+
+        /// <summary>
+        /// Startet den Zeitgeber für automatische Sitzungsverlängerung.
+        /// <remarks>
+        /// Wenn der Zeitgeber läuft, wird er neu gestartet.
+        /// </remarks>
+        /// </summary>
+        private void StartKeepSessionAliveTimer()
+        { 
+            // Wenn der Zeitgeber für automatische Sitzungsverlängerung existiert ...
+            if (_keepSessionAliveTimer != null)
+                // Zeitgeber entsorgen
+                _keepSessionAliveTimer.Dispose();
+
+            // Wenn die Sitzung automatisch verlängert werden soll ...
+            if (_keepSessionAlive)
+                // Zeitgeber erzeugen
+                _keepSessionAliveTimer = new Timer(new TimerCallback(KeepSessionAlive), null, 1000, (_sessionAgeLimit / 2) * 60000);
+        }
+
+        /// <summary>
+        /// Wird vom Zeitgeber aufgerufen, wenn die Sitzung verlängert werden soll. 
+        /// </summary>
+        /// <param name="state">Statusobjekt</param>
+        private void KeepSessionAlive(object state)
+        {
+            try
+            {
+                // Sitzung erneuern
+                int serverSessionAgeLimit = RemoteComponentFactory.RenewSession();
+
+                // Wenn der Wert für die Sitzungslebensdauer auf dem Server in der Zwischenzeit geändert wurde ...
+                if (_sessionAgeLimit != serverSessionAgeLimit)
+                {
+                    // Neuen Wert für Sitzungslebendauer speichern
+                    _sessionAgeLimit = serverSessionAgeLimit;
+
+                    // Zeitgeber neu starten
+                    StartKeepSessionAliveTimer();
+                }
+            }
+            catch
+            { }
         }
 
         /// <summary>
@@ -173,9 +250,9 @@ namespace Zyan.Communication
         /// <typeparam name="T">Typ der öffentlichen Schnittstelle der zu konsumierenden Komponente</typeparam>        
         /// <returns>Proxy</returns>
         public T CreateProxy<T>()
-        { 
+        {
             // Andere Überladung aufrufen
-            return CreateProxy<T>(false);             
+            return CreateProxy<T>(false);
         }
 
         /// <summary>
@@ -190,7 +267,7 @@ namespace Zyan.Communication
             Type interfaceType = typeof(T);
 
             // Schnittstellenname lesen
-            string interfaceName=interfaceType.FullName;
+            string interfaceName = interfaceType.FullName;
 
             // Wenn keine Schnittstelle angegeben wurde ...
             if (!interfaceType.IsInterface)
@@ -203,7 +280,7 @@ namespace Zyan.Communication
                 throw new ApplicationException(string.Format("Für Schnittstelle '{0}' ist auf dem Server '{1}' keine Komponente registriert.", interfaceName, _serverUrl));
 
             // Proxy erzeugen
-            ZyanProxy proxy = new ZyanProxy(typeof(T), this, implicitTransactionTransfer,_sessionID,_componentHostName, _autoLoginOnExpiredSession, _autoLoginCredentials);
+            ZyanProxy proxy = new ZyanProxy(typeof(T), this, implicitTransactionTransfer, _sessionID, _componentHostName, _autoLoginOnExpiredSession, _autoLoginCredentials);
 
             // Proxy transparent machen und zurückgeben
             return (T)proxy.GetTransparentProxy();
@@ -218,7 +295,7 @@ namespace Zyan.Communication
         protected internal IComponentInvoker RemoteComponentFactory
         {
             get
-            { 
+            {
                 // Wenn noch keine Verbindung zur entfernten Komponentenfabrik existiert ...
                 if (_remoteComponentFactory == null)
                 {
@@ -228,7 +305,7 @@ namespace Zyan.Communication
                 // Fabrik-Proxy zurückgeben
                 return _remoteComponentFactory;
             }
-        }               
+        }
 
         // Schalter der angibt, ob Dispose bereits aufgerufen wurde
         private bool _isDisposed = false;
@@ -247,6 +324,13 @@ namespace Zyan.Communication
                 // Verbindung aus der Auflistung entfernen
                 _connections.Remove(this);
 
+                // Wenn der Zeitgeber noch existiert ...
+                if (_keepSessionAliveTimer != null)
+                {
+                    // Zeitgeber entsorgen
+                    _keepSessionAliveTimer.Dispose();
+                    _keepSessionAliveTimer = null;
+                }
                 try
                 {
                     // Vom Server abmelden
@@ -273,7 +357,7 @@ namespace Zyan.Communication
         /// Destruktor.
         /// </summary>
         ~ZyanConnection()
-        { 
+        {
             // Ressourcen freigeben
             Dispose();
         }
@@ -336,7 +420,7 @@ namespace Zyan.Communication
         #region Benachrichtigungen
 
         // Wörterbuch für Benachrichtigungs-Registrierungen
-        private volatile Dictionary<Guid,NotificationReceiver> _subscriptions = null;               
+        private volatile Dictionary<Guid, NotificationReceiver> _subscriptions = null;
 
         // Sperrobjekt für Threadsynchronisierung
         private object _subscriptionsLockObject = new object();
