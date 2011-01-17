@@ -124,28 +124,8 @@ namespace Zyan.Communication
             }
             else
             {
-                // Transferobjekt für Kontextdaten erzeugen, die implizit übertragen werden sollen 
-                LogicalCallContextData data = new LogicalCallContextData();
-
-                // Sitzungsschlüssel im Transferobjekt ablegen
-                data.Store.Add("sessionid", _sessionID);
-
-                // Wenn eine Umgebungstransaktion aktiv ist die implizite Transaktionsübertragung eingeschaltet ist ...
-                if (_implicitTransactionTransfer && Transaction.Current != null)
-                {
-                    // Umgebungstransaktion abrufen
-                    Transaction transaction = Transaction.Current;
-
-                    // Wenn die Transaktion noch aktiv ist ...
-                    if (transaction.TransactionInformation.Status == TransactionStatus.InDoubt ||
-                        transaction.TransactionInformation.Status == TransactionStatus.Active)
-                    {
-                        // Transaktion im Transferobjekt ablegen                        
-                        data.Store.Add("transaction", transaction);
-                    }
-                }
-                // Transferobjekt in den Aufrufkontext einhängen
-                CallContext.SetData("__ZyanContextData_" + _componentHostName, data);
+                // Aufrufkontext vorbereiten
+                _connection.PrepareCallContext(_implicitTransactionTransfer);
 
                 // Entfernten Methodenaufruf durchführen und jede Antwortnachricht sofort über einen Rückkanal empfangen
                 return InvokeRemoteMethod(methodCallMessage);

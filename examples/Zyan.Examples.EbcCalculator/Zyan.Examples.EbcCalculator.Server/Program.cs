@@ -17,6 +17,8 @@ namespace Zyan.Examples.EbcCalculator
             
             using (ZyanComponentHost host = new ZyanComponentHost("EbcCalc", protocol))
             {
+                host.SessionManager.SessionAgeLimit = 2;
+
                 host.RegisterComponent<ICalculator, Calculator>();
                 
                 Console.ReadLine();
