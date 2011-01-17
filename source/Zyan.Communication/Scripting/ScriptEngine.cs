@@ -17,6 +17,7 @@ namespace Zyan.Communication.Scripting
         /// Erzeugt aus C#-Quellcode eine ausführbare Assembly im Speicher.
         /// </summary>
         /// <param name="scriptCode">C#-Quellcode</param>
+        /// <param name="referenceAsseblies">Array mit referenzierten Assemblynamen</param>
         /// <returns>Kompilierte Assembly</returns>
         public static Assembly CompileScriptToAssembly(string scriptCode, params string[] referenceAsseblies)
         {

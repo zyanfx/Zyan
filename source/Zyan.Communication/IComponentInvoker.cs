@@ -57,5 +57,19 @@ namespace Zyan.Communication
         /// <param name="eventName">Ereignisname</param>
         /// <param name="handler">Delegat auf Client-Ereignisprozedur</param>
         void Unsubscribe(string eventName, EventHandler<NotificationEventArgs> handler);
+
+        /// <summary>
+        /// Gibt die maximale Sitzungslebensdauer (in Minuten) zurück.
+        /// </summary>
+        int SessionAgeLimit
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Verlängert die Sitzung des Aufrufers und gibt die aktuelle Sitzungslebensdauer zurück.
+        /// </summary>
+        /// <returns>Sitzungslebensdauer (in Minuten)</returns>
+        int RenewSession();
     }
 }
