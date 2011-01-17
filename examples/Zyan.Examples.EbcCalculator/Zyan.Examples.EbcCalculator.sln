@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual C# Express 2010
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Examples.EbcCalculator.Server", "Zyan.Examples.EbcCalculator.Server\Zyan.Examples.EbcCalculator.Server.csproj", "{EAD9FFF5-6F56-49C6-A145-BC0499B69E7F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Examples.EbcCalculator.Client", "Zyan.Examples.EbcCalculator.Client\Zyan.Examples.EbcCalculator.Client.csproj", "{3EE4BE4C-90B3-400E-AC3F-2E5FD8BCBC2F}"
@@ -10,6 +10,24 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Communication", "..\..\source\Zyan.Communication\Zyan.Communication.csproj", "{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}"
 EndProject
 Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 5
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs15
+		SccProjectUniqueName0 = ..\\..\\source\\Zyan.Communication\\Zyan.Communication.csproj
+		SccProjectName0 = ../../source/Zyan.Communication
+		SccLocalPath0 = ..\\..\\source\\Zyan.Communication
+		SccProjectUniqueName1 = Zyan.Examples.EbcCalculator.Server\\Zyan.Examples.EbcCalculator.Server.csproj
+		SccProjectName1 = Zyan.Examples.EbcCalculator.Server
+		SccLocalPath1 = Zyan.Examples.EbcCalculator.Server
+		SccLocalPath2 = .
+		SccProjectUniqueName3 = Zyan.Examples.EbcCalculator.Client\\Zyan.Examples.EbcCalculator.Client.csproj
+		SccProjectName3 = Zyan.Examples.EbcCalculator.Client
+		SccLocalPath3 = Zyan.Examples.EbcCalculator.Client
+		SccProjectUniqueName4 = Zyan.Examples.EbcCalculator.Shared\\Zyan.Examples.EbcCalculator.Shared.csproj
+		SccProjectName4 = Zyan.Examples.EbcCalculator.Shared
+		SccLocalPath4 = Zyan.Examples.EbcCalculator.Shared
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
