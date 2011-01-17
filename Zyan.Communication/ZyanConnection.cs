@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Remoting;
+using System.Runtime.Remoting.Messaging;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Serialization.Formatters;
@@ -13,6 +14,7 @@ using Zyan.Communication.Protocols.Tcp;
 using Zyan.Communication.Notification;
 using System.Net.Sockets;
 using System.Net;
+using System.Transactions;
 
 namespace Zyan.Communication
 {
@@ -201,6 +203,35 @@ namespace Zyan.Communication
         }
 
         /// <summary>
+        /// Bereitet den Aufrufkontext für die Übertragung vor.
+        /// </summary>
+        internal void PrepareCallContext(bool implicitTransactionTransfer)
+        {
+            // Transferobjekt für Kontextdaten erzeugen, die implizit übertragen werden sollen 
+            LogicalCallContextData data = new LogicalCallContextData();
+
+            // Sitzungsschlüssel im Transferobjekt ablegen
+            data.Store.Add("sessionid", _sessionID);
+
+            // Wenn eine Umgebungstransaktion aktiv ist die implizite Transaktionsübertragung eingeschaltet ist ...
+            if (implicitTransactionTransfer && Transaction.Current != null)
+            {
+                // Umgebungstransaktion abrufen
+                Transaction transaction = Transaction.Current;
+
+                // Wenn die Transaktion noch aktiv ist ...
+                if (transaction.TransactionInformation.Status == TransactionStatus.InDoubt ||
+                    transaction.TransactionInformation.Status == TransactionStatus.Active)
+                {
+                    // Transaktion im Transferobjekt ablegen                        
+                    data.Store.Add("transaction", transaction);
+                }
+            }
+            // Transferobjekt in den Aufrufkontext einhängen
+            CallContext.SetData("__ZyanContextData_" + _componentHostName, data);
+        }
+
+        /// <summary>
         /// Startet den Zeitgeber für automatische Sitzungsverlängerung.
         /// <remarks>
         /// Wenn der Zeitgeber läuft, wird er neu gestartet.
@@ -215,8 +246,12 @@ namespace Zyan.Communication
 
             // Wenn die Sitzung automatisch verlängert werden soll ...
             if (_keepSessionAlive)
+            {
+                // Intervall in Millisekunden berechnen
+                int interval = (_sessionAgeLimit / 2) * 60000;
                 // Zeitgeber erzeugen
-                _keepSessionAliveTimer = new Timer(new TimerCallback(KeepSessionAlive), null, 1000, (_sessionAgeLimit / 2) * 60000);
+                _keepSessionAliveTimer = new Timer(new TimerCallback(KeepSessionAlive), null, interval, interval);
+            }
         }
 
         /// <summary>
@@ -227,6 +262,9 @@ namespace Zyan.Communication
         {
             try
             {
+                // Aufrufkontext vorbereiten
+                PrepareCallContext(false);
+
                 // Sitzung erneuern
                 int serverSessionAgeLimit = RemoteComponentFactory.RenewSession();
 
