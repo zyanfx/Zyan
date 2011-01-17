@@ -51,7 +51,7 @@ namespace Zyan.Communication.ChannelSinks.Encryption
         /// </remarks>
 		/// </summary>
 		/// <param name="inputStream">Unverschlüsselter Eingabedatenstrom</param>
-        /// <param name="cryptoProvider">Kryptografieanbieter für symmetrische Verschlüsselung</param>
+        /// <param name="provider">Kryptografieanbieter für symmetrische Verschlüsselung</param>
 		/// <returns>Verschlüsselter Datenstrom</returns>
 		public static Stream GetEncryptedStream(Stream inputStream, SymmetricAlgorithm provider) 
 		{
@@ -102,7 +102,7 @@ namespace Zyan.Communication.ChannelSinks.Encryption
         /// </remarks>
         /// </summary>
         /// <param name="inputStream">Verschlüsselter Eingabedatenstrom</param>
-        /// <param name="cryptoProvider">Kryptografieanbieter für symmetrische Verschlüsselung</param>
+        /// <param name="provider">Kryptografieanbieter für symmetrische Verschlüsselung</param>
         /// <returns>Entschlüsselter Datenstrom</returns>
 		public static Stream GetDecryptedStream(Stream inputStream, SymmetricAlgorithm provider) 
 		{

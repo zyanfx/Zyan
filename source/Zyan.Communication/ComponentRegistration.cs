@@ -19,8 +19,7 @@ namespace Zyan.Communication
         /// Konstruktor.
         /// </summary>
         /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
-        /// <param name="implementationType">Implementierungstyp der Komponente</param>        
-        /// <param name="syncBehavior">Sync/Async Verhalten der Komponente</param>
+        /// <param name="implementationType">Implementierungstyp der Komponente</param>                
         public ComponentRegistration(Type interfaceType, Type implementationType) 
         {
             // Werte übernehmen
@@ -32,8 +31,7 @@ namespace Zyan.Communication
         /// Konstruktor.
         /// </summary>
         /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
-        /// <param name="intializationHandler">Delegat auf Inizialisierungsfunktion</param>
-        /// <param name="syncBehavior">Sync/Async Verhalten der Komponente</param>
+        /// <param name="intializationHandler">Delegat auf Inizialisierungsfunktion</param>        
         public ComponentRegistration(Type interfaceType, Func<object> intializationHandler)
         {
             // Werte übernehmen
@@ -72,8 +70,7 @@ namespace Zyan.Communication
         /// Konstruktor.
         /// </summary>
         /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
-        /// <param name="intializationHandler">Delegat auf Inizialisierungsfunktion</param>
-        /// <param name="syncBehavior">Sync/Async Verhalten der Komponente</param>
+        /// <param name="intializationHandler">Delegat auf Inizialisierungsfunktion</param>        
         /// <param name="moduleName">Modulname</param>
         public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, string moduleName)
         {

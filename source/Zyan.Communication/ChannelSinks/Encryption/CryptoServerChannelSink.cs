@@ -87,7 +87,7 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 		/// <summary>
         /// Erzeugt den gemeinsamen Schlüssel und bereitet dessen Übertragung zum Client vor.
         /// </summary>
-		/// <param name="secureTransactionID">Sicherheitstransaktionskennung</param>
+        /// <param name="transactID">Sicherheitstransaktionskennung</param>
 		/// <param name="requestHeaders">Anfrage-Header vom Client</param>
 		/// <param name="responseMsg">Antwortnachricht</param>
 		/// <param name="responseHeaders">Antwort-Header</param>
@@ -140,7 +140,7 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 		/// <summary>
         /// Entschlüsselt die eingehende Nachricht vom Client.
         /// </summary>
-		/// <param name="secureTransactionID">Sicherheitstransaktionskennung</param>
+        /// <param name="transactID">Sicherheitstransaktionskennung</param>
 		/// <param name="sinkStack">Senkenstapel</param>
 		/// <param name="requestMsg">Anfrage-Nachricht vom Client</param>
 		/// <param name="requestHeaders">Anfrage-Header vom Cient</param>
@@ -195,7 +195,7 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 		/// <summary>
         /// Prüft, ob eine bestimmte Sicherheitstransaktionskennung bereits bekannt ist.
         /// </summary>
-		/// <param name="secureTransactionID">Sicherheitstransaktionskennung</param>
+        /// <param name="transactID">Sicherheitstransaktionskennung</param>
 		/// <returns>Wahr, wenn die Sicherheitstransaktion bekannt ist, ansonsten Falsch</returns>
 		private bool IsExistingSecurityTransaction(Guid transactID)
 		{

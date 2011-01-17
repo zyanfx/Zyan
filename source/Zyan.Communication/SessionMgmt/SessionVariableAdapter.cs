@@ -5,12 +5,20 @@ using System.Text;
 
 namespace Zyan.Communication.SessionMgmt
 {
+    /// <summary>
+    /// Adapter für den Zugriff auf Sitzungsvariablen.
+    /// </summary>
     public class SessionVariableAdapter
     {
+        // Felder
         private ISessionManager _sessionManager = null;
-
         private Guid _sessionID = Guid.Empty;
 
+        /// <summary>
+        /// Erzeugt eine neue Instanz von SessionVariableAdapter.
+        /// </summary>
+        /// <param name="sessionManager">Sitzungsverwaltung</param>
+        /// <param name="sessionID">Sitzungsschlüssel</param>
         internal SessionVariableAdapter(ISessionManager sessionManager, Guid sessionID)
         {
             _sessionManager = sessionManager;

@@ -338,7 +338,7 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 			/// <param name="msg">Remoting-Nachricht</param>
 			/// <param name="headers">Header-Auflistung</param>
 			/// <param name="stream">Eingabe-Datenstrom</param>
-			/// <param name="secureTransactionID">Eindeutige Kennung der Sicherheitstransaktion</param>
+            /// <param name="id">Eindeutige Kennung der Sicherheitstransaktion</param>
 			public AsyncProcessingState(IMessage msg, ITransportHeaders headers, ref Stream stream, Guid id)
 			{
                 // Werte übernehmen
