@@ -63,22 +63,41 @@ namespace Zyan.Communication
             foreach (RemoteOutputPinWiring correlationInfo in outputPinCorrelationSet)
             {
                 // Dynamischen Draht erzeugen
-                object dynamicWire = DynamicWireFactory.Instance.CreateDynamicWire(type, correlationInfo.ServerPropertyName);
+                object dynamicWire = DynamicWireFactory.Instance.CreateDynamicWire(type, correlationInfo.ServerPropertyName, correlationInfo.IsEvent);
 
                 // Typ des dynamischen Drahtes ermitteln
                 Type dynamicWireType = dynamicWire.GetType();
 
                 // Dynamischen Draht mit Client-Fernsteuerung verdrahten
                 dynamicWireType.GetProperty("ClientPinWiring").SetValue(dynamicWire, correlationInfo, null);
+                                               
+                // wenn es sich um ein Ereignis handelt ...
+                if (correlationInfo.IsEvent)
+                {
+                    // Metadaten des aktuellen Ausgabe-Pins abufen                
+                    EventInfo outputPinMetaData = type.GetEvent(correlationInfo.ServerPropertyName);
 
-                // Metadaten des aktuellen Ausgabe-Pins abufen                
-                PropertyInfo outputPinMetaData = type.GetProperty(correlationInfo.ServerPropertyName);
+                    // Zusatzinformationen übergeben
+                    dynamicWireType.GetProperty("ServerEventInfo").SetValue(dynamicWire, outputPinMetaData, null);
+                    dynamicWireType.GetProperty("Component").SetValue(dynamicWire, instance, null);
 
-                // Delegat zu dynamischem Draht erzeugen
-                Delegate dynamicWireDelegate = Delegate.CreateDelegate(outputPinMetaData.PropertyType, dynamicWire, dynamicWireType.GetMethod("In"));
+                    // Delegat zu dynamischem Draht erzeugen
+                    Delegate dynamicWireDelegate = Delegate.CreateDelegate(outputPinMetaData.EventHandlerType, dynamicWire, dynamicWireType.GetMethod("In"));
 
-                // Ausgehende Nachrichten mit passender Abfangvorrichtung verdrahten 
-                outputPinMetaData.SetValue(instance, dynamicWireDelegate, null);
+                    // Ausgehende Nachrichten mit passender Abfangvorrichtung verdrahten 
+                    outputPinMetaData.AddEventHandler(instance, dynamicWireDelegate);
+                }
+                else
+                {
+                    // Metadaten des aktuellen Ausgabe-Pins abufen                
+                    PropertyInfo outputPinMetaData = type.GetProperty(correlationInfo.ServerPropertyName);                                       
+
+                    // Delegat zu dynamischem Draht erzeugen
+                    Delegate dynamicWireDelegate = Delegate.CreateDelegate(outputPinMetaData.PropertyType, dynamicWire, dynamicWireType.GetMethod("In"));
+
+                    // Ausgehende Nachrichten mit passender Abfangvorrichtung verdrahten 
+                    outputPinMetaData.SetValue(instance, dynamicWireDelegate, null);
+                }
             }
         }
 
@@ -98,11 +117,32 @@ namespace Zyan.Communication
             // Alle Einträge des Korrelationssatzes durchlaufen
             foreach (RemoteOutputPinWiring correlationInfo in outputPinCorrelationSet)
             {
-                // Metadaten des aktuellen Ausgabe-Pins abufen                
-                PropertyInfo outputPinMetaData = type.GetProperty(correlationInfo.ServerPropertyName);
+                // Wenn es sich um einen Ereignis-Pin handelt ...
+                if (correlationInfo.IsEvent)
+                {
+                    // Dynamischen Draht erzeugen
+                    object dynamicWire = DynamicWireFactory.Instance.CreateDynamicWire(type, correlationInfo.ServerPropertyName, correlationInfo.IsEvent);
 
-                // Verdrahtung aufheben
-                outputPinMetaData.SetValue(instance, null, null);
+                    // Typ des dynamischen Drahtes ermitteln
+                    Type dynamicWireType = dynamicWire.GetType();
+
+                    // Metadaten des aktuellen Ausgabe-Pins abufen                
+                    EventInfo outputPinMetaData = type.GetEvent(correlationInfo.ServerPropertyName);
+                    
+                    // Delegat zu dynamischem Draht erzeugen
+                    Delegate dynamicWireDelegate = Delegate.CreateDelegate(outputPinMetaData.EventHandlerType, dynamicWire, dynamicWireType.GetMethod("In"));
+
+                    // Verdrahtung aufheben
+                    outputPinMetaData.RemoveEventHandler(instance, dynamicWireDelegate);
+                }
+                else
+                {
+                    // Metadaten des aktuellen Ausgabe-Pins abufen                
+                    PropertyInfo outputPinMetaData = type.GetProperty(correlationInfo.ServerPropertyName);
+
+                    // Verdrahtung aufheben
+                    outputPinMetaData.SetValue(instance, null, null);
+                }
             }
         }
 
@@ -233,8 +273,10 @@ namespace Zyan.Communication
             // Implementierungstyp abrufen
             Type type = instance.GetType();
 
-            // Bei Bedarf Client- und Server-Komponente miteinander verdrahten
-            CreateClientServerWires(type, instance, outputPinCorrelationSet);
+            // Wenn die Komponente SingleCallaktiviert ist ...
+            if (registration.ActivationType==ActivationType.SingleCall)
+                // Bei Bedarf Client- und Server-Komponente miteinander verdrahten
+                CreateClientServerWires(type, instance, outputPinCorrelationSet);
 
             // Transaktionsbereich
             TransactionScope scope = null;
@@ -335,8 +377,10 @@ namespace Zyan.Communication
                     // Transaktionsbereich entsorgen
                     scope.Dispose();
                 }
-                // Verdrahtung aufheben
-                RemoveClientServerWires(type, instance, outputPinCorrelationSet);
+                // Wenn die Komponente SingleCallaktiviert ist ...
+                if (registration.ActivationType == ActivationType.SingleCall)
+                    // Verdrahtung aufheben
+                    RemoveClientServerWires(type, instance, outputPinCorrelationSet);
             }
             // Ggf. AfterInvoke-Abos verarbeiten
             ProcessAfterInvoke(trackingID, ref interfaceName, ref outputPinCorrelationSet, ref methodName, ref args, ref returnValue);
@@ -347,13 +391,95 @@ namespace Zyan.Communication
 
         #endregion
 
+        #region Ereignis-Unterstützung
+
+        /// <summary>
+        /// Abonniert ein Ereignis einer Serverkomponente.
+        /// </summary>
+        /// <param name="interfaceName">Schnittstellenname der Serverkomponente</param>
+        /// <param name="correlation">Korrelationsinformation</param>
+        public void AddEventHandler(string interfaceName, RemoteOutputPinWiring correlation)
+        {
+            // Wenn kein Schnittstellenname angegeben wurde ...
+            if (string.IsNullOrEmpty(interfaceName))
+                // Ausnahme werfen
+                throw new ArgumentException(LanguageResource.ArgumentException_InterfaceNameMissing, "interfaceName");
+
+            // Wenn für den angegebenen Schnittstellennamen keine Komponente registriert ist ...
+            if (!_host.ComponentRegistry.ContainsKey(interfaceName))
+                // Ausnahme erzeugen
+                throw new KeyNotFoundException(string.Format("Für die angegebene Schnittstelle '{0}' ist keine Komponente registiert.", interfaceName));
+
+            // Komponentenregistrierung abrufen
+            ComponentRegistration registration = _host.ComponentRegistry[interfaceName];
+
+            // Wenn die Komponente nicht Singletonaktiviert ist ...
+            if (registration.ActivationType != ActivationType.Singleton)
+                // Prozedur abbrechen
+                return;
+
+            // Komponenteninstanz erzeugen
+            object instance = _host.GetComponentInstance(registration);
+
+            // Implementierungstyp abrufen
+            Type type = instance.GetType();
+
+            // Liste für Übergabe der Korrelationsinformation erzeugen
+            ArrayList correlationSet = new ArrayList();
+            correlationSet.Add(correlation);
+
+            // Client- und Server-Komponente miteinander verdrahten
+            CreateClientServerWires(type, instance, correlationSet);
+        }
+
+        /// <summary>
+        /// Entfernt das Abonnement eines Ereignisses einer Serverkomponente.
+        /// </summary>
+        /// <param name="interfaceName">Schnittstellenname der Serverkomponente</param>
+        /// <param name="correlation">Korrelationsinformation</param>
+        public void RemoveEventHandler(string interfaceName, RemoteOutputPinWiring correlation)
+        {
+            // Wenn kein Schnittstellenname angegeben wurde ...
+            if (string.IsNullOrEmpty(interfaceName))
+                // Ausnahme werfen
+                throw new ArgumentException(LanguageResource.ArgumentException_InterfaceNameMissing, "interfaceName");
+
+            // Wenn für den angegebenen Schnittstellennamen keine Komponente registriert ist ...
+            if (!_host.ComponentRegistry.ContainsKey(interfaceName))
+                // Ausnahme erzeugen
+                throw new KeyNotFoundException(string.Format("Für die angegebene Schnittstelle '{0}' ist keine Komponente registiert.", interfaceName));
+
+            // Komponentenregistrierung abrufen
+            ComponentRegistration registration = _host.ComponentRegistry[interfaceName];
+
+            // Wenn die Komponente nicht Singletonaktiviert ist ...
+            if (registration.ActivationType != ActivationType.Singleton)
+                // Prozedur abbrechen
+                return;
+
+            // Komponenteninstanz erzeugen
+            object instance = _host.GetComponentInstance(registration);
+
+            // Implementierungstyp abrufen
+            Type type = instance.GetType();
+
+            // Liste für Übergabe der Korrelationsinformation erzeugen
+            ArrayList correlationSet = new ArrayList();
+            correlationSet.Add(correlation);
+            
+            // Client- und Server-Komponente miteinander verdrahten
+            RemoveClientServerWires(type, instance, correlationSet);
+        }
+
+        #endregion
+
         #region Metadaten abfragen
 
         /// <summary>
         /// Gibt eine Liste mit allen registrierten Komponenten zurück.
         /// </summary>
         /// <returns>Liste mit Namen der registrierten Komponenten</returns>
-        public string[] GetRegisteredComponents()
+        public ComponentInfo[] GetRegisteredComponents()
         {
             // Daten vom Host abrufen
             return _host.GetRegisteredComponents().ToArray();

@@ -27,7 +27,7 @@ namespace Zyan.Communication
         private string _serverUrl = string.Empty;
 
         // Liste mit allen registrierten Komponenten des verbundenen Servers
-        private List<string> _registeredComponents = null;
+        private List<ComponentInfo> _registeredComponents = null;
 
         // Sitzungsschlüssel
         private Guid _sessionID = Guid.Empty;
@@ -190,7 +190,7 @@ namespace Zyan.Communication
             RemoteComponentFactory.Logon(_sessionID, credentials);
 
             // Registrierte Komponenten vom Server abrufen
-            _registeredComponents = new List<string>(RemoteComponentFactory.GetRegisteredComponents());
+            _registeredComponents = new List<ComponentInfo>(RemoteComponentFactory.GetRegisteredComponents());
 
             // Sitzungslimit abrufen
             _sessionAgeLimit = RemoteComponentFactory.SessionAgeLimit;
@@ -311,14 +311,19 @@ namespace Zyan.Communication
             if (!interfaceType.IsInterface)
                 // Ausnahme werfen
                 throw new ApplicationException(string.Format("Der angegebene Typ '{0}' ist keine Schnittstelle! Für die Erzeugung einer entfernten Komponenteninstanz, wird deren öffentliche Schnittstelle benötigt!", interfaceName));
+            
+            // Komponenteninformation abrufen
+            ComponentInfo info = (from entry in _registeredComponents
+                                  where entry.InterfaceName.Equals(interfaceName)
+                                  select entry).FirstOrDefault();
 
             // Wenn für die Schnittstelle auf dem verbundenen Server keine Komponente registriert ist ...
-            if (!_registeredComponents.Contains(interfaceName))
+            if (info==null)
                 // Ausnahme werfne
                 throw new ApplicationException(string.Format("Für Schnittstelle '{0}' ist auf dem Server '{1}' keine Komponente registriert.", interfaceName, _serverUrl));
 
             // Proxy erzeugen
-            ZyanProxy proxy = new ZyanProxy(typeof(T), this, implicitTransactionTransfer, _sessionID, _componentHostName, _autoLoginOnExpiredSession, _autoLoginCredentials);
+            ZyanProxy proxy = new ZyanProxy(typeof(T), this, implicitTransactionTransfer, _sessionID, _componentHostName, _autoLoginOnExpiredSession, _autoLoginCredentials, info.ActivationType);
 
             // Proxy transparent machen und zurückgeben
             return (T)proxy.GetTransparentProxy();

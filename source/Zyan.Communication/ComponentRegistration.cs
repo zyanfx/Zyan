@@ -3,10 +3,38 @@
 namespace Zyan.Communication
 {
     /// <summary>
+    /// Aufzählung der verfügbaren Aktivierungsarten.
+    /// </summary>
+    public enum ActivationType : short
+    {
+        /// <summary>
+        /// Komponenteninstanz lebt nur einen Aufruf lang. Für jeden Aufruf wird eine separate Instanz erzeugt.
+        /// <remarks>SingleCallaktivierte Komponenten müssen nicht threadsicher sein.</remarks>
+        /// </summary>
+        SingleCall = 1,
+        /// <summary>
+        /// Komponenteninstanz wird bei erstem Aufruf erzeugt und wird für alle weiteren Aufrufe wiederverwendet.
+        /// <remarks>Singltonaktivierte Komponenten müssen threadsicher sein.</remarks>
+        /// </summary>
+        Singleton
+    }
+
+    /// <summary>
     /// Beschreibt eine Komponenten-Registrierung.
     /// </summary>
     public class ComponentRegistration
     {
+        // Sperrobjekt für Threadsynchronisierung
+        private object _syncLock = new object();
+
+        /// <summary>
+        /// Gibt das Sperrobjekt für Threadsynchronisierung zurück.
+        /// </summary>
+        public object SyncLock
+        {
+            get { return _syncLock; }
+        }
+
         /// <summary>
         /// Standardkonstruktor.
         /// </summary>
@@ -25,6 +53,21 @@ namespace Zyan.Communication
             // Werte übernehmen
             this.InterfaceType = interfaceType;
             this.ImplementationType = implementationType;
+            this.ActivationType = ActivationType.SingleCall;
+        }
+
+        /// <summary>
+        /// Konstruktor.
+        /// </summary>
+        /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
+        /// <param name="implementationType">Implementierungstyp der Komponente</param>                
+        /// <param name="activationType">Aktivierungsart</param>
+        public ComponentRegistration(Type interfaceType, Type implementationType, ActivationType activationType)
+        {
+            // Werte übernehmen
+            this.InterfaceType = interfaceType;
+            this.ImplementationType = implementationType;
+            this.ActivationType = activationType;
         }
 
         /// <summary>
@@ -36,7 +79,22 @@ namespace Zyan.Communication
         {
             // Werte übernehmen
             this.InterfaceType = interfaceType;            
-            this.InitializationHandler = intializationHandler;            
+            this.InitializationHandler = intializationHandler;
+            this.ActivationType = ActivationType.SingleCall;
+        }
+
+        /// <summary>
+        /// Konstruktor.
+        /// </summary>
+        /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
+        /// <param name="intializationHandler">Delegat auf Inizialisierungsfunktion</param>        
+        /// <param name="activationType">Aktivierungsart</param>
+        public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, ActivationType activationType)
+        {
+            // Werte übernehmen
+            this.InterfaceType = interfaceType;
+            this.InitializationHandler = intializationHandler;
+            this.ActivationType = activationType;
         }
 
         /// <summary>
@@ -49,9 +107,10 @@ namespace Zyan.Communication
             // Werte übernehmen
             this.InterfaceType = interfaceType;
             this.ImplementationType = singletonInstance.GetType();
-            this.SingletonInstance = singletonInstance;            
+            this.SingletonInstance = singletonInstance;
+            this.ActivationType = ActivationType.Singleton;
         }
-
+                
         /// <summary>
         /// Konstruktor.
         /// </summary>
@@ -64,6 +123,23 @@ namespace Zyan.Communication
             this.InterfaceType = interfaceType;
             this.ImplementationType = implementationType;
             this.ModuleName = moduleName;
+            this.ActivationType = ActivationType.SingleCall;
+        }
+
+        /// <summary>
+        /// Konstruktor.
+        /// </summary>
+        /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
+        /// <param name="implementationType">Implementierungstyp der Komponente</param>        
+        /// <param name="moduleName">Modulname</param>
+        /// <param name="activationType">Aktivierungsart</param>
+        public ComponentRegistration(Type interfaceType, Type implementationType, string moduleName, ActivationType activationType)
+        {
+            // Werte übernehmen
+            this.InterfaceType = interfaceType;
+            this.ImplementationType = implementationType;
+            this.ModuleName = moduleName;
+            this.ActivationType = activationType;
         }
 
         /// <summary>
@@ -78,6 +154,23 @@ namespace Zyan.Communication
             this.InterfaceType = interfaceType;
             this.InitializationHandler = intializationHandler;
             this.ModuleName = moduleName;
+            this.ActivationType = ActivationType.SingleCall;
+        }
+
+        /// <summary>
+        /// Konstruktor.
+        /// </summary>
+        /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
+        /// <param name="intializationHandler">Delegat auf Inizialisierungsfunktion</param>        
+        /// <param name="moduleName">Modulname</param>
+        /// <param name="activationType">Aktivierungsart</param>
+        public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, string moduleName, ActivationType activationType)
+        {
+            // Werte übernehmen
+            this.InterfaceType = interfaceType;
+            this.InitializationHandler = intializationHandler;
+            this.ModuleName = moduleName;
+            this.ActivationType = activationType;
         }
 
         /// <summary>
@@ -93,6 +186,7 @@ namespace Zyan.Communication
             this.ImplementationType = singletonInstance.GetType();
             this.SingletonInstance = singletonInstance;
             this.ModuleName = moduleName;
+            this.ActivationType = ActivationType.Singleton;
         }
 
         /// <summary>
@@ -143,7 +237,16 @@ namespace Zyan.Communication
             get;
             set;
         }
-        
+
+        /// <summary>
+        /// Gibt die Aktivierungsart der Komponente zurück, oder lget sie fest.
+        /// </summary>
+        public ActivationType ActivationType
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// Gibt die Objektdaten als Zeichenkette zurück.
         /// </summary>

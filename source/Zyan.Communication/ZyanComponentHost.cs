@@ -246,6 +246,18 @@ namespace Zyan.Communication
             // Aufruf an Komponentenkatalog weiterleiten
             _catalog.RegisterComponent<I, T>();            
         }
+
+        /// <summary>
+        /// Registriert eine bestimmte Komponente.
+        /// </summary>        
+        /// <param name="activationType">Aktivierungsart</param>
+        /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
+        /// <typeparam name="T">Implementierungstyp der Komponente</typeparam>
+        public void RegisterComponent<I, T>(ActivationType activationType)
+        {
+            // Aufruf an Komponentenkatalog weiterleiten
+            _catalog.RegisterComponent<I, T>(activationType);
+        }
         
         /// <summary>
         /// Registriert eine bestimmte Komponente.
@@ -256,6 +268,18 @@ namespace Zyan.Communication
         {
             // Aufruf an Komponentenkatalog weiterleiten
             _catalog.RegisterComponent<I>(factoryMethod);            
+        }
+
+        /// <summary>
+        /// Registriert eine bestimmte Komponente.
+        /// </summary>
+        /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
+        /// <param name="factoryMethod">Delegat auf Fabrikmethode, die sich um die Erzeugung und Inizialisierung der Komponente kümmert</param>
+        /// <param name="activationType">Aktivierungstyp</param>
+        public void RegisterComponent<I>(Func<object> factoryMethod, ActivationType activationType)
+        {
+            // Aufruf an Komponentenkatalog weiterleiten
+            _catalog.RegisterComponent<I>(factoryMethod,activationType);
         }
 
         /// <summary>
@@ -284,6 +308,19 @@ namespace Zyan.Communication
 
         /// <summary>
         /// Registriert eine bestimmte Komponente.
+        /// </summary>        
+        /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
+        /// <typeparam name="T">Implementierungstyp der Komponente</typeparam>
+        /// <param name="moduleName">Modulname</param>
+        /// <param name="activationType">Aktivierungstyp</param>
+        public void RegisterComponent<I, T>(string moduleName,ActivationType activationType)
+        {
+            // Aufruf an Komponentenkatalog weiterleiten
+            _catalog.RegisterComponent<I, T>(moduleName,activationType);
+        }
+
+        /// <summary>
+        /// Registriert eine bestimmte Komponente.
         /// </summary>
         /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
         /// <param name="moduleName">Modulname</param>
@@ -292,6 +329,19 @@ namespace Zyan.Communication
         {
             // Aufruf an Komponentenkatalog weiterleiten
             _catalog.RegisterComponent<I>(moduleName, factoryMethod);            
+        }
+
+        /// <summary>
+        /// Registriert eine bestimmte Komponente.
+        /// </summary>
+        /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
+        /// <param name="moduleName">Modulname</param>
+        /// <param name="factoryMethod">Delegat auf Fabrikmethode, die sich um die Erzeugung und Inizialisierung der Komponente kümmert</param>
+        /// <param name="activationType">Aktivierungstyp</param>
+        public void RegisterComponent<I>(string moduleName, Func<object> factoryMethod, ActivationType activationType)
+        {
+            // Aufruf an Komponentenkatalog weiterleiten
+            _catalog.RegisterComponent<I>(moduleName, factoryMethod, activationType);
         }
 
         /// <summary>
@@ -311,7 +361,7 @@ namespace Zyan.Communication
         /// Gibt eine Liste mit allen registrierten Komponenten zurück.
         /// </summary>
         /// <returns>Liste der registrierten Komponenten</returns>
-        public List<string> GetRegisteredComponents()
+        public List<ComponentInfo> GetRegisteredComponents()
         { 
             // Aufruf an Komponentenkatalog weiterleiten
             return _catalog.GetRegisteredComponents();
