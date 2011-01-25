@@ -26,7 +26,16 @@ namespace Zyan.Communication
             get;
             set;
         }
-                
+
+        /// <summary>
+        /// Gibt zurück, ob es sich um ein Ereignis handelt, oder legt diest fest.
+        /// </summary>
+        public bool IsEvent
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// Ruft den verdrahteten Client-Pin dynamisch auf.
         /// </summary>

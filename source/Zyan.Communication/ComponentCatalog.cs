@@ -89,6 +89,18 @@ namespace Zyan.Communication
         /// <typeparam name="T">Implementierungstyp der Komponente</typeparam>
         public void RegisterComponent<I, T>()
         {
+            // Andere Überladung aufrufen
+            RegisterComponent<I, T>(ActivationType.SingleCall);
+        }
+
+        /// <summary>
+        /// Registriert eine bestimmte Komponente.
+        /// </summary>        
+        /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
+        /// <typeparam name="T">Implementierungstyp der Komponente</typeparam>
+        /// <param name="activationType">Aktivierungsart</param>
+        public void RegisterComponent<I, T>(ActivationType activationType)
+        {
             // Typinformationen abrufen
             Type interfaceType = typeof(I);
             Type implementationType = typeof(T);
@@ -110,7 +122,7 @@ namespace Zyan.Communication
             if (!ComponentRegistry.ContainsKey(interfaceName))
             {
                 // Registrierungseintrag erstellen
-                ComponentRegistration registration = new ComponentRegistration(interfaceType, implementationType);
+                ComponentRegistration registration = new ComponentRegistration(interfaceType, implementationType, activationType);
 
                 // Registrierungseintrag der Liste zufügen
                 ComponentRegistry.Add(interfaceName, registration);
@@ -123,6 +135,18 @@ namespace Zyan.Communication
         /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
         /// <param name="factoryMethod">Delegat auf Fabrikmethode, die sich um die Erzeugung und Inizialisierung der Komponente kümmert</param>
         public void RegisterComponent<I>(Func<object> factoryMethod)
+        {
+            // Andere Überladung aufrufen
+            RegisterComponent<I>(factoryMethod, ActivationType.SingleCall);
+        }
+
+        /// <summary>
+        /// Registriert eine bestimmte Komponente.
+        /// </summary>
+        /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
+        /// <param name="factoryMethod">Delegat auf Fabrikmethode, die sich um die Erzeugung und Inizialisierung der Komponente kümmert</param>
+        /// <param name="activationType">Aktivierungsart</param>
+        public void RegisterComponent<I>(Func<object> factoryMethod, ActivationType activationType)
         {
             // Typinformationen abrufen
             Type interfaceType = typeof(I);
@@ -144,7 +168,7 @@ namespace Zyan.Communication
             if (!ComponentRegistry.ContainsKey(interfaceName))
             {
                 // Registrierungseintrag erstellen
-                ComponentRegistration registration = new ComponentRegistration(interfaceType, factoryMethod);
+                ComponentRegistration registration = new ComponentRegistration(interfaceType, factoryMethod, activationType);
 
                 // Registrierungseintrag der Liste zufügen
                 ComponentRegistry.Add(interfaceName, registration);
@@ -195,6 +219,19 @@ namespace Zyan.Communication
         /// <param name="moduleName">Modulname</param>
         public void RegisterComponent<I, T>(string moduleName)
         {
+            // Andere Überladung aufrufen
+            RegisterComponent<I, T>(moduleName, ActivationType.SingleCall);
+        }
+
+        /// <summary>
+        /// Registriert eine bestimmte Komponente.
+        /// </summary>        
+        /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
+        /// <typeparam name="T">Implementierungstyp der Komponente</typeparam>
+        /// <param name="moduleName">Modulname</param>
+        /// <param name="activationType">Aktivierungsart</param>
+        public void RegisterComponent<I, T>(string moduleName, ActivationType activationType)
+        {
             // Typinformationen abrufen
             Type interfaceType = typeof(I);
             Type implementationType = typeof(T);
@@ -216,7 +253,7 @@ namespace Zyan.Communication
             if (!ComponentRegistry.ContainsKey(interfaceName))
             {
                 // Registrierungseintrag erstellen
-                ComponentRegistration registration = new ComponentRegistration(interfaceType, implementationType, moduleName);
+                ComponentRegistration registration = new ComponentRegistration(interfaceType, implementationType, moduleName, activationType);
 
                 // Registrierungseintrag der Liste zufügen
                 ComponentRegistry.Add(interfaceName, registration);
@@ -230,6 +267,19 @@ namespace Zyan.Communication
         /// <param name="moduleName">Modulname</param>
         /// <param name="factoryMethod">Delegat auf Fabrikmethode, die sich um die Erzeugung und Inizialisierung der Komponente kümmert</param>
         public void RegisterComponent<I>(string moduleName, Func<object> factoryMethod)
+        {
+            // Andere Überladung aufrufen
+            RegisterComponent<I>(moduleName, factoryMethod, ActivationType.SingleCall);
+        }
+
+        /// <summary>
+        /// Registriert eine bestimmte Komponente.
+        /// </summary>
+        /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
+        /// <param name="moduleName">Modulname</param>
+        /// <param name="factoryMethod">Delegat auf Fabrikmethode, die sich um die Erzeugung und Inizialisierung der Komponente kümmert</param>
+        /// <param name="activationType">Aktivierungsart</param>
+        public void RegisterComponent<I>(string moduleName, Func<object> factoryMethod, ActivationType activationType)
         {
             // Typinformationen abrufen
             Type interfaceType = typeof(I);
@@ -251,7 +301,7 @@ namespace Zyan.Communication
             if (!ComponentRegistry.ContainsKey(interfaceName))
             {
                 // Registrierungseintrag erstellen
-                ComponentRegistration registration = new ComponentRegistration(interfaceType, factoryMethod, moduleName);
+                ComponentRegistration registration = new ComponentRegistration(interfaceType, factoryMethod, moduleName, activationType);
 
                 // Registrierungseintrag der Liste zufügen
                 ComponentRegistry.Add(interfaceName, registration);
@@ -294,26 +344,30 @@ namespace Zyan.Communication
                 ComponentRegistry.Add(interfaceName, registration);
             }
         }
-        
+                
         /// <summary>
         /// Gibt eine Liste mit allen registrierten Komponenten zurück.
         /// </summary>
         /// <returns>Liste der registrierten Komponenten</returns>
-        public List<string> GetRegisteredComponents()
+        public List<ComponentInfo> GetRegisteredComponents()
         {
             // Wörterbuch erzeugen 
-            List<string> result = new List<string>();
+            List<ComponentInfo> result = new List<ComponentInfo>();
 
             // Komponentenregistrierung druchlaufen
             foreach (ComponentRegistration registration in ComponentRegistry.Values)
             {
                 // Neuen Eintrag erstellen
-                result.Add(registration.InterfaceType.FullName);
+                result.Add(new ComponentInfo()
+                           {
+                               InterfaceName = registration.InterfaceType.FullName,
+                               ActivationType = registration.ActivationType
+                           });
             }
             // Wörterbuch zurückgeben
             return result;
         }
-
+        
         /// <summary>
         /// Gibt eine Instanz einer registrierten Komponente zurück.
         /// </summary>
@@ -326,18 +380,44 @@ namespace Zyan.Communication
                 // Ausnahme werfen
                 throw new ArgumentNullException("registration");
 
-            // Wenn eine Singleton-Instanz registriert wurde ...
-            if (registration.SingletonInstance != null)
-                // Singleton-Instanz zurückgeben
-                return registration.SingletonInstance;
+            // Aktivierungsart auswerten
+            switch (registration.ActivationType)
+            { 
+                case ActivationType.SingleCall: // SingleCall-Aktivierung
+                    
+                    // Wenn eine Initialisierungsfunktion angegeben wurde ...
+                    if (registration.InitializationHandler != null)
+                        // Komponenteninstanz von Inizialisierungsfunktion erzeugen lassen
+                        return registration.InitializationHandler();
+                    else
+                        // Komponenteninstanz erzeugen
+                        return Activator.CreateInstance(registration.ImplementationType);
 
-            // Wenn eine Initialisierungsfunktion angegeben wurde ...
-            if (registration.InitializationHandler != null)
-                // Komponenteninstanz von Inizialisierungsfunktion erzeugen lassen
-                return registration.InitializationHandler();
-            else
-                // Komponenteninstanz erzeugen
-                return Activator.CreateInstance(registration.ImplementationType);
+                case ActivationType.Singleton: // Singleton-Aktivierung
+
+                    // Wenn noch keine Singleton-Instanz existiert ...
+                    if (registration.SingletonInstance == null)
+                    {
+                        lock (registration.SyncLock)
+                        { 
+                            // Wenn die Singleton-Instanz nicht bereits durch einen anderen Thread erzeugt wurde ...
+                            if (registration.SingletonInstance == null)
+                            {
+                                // Wenn eine Initialisierungsfunktion angegeben wurde ...
+                                if (registration.InitializationHandler!=null)
+                                    // Singleton-Instanz mittels Inizialisierungsfunktion erzeugen
+                                    registration.SingletonInstance = registration.InitializationHandler();
+                                else
+                                    // Singleton-Instanz erzeugen
+                                    registration.SingletonInstance = Activator.CreateInstance(registration.ImplementationType);
+                            }
+                        }
+                    }
+                    // Singleton-Instanz zurückgeben
+                    return registration.SingletonInstance;
+            }
+            // Ausnahme werfen
+            throw new NullReferenceException();
         }
 
         /// <summary>
