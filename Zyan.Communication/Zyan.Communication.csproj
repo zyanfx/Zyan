@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComponentCatalog.cs" />
+    <Compile Include="ComponentInfo.cs" />
     <Compile Include="DynamicWireFactory.cs" />
     <Compile Include="InvalidSessionException.cs" />
     <Compile Include="InvokeCanceledEventArgs.cs" />

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -24,6 +25,7 @@ namespace Zyan.Communication
         private bool _autoLoginOnExpiredSession = false;
         private Hashtable _autoLoginCredentials = null;
         private ZyanConnection _connection = null;
+        private ActivationType _activationType = ActivationType.SingleCall;
 
         /// <summary>
         /// Konstruktor.
@@ -35,7 +37,8 @@ namespace Zyan.Communication
         /// <param name="componentHostName">Name des entfernten Komponentenhosts</param>
         /// <param name="autoLoginOnExpiredSession">Gibt an, ob sich der Proxy automatisch neu anmelden soll, wenn die Sitzung abgelaufen ist</param>
         /// <param name="autoLogoninCredentials">Optional! Anmeldeinformationen, die nur benötigt werden, wenn autoLoginOnExpiredSession auf Wahr eingestellt ist</param>              
-        public ZyanProxy(Type type, ZyanConnection connection, bool implicitTransactionTransfer, Guid sessionID, string componentHostName, bool autoLoginOnExpiredSession, Hashtable autoLogoninCredentials)
+        /// <param name="activationType">Aktivierungsart</param>
+        public ZyanProxy(Type type, ZyanConnection connection, bool implicitTransactionTransfer, Guid sessionID, string componentHostName, bool autoLoginOnExpiredSession, Hashtable autoLogoninCredentials, ActivationType activationType)
             : base(type)
         {
             // Wenn kein Typ angegeben wurde ...
@@ -59,6 +62,9 @@ namespace Zyan.Communication
 
             // Schnittstellentyp übernehmen
             _interfaceType = type;
+
+            // Aktivierungsart übernehmen
+            _activationType = activationType;
 
             // Aufrufer von Verbindung übernehmen
             _remoteInvoker = _connection.RemoteComponentFactory;
@@ -96,13 +102,14 @@ namespace Zyan.Communication
             // Methoden-Metadaten abrufen
             MethodInfo methodInfo = (MethodInfo)methodCallMessage.MethodBase;
             methodInfo.GetParameters();
+
             // Wenn die Methode ein Ausgabe-Pin ist ...
             if (methodInfo.ReturnType.Equals(typeof(void)) &&
                 methodCallMessage.InArgCount == 1 &&
                 methodCallMessage.ArgCount == 1 &&
                 methodCallMessage.Args[0] != null &&
                 typeof(Delegate).IsAssignableFrom(methodCallMessage.Args[0].GetType()) &&
-                methodCallMessage.MethodName.StartsWith("set_"))
+                (methodCallMessage.MethodName.StartsWith("set_") || methodCallMessage.MethodName.StartsWith("add_")))
             {
                 // EBC-Eingangsnachricht abrufen
                 object inputMessage = methodCallMessage.GetArg(0);
@@ -115,10 +122,57 @@ namespace Zyan.Communication
                 {
                     ClientReceiver = inputMessage,
                     ServerPropertyName = propertyName,
+                    IsEvent = methodCallMessage.MethodName.StartsWith("add_")
                 };
-                // Verdrahtung in der Sammlung ablegen
-                _outputMessageCorrelationSet.Add(wiring);
+                // Wenn die Serverkomponente SingleCallaktiviert ist ...
+                if (_activationType == ActivationType.SingleCall)
+                    // Verdrahtung in der Sammlung ablegen
+                    _outputMessageCorrelationSet.Add(wiring);
+                else
+                    // Ereignis der Serverkomponente abonnieren
+                    _connection.RemoteComponentFactory.AddEventHandler(_interfaceType.FullName, wiring);
+                
+                // Leere Remoting-Antwortnachricht erstellen und zurückgeben
+                return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
+            }
+            else if (methodInfo.ReturnType.Equals(typeof(void)) &&
+                methodCallMessage.InArgCount == 1 &&
+                methodCallMessage.ArgCount == 1 &&
+                methodCallMessage.Args[0] != null &&
+                typeof(Delegate).IsAssignableFrom(methodCallMessage.Args[0].GetType()) &&
+                (methodCallMessage.MethodName.StartsWith("remove_")))
+            {
+                // EBC-Eingangsnachricht abrufen
+                object inputMessage = methodCallMessage.GetArg(0);
 
+                // "remove_" wegschneiden
+                string propertyName = methodCallMessage.MethodName.Substring(7);
+                                
+                // Wenn die Serverkomponente SingleCallaktiviert ist ...
+                if (_activationType == ActivationType.SingleCall)
+                {
+                    // Verdrahtungskonfiguration suchen
+                    RemoteOutputPinWiring found = (from wiring in (RemoteOutputPinWiring[])_outputMessageCorrelationSet.ToArray()
+                                                   where wiring.ServerPropertyName.Equals(propertyName) && wiring.ClientReceiver == inputMessage
+                                                   select wiring).FirstOrDefault();
+
+                    // Wenn eine passende Verdrahtungskonfiguration gefunden wurde ...
+                    if (found != null)
+                        // Verdrahtungskonfiguration entfernen
+                        _outputMessageCorrelationSet.Remove(found);
+                }
+                else
+                {
+                    // Verdrahtungskonfiguration festschreiben
+                    RemoteOutputPinWiring wiring = new RemoteOutputPinWiring()
+                    {
+                        ClientReceiver = inputMessage,
+                        ServerPropertyName = propertyName,
+                        IsEvent = true
+                    };
+                    // Ereignisabo entfernen
+                    _connection.RemoteComponentFactory.RemoveEventHandler(_interfaceType.FullName, wiring);
+                }
                 // Leere Remoting-Antwortnachricht erstellen und zurückgeben
                 return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
             }

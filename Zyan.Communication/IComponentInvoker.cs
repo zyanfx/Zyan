@@ -29,7 +29,7 @@ namespace Zyan.Communication
         /// Gibt eine Liste mit allen registrierten Komponenten zurück.
         /// </summary>
         /// <returns>Liste mit Namen der registrierten Komponenten</returns>
-        string[] GetRegisteredComponents();
+        ComponentInfo[] GetRegisteredComponents();
 
         /// <summary>
         /// Meldet einen Client am Applikationserver an.
@@ -71,5 +71,19 @@ namespace Zyan.Communication
         /// </summary>
         /// <returns>Sitzungslebensdauer (in Minuten)</returns>
         int RenewSession();
+
+        /// <summary>
+        /// Abonniert ein Ereignis einer Serverkomponente.
+        /// </summary>
+        /// <param name="interfaceName">Schnittstellenname der Serverkomponente</param>
+        /// <param name="correlation">Korrelationsinformation</param>
+        void AddEventHandler(string interfaceName, RemoteOutputPinWiring correlation);
+
+        /// <summary>
+        /// Entfernt das Abonnement eines Ereignisses einer Serverkomponente.
+        /// </summary>
+        /// <param name="interfaceName">Schnittstellenname der Serverkomponente</param>
+        /// <param name="correlation">Korrelationsinformation</param>
+        void RemoveEventHandler(string interfaceName, RemoteOutputPinWiring correlation);
     }
 }
