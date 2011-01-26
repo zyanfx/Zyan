@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Zyan.Communication
 {
@@ -35,12 +36,24 @@ namespace Zyan.Communication
             get { return _syncLock; }
         }
 
+        // Liste mit Ereignisverdrahtungen
+        private Dictionary<Guid,Delegate> _eventWirings;
+
+        /// <summary>
+        /// Gibt die Liste der Ereignisverdrahtungen zurück.
+        /// </summary>
+        internal Dictionary<Guid, Delegate> EventWirings
+        {
+            get { return _eventWirings; }
+        }
+
         /// <summary>
         /// Standardkonstruktor.
         /// </summary>
         public ComponentRegistration()
         {
-
+            // Liste für Ereignisverdrahtungen erzeugen
+            _eventWirings = new Dictionary<Guid, Delegate>();
         }
 
         /// <summary>
@@ -49,6 +62,7 @@ namespace Zyan.Communication
         /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
         /// <param name="implementationType">Implementierungstyp der Komponente</param>                
         public ComponentRegistration(Type interfaceType, Type implementationType) 
+            : this()
         {
             // Werte übernehmen
             this.InterfaceType = interfaceType;
@@ -63,6 +77,7 @@ namespace Zyan.Communication
         /// <param name="implementationType">Implementierungstyp der Komponente</param>                
         /// <param name="activationType">Aktivierungsart</param>
         public ComponentRegistration(Type interfaceType, Type implementationType, ActivationType activationType)
+            : this()
         {
             // Werte übernehmen
             this.InterfaceType = interfaceType;
@@ -76,6 +91,7 @@ namespace Zyan.Communication
         /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
         /// <param name="intializationHandler">Delegat auf Inizialisierungsfunktion</param>        
         public ComponentRegistration(Type interfaceType, Func<object> intializationHandler)
+            : this()
         {
             // Werte übernehmen
             this.InterfaceType = interfaceType;            
@@ -90,6 +106,7 @@ namespace Zyan.Communication
         /// <param name="intializationHandler">Delegat auf Inizialisierungsfunktion</param>        
         /// <param name="activationType">Aktivierungsart</param>
         public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, ActivationType activationType)
+            : this()
         {
             // Werte übernehmen
             this.InterfaceType = interfaceType;
@@ -103,6 +120,7 @@ namespace Zyan.Communication
         /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
         /// <param name="singletonInstance">Singleton-Instanz der Komponente</param>
         public ComponentRegistration(Type interfaceType, object singletonInstance)
+            : this()
         {
             // Werte übernehmen
             this.InterfaceType = interfaceType;
@@ -118,6 +136,7 @@ namespace Zyan.Communication
         /// <param name="implementationType">Implementierungstyp der Komponente</param>        
         /// <param name="moduleName">Modulname</param>
         public ComponentRegistration(Type interfaceType, Type implementationType, string moduleName)
+            : this()
         {
             // Werte übernehmen
             this.InterfaceType = interfaceType;
@@ -134,6 +153,7 @@ namespace Zyan.Communication
         /// <param name="moduleName">Modulname</param>
         /// <param name="activationType">Aktivierungsart</param>
         public ComponentRegistration(Type interfaceType, Type implementationType, string moduleName, ActivationType activationType)
+            : this()
         {
             // Werte übernehmen
             this.InterfaceType = interfaceType;
@@ -149,6 +169,7 @@ namespace Zyan.Communication
         /// <param name="intializationHandler">Delegat auf Inizialisierungsfunktion</param>        
         /// <param name="moduleName">Modulname</param>
         public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, string moduleName)
+            : this()
         {
             // Werte übernehmen
             this.InterfaceType = interfaceType;
@@ -165,6 +186,7 @@ namespace Zyan.Communication
         /// <param name="moduleName">Modulname</param>
         /// <param name="activationType">Aktivierungsart</param>
         public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, string moduleName, ActivationType activationType)
+            : this()
         {
             // Werte übernehmen
             this.InterfaceType = interfaceType;
@@ -180,6 +202,7 @@ namespace Zyan.Communication
         /// <param name="singletonInstance">Singleton-Instanz der Komponente</param>
         /// <param name="moduleName">Modulname</param>
         public ComponentRegistration(Type interfaceType, object singletonInstance, string moduleName)
+            : this()
         {
             // Werte übernehmen
             this.InterfaceType = interfaceType;

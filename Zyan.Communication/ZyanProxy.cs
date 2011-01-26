@@ -18,7 +18,7 @@ namespace Zyan.Communication
         // Felder
         private Type _interfaceType = null;
         private IComponentInvoker _remoteInvoker = null;
-        private ArrayList _outputMessageCorrelationSet = null;
+        private List<RemoteOutputPinWiring> _outputMessageCorrelationSet = null;
         private bool _implicitTransactionTransfer = false;
         private Guid _sessionID;
         private string _componentHostName = string.Empty;
@@ -81,7 +81,7 @@ namespace Zyan.Communication
                 _autoLoginCredentials = autoLogoninCredentials;
 
             // Sammlung für Korrelationssatz erzeugen
-            _outputMessageCorrelationSet = new ArrayList();
+            _outputMessageCorrelationSet = new List<RemoteOutputPinWiring>();
         }
 
         /// <summary>
@@ -124,13 +124,13 @@ namespace Zyan.Communication
                     ServerPropertyName = propertyName,
                     IsEvent = methodCallMessage.MethodName.StartsWith("add_")
                 };
-                // Wenn die Serverkomponente SingleCallaktiviert ist ...
-                if (_activationType == ActivationType.SingleCall)
-                    // Verdrahtung in der Sammlung ablegen
-                    _outputMessageCorrelationSet.Add(wiring);
-                else
+                // Wenn die Serverkomponente Singletonaktiviert ist ...
+                if (_activationType == ActivationType.Singleton)                    
                     // Ereignis der Serverkomponente abonnieren
                     _connection.RemoteComponentFactory.AddEventHandler(_interfaceType.FullName, wiring);
+
+                // Verdrahtung in der Sammlung ablegen
+                _outputMessageCorrelationSet.Add(wiring);
                 
                 // Leere Remoting-Antwortnachricht erstellen und zurückgeben
                 return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
@@ -147,31 +147,30 @@ namespace Zyan.Communication
 
                 // "remove_" wegschneiden
                 string propertyName = methodCallMessage.MethodName.Substring(7);
-                                
-                // Wenn die Serverkomponente SingleCallaktiviert ist ...
-                if (_activationType == ActivationType.SingleCall)
+
+                // Wenn Verdrahtungen gespeichert sind ...
+                if (_outputMessageCorrelationSet.Count > 0)
                 {
                     // Verdrahtungskonfiguration suchen
                     RemoteOutputPinWiring found = (from wiring in (RemoteOutputPinWiring[])_outputMessageCorrelationSet.ToArray()
-                                                   where wiring.ServerPropertyName.Equals(propertyName) && wiring.ClientReceiver == inputMessage
+                                                   where wiring.ServerPropertyName.Equals(propertyName) && wiring.ClientReceiver.Equals(inputMessage)
                                                    select wiring).FirstOrDefault();
 
                     // Wenn eine passende Verdrahtungskonfiguration gefunden wurde ...
                     if (found != null)
-                        // Verdrahtungskonfiguration entfernen
-                        _outputMessageCorrelationSet.Remove(found);
-                }
-                else
-                {
-                    // Verdrahtungskonfiguration festschreiben
-                    RemoteOutputPinWiring wiring = new RemoteOutputPinWiring()
                     {
-                        ClientReceiver = inputMessage,
-                        ServerPropertyName = propertyName,
-                        IsEvent = true
-                    };
-                    // Ereignisabo entfernen
-                    _connection.RemoteComponentFactory.RemoveEventHandler(_interfaceType.FullName, wiring);
+                        // Wenn die Serverkomponente SingleCallaktiviert ist ...
+                        if (_activationType == ActivationType.SingleCall)
+                        {
+                            // Verdrahtungskonfiguration entfernen
+                            _outputMessageCorrelationSet.Remove(found);
+                        }
+                        else
+                        {
+                            // Ereignisabo entfernen
+                            _connection.RemoteComponentFactory.RemoveEventHandler(_interfaceType.FullName, found);
+                        }
+                    }
                 }
                 // Leere Remoting-Antwortnachricht erstellen und zurückgeben
                 return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
@@ -201,12 +200,20 @@ namespace Zyan.Communication
                 // Variable für Rückgabewert
                 object returnValue = null;
 
+                // Variable für Verdrahtungskorrelationssatz
+                List<RemoteOutputPinWiring> correlationSet = null;
+
+                // Wenn die Komponente SingleCallaktiviert ist ...
+                if (_activationType == ActivationType.SingleCall)
+                    // Korrelationssatz übernehmen (wird mit übertragen)
+                    correlationSet = _outputMessageCorrelationSet;
+
                 // Ereignisargumente für BeforeInvoke erstellen
                 BeforeInvokeEventArgs cancelArgs = new BeforeInvokeEventArgs()
                 {
                     TrackingID = trackingID,
                     InterfaceName = _interfaceType.FullName,
-                    OutputPinCorrelationSet = _outputMessageCorrelationSet,
+                    OutputPinCorrelationSet = correlationSet,
                     MethodName = methodCallMessage.MethodName,
                     Arguments = methodCallMessage.Args,
                     Cancel = false
@@ -231,14 +238,14 @@ namespace Zyan.Communication
                 try
                 {
                     // Entfernten Methodenaufruf durchführen
-                    returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, _outputMessageCorrelationSet, methodCallMessage.MethodName, methodCallMessage.MethodBase.GetParameters(), methodCallMessage.Args);
+                    returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, correlationSet, methodCallMessage.MethodName, methodCallMessage.MethodBase.GetParameters(), methodCallMessage.Args);
 
                     // Ereignisargumente für AfterInvoke erstellen
                     AfterInvokeEventArgs afterInvokeArgs = new AfterInvokeEventArgs()
                     {
                         TrackingID = trackingID,
                         InterfaceName = _interfaceType.FullName,
-                        OutputPinCorrelationSet = _outputMessageCorrelationSet,
+                        OutputPinCorrelationSet = correlationSet,
                         MethodName = methodCallMessage.MethodName,
                         Arguments = methodCallMessage.Args,
                         ReturnValue = returnValue
@@ -255,7 +262,7 @@ namespace Zyan.Communication
                         _remoteInvoker.Logon(_sessionID, _autoLoginCredentials);
 
                         // Entfernten Methodenaufruf erneut versuchen                        
-                        returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, _outputMessageCorrelationSet, methodCallMessage.MethodName, methodCallMessage.MethodBase.GetParameters(), methodCallMessage.Args);
+                        returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, correlationSet, methodCallMessage.MethodName, methodCallMessage.MethodBase.GetParameters(), methodCallMessage.Args);
                     }
                 }
                 // Remoting-Antwortnachricht erstellen und zurückgeben

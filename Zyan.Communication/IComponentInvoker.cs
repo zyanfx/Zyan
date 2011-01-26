@@ -23,7 +23,7 @@ namespace Zyan.Communication
         /// <param name="paramDefs">Parameter-Definitionen</param>
         /// <param name="args">Parameter</param>        
         /// <returns>Rückgabewert</returns>
-        object Invoke(Guid trackingID, string interfaceName, ArrayList outputPinCorrelationSet, string methodName, ParameterInfo[] paramDefs, params object[] args);
+        object Invoke(Guid trackingID, string interfaceName, List<RemoteOutputPinWiring> outputPinCorrelationSet, string methodName, ParameterInfo[] paramDefs, params object[] args);
 
         /// <summary>
         /// Gibt eine Liste mit allen registrierten Komponenten zurück.
