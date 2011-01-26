@@ -8,7 +8,19 @@ namespace Zyan.Communication
     /// Beschreibt die Verdrahtung eines entfernten Ausgabe-Pins.
     /// </summary>
     public class RemoteOutputPinWiring : MarshalByRefObject
-    {        
+    {
+        // Korrelationsschlüssel
+        private Guid _correlationID;
+
+        /// <summary>
+        /// Erzeugt eine neue Instanz von RemoteOutputPinWiring.
+        /// </summary>
+        public RemoteOutputPinWiring()
+        {
+            // Eindeutigen Korrelationsschlüssel erzeugen
+            _correlationID = Guid.NewGuid();
+        }
+
         /// <summary>
         /// Gibt den clientseitigen Empfängerdelegaten zurück, oder legt ihn fest.
         /// </summary>
@@ -36,6 +48,14 @@ namespace Zyan.Communication
             set;
         }
 
+        /// <summary>
+        /// Gibt den eindeutigen Korrelationsschlüssel zurück oder legt ihn fest.
+        /// </summary>
+        public Guid CorrelationID
+        {
+            get { return _correlationID; }
+        }
+        
         /// <summary>
         /// Ruft den verdrahteten Client-Pin dynamisch auf.
         /// </summary>

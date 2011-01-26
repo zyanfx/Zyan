@@ -34,7 +34,7 @@ namespace Zyan.Communication
         /// <summary>
         /// Gibt den Korrelationssatz für Ausgangs-Pins zurück, oder legt ihn fest.
         /// </summary>
-        public ArrayList OutputPinCorrelationSet { get; set; }
+        public List<RemoteOutputPinWiring> OutputPinCorrelationSet { get; set; }
 
         /// <summary>
         /// Gibt den Methodennamen zurück, oder legt ihn fest.
