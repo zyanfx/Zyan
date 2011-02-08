@@ -9,9 +9,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Examples.MiniChat.Cons
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Examples.MiniChat.Client", "Zyan.Examples.MiniChat.Client\Zyan.Examples.MiniChat.Client.csproj", "{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Communication", "..\..\source\Zyan.Communication\Zyan.Communication.csproj", "{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 5
+		SccNumberOfProjects = 6
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs15
 		SccProjectUniqueName0 = Zyan.Examples.MiniChat.Shared\\Zyan.Examples.MiniChat.Shared.csproj
@@ -27,6 +29,9 @@ Global
 		SccProjectName3 = Zyan.Examples.MiniChat.Client
 		SccLocalPath3 = Zyan.Examples.MiniChat.Client
 		SccLocalPath4 = .
+		SccProjectUniqueName5 = ..\\..\\source\\Zyan.Communication\\Zyan.Communication.csproj
+		SccProjectName5 = ../../source/Zyan.Communication
+		SccLocalPath5 = ..\\..\\source\\Zyan.Communication
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +82,16 @@ Global
 		{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}.Release|Mixed Platforms.Build.0 = Release|x86
 		{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}.Release|x86.ActiveCfg = Release|x86
 		{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}.Release|x86.Build.0 = Release|x86
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
