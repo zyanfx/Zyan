@@ -9,17 +9,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Examples.EbcCalculator
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Communication", "..\..\source\Zyan.Communication\Zyan.Communication.csproj", "{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Examples.MiniChat.Shared", "Zyan.Examples.MiniChat.Shared\Zyan.Examples.MiniChat.Shared.csproj", "{D1D90775-1870-4E6A-AA81-759D28EA2A28}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Examples.MiniChat.Client", "Zyan.Examples.MiniChat.Client\Zyan.Examples.MiniChat.Client.csproj", "{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Examples.MiniChat.Server", "Zyan.Examples.MiniChat.Server\Zyan.Examples.MiniChat.Server.csproj", "{EEF1AC21-82B1-42FF-837E-1AAE62766BC7}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Examples.MiniChat.Console", "Zyan.Examples.MiniChat.Console\Zyan.Examples.MiniChat.Console.csproj", "{5295DCF8-5206-4EEA-8D61-EB7137CF12C9}"
-EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 9
+		SccNumberOfProjects = 5
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs15
 		SccLocalPath0 = .
@@ -35,18 +27,6 @@ Global
 		SccProjectUniqueName4 = Zyan.Examples.EbcCalculator.Shared\\Zyan.Examples.EbcCalculator.Shared.csproj
 		SccProjectName4 = Zyan.Examples.EbcCalculator.Shared
 		SccLocalPath4 = Zyan.Examples.EbcCalculator.Shared
-		SccProjectUniqueName5 = Zyan.Examples.MiniChat.Shared\\Zyan.Examples.MiniChat.Shared.csproj
-		SccProjectName5 = Zyan.Examples.MiniChat.Shared
-		SccLocalPath5 = Zyan.Examples.MiniChat.Shared
-		SccProjectUniqueName6 = Zyan.Examples.MiniChat.Client\\Zyan.Examples.MiniChat.Client.csproj
-		SccProjectName6 = Zyan.Examples.MiniChat.Client
-		SccLocalPath6 = Zyan.Examples.MiniChat.Client
-		SccProjectUniqueName7 = Zyan.Examples.MiniChat.Server\\Zyan.Examples.MiniChat.Server.csproj
-		SccProjectName7 = Zyan.Examples.MiniChat.Server
-		SccLocalPath7 = Zyan.Examples.MiniChat.Server
-		SccProjectUniqueName8 = Zyan.Examples.MiniChat.Console\\Zyan.Examples.MiniChat.Console.csproj
-		SccProjectName8 = Zyan.Examples.MiniChat.Console
-		SccLocalPath8 = Zyan.Examples.MiniChat.Console
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,46 +77,6 @@ Global
 		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Release|x86.ActiveCfg = Release|Any CPU
-		{D1D90775-1870-4E6A-AA81-759D28EA2A28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D1D90775-1870-4E6A-AA81-759D28EA2A28}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D1D90775-1870-4E6A-AA81-759D28EA2A28}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{D1D90775-1870-4E6A-AA81-759D28EA2A28}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{D1D90775-1870-4E6A-AA81-759D28EA2A28}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{D1D90775-1870-4E6A-AA81-759D28EA2A28}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D1D90775-1870-4E6A-AA81-759D28EA2A28}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D1D90775-1870-4E6A-AA81-759D28EA2A28}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{D1D90775-1870-4E6A-AA81-759D28EA2A28}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{D1D90775-1870-4E6A-AA81-759D28EA2A28}.Release|x86.ActiveCfg = Release|Any CPU
-		{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}.Debug|x86.ActiveCfg = Debug|x86
-		{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}.Debug|x86.Build.0 = Debug|x86
-		{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}.Release|Any CPU.ActiveCfg = Release|x86
-		{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}.Release|Mixed Platforms.Build.0 = Release|x86
-		{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}.Release|x86.ActiveCfg = Release|x86
-		{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}.Release|x86.Build.0 = Release|x86
-		{EEF1AC21-82B1-42FF-837E-1AAE62766BC7}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{EEF1AC21-82B1-42FF-837E-1AAE62766BC7}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{EEF1AC21-82B1-42FF-837E-1AAE62766BC7}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{EEF1AC21-82B1-42FF-837E-1AAE62766BC7}.Debug|x86.ActiveCfg = Debug|x86
-		{EEF1AC21-82B1-42FF-837E-1AAE62766BC7}.Debug|x86.Build.0 = Debug|x86
-		{EEF1AC21-82B1-42FF-837E-1AAE62766BC7}.Release|Any CPU.ActiveCfg = Release|x86
-		{EEF1AC21-82B1-42FF-837E-1AAE62766BC7}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{EEF1AC21-82B1-42FF-837E-1AAE62766BC7}.Release|Mixed Platforms.Build.0 = Release|x86
-		{EEF1AC21-82B1-42FF-837E-1AAE62766BC7}.Release|x86.ActiveCfg = Release|x86
-		{EEF1AC21-82B1-42FF-837E-1AAE62766BC7}.Release|x86.Build.0 = Release|x86
-		{5295DCF8-5206-4EEA-8D61-EB7137CF12C9}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{5295DCF8-5206-4EEA-8D61-EB7137CF12C9}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{5295DCF8-5206-4EEA-8D61-EB7137CF12C9}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{5295DCF8-5206-4EEA-8D61-EB7137CF12C9}.Debug|x86.ActiveCfg = Debug|x86
-		{5295DCF8-5206-4EEA-8D61-EB7137CF12C9}.Debug|x86.Build.0 = Debug|x86
-		{5295DCF8-5206-4EEA-8D61-EB7137CF12C9}.Release|Any CPU.ActiveCfg = Release|x86
-		{5295DCF8-5206-4EEA-8D61-EB7137CF12C9}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{5295DCF8-5206-4EEA-8D61-EB7137CF12C9}.Release|Mixed Platforms.Build.0 = Release|x86
-		{5295DCF8-5206-4EEA-8D61-EB7137CF12C9}.Release|x86.ActiveCfg = Release|x86
-		{5295DCF8-5206-4EEA-8D61-EB7137CF12C9}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
