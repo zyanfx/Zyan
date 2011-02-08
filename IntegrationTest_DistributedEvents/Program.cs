@@ -90,11 +90,16 @@ namespace IntegrationTest_DistributedEvents
 
             _proxyCallbackSingleton.DoSomething();
             if (_callbackCountSingleton == 1)
+            {
                 successCount++;
-
+                Console.WriteLine("Singleton Callback Test passed.");
+            }
             _proxyCallbackSingleCall.DoSomething();
             if (_callbackCountSingleCall == 1)
+            {
                 successCount++;
+                Console.WriteLine("SingleCall Callback Test passed.");
+            }
             
             RegisterEvents();
             if (_registrationsSingleton == _proxySingleton.Registrations)
@@ -104,11 +109,17 @@ namespace IntegrationTest_DistributedEvents
             
             _proxySingleton.TriggerEvent();
             if (_firedCountSingleton == 1)
+            {
                 successCount++;
+                Console.WriteLine("Singleton Event Test passed.");
+            }
             
             _proxySingleCall.TriggerEvent();
             if (_firedCountSingleCall == 1)
+            {
                 successCount++;
+                Console.WriteLine("SingleCall Event Test passed.");
+            }
 
             UnregisterEvents();
             if (_registrationsSingleton == _proxySingleton.Registrations)
