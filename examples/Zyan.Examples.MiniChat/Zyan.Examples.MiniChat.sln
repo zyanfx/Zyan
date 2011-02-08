@@ -1,0 +1,84 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Examples.MiniChat.Shared", "Zyan.Examples.MiniChat.Shared\Zyan.Examples.MiniChat.Shared.csproj", "{D1D90775-1870-4E6A-AA81-759D28EA2A28}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Examples.MiniChat.Server", "Zyan.Examples.MiniChat.Server\Zyan.Examples.MiniChat.Server.csproj", "{EEF1AC21-82B1-42FF-837E-1AAE62766BC7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Examples.MiniChat.Console", "Zyan.Examples.MiniChat.Console\Zyan.Examples.MiniChat.Console.csproj", "{5295DCF8-5206-4EEA-8D61-EB7137CF12C9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Examples.MiniChat.Client", "Zyan.Examples.MiniChat.Client\Zyan.Examples.MiniChat.Client.csproj", "{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 5
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs15
+		SccProjectUniqueName0 = Zyan.Examples.MiniChat.Shared\\Zyan.Examples.MiniChat.Shared.csproj
+		SccProjectName0 = Zyan.Examples.MiniChat.Shared
+		SccLocalPath0 = Zyan.Examples.MiniChat.Shared
+		SccProjectUniqueName1 = Zyan.Examples.MiniChat.Server\\Zyan.Examples.MiniChat.Server.csproj
+		SccProjectName1 = Zyan.Examples.MiniChat.Server
+		SccLocalPath1 = Zyan.Examples.MiniChat.Server
+		SccProjectUniqueName2 = Zyan.Examples.MiniChat.Console\\Zyan.Examples.MiniChat.Console.csproj
+		SccProjectName2 = Zyan.Examples.MiniChat.Console
+		SccLocalPath2 = Zyan.Examples.MiniChat.Console
+		SccProjectUniqueName3 = Zyan.Examples.MiniChat.Client\\Zyan.Examples.MiniChat.Client.csproj
+		SccProjectName3 = Zyan.Examples.MiniChat.Client
+		SccLocalPath3 = Zyan.Examples.MiniChat.Client
+		SccLocalPath4 = .
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D1D90775-1870-4E6A-AA81-759D28EA2A28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1D90775-1870-4E6A-AA81-759D28EA2A28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1D90775-1870-4E6A-AA81-759D28EA2A28}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{D1D90775-1870-4E6A-AA81-759D28EA2A28}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{D1D90775-1870-4E6A-AA81-759D28EA2A28}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D1D90775-1870-4E6A-AA81-759D28EA2A28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1D90775-1870-4E6A-AA81-759D28EA2A28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1D90775-1870-4E6A-AA81-759D28EA2A28}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{D1D90775-1870-4E6A-AA81-759D28EA2A28}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{D1D90775-1870-4E6A-AA81-759D28EA2A28}.Release|x86.ActiveCfg = Release|Any CPU
+		{EEF1AC21-82B1-42FF-837E-1AAE62766BC7}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{EEF1AC21-82B1-42FF-837E-1AAE62766BC7}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{EEF1AC21-82B1-42FF-837E-1AAE62766BC7}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{EEF1AC21-82B1-42FF-837E-1AAE62766BC7}.Debug|x86.ActiveCfg = Debug|x86
+		{EEF1AC21-82B1-42FF-837E-1AAE62766BC7}.Debug|x86.Build.0 = Debug|x86
+		{EEF1AC21-82B1-42FF-837E-1AAE62766BC7}.Release|Any CPU.ActiveCfg = Release|x86
+		{EEF1AC21-82B1-42FF-837E-1AAE62766BC7}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{EEF1AC21-82B1-42FF-837E-1AAE62766BC7}.Release|Mixed Platforms.Build.0 = Release|x86
+		{EEF1AC21-82B1-42FF-837E-1AAE62766BC7}.Release|x86.ActiveCfg = Release|x86
+		{EEF1AC21-82B1-42FF-837E-1AAE62766BC7}.Release|x86.Build.0 = Release|x86
+		{5295DCF8-5206-4EEA-8D61-EB7137CF12C9}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{5295DCF8-5206-4EEA-8D61-EB7137CF12C9}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{5295DCF8-5206-4EEA-8D61-EB7137CF12C9}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{5295DCF8-5206-4EEA-8D61-EB7137CF12C9}.Debug|x86.ActiveCfg = Debug|x86
+		{5295DCF8-5206-4EEA-8D61-EB7137CF12C9}.Debug|x86.Build.0 = Debug|x86
+		{5295DCF8-5206-4EEA-8D61-EB7137CF12C9}.Release|Any CPU.ActiveCfg = Release|x86
+		{5295DCF8-5206-4EEA-8D61-EB7137CF12C9}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{5295DCF8-5206-4EEA-8D61-EB7137CF12C9}.Release|Mixed Platforms.Build.0 = Release|x86
+		{5295DCF8-5206-4EEA-8D61-EB7137CF12C9}.Release|x86.ActiveCfg = Release|x86
+		{5295DCF8-5206-4EEA-8D61-EB7137CF12C9}.Release|x86.Build.0 = Release|x86
+		{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}.Debug|x86.ActiveCfg = Debug|x86
+		{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}.Debug|x86.Build.0 = Debug|x86
+		{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}.Release|Any CPU.ActiveCfg = Release|x86
+		{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}.Release|Mixed Platforms.Build.0 = Release|x86
+		{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}.Release|x86.ActiveCfg = Release|x86
+		{78375F7F-30F3-4918-8AB2-E9BF1F5BB4D9}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
