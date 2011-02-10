@@ -57,29 +57,29 @@ namespace Zyan.Communication
         private object _wireTypeCacheLockObject = new object();
 
         /// <summary>
-        /// Erzeugt einen dynamischen Draht für einen bestimmten Ausgangs-Pin einer Komponente. 
+        /// Erzeugt einen dynamischen Draht für ein bestimmtes Ereignis einer Komponente. 
         /// </summary>
         /// <param name="componentType">Typ der Komponente</param>
-        /// <param name="outPinPropertyName">Eigenschaftsname des Ausgangs-Pins</param>
+        /// <param name="eventMemberName">Name des Ereignisses oder der Delegat-Eigenschaft</param>
         /// <param name="isEvent">Gibt an, ob der Draht als Ereignis implementiert ist, oder nicht</param>
         /// <returns>Instanz des passenden dynamischen Drahts</returns>
-        public object CreateDynamicWire(Type componentType, string outPinPropertyName, bool isEvent)
+        public object CreateDynamicWire(Type componentType, string eventMemberName, bool isEvent)
         {
             // Wenn kein Komponententyp angegeben wurde ...
             if (componentType == null)
                 // Ausnahme werfen
                 throw new ArgumentNullException("componentType");
 
-            // Wenn kein Ausgangs-Pin-Name angegeben wurde ...
-            if (string.IsNullOrEmpty(outPinPropertyName))
+            // Wenn kein Ereignisname angegeben wurde ...
+            if (string.IsNullOrEmpty(eventMemberName))
                 // Ausnahme werfen
-                throw new ArgumentException(LanguageResource.ArgumentException_OutPutPinNameMissing, "outPinPropertyName");
+                throw new ArgumentException(LanguageResource.ArgumentException_OutPutPinNameMissing, "eventMemberName");
 
-            // Schlüssel aus Komponententyp und Ausgangs-Pin-Namen erzeugen
+            // Schlüssel aus Komponententyp und Ereignisnamen erzeugen
             StringBuilder wireKeyBuilder = new StringBuilder();
             wireKeyBuilder.Append(componentType.FullName);
             wireKeyBuilder.Append("|");
-            wireKeyBuilder.Append(outPinPropertyName);
+            wireKeyBuilder.Append(eventMemberName);
             string wireKey = wireKeyBuilder.ToString();
 
             // Variable für Drahttyp
@@ -90,17 +90,17 @@ namespace Zyan.Communication
 
             lock (_wireTypeCacheLockObject)
             {
-                // Prüfen ob bereits ein passender dynamischer Draht für den Ausgangs-Pin existiert ...
+                // Prüfen ob bereits ein passender dynamischer Draht für das Ereignis existiert ...
                 wireTypeAlreadyCreated=_wireTypeCache.ContainsKey(wireKey);
             }
-            // Wenn bereits ein passender dynamischer Draht für diesen Ausgangs-Pin ezeugt wurde ...
+            // Wenn bereits ein passender dynamischer Draht für dieses Ereignis ezeugt wurde ...
             if (wireTypeAlreadyCreated)
                 // Bestehenden Drahttyp verwenden
                 wireType = _wireTypeCache[wireKey];
             else
             {                
                 // Passenden Drahtyp erzeugen
-                wireType = BuildDynamicWireType(componentType, outPinPropertyName, isEvent);
+                wireType = BuildDynamicWireType(componentType, eventMemberName, isEvent);
 
                 lock (_wireTypeCacheLockObject)
                 {
@@ -121,13 +121,76 @@ namespace Zyan.Communication
         }
 
         /// <summary>
-        /// Erzeugt einen dynamischen Draht für einen bestimmten Ausgangs-Pin einer Komponente.
+        /// Erzeugt einen dynamischen Draht für ein bestimmtes Ereignis einer Komponente. 
         /// </summary>
         /// <param name="componentType">Typ der Komponente</param>
-        /// <param name="outPinPropertyName">Eigenschaftsname des Ausgangs-Pins</param>
+        /// <param name="delegateType">Delegattyp</param>
+        /// <param name="clientInterceptor">Client-Abfangvorrichtung</param>
+        /// <returns>Instanz des passenden dynamischen Drahts</returns>
+        public object CreateDynamicWire(Type componentType, Type delegateType, DelegateInterceptor clientInterceptor)
+        {
+            // Wenn kein Komponententyp angegeben wurde ...
+            if (componentType == null)
+                // Ausnahme werfen
+                throw new ArgumentNullException("componentType");
+
+            // Wenn kein Delegattyp angegeben wurde ...
+            if (delegateType == null)
+                // Ausnahme werfen
+                throw new ArgumentNullException("delegateType");
+
+            // Wenn keine Client-Abfangeinrichtung angegeben wurde ...
+            if (clientInterceptor == null)
+                // Ausnahme werfen
+                throw new ArgumentNullException("clientInterceptor");
+                        
+            // Passenden Drahtyp erzeugen
+            Type wireType = BuildDynamicWireType(componentType, delegateType, clientInterceptor);
+                                    
+            // Drahtinstanz erzeugen 
+            object wire = Activator.CreateInstance(wireType);
+
+            // Drahtinstanz zurückgeben
+            return wire;
+        }
+
+        /// <summary>
+        /// Erzeugt den Typen für einen dynamischen Draht für ein bestimmtes Ereignis einer Komponente.
+        /// </summary>
+        /// <param name="componentType">Typ der Komponente</param>
+        /// <param name="delegateType">Delegattyp</param>
+        /// <param name="clientInterceptor">Client-Abfangvorrichtung</param>
+        /// <returns>Typ des dynamischen Drahts</returns>
+        private Type BuildDynamicWireType(Type componentType, Type delegateType, DelegateInterceptor clientInterceptor)
+        {
+            // Verweise der Komponenten-Assembly übernehmen
+            string[] references = (from assy in componentType.Assembly.GetReferencedAssemblies()
+                                   select Assembly.Load(assy).Location).ToArray();
+
+            // Variable für Quellcode
+            string sourceCode = string.Empty;
+            
+            // Quellcode für dynamischen Draht erzeugen
+            sourceCode = CreateDynamicWireSourceCodeForDelegate(delegateType);
+            
+            // Dynamischen Draht kompilieren
+            Assembly assembly = ScriptEngine.CompileScriptToAssembly(sourceCode, references);
+
+            // Typinformationen des dynamischen Drahtes abrufen
+            Type dynamicWireType = assembly.GetType("Zyan.Communication.DynamicWire");
+
+            // Typ des dynamischen Drahtes zurückgeben
+            return dynamicWireType;
+        }
+
+        /// <summary>
+        /// Erzeugt den Typen für einen dynamischen Draht für ein bestimmtes Ereignis einer Komponente.
+        /// </summary>
+        /// <param name="componentType">Typ der Komponente</param>
+        /// <param name="eventMemberName">Name des Ereignisses oder der Delegat-Eigenschaft</param>
         /// <param name="isEvent">Gibt an, ob der Draht als Ereignis implementiert ist, oder nicht</param>
         /// <returns>Typ des dynamischen Drahts</returns>
-        private Type BuildDynamicWireType(Type componentType,string outPinPropertyName, bool isEvent)
+        private Type BuildDynamicWireType(Type componentType,string eventMemberName, bool isEvent)
         {
             // Verweise der Komponenten-Assembly übernehmen
             string[] references = (from assy in componentType.Assembly.GetReferencedAssemblies()
@@ -139,19 +202,19 @@ namespace Zyan.Communication
             // Wenn der Draht als Ereignis implementiert ist ...
             if (isEvent)
             {
-                // Metadaten des Ausgangs-Pin-Ereignisses abrufen
-                EventInfo outPinInfo = componentType.GetEvent(outPinPropertyName);
+                // Metadaten des Ereignisses abrufen
+                EventInfo eventInfo = componentType.GetEvent(eventMemberName);
 
                 // Quellcode für dynamischen Draht erzeugen
-                sourceCode = CreateDynamicWireSourceCodeForEvent(outPinInfo);
+                sourceCode = CreateDynamicWireSourceCodeForEvent(eventInfo);
             }
             else
             {
-                // Metadaten der Ausgangs-Pin-Eigenschaft abrufen
-                PropertyInfo outPinInfo = componentType.GetProperty(outPinPropertyName);
+                // Metadaten der Delegat-Eigenschaft abrufen
+                PropertyInfo delegatePropInfo = componentType.GetProperty(eventMemberName);
 
                 // Quellcode für dynamischen Draht erzeugen
-                sourceCode = CreateDynamicWireSourceCodeForDelegate(outPinInfo);
+                sourceCode = CreateDynamicWireSourceCodeForDelegate(delegatePropInfo);
             }
             // Dynamischen Draht kompilieren
             Assembly assembly = ScriptEngine.CompileScriptToAssembly(sourceCode, references);
@@ -164,17 +227,17 @@ namespace Zyan.Communication
         }
 
         /// <summary>
-        /// Erzeugt den Quellcode für einen dynamischen Draht, der zu einem bestimmten Ausgangs-Pin passt.
+        /// Erzeugt den Quellcode für einen dynamischen Draht, der zu einem bestimmten Ereignis passt.
         /// </summary>
-        /// <param name="outPinInfo">Metadaten des Ausgangs-Pin-Ereignisses</param>
+        /// <param name="eventInfo">Metadaten des Ereignisses</param>
         /// <returns>Quellcode (C#)</returns>
-        private string CreateDynamicWireSourceCodeForEvent(EventInfo outPinInfo)
+        private string CreateDynamicWireSourceCodeForEvent(EventInfo eventInfo)
         {
-            // Delegat-Typ des Ausgangs-Pins ermitteln
-            Type outPinDelegateType = outPinInfo.EventHandlerType;
+            // Delegat-Typ des Ereignisses ermitteln
+            Type eventType = eventInfo.EventHandlerType;
 
             // Metadaten des Delegaten abrufen
-            MethodInfo outPinMethod = outPinDelegateType.GetMethod("Invoke");
+            MethodInfo eventMethod = eventType.GetMethod("Invoke");
 
             // Quellcode für dynamischen Draht zusammensetzen
             StringBuilder code = new StringBuilder();
@@ -188,11 +251,11 @@ namespace Zyan.Communication
             code.AppendLine("       public object Component { get { return _component; } set { _component = value; } }");
             code.AppendLine("       private System.Reflection.EventInfo _serverEventInfo = null;");
             code.AppendLine("       public System.Reflection.EventInfo ServerEventInfo { get { return _serverEventInfo; } set { _serverEventInfo = value; } }");
-            code.AppendLine("       private RemoteOutputPinWiring _clientPinWiring = null;");
-            code.AppendLine("       public RemoteOutputPinWiring ClientPinWiring { get { return _clientPinWiring; } set { _clientPinWiring = value; } }");
+            code.AppendLine("       private DelegateInterceptor _interceptor = null;");
+            code.AppendLine("       public DelegateInterceptor Interceptor { get { return _interceptor; } set { _interceptor = value; } }");
             
             // Ermitteln, ob der Delegat einen Rückgabewert bescheibt
-            bool hasReturnValue = !outPinMethod.ReturnType.Name.Equals("Void");
+            bool hasReturnValue = !eventMethod.ReturnType.Name.Equals("Void");
 
             // Wenn der Delegat keinen Rückgabewert bescheibt ...
             if (!hasReturnValue)
@@ -200,13 +263,13 @@ namespace Zyan.Communication
                 code.Append("       public void In(");
             else
                 // Rückgabetyp verwenden
-                code.AppendFormat("       public {0} In(", outPinMethod.ReturnType.FullName);
+                code.AppendFormat("       public {0} In(", eventMethod.ReturnType.FullName);
 
             // Variable für Anzahl der Parameter, die der Delegat bescheibt
             int argCount = 0;
 
             // Parameter des Delegaten abrufen
-            ParameterInfo[] argInfos = outPinMethod.GetParameters();
+            ParameterInfo[] argInfos = eventMethod.GetParameters();
 
             // Alle Parameter durchlaufen
             foreach (ParameterInfo argInfo in argInfos)
@@ -229,11 +292,11 @@ namespace Zyan.Communication
                         
             // Wenn der Delegat keinen Rückgabewert beschreibt ...
             if (!hasReturnValue)
-                // InvokeDynamicClientPin aufrufen
-                code.Append("try { ClientPinWiring.InvokeDynamicClientPin(");
+                // InvokeClientDelegate aufrufen
+                code.Append("try { Interceptor.InvokeClientDelegate(");
             else
-                // InvokeDynamicClientPin aufrufen und Rückgabewert zurückgeben (Typenumwandlung durchführen)
-                code.AppendFormat("try { return ({0})ClientPinWiring.InvokeDynamicClientPin(", outPinMethod.ReturnType.FullName);
+                // InvokeClientDelegate aufrufen und Rückgabewert zurückgeben (Typenumwandlung durchführen)
+                code.AppendFormat("try { return ({0})Interceptor.InvokeClientDelegate(", eventMethod.ReturnType.FullName);
 
             // Parameterzähler zurücksetzen
             argCount = 0;
@@ -267,17 +330,28 @@ namespace Zyan.Communication
         }
 
         /// <summary>
-        /// Erzeugt den Quellcode für einen dynamischen Draht, der zu einem bestimmten Ausgangs-Pin passt.
+        /// Erzeugt den Quellcode für einen dynamischen Draht, der zu einem bestimmten Delegat passt.
         /// </summary>
-        /// <param name="outPinInfo">Metadaten der Eigenschaft des Ausgangs-Pins</param>
+        /// <param name="delegatePropInfo">Metadaten der Delegat-Eigenschaft</param>
         /// <returns>Quellcode (C#)</returns>
-        private string CreateDynamicWireSourceCodeForDelegate(PropertyInfo outPinInfo)
-        {   
-            // Delegat-Typ des Ausgangs-Pins ermitteln
-            Type outPinDelegateType = outPinInfo.PropertyType;
+        private string CreateDynamicWireSourceCodeForDelegate(PropertyInfo delegatePropInfo)
+        {
+            // Delegat-Typ ermitteln
+            Type delegateType = delegatePropInfo.PropertyType;
 
+            // Andere Überladung aufrufen
+            return CreateDynamicWireSourceCodeForDelegate(delegateType);
+        }
+
+        /// <summary>
+        /// Erzeugt den Quellcode für einen dynamischen Draht, der zu einem bestimmten Delegat passt.
+        /// </summary>
+        /// <param name="delegateType">Delegattyp</param>
+        /// <returns>Quellcode (C#)</returns>
+        private string CreateDynamicWireSourceCodeForDelegate(Type delegateType)
+        {
             // Metadaten des Delegaten abrufen
-            MethodInfo outPinMethod = outPinDelegateType.GetMethod("Invoke");
+            MethodInfo delegateMethod = delegateType.GetMethod("Invoke");
 
             // Quellcode für dynamischen Draht zusammensetzen
             StringBuilder code = new StringBuilder();
@@ -285,11 +359,11 @@ namespace Zyan.Communication
             code.AppendLine("{");
             code.AppendLine("   public class DynamicWire");
             code.AppendLine("   {");
-            code.AppendLine("       private RemoteOutputPinWiring _clientPinWiring = null;");
-            code.AppendLine("       public RemoteOutputPinWiring ClientPinWiring { get {return _clientPinWiring;} set { _clientPinWiring = value; } }");
+            code.AppendLine("       private DelegateInterceptor _interceptor = null;");
+            code.AppendLine("       public DelegateInterceptor Interceptor { get {return _interceptor;} set { _interceptor = value; } }");
 
             // Ermitteln, ob der Delegat einen Rückgabewert bescheibt
-            bool hasReturnValue = !outPinMethod.ReturnType.Name.Equals("Void");
+            bool hasReturnValue = !delegateMethod.ReturnType.Name.Equals("Void");
 
             // Wenn der Delegat keinen Rückgabewert bescheibt ...
             if (!hasReturnValue)
@@ -297,13 +371,13 @@ namespace Zyan.Communication
                 code.Append("       public void In(");
             else
                 // Rückgabetyp verwenden
-                code.AppendFormat("       public {0} In(", outPinMethod.ReturnType.FullName);
+                code.AppendFormat("       public {0} In(", delegateMethod.ReturnType.FullName);
 
             // Variable für Anzahl der Parameter, die der Delegat bescheibt
             int argCount = 0;
 
             // Parameter des Delegaten abrufen
-            ParameterInfo[] argInfos = outPinMethod.GetParameters();
+            ParameterInfo[] argInfos = delegateMethod.GetParameters();
 
             // Alle Parameter durchlaufen
             foreach (ParameterInfo argInfo in argInfos)
@@ -327,11 +401,11 @@ namespace Zyan.Communication
 
             // Wenn der Delegat keinen Rückgabewert beschreibt ...
             if (!hasReturnValue)
-                // InvokeDynamicClientPin aufrufen
-                code.Append("ClientPinWiring.InvokeDynamicClientPin(");
+                // InvokeClientDelegate aufrufen
+                code.Append("Interceptor.InvokeClientDelegate(");
             else
-                // InvokeDynamicClientPin aufrufen und Rückgabewert zurückgeben (Typenumwandlung durchführen)
-                code.AppendFormat("return ({0})ClientPinWiring.InvokeDynamicClientPin(", outPinMethod.ReturnType.FullName);
+                // InvokeClientDelegate aufrufen und Rückgabewert zurückgeben (Typenumwandlung durchführen)
+                code.AppendFormat("return ({0})Interceptor.InvokeClientDelegate(", delegateMethod.ReturnType.FullName);
 
             // Parameterzähler zurücksetzen
             argCount = 0;

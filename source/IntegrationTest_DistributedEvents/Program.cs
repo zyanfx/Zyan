@@ -7,9 +7,27 @@ using System.IO;
 using System.Reflection;
 using Zyan.Communication.Protocols.Tcp;
 using Zyan.Communication.Security;
+using System.Threading;
 
 namespace IntegrationTest_DistributedEvents
 {
+    public class RequestResponseResult
+    {
+        public RequestResponseResult()
+        {
+            Count = 0;
+        }
+
+        public int Count
+        { get; set; }
+
+        public void ReceiveResponseSingleCall(string text)
+        {
+            Console.WriteLine(string.Format("Request/Response: {0}", text));
+            Count++;
+        }
+    }
+
     class Program
     {
         private static AppDomain _serverAppDomain;
@@ -18,6 +36,7 @@ namespace IntegrationTest_DistributedEvents
         private static IEventComponentSingleCall _proxySingleCall;
         private static ICallbackComponentSingleton _proxyCallbackSingleton;
         private static ICallbackComponentSingleCall _proxyCallbackSingleCall;
+        private static IRequestResponseCallbackSingleCall _proxyRequestResponseSingleCall;
 
         private static int _firedCountSingleton = 0;
         private static int _firedCountSingleCall = 0;
@@ -62,6 +81,8 @@ namespace IntegrationTest_DistributedEvents
             _callbackCountSingleCall++;
         }
 
+        
+
         public static int Main(string[] args)
         {
             AppDomainSetup setup = new AppDomainSetup();
@@ -82,6 +103,7 @@ namespace IntegrationTest_DistributedEvents
             _proxySingleCall = _connection.CreateProxy<IEventComponentSingleCall>();
             _proxyCallbackSingleton = _connection.CreateProxy<ICallbackComponentSingleton>();
             _proxyCallbackSingleCall = _connection.CreateProxy<ICallbackComponentSingleCall>();
+            _proxyRequestResponseSingleCall = _connection.CreateProxy<IRequestResponseCallbackSingleCall>();
 
             int successCount = 0;
 
@@ -127,12 +149,21 @@ namespace IntegrationTest_DistributedEvents
             if (_registrationsSingleCall == _proxySingleCall.Registrations)
                 successCount++;
 
+            RequestResponseResult requestResponseResult = new RequestResponseResult();
+
+            _proxyRequestResponseSingleCall.DoRequestResponse("Success", requestResponseResult.ReceiveResponseSingleCall);
+
+            Thread.Sleep(1000);
+
+            if (requestResponseResult.Count == 1)            
+                successCount++;
+
             _connection.Dispose();
             EventServerLocator locator = _serverAppDomain.CreateInstanceAndUnwrap(Assembly.GetExecutingAssembly().FullName, "IntegrationTest_DistributedEvents.EventServerLocator") as EventServerLocator;
             locator.GetEventServer().Dispose();
             AppDomain.Unload(_serverAppDomain);
 
-            if (successCount == 8)
+            if (successCount == 9)
                 return 0;
             else
                 return 1;
