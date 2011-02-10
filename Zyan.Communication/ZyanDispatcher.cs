@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using System.Security;
 using System.Security.Principal;
@@ -12,6 +13,7 @@ using System.Transactions;
 using Zyan.Communication.Security;
 using Zyan.Communication.Notification;
 using Zyan.Communication.SessionMgmt;
+using System.Linq.Expressions;
 
 namespace Zyan.Communication
 {
@@ -20,7 +22,7 @@ namespace Zyan.Communication
     /// Nimmt Remoting-Aufrufe für eine bestimmte Komponente entgegen und
     /// leitet sie lokal an die Komponente weiter.
     /// </summary>
-    public class ComponentInvoker : MarshalByRefObject, IComponentInvoker
+    public class ZyanDispatcher : MarshalByRefObject, IZyanDispatcher
     {
         #region Konstruktor
 
@@ -28,7 +30,7 @@ namespace Zyan.Communication
         /// Konstruktor.
         /// </summary>
         /// <param name="host">Komponentenhost</param>
-        public ComponentInvoker(ZyanComponentHost host)
+        public ZyanDispatcher(ZyanComponentHost host)
         {
             // Wenn kein Komponentenhost übergeben wurde ...
             if (host == null)
@@ -51,17 +53,17 @@ namespace Zyan.Communication
         /// </summary>
         /// <param name="type">Implementierungstyp der Server-Komponente</param>
         /// <param name="instance">Instanz der Serverkomponente</param>
-        /// <param name="outputPinCorrelationSet">Korrelationssatz mit Verdrahtungsinformationen</param>
+        /// <param name="delegateCorrelationSet">Korrelationssatz mit Verdrahtungsinformationen</param>
         /// <param name="wiringList">Auflistung mit gespeicherten Verdrahtungen</param>
-        private void CreateClientServerWires(Type type, object instance, List<RemoteOutputPinWiring> outputPinCorrelationSet, Dictionary<Guid, Delegate> wiringList)
+        private void CreateClientServerWires(Type type, object instance, List<DelegateCorrelationInfo> delegateCorrelationSet, Dictionary<Guid, Delegate> wiringList)
         {
             // Wenn kein Korrelationssatz angegeben wurde ...
-            if (outputPinCorrelationSet == null)
+            if (delegateCorrelationSet == null)
                 // Prozedur abbrechen
                 return;
 
             // Alle Einträge des Korrelationssatzes durchlaufen
-            foreach (RemoteOutputPinWiring correlationInfo in outputPinCorrelationSet)
+            foreach (DelegateCorrelationInfo correlationInfo in delegateCorrelationSet)
             {                
                 // Wenn mit diesem Korrelationsschlüssel schon verdrahtet wurde ...
                 if (wiringList.ContainsKey(correlationInfo.CorrelationID))
@@ -69,29 +71,29 @@ namespace Zyan.Communication
                     continue;
                 
                 // Dynamischen Draht erzeugen
-                object dynamicWire = DynamicWireFactory.Instance.CreateDynamicWire(type, correlationInfo.ServerPropertyName, correlationInfo.IsEvent);
+                object dynamicWire = DynamicWireFactory.Instance.CreateDynamicWire(type, correlationInfo.DelegateMemberName, correlationInfo.IsEvent);
 
                 // Typ des dynamischen Drahtes ermitteln
                 Type dynamicWireType = dynamicWire.GetType();
 
                 // Dynamischen Draht mit Client-Fernsteuerung verdrahten
-                dynamicWireType.GetProperty("ClientPinWiring").SetValue(dynamicWire, correlationInfo, null);
+                dynamicWireType.GetProperty("Interceptor").SetValue(dynamicWire, correlationInfo.ClientDelegateInterceptor, null);
                                                
                 // wenn es sich um ein Ereignis handelt ...
                 if (correlationInfo.IsEvent)
                 {
-                    // Metadaten des aktuellen Ausgabe-Pins abufen                
-                    EventInfo outputPinMetaData = type.GetEvent(correlationInfo.ServerPropertyName);
+                    // Metadaten des Ereignisses abufen                
+                    EventInfo eventInfo = type.GetEvent(correlationInfo.DelegateMemberName);
 
                     // Zusatzinformationen übergeben
-                    dynamicWireType.GetProperty("ServerEventInfo").SetValue(dynamicWire, outputPinMetaData, null);
+                    dynamicWireType.GetProperty("ServerEventInfo").SetValue(dynamicWire, eventInfo, null);
                     dynamicWireType.GetProperty("Component").SetValue(dynamicWire, instance, null);
 
                     // Delegat zu dynamischem Draht erzeugen
-                    Delegate dynamicWireDelegate = Delegate.CreateDelegate(outputPinMetaData.EventHandlerType, dynamicWire, dynamicWireType.GetMethod("In"));
+                    Delegate dynamicWireDelegate = Delegate.CreateDelegate(eventInfo.EventHandlerType, dynamicWire, dynamicWireType.GetMethod("In"));
 
                     // Ausgehende Nachrichten mit passender Abfangvorrichtung verdrahten 
-                    outputPinMetaData.AddEventHandler(instance, dynamicWireDelegate);
+                    eventInfo.AddEventHandler(instance, dynamicWireDelegate);
                     
                     // Verdrahtung speichern
                     wiringList.Add(correlationInfo.CorrelationID, dynamicWireDelegate);
@@ -99,7 +101,7 @@ namespace Zyan.Communication
                 else
                 {
                     // Metadaten des aktuellen Ausgabe-Pins abufen                
-                    PropertyInfo outputPinMetaData = type.GetProperty(correlationInfo.ServerPropertyName);                                       
+                    PropertyInfo outputPinMetaData = type.GetProperty(correlationInfo.DelegateMemberName);                                       
 
                     // Delegat zu dynamischem Draht erzeugen
                     Delegate dynamicWireDelegate = Delegate.CreateDelegate(outputPinMetaData.PropertyType, dynamicWire, dynamicWireType.GetMethod("In"));
@@ -118,41 +120,41 @@ namespace Zyan.Communication
         /// </summary>
         /// <param name="type">Implementierungstyp der Server-Komponente</param>
         /// <param name="instance">Instanz der Serverkomponente</param>
-        /// <param name="outputPinCorrelationSet">Korrelationssatz mit Verdrahtungsinformationen</param>
+        /// <param name="delegateCorrelationSet">Korrelationssatz mit Verdrahtungsinformationen</param>
         /// <param name="wiringList">Auflistung mit gespeicherten Verdrahtungen</param>
-        private void RemoveClientServerWires(Type type, object instance, List<RemoteOutputPinWiring> outputPinCorrelationSet, Dictionary<Guid, Delegate> wiringList)
+        private void RemoveClientServerWires(Type type, object instance, List<DelegateCorrelationInfo> delegateCorrelationSet, Dictionary<Guid, Delegate> wiringList)
         {
             // Wenn kein Korrelationssatz angegeben wurde ...
-            if (outputPinCorrelationSet == null)
+            if (delegateCorrelationSet == null)
                 // Prozedur abbrechen
                 return;
 
             // Alle Einträge des Korrelationssatzes durchlaufen
-            foreach (RemoteOutputPinWiring correlationInfo in outputPinCorrelationSet)
+            foreach (DelegateCorrelationInfo correlationInfo in delegateCorrelationSet)
             {
-                // Wenn es sich um einen Ereignis-Pin handelt ...
+                // Wenn es sich um ein Ereignis handelt ...
                 if (correlationInfo.IsEvent)
                 {
                     // Wenn eine Verdrahtung mit dem angegebenen Korrelationsschlüssel gespeichert ist ...
                     if (wiringList.ContainsKey(correlationInfo.CorrelationID))
                     {
-                        // Metadaten des aktuellen Ausgabe-Pins abufen                
-                        EventInfo outputPinMetaData = type.GetEvent(correlationInfo.ServerPropertyName);
+                        // Metadaten des Ereignisses abufen                
+                        EventInfo eventInfo = type.GetEvent(correlationInfo.DelegateMemberName);
                         
                         // Delegat abrufen
                         Delegate dynamicWireDelegate = wiringList[correlationInfo.CorrelationID];
 
                         // Verdrahtung aufheben
-                        outputPinMetaData.RemoveEventHandler(instance, dynamicWireDelegate);
+                        eventInfo.RemoveEventHandler(instance, dynamicWireDelegate);
                     }
                 }
                 else
                 {
                     // Metadaten des aktuellen Ausgabe-Pins abufen                
-                    PropertyInfo outputPinMetaData = type.GetProperty(correlationInfo.ServerPropertyName);
+                    PropertyInfo delegatePropInfo = type.GetProperty(correlationInfo.DelegateMemberName);
 
                     // Verdrahtung aufheben
-                    outputPinMetaData.SetValue(instance, null, null);
+                    delegatePropInfo.SetValue(instance, null, null);
                 }
             }
         }
@@ -162,10 +164,10 @@ namespace Zyan.Communication
         /// </summary>
         /// <param name="trackingID">Aufrufschlüssel zur Nachverfolgung</param>
         /// <param name="interfaceName">Name der Komponentenschnittstelle</param>
-        /// <param name="outputPinCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Ausgangs-Pins mit entfernten Methoden</param>
+        /// <param name="delegateCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Delegaten und Ereignisse mit entfernten Methoden</param>
         /// <param name="methodName">Methodenname</param>
         /// <param name="args">Parameter</param>   
-        private void ProcessBeforeInvoke(Guid trackingID, ref string interfaceName, ref List<RemoteOutputPinWiring> outputPinCorrelationSet, ref string methodName, ref object[] args)
+        private void ProcessBeforeInvoke(Guid trackingID, ref string interfaceName, ref List<DelegateCorrelationInfo> delegateCorrelationSet, ref string methodName, ref object[] args)
         {
             // Wenn BeforeInvoke-Abos vorhanden sind ...
             if (_host.HasBeforeInvokeSubscriptions())
@@ -175,7 +177,7 @@ namespace Zyan.Communication
                 {
                     TrackingID = trackingID,
                     InterfaceName = interfaceName,
-                    OutputPinCorrelationSet = outputPinCorrelationSet,
+                    DelegateCorrelationSet = delegateCorrelationSet,
                     MethodName = methodName,
                     Arguments = args,
                     Cancel = false
@@ -201,7 +203,7 @@ namespace Zyan.Communication
                 {
                     // Einstellungen der Ereignisargumente übernehmen
                     interfaceName = cancelArgs.InterfaceName;
-                    outputPinCorrelationSet = cancelArgs.OutputPinCorrelationSet;
+                    delegateCorrelationSet = cancelArgs.DelegateCorrelationSet;
                     methodName = cancelArgs.MethodName;
                     args = cancelArgs.Arguments;
                 }
@@ -213,11 +215,11 @@ namespace Zyan.Communication
         /// </summary>
         /// <param name="trackingID">Aufrufschlüssel zur Nachverfolgung</param>
         /// <param name="interfaceName">Name der Komponentenschnittstelle</param>
-        /// <param name="outputPinCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Ausgangs-Pins mit entfernten Methoden</param>
+        /// <param name="delegateCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Delegaten und Ereignisse mit entfernten Methoden</param>
         /// <param name="methodName">Methodenname</param>
         /// <param name="args">Parameter</param>   
         /// <param name="returnValue">Rückgabewert</param>
-        private void ProcessAfterInvoke(Guid trackingID, ref string interfaceName, ref List<RemoteOutputPinWiring> outputPinCorrelationSet, ref string methodName, ref object[] args, ref object returnValue)
+        private void ProcessAfterInvoke(Guid trackingID, ref string interfaceName, ref List<DelegateCorrelationInfo> delegateCorrelationSet, ref string methodName, ref object[] args, ref object returnValue)
         {
             // Wenn AfterInvoke-Abos registriert sind ...
             if (_host.HasAfterInvokeSubscriptions())
@@ -227,7 +229,7 @@ namespace Zyan.Communication
                 {
                     TrackingID = trackingID,
                     InterfaceName = interfaceName,
-                    OutputPinCorrelationSet = outputPinCorrelationSet,
+                    DelegateCorrelationSet = delegateCorrelationSet,
                     MethodName = methodName,
                     Arguments = args,
                     ReturnValue = returnValue
@@ -243,12 +245,12 @@ namespace Zyan.Communication
         /// </summary>
         /// <param name="trackingID">Aufrufschlüssel zur Nachverfolgung</param>
         /// <param name="interfaceName">Name der Komponentenschnittstelle</param>
-        /// <param name="outputPinCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Ausgangs-Pins mit entfernten Methoden</param>
+        /// <param name="delegateCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Delegaten oder Ereignisse mit entfernten Methoden</param>
         /// <param name="methodName">Methodenname</param>
         /// <param name="paramDefs">Parameter-Definitionen</param>
         /// <param name="args">Parameter</param>        
         /// <returns>Rückgabewert</returns>
-        public object Invoke(Guid trackingID, string interfaceName, List<RemoteOutputPinWiring> outputPinCorrelationSet, string methodName, ParameterInfo[] paramDefs, params object[] args)
+        public object Invoke(Guid trackingID, string interfaceName, List<DelegateCorrelationInfo> delegateCorrelationSet, string methodName, ParameterInfo[] paramDefs, params object[] args)
         {
             // Wenn kein Schnittstellenname angegeben wurde ...
             if (string.IsNullOrEmpty(interfaceName))
@@ -261,7 +263,7 @@ namespace Zyan.Communication
                 throw new ArgumentException(LanguageResource.ArgumentException_MethodNameMissing, "methodName");
 
             // Ggf. BeforeInvoke-Abos verarbeiten
-            ProcessBeforeInvoke(trackingID, ref interfaceName, ref outputPinCorrelationSet, ref methodName, ref args);
+            ProcessBeforeInvoke(trackingID, ref interfaceName, ref delegateCorrelationSet, ref methodName, ref args);
 
             // Wenn für den angegebenen Schnittstellennamen keine Komponente registriert ist ...
             if (!_host.ComponentRegistry.ContainsKey(interfaceName))
@@ -294,7 +296,7 @@ namespace Zyan.Communication
                 wiringList = new Dictionary<Guid, Delegate>();
                 
                 // Bei Bedarf Client- und Server-Komponente miteinander verdrahten
-                CreateClientServerWires(type, instance, outputPinCorrelationSet, wiringList);
+                CreateClientServerWires(type, instance, delegateCorrelationSet, wiringList);
             }
             // Transaktionsbereich
             TransactionScope scope = null;
@@ -357,19 +359,60 @@ namespace Zyan.Communication
             // Typen-Array (zur Ermittlung der passenden Signatur) erzeugen
             Type[] types = new Type[paramDefs.Length];
 
-            // Alle Parameter durchlaufen
+            // Auflistung der Indizes von Parametern, für die eine Delegatenverdrahtung notwendig ist
+            Dictionary<int,DelegateInterceptor> delegateParamIndexes=new Dictionary<int,DelegateInterceptor>();
+
+            // Alle Parametertypen durchlaufen
             for (int i = 0; i < paramDefs.Length; i++)
-            {
+            {   
                 // Typ in Array einfügen
                 types[i] = paramDefs[i].ParameterType;
+
+                // Versuchen den aktuellen Parameter in eine Delegaten-Abfangvorrichtung zu casten
+                DelegateInterceptor delegateParamInterceptor = args[i] as DelegateInterceptor;
+
+                // Wenn aktuelle Parameter eine Delegaten-Abfangvorrichtung ist ...
+                if (delegateParamInterceptor != null)
+                    // Parameter der Delegaten-Verdrahtungsliste zufügen
+                    delegateParamIndexes.Add(i, delegateParamInterceptor);
             }
             // Ausnahme-Schalter
             bool exceptionThrown = false;
 
             try
             {
+                // Metadaten der aufzurufenden Methode abrufen
+                MethodInfo methodInfo = type.GetMethod(methodName, types);
+
+                // Metadaten der Parameter abrufen
+                ParameterInfo[] serverMethodParamDefs = methodInfo.GetParameters();
+
+                // Delegaten-Verdrahtungsliste durchlaufen
+                foreach(int index in delegateParamIndexes.Keys)
+                { 
+                    // Abfangvorrichtung adressieren
+                    DelegateInterceptor delegateParamInterceptor = delegateParamIndexes[index];
+
+                    // Metadaten des passenden Parameters der Serverkomponenten-Methode adressieren
+                    ParameterInfo serverMethodParamDef = serverMethodParamDefs[index];
+                    
+                    // Dynamischen Draht erzeugen
+                    object dynamicWire = DynamicWireFactory.Instance.CreateDynamicWire(type, serverMethodParamDef.ParameterType, delegateParamInterceptor);
+
+                    // Typ des dynamischen Drahtes ermitteln
+                    Type dynamicWireType = dynamicWire.GetType();
+
+                    // Dynamischen Draht mit Client-Fernsteuerung verdrahten
+                    dynamicWireType.GetProperty("Interceptor").SetValue(dynamicWire, delegateParamInterceptor, null);
+                                        
+                    // Delegat zu dynamischem Draht erzeugen
+                    Delegate dynamicWireDelegate = Delegate.CreateDelegate(serverMethodParamDef.ParameterType, dynamicWire, dynamicWireType.GetMethod("In"));
+                    
+                    // Abfangvorrichtung durch dynamischen Draht austauschen
+                    args[index] = dynamicWireDelegate;
+                }            
                 // Methode aufrufen
-                returnValue = type.GetMethod(methodName, types).Invoke(instance, args);
+                returnValue = methodInfo.Invoke(instance, args);
             }
             catch (Exception ex)
             {
@@ -398,10 +441,10 @@ namespace Zyan.Communication
                 // Wenn die Komponente SingleCallaktiviert ist ...
                 if (registration.ActivationType == ActivationType.SingleCall)
                     // Verdrahtung aufheben
-                    RemoveClientServerWires(type, instance, outputPinCorrelationSet, wiringList);
+                    RemoveClientServerWires(type, instance, delegateCorrelationSet, wiringList);
             }
             // Ggf. AfterInvoke-Abos verarbeiten
-            ProcessAfterInvoke(trackingID, ref interfaceName, ref outputPinCorrelationSet, ref methodName, ref args, ref returnValue);
+            ProcessAfterInvoke(trackingID, ref interfaceName, ref delegateCorrelationSet, ref methodName, ref args, ref returnValue);
 
             // Rückgabewert zurückgeben
             return returnValue;
@@ -416,7 +459,7 @@ namespace Zyan.Communication
         /// </summary>
         /// <param name="interfaceName">Schnittstellenname der Serverkomponente</param>
         /// <param name="correlation">Korrelationsinformation</param>
-        public void AddEventHandler(string interfaceName, RemoteOutputPinWiring correlation)
+        public void AddEventHandler(string interfaceName, DelegateCorrelationInfo correlation)
         {
             // Wenn kein Schnittstellenname angegeben wurde ...
             if (string.IsNullOrEmpty(interfaceName))
@@ -443,7 +486,7 @@ namespace Zyan.Communication
             Type type = instance.GetType();
 
             // Liste für Übergabe der Korrelationsinformation erzeugen
-            List<RemoteOutputPinWiring> correlationSet = new List<RemoteOutputPinWiring>();
+            List<DelegateCorrelationInfo> correlationSet = new List<DelegateCorrelationInfo>();
             correlationSet.Add(correlation);
 
             // Client- und Server-Komponente miteinander verdrahten
@@ -455,7 +498,7 @@ namespace Zyan.Communication
         /// </summary>
         /// <param name="interfaceName">Schnittstellenname der Serverkomponente</param>
         /// <param name="correlation">Korrelationsinformation</param>
-        public void RemoveEventHandler(string interfaceName, RemoteOutputPinWiring correlation)
+        public void RemoveEventHandler(string interfaceName, DelegateCorrelationInfo correlation)
         {
             // Wenn kein Schnittstellenname angegeben wurde ...
             if (string.IsNullOrEmpty(interfaceName))
@@ -482,7 +525,7 @@ namespace Zyan.Communication
             Type type = instance.GetType();
 
             // Liste für Übergabe der Korrelationsinformation erzeugen
-            List<RemoteOutputPinWiring> correlationSet = new List<RemoteOutputPinWiring>();
+            List<DelegateCorrelationInfo> correlationSet = new List<DelegateCorrelationInfo>();
             correlationSet.Add(correlation);
             
             // Client- und Server-Komponente miteinander verdrahten

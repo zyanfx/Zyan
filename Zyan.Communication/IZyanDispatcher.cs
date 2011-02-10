@@ -10,7 +10,7 @@ namespace Zyan.Communication
     /// <summary>
     /// Schnittstelle für Fabriken zur Produktion verteilbarer Komponenten. 
     /// </summary>
-    public interface IComponentInvoker
+    public interface IZyanDispatcher
     {
         /// <summary>
         /// Ruft eine bestimmte Methode einer Komponente auf und übergibt die angegebene Nachricht als Parameter.
@@ -18,12 +18,12 @@ namespace Zyan.Communication
         /// </summary>
         /// <param name="trackingID">Aufrufschlüssel zur Nachverfolgung</param>
         /// <param name="interfaceName">Name der Komponentenschnittstelle</param>
-        /// <param name="outputPinCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Ausgangs-Pins mit entfernten Methoden</param>
+        /// <param name="delegateCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Delegaten und Ereignisse mit entfernten Methoden</param>
         /// <param name="methodName">Methodenname</param>
         /// <param name="paramDefs">Parameter-Definitionen</param>
         /// <param name="args">Parameter</param>        
         /// <returns>Rückgabewert</returns>
-        object Invoke(Guid trackingID, string interfaceName, List<RemoteOutputPinWiring> outputPinCorrelationSet, string methodName, ParameterInfo[] paramDefs, params object[] args);
+        object Invoke(Guid trackingID, string interfaceName, List<DelegateCorrelationInfo> delegateCorrelationSet, string methodName, ParameterInfo[] paramDefs, params object[] args);
 
         /// <summary>
         /// Gibt eine Liste mit allen registrierten Komponenten zurück.
@@ -77,13 +77,13 @@ namespace Zyan.Communication
         /// </summary>
         /// <param name="interfaceName">Schnittstellenname der Serverkomponente</param>
         /// <param name="correlation">Korrelationsinformation</param>
-        void AddEventHandler(string interfaceName, RemoteOutputPinWiring correlation);
+        void AddEventHandler(string interfaceName, DelegateCorrelationInfo correlation);
 
         /// <summary>
         /// Entfernt das Abonnement eines Ereignisses einer Serverkomponente.
         /// </summary>
         /// <param name="interfaceName">Schnittstellenname der Serverkomponente</param>
         /// <param name="correlation">Korrelationsinformation</param>
-        void RemoveEventHandler(string interfaceName, RemoteOutputPinWiring correlation);
+        void RemoveEventHandler(string interfaceName, DelegateCorrelationInfo correlation);
     }
 }

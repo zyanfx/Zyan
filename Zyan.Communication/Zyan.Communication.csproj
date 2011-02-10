@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="ComponentCatalog.cs" />
     <Compile Include="ComponentInfo.cs" />
+    <Compile Include="DelegateCorrelationInfo.cs" />
     <Compile Include="DynamicWireFactory.cs" />
     <Compile Include="InvalidSessionException.cs" />
     <Compile Include="InvokeCanceledEventArgs.cs" />
@@ -97,12 +98,12 @@
     <Compile Include="ZyanComponentHost.cs" />
     <Compile Include="ZyanConnection.cs" />
     <Compile Include="ComponentRegistration.cs" />
-    <Compile Include="IComponentInvoker.cs" />
+    <Compile Include="IZyanDispatcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ComponentInvoker.cs" />
+    <Compile Include="ZyanDispatcher.cs" />
     <Compile Include="ZyanConnectionSetup.cs" />
     <Compile Include="ZyanProxy.cs" />
-    <Compile Include="RemoteOutputPinWiring.cs" />
+    <Compile Include="DelegateInterceptor.cs" />
     <Compile Include="Security\AuthRequestMessage.cs" />
     <Compile Include="Security\AuthResponseMessage.cs" />
     <Compile Include="Security\IAuthenticationProvider.cs" />
