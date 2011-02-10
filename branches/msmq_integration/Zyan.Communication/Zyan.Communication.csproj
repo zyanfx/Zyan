@@ -41,6 +41,7 @@
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Messaging" />
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Windows.Forms" />
@@ -73,6 +74,11 @@
     <Compile Include="Protocols\Http\HttpCustomServerProtocolSetup.cs" />
     <Compile Include="Protocols\Ipc\IpcBinaryClientProtocolSetup.cs" />
     <Compile Include="Protocols\Ipc\IpcBinaryServerProtocolSetup.cs" />
+    <Compile Include="Protocols\Msmq\MsmqClientProtocolSetup.cs" />
+    <Compile Include="Protocols\Msmq\MsmqServerProtocolSetup.cs" />
+    <Compile Include="Protocols\Msmq\Transport\MSMQListener.cs" />
+    <Compile Include="Protocols\Msmq\Transport\MSMQReceiver.cs" />
+    <Compile Include="Protocols\Msmq\Transport\MSMQSender.cs" />
     <Compile Include="Protocols\Tcp\TcpCustomClientProtocolSetup.cs" />
     <Compile Include="Protocols\Tcp\TcpCustomServerProtocolSetup.cs" />
     <Compile Include="Protocols\Tcp\TcpBinaryClientProtocolSetup.cs" />
@@ -122,6 +128,7 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
