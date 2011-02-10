@@ -25,7 +25,7 @@ namespace Zyan.Communication
         #region Deklarationen
 
         // Felder
-        private ComponentInvoker _invoker = null;
+        private ZyanDispatcher _invoker = null;
 
         // Authentifizierungsanbieter
         private IAuthenticationProvider _authProvider = null;
@@ -131,7 +131,7 @@ namespace Zyan.Communication
             _catalog = catalog;
             
             // Komponentenaufrufer erzeugen
-            _invoker = new ComponentInvoker(this);
+            _invoker = new ZyanDispatcher(this);
 
             // Authentifizierungsanbieter übernehmen und verdrahten
             _authProvider = protocolSetup.AuthenticationProvider;

@@ -128,6 +128,19 @@ namespace IntegrationTest_DistributedEvents
             }
         }
     }
+    
+    public interface IRequestResponseCallbackSingleCall
+    {
+        void DoRequestResponse(string text, Action<string> callback);
+    }
+
+    public class RequestResponseCallbackSingleCall : IRequestResponseCallbackSingleCall
+    {
+        public void DoRequestResponse(string text, Action<string> callback)
+        {
+            callback(text + "!");
+        }
+    }
 
     public class EventServerLocator : MarshalByRefObject
     { 
@@ -162,6 +175,7 @@ namespace IntegrationTest_DistributedEvents
             _host.RegisterComponent<IEventComponentSingleCall, EventComponentSingleCall>(ActivationType.SingleCall);
             _host.RegisterComponent<ICallbackComponentSingleton, CallbackComponentSingleton>(ActivationType.Singleton);
             _host.RegisterComponent<ICallbackComponentSingleCall, CallbackComponentSingleCall>(ActivationType.SingleCall);
+            _host.RegisterComponent<IRequestResponseCallbackSingleCall, RequestResponseCallbackSingleCall>(ActivationType.SingleCall);
 	    }
 
         public void Dispose()

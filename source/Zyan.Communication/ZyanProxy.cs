@@ -17,8 +17,8 @@ namespace Zyan.Communication
     {
         // Felder
         private Type _interfaceType = null;
-        private IComponentInvoker _remoteInvoker = null;
-        private List<RemoteOutputPinWiring> _outputMessageCorrelationSet = null;
+        private IZyanDispatcher _remoteInvoker = null;
+        private List<DelegateCorrelationInfo> _delegateCorrelationSet = null;
         private bool _implicitTransactionTransfer = false;
         private Guid _sessionID;
         private string _componentHostName = string.Empty;
@@ -81,7 +81,7 @@ namespace Zyan.Communication
                 _autoLoginCredentials = autoLogoninCredentials;
 
             // Sammlung für Korrelationssatz erzeugen
-            _outputMessageCorrelationSet = new List<RemoteOutputPinWiring>();
+            _delegateCorrelationSet = new List<DelegateCorrelationInfo>();
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace Zyan.Communication
             MethodInfo methodInfo = (MethodInfo)methodCallMessage.MethodBase;
             methodInfo.GetParameters();
 
-            // Wenn die Methode ein Ausgabe-Pin ist ...
+            // Wenn die Methode ein Delegat ist ...
             if (methodInfo.ReturnType.Equals(typeof(void)) &&
                 methodCallMessage.InArgCount == 1 &&
                 methodCallMessage.ArgCount == 1 &&
@@ -111,26 +111,31 @@ namespace Zyan.Communication
                 typeof(Delegate).IsAssignableFrom(methodCallMessage.Args[0].GetType()) &&
                 (methodCallMessage.MethodName.StartsWith("set_") || methodCallMessage.MethodName.StartsWith("add_")))
             {
-                // EBC-Eingangsnachricht abrufen
-                object inputMessage = methodCallMessage.GetArg(0);
+                // Delegat auf zu verdrahtende Client-Methode abrufen
+                object receiveMethodDelegate = methodCallMessage.GetArg(0);
 
                 // "set_" wegschneiden
                 string propertyName = methodCallMessage.MethodName.Substring(4);
 
                 // Verdrahtungskonfiguration festschreiben
-                RemoteOutputPinWiring wiring = new RemoteOutputPinWiring()
+                DelegateInterceptor wiring = new DelegateInterceptor()
                 {
-                    ClientReceiver = inputMessage,
-                    ServerPropertyName = propertyName,
-                    IsEvent = methodCallMessage.MethodName.StartsWith("add_")
+                    ClientDelegate = receiveMethodDelegate                
+                };
+                // Korrelationsinformation zusammenstellen
+                DelegateCorrelationInfo correlationInfo = new DelegateCorrelationInfo()
+                {
+                    IsEvent = methodCallMessage.MethodName.StartsWith("add_"),
+                    DelegateMemberName = propertyName,
+                    ClientDelegateInterceptor=wiring
                 };
                 // Wenn die Serverkomponente Singletonaktiviert ist ...
                 if (_activationType == ActivationType.Singleton)                    
                     // Ereignis der Serverkomponente abonnieren
-                    _connection.RemoteComponentFactory.AddEventHandler(_interfaceType.FullName, wiring);
+                    _connection.RemoteComponentFactory.AddEventHandler(_interfaceType.FullName, correlationInfo);
 
                 // Verdrahtung in der Sammlung ablegen
-                _outputMessageCorrelationSet.Add(wiring);
+                _delegateCorrelationSet.Add(correlationInfo);
                 
                 // Leere Remoting-Antwortnachricht erstellen und zurückgeben
                 return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
@@ -149,12 +154,12 @@ namespace Zyan.Communication
                 string propertyName = methodCallMessage.MethodName.Substring(7);
 
                 // Wenn Verdrahtungen gespeichert sind ...
-                if (_outputMessageCorrelationSet.Count > 0)
+                if (_delegateCorrelationSet.Count > 0)
                 {
                     // Verdrahtungskonfiguration suchen
-                    RemoteOutputPinWiring found = (from wiring in (RemoteOutputPinWiring[])_outputMessageCorrelationSet.ToArray()
-                                                   where wiring.ServerPropertyName.Equals(propertyName) && wiring.ClientReceiver.Equals(inputMessage)
-                                                   select wiring).FirstOrDefault();
+                    DelegateCorrelationInfo found = (from correlationInfo in (DelegateCorrelationInfo[])_delegateCorrelationSet.ToArray()
+                                                     where correlationInfo.DelegateMemberName.Equals(propertyName) && correlationInfo.ClientDelegateInterceptor.ClientDelegate.Equals(inputMessage)
+                                                     select correlationInfo).FirstOrDefault();
 
                     // Wenn eine passende Verdrahtungskonfiguration gefunden wurde ...
                     if (found != null)
@@ -163,7 +168,7 @@ namespace Zyan.Communication
                         if (_activationType == ActivationType.SingleCall)
                         {
                             // Verdrahtungskonfiguration entfernen
-                            _outputMessageCorrelationSet.Remove(found);
+                            _delegateCorrelationSet.Remove(found);
                         }
                         else
                         {
@@ -201,19 +206,19 @@ namespace Zyan.Communication
                 object returnValue = null;
 
                 // Variable für Verdrahtungskorrelationssatz
-                List<RemoteOutputPinWiring> correlationSet = null;
+                List<DelegateCorrelationInfo> correlationSet = null;
 
                 // Wenn die Komponente SingleCallaktiviert ist ...
                 if (_activationType == ActivationType.SingleCall)
                     // Korrelationssatz übernehmen (wird mit übertragen)
-                    correlationSet = _outputMessageCorrelationSet;
+                    correlationSet = _delegateCorrelationSet;
 
                 // Ereignisargumente für BeforeInvoke erstellen
                 BeforeInvokeEventArgs cancelArgs = new BeforeInvokeEventArgs()
                 {
                     TrackingID = trackingID,
                     InterfaceName = _interfaceType.FullName,
-                    OutputPinCorrelationSet = correlationSet,
+                    DelegateCorrelationSet = correlationSet,
                     MethodName = methodCallMessage.MethodName,
                     Arguments = methodCallMessage.Args,
                     Cancel = false
@@ -235,17 +240,23 @@ namespace Zyan.Communication
                     // Abbruchausnahme werfen
                     throw cancelArgs.CancelException;
                 }
+                // Parametertypen ermitteln
+                ParameterInfo[] paramDefs = methodCallMessage.MethodBase.GetParameters();
+
                 try
                 {
+                    // Ggf. Delegaten-Parameter abfangen
+                    object[] checkedArgs = InterceptDelegateParameters(methodCallMessage);
+
                     // Entfernten Methodenaufruf durchführen
-                    returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, correlationSet, methodCallMessage.MethodName, methodCallMessage.MethodBase.GetParameters(), methodCallMessage.Args);
+                    returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, correlationSet, methodCallMessage.MethodName, paramDefs, checkedArgs);
 
                     // Ereignisargumente für AfterInvoke erstellen
                     AfterInvokeEventArgs afterInvokeArgs = new AfterInvokeEventArgs()
                     {
                         TrackingID = trackingID,
                         InterfaceName = _interfaceType.FullName,
-                        OutputPinCorrelationSet = correlationSet,
+                        DelegateCorrelationSet = correlationSet,
                         MethodName = methodCallMessage.MethodName,
                         Arguments = methodCallMessage.Args,
                         ReturnValue = returnValue
@@ -262,7 +273,7 @@ namespace Zyan.Communication
                         _remoteInvoker.Logon(_sessionID, _autoLoginCredentials);
 
                         // Entfernten Methodenaufruf erneut versuchen                        
-                        returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, correlationSet, methodCallMessage.MethodName, methodCallMessage.MethodBase.GetParameters(), methodCallMessage.Args);
+                        returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, correlationSet, methodCallMessage.MethodName, paramDefs, methodCallMessage.Args);
                     }
                 }
                 // Remoting-Antwortnachricht erstellen und zurückgeben
@@ -283,6 +294,41 @@ namespace Zyan.Communication
                 // Sitzungsfehler als Remoting-Nachricht zurückgeben
                 return new ReturnMessage(sessionException, methodCallMessage);
             }
+        }
+
+        /// <summary>
+        /// Ersetzt Delegaten-Parameter einer Remoting-Nachricht durch eine entsprechende Delegaten-Abfangvorrichtung.
+        /// </summary>
+        /// <param name="message">Remoting-Nachricht</param>
+        /// <returns>argumentliste</returns>
+        private object[] InterceptDelegateParameters(IMethodCallMessage message)
+        { 
+            // Argument-Array erzeugen
+            object[] result = new object[message.ArgCount];
+
+            // Alle Parameter durchlaufen
+            for (int i = 0; i < message.ArgCount; i++)
+            { 
+                // Parameter abrufen
+                object arg = message.Args[i];
+
+                // Wenn der aktuelle Parameter ein Delegat ist ...
+                if (typeof(Delegate).IsAssignableFrom(arg.GetType()))
+                {
+                    // Abfangvorrichtung erzeugen
+                    DelegateInterceptor interceptor = new DelegateInterceptor()
+                    {
+                        ClientDelegate = arg
+                    };
+                    // Original-Parameter durch Abfangvorrichting in der Remoting-Nachricht ersetzen
+                    result[i] = interceptor;
+                }
+                else
+                    // 1:1
+                    result[i] = arg;
+            }
+            // Arument-Array zurückgeben
+            return result;
         }
     }
 }

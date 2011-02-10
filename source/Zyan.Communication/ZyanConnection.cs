@@ -330,12 +330,12 @@ namespace Zyan.Communication
         }
 
         // Proxy für den Zugriff auf die entfernte Komponentenfabrik des Komponentenhosts
-        private IComponentInvoker _remoteComponentFactory = null;
+        private IZyanDispatcher _remoteComponentFactory = null;
 
         /// <summary>
         /// Gibt einen Proxy für den Zugriff auf die entfernte Komponentenfabrik des Komponentenhosts zurück.
         /// </summary>
-        protected internal IComponentInvoker RemoteComponentFactory
+        protected internal IZyanDispatcher RemoteComponentFactory
         {
             get
             {
@@ -343,7 +343,7 @@ namespace Zyan.Communication
                 if (_remoteComponentFactory == null)
                 {
                     // Verbindung zur entfernten Komponentenfabrik herstellen
-                    _remoteComponentFactory = (IComponentInvoker)Activator.GetObject(typeof(IComponentInvoker), _serverUrl);
+                    _remoteComponentFactory = (IZyanDispatcher)Activator.GetObject(typeof(IZyanDispatcher), _serverUrl);
                 }
                 // Fabrik-Proxy zurückgeben
                 return _remoteComponentFactory;

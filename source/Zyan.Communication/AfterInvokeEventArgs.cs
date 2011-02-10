@@ -22,9 +22,9 @@ namespace Zyan.Communication
         public string InterfaceName {get; set;}
 
         /// <summary>
-        /// Gibt den Korrelationssatz für Ausgangs-Pins zurück, oder legt ihn fest.
+        /// Gibt den Korrelationssatz für Delegaten zurück, oder legt ihn fest.
         /// </summary>
-        public List<RemoteOutputPinWiring> OutputPinCorrelationSet { get; set; }
+        public List<DelegateCorrelationInfo> DelegateCorrelationSet { get; set; }
 
         /// <summary>
         /// Gibt den Methodennamen zurück, oder legt ihn fest.
