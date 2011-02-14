@@ -44,7 +44,10 @@ namespace Zyan.Communication.Protocols.Msmq
                 throw new NotSupportedException();
 
             // Zufälligen Kanalnamen vergeben
-            _channelName = "MsmqServerProtocolSetup_" + Guid.NewGuid().ToString();
+            _channelName = "msmq";
+
+            // Null-Authentifizierungsanbieter erstellen
+            _authProvider = new NullAuthenticationProvider();
 
             // Portnamen übernehmen
             _listenerQueue = listenerQueue;
@@ -76,7 +79,7 @@ namespace Zyan.Communication.Protocols.Msmq
                 BinaryClientFormatterSinkProvider clientFormatter = new BinaryClientFormatterSinkProvider();
 
                 // Neuen MSMQ-Kanal erzeugen
-                channel = new RKiss.MSMQChannelLib.MSMQReceiver(channelSettings, serverFormatter);
+                channel = new RKiss.MSMQChannel.Receiver(channelSettings, serverFormatter);
 
                 // Wenn Zyan nicht mit mono ausgeführt wird ...
                 if (!MonoCheck.IsRunningOnMono)

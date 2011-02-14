@@ -76,9 +76,12 @@
     <Compile Include="Protocols\Ipc\IpcBinaryServerProtocolSetup.cs" />
     <Compile Include="Protocols\Msmq\MsmqClientProtocolSetup.cs" />
     <Compile Include="Protocols\Msmq\MsmqServerProtocolSetup.cs" />
-    <Compile Include="Protocols\Msmq\Transport\MSMQListener.cs" />
-    <Compile Include="Protocols\Msmq\Transport\MSMQReceiver.cs" />
-    <Compile Include="Protocols\Msmq\Transport\MSMQSender.cs" />
+    <Compile Include="Protocols\Msmq\Transport\InterfaceContract.cs" />
+    <Compile Include="Protocols\Msmq\Transport\KnowledgeBase.cs" />
+    <Compile Include="Protocols\Msmq\Transport\Listener.cs" />
+    <Compile Include="Protocols\Msmq\Transport\Receiver.cs" />
+    <Compile Include="Protocols\Msmq\Transport\Sender.cs" />
+    <Compile Include="Protocols\Msmq\Transport\SenderMessageSink.cs" />
     <Compile Include="Protocols\Tcp\TcpCustomClientProtocolSetup.cs" />
     <Compile Include="Protocols\Tcp\TcpCustomServerProtocolSetup.cs" />
     <Compile Include="Protocols\Tcp\TcpBinaryClientProtocolSetup.cs" />
