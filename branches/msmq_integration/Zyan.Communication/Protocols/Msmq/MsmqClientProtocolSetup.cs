@@ -47,7 +47,10 @@ namespace Zyan.Communication.Protocols.Msmq
             {
                 // Konfiguration für den Kanal erstellen
                 System.Collections.IDictionary channelSettings = new System.Collections.Hashtable();
-                channelSettings["name"] = _channelName;
+                channelSettings["name"] = "msmq";
+                channelSettings["respond"] = @"private$\rspchannel";
+                channelSettings["admin"] = @"private$\adminchannel";
+                channelSettings["timeout"] = 30;
                                 
                 // Binäre Serialisierung von komplexen Objekten aktivieren
                 BinaryServerFormatterSinkProvider serverFormatter = new BinaryServerFormatterSinkProvider();
@@ -55,7 +58,7 @@ namespace Zyan.Communication.Protocols.Msmq
                 //BinaryClientFormatterSinkProvider clientFormatter = new BinaryClientFormatterSinkProvider();
 
                 // Neuen MSMQ-Kanal erzeugen
-                channel = new RKiss.MSMQChannelLib.MSMQSender(channelSettings, serverFormatter);
+                channel = new RKiss.MSMQChannel.Sender(channelSettings, null);
 
                 // Wenn Zyan nicht mit mono ausgeführt wird ...
                 if (!MonoCheck.IsRunningOnMono)

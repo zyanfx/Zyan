@@ -6,6 +6,7 @@ using Zyan.Communication;
 using System.IO;
 using System.Reflection;
 using Zyan.Communication.Protocols.Tcp;
+using Zyan.Communication.Protocols.Msmq;
 using Zyan.Communication.Security;
 using System.Threading;
 
@@ -97,8 +98,10 @@ namespace IntegrationTest_DistributedEvents
             });
             _serverAppDomain.DoCallBack(serverWork);
 
-            TcpCustomClientProtocolSetup protocol = new TcpCustomClientProtocolSetup(true);
-            _connection = new ZyanConnection("tcp://localhost:8083/EventTest",protocol);
+            //TcpCustomClientProtocolSetup protocol = new TcpCustomClientProtocolSetup(true);
+            MsmqClientProtocolSetup protocol = new MsmqClientProtocolSetup();
+            //_connection = new ZyanConnection("tcp://localhost:8083/EventTest",protocol);
+            _connection = new ZyanConnection(@"msmq://private$/reqchannel/EventTest", protocol);
             _proxySingleton = _connection.CreateProxy<IEventComponentSingleton>();
             _proxySingleCall = _connection.CreateProxy<IEventComponentSingleCall>();
             _proxyCallbackSingleton = _connection.CreateProxy<ICallbackComponentSingleton>();
