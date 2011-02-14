@@ -5,6 +5,7 @@ using System.Text;
 using Zyan.Communication;
 using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp;
+using Zyan.Communication.Protocols.Msmq;
 using Zyan.Communication.Security;
 
 namespace IntegrationTest_DistributedEvents
@@ -169,7 +170,8 @@ namespace IntegrationTest_DistributedEvents
 
         private EventServer ()
 	    {
-            TcpCustomServerProtocolSetup protocol = new TcpCustomServerProtocolSetup(8083, new NullAuthenticationProvider(), true);
+            //TcpCustomServerProtocolSetup protocol = new TcpCustomServerProtocolSetup(8083, new NullAuthenticationProvider(), true);
+            MsmqServerProtocolSetup protocol = new MsmqServerProtocolSetup(@"private$\reqchannel");
             _host = new ZyanComponentHost("EventTest", protocol);
             _host.RegisterComponent<IEventComponentSingleton, EventComponentSingleton>(ActivationType.Singleton);
             _host.RegisterComponent<IEventComponentSingleCall, EventComponentSingleCall>(ActivationType.SingleCall);
