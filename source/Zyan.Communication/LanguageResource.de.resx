@@ -112,10 +112,10 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ApplicationException_MultipleModuleControlersNotAllowed" xml:space="preserve">
     <value>Mehrere Modulcontroller im selben Modul sind nicht zulässig.</value>
@@ -212,5 +212,8 @@
   </data>
   <data name="InvalidCredentials" xml:space="preserve">
     <value>Benutzername und/oder Kennwort sind nicht korrekt.</value>
+  </data>
+  <data name="ApplicationException_NoChannel" xml:space="preserve">
+    <value>Es wurde kein Kanal erstellt.</value>
   </data>
 </root>
