@@ -70,6 +70,15 @@ namespace Zyan.Communication {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die No channel was created. ähnelt.
+        /// </summary>
+        internal static string ApplicationException_NoChannel {
+            get {
+                return ResourceManager.GetString("ApplicationException_NoChannel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Notification service is not running on the host. ähnelt.
         /// </summary>
         internal static string ApplicationException_NotificationServiceNotRunning {
