@@ -371,11 +371,12 @@ namespace Zyan.Communication
 
         #region Netzwerk-Kommunikation
 
-        // TCP-Anschlussnummer dieses Komponentenhosts
-        private int _tcpPort = 0;
 
         // Name dieses Komponentenhosts
         private string _name = string.Empty;
+
+        // Kanalname
+        private string _channelName = string.Empty;
 
         /// <summary>
         /// Gibt den Namen des Komponentenhosts zurück.
@@ -395,11 +396,18 @@ namespace Zyan.Communication
                         
             // Wenn der Kanal erzeugt wurde ...
             if (channel != null)
+            {
+                // Kanalnamen merken
+                _channelName = channel.ChannelName;
+
                 // Kanal registrieren
                 ChannelServices.RegisterChannel(channel, false);
 
-            // Komponentenhost für entfernte Zugriffe veröffentlichen            
-            RemotingServices.Marshal(_invoker, _name);            
+                // Komponentenhost für entfernte Zugriffe veröffentlichen            
+                RemotingServices.Marshal(_invoker, _name);
+            }
+            else
+                throw new ApplicationException(LanguageResource.ApplicationException_NoChannel);
         }
 
         /// <summary>
@@ -410,28 +418,17 @@ namespace Zyan.Communication
             // Veröffentlichung des Komponentenhosts für entfernte Zugriffe löschen
             RemotingServices.Disconnect(_invoker);
 
-            // TCP-Kommunikationskanal schließen
-            CloseTcpChannel();                                        
+            // Kommunikationskanal schließen
+            CloseChannel();                                        
         }
 
         /// <summary>
-        /// Gibt den internen Namen des Kommunikationskanals dieses Komponentenhosts zurück.
+        /// Schließt den Kanal, falls dieser geöffent ist.
         /// </summary>
-        private string InternalChannelName
-        {
-            get { return "RainbirdEbcComponentHost" + Convert.ToString(_tcpPort); }
-        }
-
-        /// <summary>
-        /// Schließt den TCP-Kanal, falls dieser geöffent ist.
-        /// </summary>
-        private void CloseTcpChannel()
+        private void CloseChannel()
         { 
-            // Kanalnamen abrufen
-            string channelName = InternalChannelName;
-
             // Kanal suchen
-            IChannel channel = ChannelServices.GetChannel(channelName);
+            IChannel channel = ChannelServices.GetChannel(_channelName);
 
             // Wenn der Kanal gefunden wurde ...
             if (channel != null)             
