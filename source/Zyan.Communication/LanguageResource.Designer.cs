@@ -187,6 +187,15 @@ namespace Zyan.Communication {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die For type &apos;{0}&apos; is already a serialization handler registered. ähnelt.
+        /// </summary>
+        internal static string ArgumentException_TypeHasAlreadyAHandler {
+            get {
+                return ResourceManager.GetString("ArgumentException_TypeHasAlreadyAHandler", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The provided implementation type is not a class. ähnelt.
         /// </summary>
         internal static string ArgumentException_TypeIsNotAClass {
@@ -300,6 +309,15 @@ namespace Zyan.Communication {
         internal static string InvalidCredentials {
             get {
                 return ResourceManager.GetString("InvalidCredentials", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die No serialization handler is registered for type &apos;{0}&apos;. ähnelt.
+        /// </summary>
+        internal static string KeyNotFoundException_SerializationHandlerNotFound {
+            get {
+                return ResourceManager.GetString("KeyNotFoundException_SerializationHandlerNotFound", resourceCulture);
             }
         }
         

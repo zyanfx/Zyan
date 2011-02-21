@@ -59,6 +59,7 @@
     <Compile Include="InvokeCanceledException.cs" />
     <Compile Include="BeforeInvokeEventArgs.cs" />
     <Compile Include="AfterInvokeEventArgs.cs" />
+    <Compile Include="ISerializationHandler.cs" />
     <Compile Include="LanguageResource.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -90,6 +91,8 @@
     <Compile Include="Scripting\ScriptEngine.cs" />
     <Compile Include="Security\BasicWindowsAuthProvider.cs" />
     <Compile Include="Security\WindowsSecurityTools.cs" />
+    <Compile Include="CustomSerializationContainer.cs" />
+    <Compile Include="SerializationHandlerRepository.cs" />
     <Compile Include="SessionMgmt\InProcSessionManager.cs" />
     <Compile Include="SessionMgmt\ISessionManager.cs" />
     <Compile Include="SessionMgmt\SessionVariableAdapter.cs" />

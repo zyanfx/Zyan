@@ -158,11 +158,14 @@ namespace Zyan.Communication
 
             // Einstellung für automatische Sitzungsverlängung übernehmen
             _keepSessionAlive = keepSessionAlive;
-
+            
             // Wenn automatisches Anmelden aktiv ist ...
             if (_autoLoginOnExpiredSession)
                 // Anmeldedaten speichern
                 _autoLoginCredentials = credentials;
+
+            // Verwaltung für Serialisierungshandling erzeugen
+            _serializationHandling = new SerializationHandlerRepository();
 
             // Server-URL in Bestandteile zerlegen
             string[] addressParts = _serverUrl.Split('/');
@@ -404,6 +407,21 @@ namespace Zyan.Communication
             // Ressourcen freigeben
             Dispose();
         }
+
+        #region Benutzerdefinierte Serialisierung
+
+        // Serialisierungshandling.
+        private SerializationHandlerRepository _serializationHandling = null;
+
+        /// <summary>
+        /// Gibt die Verwaltung für benutzerdefinierte Serialisierungsbehandlung zurück.
+        /// </summary>
+        public SerializationHandlerRepository SerializationHandling
+        {
+            get { return _serializationHandling; }
+        }
+
+        #endregion
 
         #region Aufrufverfolgung
 

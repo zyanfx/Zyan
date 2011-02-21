@@ -216,4 +216,10 @@
   <data name="ApplicationException_NoChannel" xml:space="preserve">
     <value>No channel was created.</value>
   </data>
+  <data name="ArgumentException_TypeHasAlreadyAHandler" xml:space="preserve">
+    <value>For type '{0}' is already a serialization handler registered.</value>
+  </data>
+  <data name="KeyNotFoundException_SerializationHandlerNotFound" xml:space="preserve">
+    <value>No serialization handler is registered for type '{0}'.</value>
+  </data>
 </root>

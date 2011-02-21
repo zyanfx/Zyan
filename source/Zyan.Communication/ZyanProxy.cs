@@ -306,6 +306,9 @@ namespace Zyan.Communication
             // Argument-Array erzeugen
             object[] result = new object[message.ArgCount];
 
+            // Parametertypen ermitteln
+            ParameterInfo[] paramDefs = message.MethodBase.GetParameters();
+
             // Alle Parameter durchlaufen
             for (int i = 0; i < message.ArgCount; i++)
             { 
@@ -324,8 +327,28 @@ namespace Zyan.Communication
                     result[i] = interceptor;
                 }
                 else
-                    // 1:1
-                    result[i] = arg;
+                {
+                    // Typ des Parameters abfragen
+                    Type argType = paramDefs[i].ParameterType;
+
+                    // Passenden Serialisierungshandler suchen
+                    Type handledType;
+                    ISerializationHandler handler;
+                    _connection.SerializationHandling.FindMatchingSerializationHandler(argType,out handledType,out handler);
+
+                    // Wenn für diesen Typ ein passender Serialisierungshandler registriert ist ...
+                    if (handler != null)
+                    {   
+                        // Serialisierung durchführen
+                        byte[] raw = handler.Serialize(arg);
+
+                        // Parameter durch Serialisierungscontainer ersetzen
+                        result[i] = new CustomSerializationContainer(handledType, argType, raw);
+                    }
+                    else
+                        // 1:1
+                        result[i] = arg;
+                }
             }
             // Arument-Array zurückgeben
             return result;
