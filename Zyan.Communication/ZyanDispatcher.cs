@@ -375,6 +375,33 @@ namespace Zyan.Communication
                 if (delegateParamInterceptor != null)
                     // Parameter der Delegaten-Verdrahtungsliste zufügen
                     delegateParamIndexes.Add(i, delegateParamInterceptor);
+                else
+                { 
+                    // Versuchen den aktuellen Parameter in einen Serialisierungscontainer zu casten
+                    CustomSerializationContainer container = args[i] as CustomSerializationContainer;
+
+                    // Wenn der aktuelle Parameter ein Serialisierungscontainer ist ...
+                    if (container != null)
+                    { 
+                        // Passenden Serialisierungshandler suchen                        
+                        ISerializationHandler serializationHandler = _host.SerializationHandling[container.HandledType];
+
+                        // Wenn kein passender Serialisierungshandler registriert ist ...
+                        if (serializationHandler == null)
+                        {
+                            // Ausnahme erzeugen
+                            KeyNotFoundException ex = new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_SerializationHandlerNotFound,container.HandledType.FullName));
+
+                            // InvokeCanceled-Ereignis feuern
+                            _host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
+
+                            // Ausnahme werfen
+                            throw ex;
+                        }
+                        // Deserialisierung durchführen
+                        args[i] = serializationHandler.Deserialize(container.DataType, container.Data);
+                    }
+                }
             }
             // Ausnahme-Schalter
             bool exceptionThrown = false;
