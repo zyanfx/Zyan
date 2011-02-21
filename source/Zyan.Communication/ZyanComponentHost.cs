@@ -130,6 +130,9 @@ namespace Zyan.Communication
             _sessionManager = sessionManager;
             _catalog = catalog;
             
+            // Verwaltung für Serialisierungshandling erzeugen
+            _serializationHandling = new SerializationHandlerRepository();
+            
             // Komponentenaufrufer erzeugen
             _invoker = new ZyanDispatcher(this);
 
@@ -608,6 +611,21 @@ namespace Zyan.Communication
 
             // Delegat zurückgeben
             return sendHandler;
+        }
+
+        #endregion
+
+        #region Benutzerdefinierte Serialisierung
+
+        // Serialisierungshandling.
+        private SerializationHandlerRepository _serializationHandling = null;
+
+        /// <summary>
+        /// Gibt die Verwaltung für benutzerdefinierte Serialisierungsbehandlung zurück.
+        /// </summary>
+        public SerializationHandlerRepository SerializationHandling
+        {
+            get { return _serializationHandling; }
         }
 
         #endregion
