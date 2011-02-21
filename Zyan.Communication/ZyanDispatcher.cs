@@ -440,6 +440,28 @@ namespace Zyan.Communication
                 }            
                 // Methode aufrufen
                 returnValue = methodInfo.Invoke(instance, args);
+
+                // Wenn der Rückgabewert nicht null ist ...
+                if (returnValue != null)
+                {
+                    // Typ des Rückgabewerts abfragen
+                    Type returnValueType = returnValue.GetType();
+
+                    // Passenden Serialisierungshandler suchen
+                    Type handledType;
+                    ISerializationHandler handler;
+                    _host.SerializationHandling.FindMatchingSerializationHandler(returnValueType, out handledType, out handler);
+
+                    // Wenn für diesen Typ ein passender Serialisierungshandler registriert ist ...
+                    if (handler != null)
+                    {
+                        // Serialisierung durchführen
+                        byte[] raw = handler.Serialize(returnValue);
+
+                        // Rückgabewert durch Serialisierungscontainer ersetzen
+                        returnValue = new CustomSerializationContainer(handledType, returnValueType, raw);
+                    }                    
+                }
             }
             catch (Exception ex)
             {
