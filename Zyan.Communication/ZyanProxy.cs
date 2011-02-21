@@ -274,25 +274,24 @@ namespace Zyan.Communication
 
                         // Entfernten Methodenaufruf erneut versuchen                        
                         returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, correlationSet, methodCallMessage.MethodName, paramDefs, methodCallMessage.Args);
-
-                        // Versuchen den Rückgabewert in einen Serialisierungscontainer zu casten
-                        CustomSerializationContainer container = returnValue as CustomSerializationContainer;
-
-                        // Wenn der aktuelle Parameter ein Serialisierungscontainer ist ...
-                        if (container != null)
-                        {
-                            // Passenden Serialisierungshandler suchen                        
-                            ISerializationHandler serializationHandler = _connection.SerializationHandling[container.HandledType];
-
-                            // Wenn kein passender Serialisierungshandler registriert ist ...
-                            if (serializationHandler == null)                            
-                                // Ausnahme werfen
-                                throw new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_SerializationHandlerNotFound, container.HandledType.FullName));
-                                                        
-                            // Deserialisierung durchführen
-                            returnValue = serializationHandler.Deserialize(container.DataType, container.Data);
-                        }
                     }
+                }
+                // Versuchen den Rückgabewert in einen Serialisierungscontainer zu casten
+                CustomSerializationContainer container = returnValue as CustomSerializationContainer;
+
+                // Wenn der aktuelle Parameter ein Serialisierungscontainer ist ...
+                if (container != null)
+                {
+                    // Passenden Serialisierungshandler suchen                        
+                    ISerializationHandler serializationHandler = _connection.SerializationHandling[container.HandledType];
+
+                    // Wenn kein passender Serialisierungshandler registriert ist ...
+                    if (serializationHandler == null)
+                        // Ausnahme werfen
+                        throw new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_SerializationHandlerNotFound, container.HandledType.FullName));
+
+                    // Deserialisierung durchführen
+                    returnValue = serializationHandler.Deserialize(container.DataType, container.Data);
                 }
                 // Remoting-Antwortnachricht erstellen und zurückgeben
                 return new ReturnMessage(returnValue, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
