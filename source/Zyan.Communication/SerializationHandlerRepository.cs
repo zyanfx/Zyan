@@ -12,10 +12,19 @@ namespace Zyan.Communication
     public class SerializationHandlerRepository : IEnumerable<ISerializationHandler>
     {
         // Auflistung der registrierten Serialisierungshandler
-        private Dictionary<Type, ISerializationHandler> _serializationHandlers = null;
+        private volatile Dictionary<Type, ISerializationHandler> _serializationHandlers = null;
 
         // Sperrobjekt zur Synchronisierung des threadübergreifenden Zugriffs auf die registrierten Serialisierungshandler
         private object _serializationHandlersLockObject = new object();
+
+        /// <summary>
+        /// Erzeugt eine neue Instanz der SerializationHandlerRepository-Klasse.
+        /// </summary>
+        public SerializationHandlerRepository()
+        {
+            // Auflistung erzeugen
+            _serializationHandlers = new Dictionary<Type, ISerializationHandler>();
+        }
 
         /// <summary>
         /// Registriert einen Serialisierungshandler für einen bestimmten Typ.
