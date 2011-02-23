@@ -1,0 +1,1246 @@
+/* START - Basic styles */
+
+BODY {
+/*	margin: 0px; 
+	padding: 0px;*/
+	font-family: Verdana, Sans-Serif; 
+	font-size: 12px;
+	color: #333333;
+	background: #FFFFFF;
+	letter-spacing: .02em;
+	line-height: 16px; }
+
+/* specifics on sizing for leftnav table cells */
+DIV.leftnavCell{
+	background: #99ccff;
+	padding-left: 10px;
+	padding-top: 5px;
+	padding-bottom: 3px;
+	line-height: 10px;
+}
+ 
+TABLE, TD { 
+	vertical-align: top; 
+	font-family: Verdana; 
+	font-size: 10px;
+	color: #333333;
+	letter-spacing: .02em;
+	line-height: 16px; 
+}
+
+A {
+	COLOR: 				#000000;
+	TEXT-DECORATION: 	underline; }
+
+A:hover {
+	COLOR: 				#3399FF;
+	TEXT-DECORATION: 	underline; }
+
+A:active {
+	COLOR: 				#0066CC;
+	TEXT-DECORATION: 	underline; }
+	
+
+A.gray {
+	COLOR: 				#999999;
+	TEXT-DECORATION: 	underline; }
+
+A.gray:hover {
+	COLOR: 				#000000;
+	TEXT-DECORATION: 	underline; }
+
+A.gray:active {
+	COLOR: 				#0066CC;
+	TEXT-DECORATION: 	underline; }	
+	
+A.whitelink 
+{
+	COLOR: 				#FFFFFF;
+	font-weight:	    normal; 
+	TEXT-DECORATION: 	underline; }
+
+A.whitelink:hover {
+	COLOR: 				#FFFF99;
+	TEXT-DECORATION: 	underline; }
+
+A.whitelink:active {
+	COLOR: 				#FFFFFF;
+	TEXT-DECORATION: 	underline; }
+
+H1 {
+	margin-top: 16px;
+	margin-bottom: 10px;
+	font-family: Verdana;
+	font-size: 14px;
+	color: #333333;
+	font-weight: bold;
+	letter-spacing: .08em; }
+
+H2 {
+	FONT-FAMILY: 		Verdana, Sans-Serif;
+	FONT-WEIGHT: 		Bold;
+	FONT-SIZE: 			16px; }
+
+H3 {
+	FONT-FAMILY: 		Verdana, Sans-Serif; 
+	FONT-WEIGHT: 		Bold;
+	FONT-SIZE: 			x-small; }
+
+label {
+	FONT-SIZE: 			8pt; }	
+	
+.smalltext {
+	FONT-SIZE:			10px; }
+
+.boldtext {
+	FONT-WEIGHT:		bold; }		
+	
+.ValignMiddle {
+	VERTICAL-ALIGN:		middle; }	
+	
+.AlignCenter {
+	TEXT-ALIGN:			center; }	
+
+/* END - Basic styles */
+
+TR.normal {
+	BACKGROUND-COLOR: 	#FFFFFF; }
+
+TR.altern {
+	BACKGROUND-COLOR: 	#E5F2FF; }
+
+TD.header {
+	BACKGROUND-COLOR: 	#99CCFF;
+	COLOR: 				#000000;
+	FONT-FAMILY: 		Verdana, Sans-Serif;
+	FONT-SIZE: 			10px;
+	TEXT-ALIGN: 		left; }
+
+TD.featuredheader {
+	BACKGROUND-COLOR: 	#0066CC;
+	COLOR: 				#FFFFFF;
+	FONT-FAMILY: 		Verdana, Sans-Serif;
+	FONT-SIZE: 			x-small;
+	FONT-WEIGHT: 		bold;
+	TEXT-ALIGN: 		left; }
+
+TD.code {
+	FONT-FAMILY: 		courier;
+	FONT-SIZE: 			16px; }
+
+A.rollover {
+	COLOR: 				#3399FF;
+	FONT-SIZE: 			10px;
+	TEXT-DECORATION: 	none; }
+
+	A.rollover:hover {
+		COLOR: 			#000000; }
+
+	A.rollover:active {
+		COLOR: 			#000000; }
+
+A.rollovernav {
+	COLOR: 				#000000;
+	FONT-SIZE: 			10px;
+	TEXT-DECORATION: 	none; }
+
+	A.rollovernav:hover {
+		COLOR: 			#FFFF99; }
+
+	A.rollovernav:active {
+		COLOR: 			#000000; }
+		
+A.2ndheadercell_rollover {
+	COLOR: 				#000000; }
+
+	A.2ndheadercell_rollover:hover {
+		COLOR: 			#FFFFFF; }
+
+	A.2ndheadercell_rollover:active {
+		COLOR: 			#FFFF99; }		
+
+A.featuredrollovernav {
+	COLOR: 				#FFFFFF;
+	FONT-SIZE: 			10px; }
+
+	A.featuredrollovernav:hover {
+		COLOR: 			#FFFF99; }
+
+	A.featuredrollovernav:active {
+		COLOR: 			#000000; }
+
+A.rollovernavheader {
+	COLOR: 				#CC0000;
+	FONT-SIZE: 			11px;
+	FONT-WEIGHT: 		bold;
+	TEXT-DECORATION: 	none; }
+
+	A.rollovernavheader:hover {
+		COLOR: 			#000000; }
+
+	A.rollovernavheader:active {
+		COLOR: 			#CC0000; }
+
+A.rollovernav_ltblue {
+	COLOR: 				#000000;
+	FONT-SIZE: 			10px; }
+
+	A.rollovernav_ltblue:hover {
+		COLOR: 			#FFFFFF; }
+
+	A.rollovernav_ltblue:active {
+		COLOR: 			#3399FF; }
+
+A.rollovertablehead {
+	COLOR: 				#000000;
+	FONT-SIZE: 			12px;
+	FONT-WEIGHT: 		bold; }
+
+	A.rollovertablehead:hover {
+		COLOR: 			#FFFFFF; }
+
+	A.rollovertablehead:active {
+		COLOR: 			#CC0000; }
+
+A.rollovertablehead_invert {
+	COLOR: 				#0066FF;
+	FONT-SIZE: 			12px;
+	FONT-WEIGHT: 		bold; }
+
+	A.rollovertablehead_invert:hover {
+		COLOR: 			#000000; }
+
+	A.rollovertablehead_invert:active {
+		COLOR: 			#FFFF99; }
+
+A.featuredrollovertablehead {
+	COLOR: 				#FFFF99;
+	FONT-SIZE: 			13px;
+	FONT-WEIGHT: 		bold; }
+
+	A.featuredrollovertablehead:hover {
+		COLOR: 			#FFFFFF; }
+
+	A.featuredrollovertablehead:active {
+		COLOR: 			#FFFF99; }
+
+.gdnbutton {
+	font-family:		Verdana, Sans-Serif;
+	font-size:			10px;
+	font-weight:		bold;
+	text-decoration:	none;
+	background-color:	#3399FF;
+	color:				#FFFFFF;
+	border-top:			1px solid #99CCFF;
+	border-left:		1px solid #99CCFF;
+	border-right:		1px solid #336699;
+	border-bottom:		1px solid #336699;
+	cursor:				hand; }
+
+input.gdnbuttondemo {
+	font-family:		Verdana, Sans-Serif;
+	font-size:			10px;
+	font-weight:		bold;
+	text-decoration:	none;
+	background-color:	#99CCFF;
+	color:				#000000;
+	border-top:			1px solid #FFFFFF;
+	border-left:		1px solid #FFFFFF;
+	border-right:		1px solid #000066;
+	border-bottom:		1px solid #000066;
+	cursor:				hand; }
+
+/* START - SAMPLE CODE WITH DIFFERENT LANGUAGES */
+
+.sampleCode {
+	BORDER: 			1px solid #3399FF; 
+	PADDING-RIGHT: 		5px; 
+	PADDING-LEFT: 		5px; 
+	PADDING-BOTTOM: 	15px;  
+	PADDING-TOP: 		0px; 
+	BACKGROUND-COLOR: 	#e5f2ff; 
+	font-size:			13px; }
+
+TD.sampleCodeTab {
+	BORDER-RIGHT: 		0px #3399FF; 
+	PADDING-RIGHT: 		3px; 
+	BORDER-TOP: 		0px solid #3399FF;  
+	PADDING-LEFT: 		3px; 
+	PADDING-BOTTOM: 	3px; 
+	FONT-SIZE: 			8pt; 
+	FONT-FAMILY: 		Verdana, Sans-Serif;
+	BORDER-LEFT: 		1px solid #3399FF; 
+	WIDTH:  			15%; 
+	PADDING-TOP: 		3px; 
+	BORDER-BOTTOM: 		1px solid #3399FF; 
+	BACKGROUND-COLOR: 	#99CCFF; 
+	TEXT-ALIGN:  		center }
+
+TD.sampleCodeBacktab {
+	CURSOR:				HAND; 
+	BORDER-RIGHT: 		0px #3399FF; 
+	PADDING-RIGHT: 		3px; 
+	BORDER-TOP: 		0px solid #3399FF; 
+	PADDING-LEFT: 		3px; 
+	PADDING-BOTTOM: 	3px; 
+	FONT-SIZE: 			8pt; 
+	FONT-FAMILY: 		Verdana, Sans-Serif; 
+	BORDER-LEFT: 		1px solid #3399FF;  
+	WIDTH: 				15%; 
+	PADDING-TOP: 		3px; 
+	BORDER-BOTTOM: 		1px solid #3399FF; 
+	BACKGROUND-COLOR: 	#ffffff;  
+	TEXT-ALIGN: 		center }
+
+TD.sampleCodeSpace {
+	BORDER-RIGHT: 		1px #cccccc; 
+	PADDING-RIGHT: 		0px; 
+	BORDER-TOP: 		0px solid #cccccc;  
+	PADDING-LEFT: 		0px; 
+	PADDING-BOTTOM:		0px; 
+	FONT-SIZE: 			8pt; 
+	FONT-FAMILY: 		Verdana, Sans-Serif; 
+	BORDER-LEFT: 		1px solid #3399FF; 
+	WIDTH:  			70%; 
+	PADDING-TOP: 		0px; 
+	BORDER-BOTTOM: 		1px #cccccc; 
+	BACKGROUND-COLOR:	white }
+
+/* END - SAMPLE CODE WITH DIFFERENT LANGUAGES */
+
+/* START - WEB COMMUNITIES -- Details Inline */
+
+A.lbclass {
+	font-family:		Verdana, Sans-Serif;
+	/*font-size:		xx-small;*/
+	font-weight:		bold;
+	text-decoration:	none;
+	background-color:	#3399FF;
+	color:				#FFFFFF;
+	padding:			2px;
+	border-top:			2px solid #99CCFF;
+	border-left:		2px solid #99CCFF;
+	border-right:		2px solid #336699;
+	border-bottom:		2px solid #336699;
+	cursor:				hand; }
+
+	A.lbclass:hover {
+		font-family:		Verdana, Sans-Serif;
+		/*font-size:		xx-small;*/
+		font-weight:		bold;
+		text-decoration:	none;
+		background-color:	#99CCFF;
+		color:				#FFFFFF; 
+		padding:			2px;
+		border-top:			2px solid #99CCFF;
+		border-left:		2px solid #99CCFF;
+		border-right:		2px solid #336699;
+		border-bottom:		2px solid #336699;
+		cursor:				hand; }
+
+	A.lbclass:active {
+		font-family:		Verdana, Sans-Serif;
+		/*font-size:		xx-small;*/
+		font-weight:		bold;
+		text-decoration:	none;
+		background-color:	#3399FF;
+		color:				#FFFFFF;
+		border-bottom:		2px solid #99CCFF;
+		border-right:		2px solid #99CCFF;
+		border-left:		2px solid #336699;
+		border-top:			2px solid #336699;
+		cursor:				hand; }
+
+A.lbclass_down {
+	font-family:		Verdana, Sans-Serif;
+	/*font-size:		xx-small;*/
+	font-weight:		bold;
+	text-decoration:	none;
+	background-color:	#3399FF;
+	color:				#FFFFFF;
+	padding:			2px;
+	border-bottom:		2px solid #99CCFF;
+	border-right:		2px solid #99CCFF;
+	border-left:		2px solid #336699;
+	border-top:			2px solid #336699;
+	cursor:				hand; }
+	
+	A.lbclass_down:hover {
+		font-family:		Verdana, Sans-Serif;
+		/*font-size:		xx-small;*/
+		font-weight:		bold;
+		text-decoration:	none;
+		background-color:	#99CCFF;
+		color:				#FFFFFF;
+		padding:			1px;
+		border-bottom:		2px solid #99CCFF;
+		border-right:		2px solid #99CCFF;
+		border-left:		2px solid #336699;
+		border-top:			2px solid #336699;
+		cursor:				hand; }
+
+TABLE.dataview, TH.headerbar /* for when you need a border on a table */ {
+	border:				1px SOLID #3399FF; }
+
+TR.altrow /* for alternating background colors in table rows */ {
+	BACKGROUND-COLOR: 	#BFDFFF; }
+
+TR.titlerow /* for the row that contains column headers in a table */ {
+	BACKGROUND-COLOR: 	#3399FF; /*#FF9900;*/
+	FONT-WEIGHT: 		bold;
+	COLOR: 				#FFFFFF; }
+
+TD.titlerow /* for column headers in a table */ {
+	BACKGROUND-COLOR: 	#FF9900;
+	FONT-WEIGHT: 		bold;
+	COLOR: 				#FFFFFF; }
+
+TD.title /* for secondary headers */ {
+	BACKGROUND-COLOR: 	#3399FF; /*#FF9900;*/
+	FONT-WEIGHT: 		bold;
+	COLOR: 				#FFFFFF;
+	PADDING: 			2px; }
+
+TH.header {
+	BACKGROUND-COLOR: 	#99CCFF;
+	COLOR: 				#000000;
+	FONT-FAMILY: 		Verdana, Sans-Serif;
+	FONT-SIZE: 			13px;
+	FONT-WEIGHT: 		bold;
+	TEXT-ALIGN: 		left; }
+
+TD.altrow /* for alternating background colors in table rows */ {
+	BACKGROUND-COLOR: }
+
+TH.dataview {
+	BACKGROUND-COLOR: 	#99CCFF;
+	COLOR: 				#000000;
+	FONT-FAMILY: 		Verdana, Sans-Serif;
+	FONT-SIZE: 			13px;
+	FONT-WEIGHT: 		bold;
+	TEXT-ALIGN: 		left; }
+
+TH.headerbar {
+	BACKGROUND-COLOR: 	#99CCFF;
+	COLOR: 				#000000;
+	FONT-FAMILY: 		Verdana, Sans-Serif;
+	FONT-SIZE: 			13px;
+	FONT-WEIGHT: 		bold;
+	TEXT-ALIGN: 		left; }
+
+.code {
+	FONT-FAMILY: 		courier new; 
+	FONT-SIZE: 			10px; }
+
+.comment {
+	COLOR: 				green }
+
+.SearchDetail {
+	font-size:			10px;
+	color: 				DimGray; }
+
+.SearchTitle {
+	font-size: 			13px;
+	font-weight: 		bold;
+	color: 				#000099; }
+
+TD.SearchResult, .SearchBox, .SearchSummary {
+	font-size: 			13px; }
+
+.navbucketheader {
+	height:				10px;
+	color:				#FFFF99; 
+	font-family: 		Verdana, Sans-Serif; 
+	font-size: 			11px; 
+	font-weight: 		bold; 
+	text-decoration: 	none;
+	filter:				progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='#333333', Positive='true') }
+
+/* START - Common Resource Repository (CRR) */
+
+.Abstract {
+	font-size: 			10px; }
+
+TABLE.controlbox {
+	color: 				#000000;
+	text-align: 		left;
+	border-top:		1px solid #3399FF; }
+
+TABLE.controlbox2 {
+	color: 				#000000;
+	text-align: 		left;
+	border-top:			1px solid #3399FF;
+	border-left:		1px solid #3399FF;
+	border-right:		1px solid #3399FF; }
+	
+TABLE.controlbox3 {
+	color: 				#000000;
+	text-align: 		left; }	
+
+TD.controlboxcell {
+	background-color: 	#99CCFF;
+	border-bottom:			1px solid #3399FF;
+	border-left:		1px solid #3399FF;
+	border-right:		1px solid #3399FF; }
+
+TABLE.results {
+	border-bottom:		1px solid #3399FF; }   
+
+TD.resultscell {
+	padding:			7px;
+	background-color:	#FFFFFF;
+	border-top:			1px solid #3399FF;
+	border-left:		1px solid #3399FF;
+	border-right:		1px solid #3399FF; }   
+
+TD.resultscell_alter {
+	padding:			7px;
+	background-color:	#E5F2FF;
+	border-top:			1px solid #3399FF;
+	border-left:		1px solid #3399FF;
+	border-right:		1px solid #3399FF; }
+
+UL.resultsbulllet {
+	margin-bottom:		0; }
+
+TD.layout_ltblue {
+	background-color: 	#99CCFF;
+	padding:			5px;
+	border-top:			1px solid #FFFFFF;
+	border-bottom:		1px solid #3399FF;
+	border-left:		1px solid #FFFFFF;
+	border-right:		1px solid #3399FF; 
+	}
+
+TD.layout_white {
+	background-color: 	#FFFFFF;
+	padding:			5px;
+	border-top:			1px solid #FFFFFF;
+	border-bottom:		1px solid #3399FF;
+	border-left:		1px solid #FFFFFF; }
+
+.errormsg {
+	font-size: 			10px;
+	color:				#FF6600;
+	font-weight:		bold; }
+	
+.green_bold {
+	color:				#339933;
+	font-weight:		bold; }	
+	
+/* END - Common Resource Repository (CRR) */	
+
+/* START - Workspaces */
+
+TABLE.TL {
+	border-top:			1px solid #3399FF;
+	border-left:		1px solid #3399FF; }
+
+TD.dkblue_tableheader {
+	BACKGROUND-COLOR: 	#3399FF;
+	FONT-WEIGHT: 		bold;
+	COLOR: 				#FFFFFF;
+	padding: 			4px;
+	border-top:			1px solid #FFFFFF;
+	border-bottom:		1px solid #3399FF;
+	border-left:		1px solid #FFFFFF;
+	border-right:		1px solid #3399FF; }
+
+TD.ltblue_columnheader {
+	BACKGROUND-COLOR: 	#99CCFF;
+	padding: 			4px;
+	border-top:			1px solid #FFFFFF;
+	border-bottom:		1px solid #3399FF;
+	border-left:		1px solid #FFFFFF;
+	border-right:		1px solid #3399FF; }
+
+TD.white_tablecontent {
+	BACKGROUND-COLOR: 	#FFFFFF;
+	COLOR: 				#000000;
+	padding: 			4px;
+	border-top:			1px solid #FFFFFF;
+	border-bottom:		1px solid #3399FF;
+	border-left:		1px solid #FFFFFF;
+	border-right:		1px solid #3399FF; }
+
+
+TD.btblue_tablecontent {
+	BACKGROUND-COLOR: 	#FFFFFF;
+	COLOR: 				#000000;
+	padding: 			4px;
+	border-top:			1px solid #FFFFFF;
+	border-bottom:		1px solid #3399FF;
+	border-left:		1px solid #FFFFFF;
+	border-right:		1px solid #FFFFFF; }
+
+TD.ltblue_tablecontent {
+	BACKGROUND-COLOR: 	#E5F2FF;
+	COLOR: 				#000000;
+	padding: 			4px;
+	border-top:			1px solid #FFFFFF;
+	border-bottom:		1px solid #3399FF;
+	border-left:		1px solid #FFFFFF;
+	border-right:		1px solid #3399FF; }
+
+TD.nocolor_tablecontent {
+	padding: 			4px;
+	border-top:			1px solid #FFFFFF;
+	border-bottom:		1px solid #3399FF;
+	border-left:		1px solid #FFFFFF;
+	border-right:		1px solid #3399FF; }
+
+TD.clear_tablecontent {
+	padding: 			4px;
+	border-top:			1px solid #FFFFFF;
+	border-bottom:		1px solid #FFFFFF;
+	border-left:		1px solid #FFFFFF;
+	border-right:		1px solid #FFFFFF; }
+
+.fontstyle, .EditTextBox {
+	font-family:		Verdana, Sans-Serif;
+	font-size: 			13px; }
+
+.EditTextBox_grayout {
+	font-family:		Verdana, Sans-Serif;
+	font-size: 			13px;
+	color:				#999999; }
+
+.pagingRepeater_Message {
+	font-size:			10px;
+	color:				#FF0000; }
+
+/* END - Workspaces */
+
+/* START - Workspaces - File Share */
+
+.FileInfoGridRow {
+	border: 			none;
+	border-top: 		1px solid #3399FF;
+	font-size: 			8pt;
+	font-family:		Verdana, Sans-Serif, Tahoma; }
+
+.FileInfoHeader {
+	border: 			none;
+	background-color: 	#0066CC;
+	color: 				#ffffff;
+	font-size: 			8pt;
+	font-family:		Verdana, Sans-Serif; }
+
+.FileInfoGridHeader {
+	border: 			1px solid #000000;
+	background-color: 	#3399FF;
+	color: 				#ffffff;
+	font-size: 			8pt;
+	font-family:		Verdana, Sans-Serif; }
+
+.FileHistoryPanelRow {
+	border-top: 		1px solid #3399FF;
+	font-size: 			8pt;
+	font-family:		Verdana, Sans-Serif, Tahoma; }
+
+.FileHistoryPanelHeader {
+	background-color: 	#0066CC;
+	color: 				#ffffff;
+	font-size: 			8pt;
+	font-family:		Verdana, Sans-Serif, Tahoma; }
+
+.verdana11 {
+	font-size: 			11px;
+	font-family: 		Verdana, Sans-Serif;
+	border-top:			1px solid #FFFFFF;
+	border-left:		1px solid #FFFFFF;
+	border-bottom:		1px solid #3399FF; }
+
+/* END - Workspaces - File Share */
+
+/* START - GDN Homepage - Featured Site */
+
+.FS-fullborder {
+	background-color:	#E5F2FF;
+	padding:			3px;
+	border:				1px solid #3399FF; }
+
+.FS-dkblueheader {
+	background-color:	#3399FF; 
+	padding:			2px;
+	font-size:			13px; 
+	font-weight:		bold; 
+	color:				#FFFFFF; }
+
+/* END - GDN Homepage - Featured Site */
+
+/* START - GDN Homepage - News Boxes */
+.NB-2sides-nobottomright {
+	border-top:			1px solid #3399FF; 
+	border-left:		1px solid #3399FF; 	
+	padding:			3px; }
+	
+.NB-3sides-nobottom {
+	border-top:			1px solid #3399FF; 
+	border-left:		1px solid #3399FF; 
+	border-right:		1px solid #3399FF; 
+	padding:			3px; }
+
+.NB-3sides-noright {
+	border-top:			1px solid #3399FF; 
+	border-bottom:		1px solid #3399FF; 
+	border-left:		1px solid #3399FF; 
+	padding:			3px; }	
+	
+.NB-3sides-notop {
+	border-right:		1px solid #3399FF; 
+	border-bottom:		1px solid #3399FF; 
+	border-left:		1px solid #3399FF; 
+	padding:			3px; }		
+	
+.NB-4sides {
+	border:				1px solid #3399FF; 
+	padding:			3px; }	
+	
+.NB-LtBlueHeader {
+	border:				1px solid #3399FF; 
+	background-color:	#E5F2FF; 
+	text-indent:		4px;
+	font-family:		verdana; 
+	font-size:			13px; 
+	font-weight:		bold; 
+	color:				#3366CC; }
+
+/* END - GDN Homepage - News Boxes */
+
+/* START - GDN left nav */
+
+.lnav_bg {
+	padding:				0px;
+	background-image:		url(/images/leftnav_bg_new.gif); 
+}
+
+.lnav_header {
+	padding-left:			11px;
+	cursor:					pointer;
+	color:					#000000;
+}
+
+.lnav_headertext {
+	FONT-WEIGHT: 			bold; 
+	FONT-SIZE: 				10px; 
+	COLOR: 					Black;	 
+	FONT-FAMILY: 			Verdana, Sans-Serif; 
+	HEIGHT: 				10px; 
+	TEXT-DECORATION: 		none;  
+	background:				#99ccff;
+}
+
+.lnav_container {
+	padding-top:			5px;
+}
+
+.leftnav {
+	background: #99ccff;
+	border: 0px;
+}
+
+
+/* main navigation items */
+/* this takes care of font settings seperately from the cell properties */
+leftnavLink {
+	font-family: Verdana;
+	font-size: 10px;
+	font-weight: bold;
+	color: #000000;
+	letter-spacing: .1em;
+	text-decoration: none;
+	line-height: 10px;
+}
+
+/* same as leftnavLink but w/o bold text decoration*/
+leftnavSubLink {
+	font-family: Verdana;
+	font-size: 10px;
+	color: #000000;
+	letter-spacing: .05em;
+	text-decoration: none;
+	line-height: 10px;
+}
+
+/*adjust the padding-left property value to adjust the sub nav item indent*/
+/*the original design had subnav items indented but doesn't lend itself to 10px fonts*/
+/*one menu item is too long (patterns & practices) to have indentation.*/
+/*truncation of that label would allow for an indentation again */
+leftnavCellIndent {
+	background: #99ccff;
+	padding-left: 20px;
+	padding-top: 5px;
+	padding-bottom: 3px;
+	line-height: 9px;
+}
+.lnav_2ndheader {
+	FONT-WEIGHT: 			bold; 
+	FONT-SIZE: 				10px; 
+	COLOR: 					#ffff99; 
+	FONT-FAMILY: 			Verdana, Sans-Serif;  
+	padding-left:			11px;
+	padding-bottom:			5px;
+}
+
+.lnav_links {
+	padding-left:			17px; 
+	padding-right:			24px;
+	padding-bottom:			5px;
+	color:					Black;
+}
+
+/* END - GDN left nav */
+
+/* START - Table styles - bordercolorlight/bordercolordark equivalent */
+
+.tables_table {
+	border-top:				1px solid #3399FF; 
+	border-left:			1px solid #3399FF; 
+	color: #000000;
+}
+.tables_table_full_border {
+	border-top:			1px solid #3399FF; 
+	border-left:			1px solid #3399FF; 
+	border-right:			1px solid #3399FF;
+	border-bottom:			1px solid #3399FF;
+}
+.tables_headercell {
+	border-top:				1px solid #FFFFFF; 
+	border-left:			1px solid #FFFFFF; 
+	border-right:			1px solid #3399FF; 
+	border-bottom:			1px solid #3399FF; 
+	BACKGROUND-COLOR: 		#3399FF;
+	FONT-WEIGHT: 			bold;
+	COLOR: 					#FFFFFF;
+	padding:				5px;	
+}
+.tables_2ndheadercell {
+	border-top:				1px solid #FFFFFF; 
+	border-left:			1px solid #FFFFFF; 
+	border-right:			1px solid #3399FF; 
+	border-bottom:			1px solid #3399FF; 
+	BACKGROUND-COLOR: 		#99CCFF;
+	padding:				5px;	
+	color: #000000;
+}
+.tables_contentcell {
+	border-top:				1px solid #FFFFFF; 
+	border-left:			1px solid #FFFFFF; 
+	border-right:			1px solid #3399FF; 
+	border-bottom:			1px solid #3399FF;
+	BACKGROUND-COLOR: 		#FFFFFF; 
+	padding:				5px;
+	font-size:				10px;
+	color: #000000;
+}
+.tables_contentcellnor {
+	border-top:				1px solid #FFFFFF; 
+	border-left:			1px solid #FFFFFF; 
+	border-bottom:			1px solid #3399FF;
+	BACKGROUND-COLOR: 		#FFFFFF; 
+	padding:				5px;
+	color: #000000;
+}
+.tables_contentcell_altern {
+	/*border-top:				1px solid #FFFFFF; 
+	border-left:			1px solid #FFFFFF; 
+	border-right:			1px solid #3399FF; 
+	border-bottom:			1px solid #3399FF; 
+	BACKGROUND-COLOR: 		#E5F2FF;
+	padding:				5px;		*/
+	background-color :	    white;
+	font-size: 10px;
+	color: #000000;
+	padding-bottom: 6px;
+	padding-left: 6px;
+	font-family: Verdana, Sans-Serif;
+}
+.tables_contentcellnor_altern {
+	border-top:				1px solid #FFFFFF; 
+	border-left:			1px solid #FFFFFF; 
+	border-bottom:			1px solid #3399FF; 
+	BACKGROUND-COLOR: 		#E5F2FF;
+	padding:				5px;	
+	color: #000000;	
+}
+
+/* END - Table styles - bordercolorlight/bordercolordark equivalent */
+
+hr.black {
+	color:					#000000;
+	height:					1px;
+	width:					94%;
+	margin-top:				15px;
+	margin-bottom:			15px;
+}
+
+.dropdown {
+	font-family:			verdana;
+	font-size:				10px;
+}
+
+A.HeaderSmall {
+	COLOR: 				#FFFFFF;
+	FONT-SIZE: 			16px; }
+
+	A.HeaderSmall:hover {
+		COLOR: 			#000000; }
+
+	A.HeaderSmall:active {
+		COLOR: 			#FFFF99; }
+
+A.HeaderXXSmall {
+	COLOR: 				#FFFFFF;
+	FONT-SIZE: 			10px;
+	FONT-WEIGHT:		normal; }
+
+	A.HeaderXXSmall:hover {
+		COLOR: 			#000000; }
+
+	A.HeaderXXSmall:active {
+		COLOR: 			#FFFF99; }
+
+A.XmlInHeader {
+
+	float:				right; 
+	font-size:			10px; 
+	font-weight:		bold; 
+	text-decoration:	none;
+	background-color:	#FF6600;
+	border-top:			1px #FFC8A4 solid;
+	border-left:		1px #FFC8A4 solid;
+	border-right:		1px #7D3302 solid;
+	border-bottom:		1px #000000 solid;
+	color: 				#FFFFFF;
+	margin-right:		2px; 
+	margin-top:			2px; 
+	margin-bottom:		2px; }
+	
+	A.XmlInHeader:hover {
+		color:			#000000;
+		text-decoration:none; }
+		
+	A.XmlInHeader:active {
+		COLOR: 			#FFFFFF;
+		border-right:	1px #FFFFFF solid; 
+		border-bottom:	1px #FFFFFF solid; 
+		border-top:		1px #000000 solid; 
+		border-left:	1px #000000 solid; }	
+	
+A.XmlButton {
+
+	font-size:			10px; 
+	font-weight:		bold; 
+	text-decoration:	none;
+	background-color:	#FF6600;
+	border-top:			1px #FFC8A4 solid;
+	border-left:		1px #FFC8A4 solid;
+	border-right:		1px #7D3302 solid;
+	border-bottom:		1px #000000 solid;
+	color: 				#FFFFFF;
+	margin-right:		2px; 
+	margin-top:			2px; 
+	margin-bottom:		2px; }
+	
+	A.XmlButton:hover {
+		color:			#000000;
+		text-decoration:none; }
+		
+	A.XmlButton:active {
+		COLOR: 			#FFFFFF;
+		border-right:	1px #FFFFFF solid; 
+		border-bottom:	1px #FFFFFF solid; 
+		border-top:		1px #000000 solid; 
+		border-left:	1px #000000 solid; }	
+	
+	
+	/********************************************Styles Added For New UI******************************************/
+	
+	.logo1
+
+{
+
+      left: 8px;
+
+      position:relative;
+
+      top: 8px;
+
+}
+
+ 	#logo2
+
+{
+
+      left: 170px;
+
+      position:absolute;
+
+      top: 8px;
+
+}
+
+#tagline
+
+{
+
+      left: 250px;
+
+      top: 40px;
+
+      font-size: 10px;
+
+      color: #ffffff;
+
+      position: absolute;
+
+}
+
+/* MSN login icon div */
+#msLogin {
+	position: relative;
+	top: 19px;
+	/*left: 225px;*/
+}
+
+/*div containing "site search" label and form input box */
+#search {
+	position: relative;
+	top: 21px;
+	left: 70px;
+	font-size: 11px;
+	color: #FFFFFF;
+}
+
+.whiteText
+{
+	font-size: 11px;
+	color: #FFFFFF;
+}
+
+/* text class for the div containing the "site search" go button  */
+/* plain text is floated over a bubble present in the header background image */
+/* there is a go button that can be used instead if so desired */
+#searchSubmit {
+	position: relative;
+	top: 2px;
+	left: 203px;
+	height: -25px;
+}
+
+/* text treatment for blue sub headers used thoughout the site */
+.blueText {
+	font-size: 12px;
+	color: #0066FF;
+}
+
+.featureBoxPadding {
+	padding-bottom: 11px;
+	line-height: 12px;
+}
+
+.featureDate {
+	color: #000000;
+	font-size: 10px;
+	line-height: 12px;
+}
+
+a.feature {
+	text-decoration: underline;
+	color: #000000;
+	font-size: 10px;
+	line-height: 12px;
+	font-weight: bold;
+	padding-bottom: 11px;
+	padding-top: 11px;
+}
+
+/* for the times when content alignment isn't behaving at the element level */
+/* this generally fixes the problem */
+TD .bottom {
+	vertical-align: bottom;
+}
+
+TD .middle {
+	vertical-align: middle;
+}
+
+TD .right {
+	text-align: right;
+}
+
+TD .center {
+	text-align: center;
+}
+
+/*general settings for the search tables */
+.searchTable {
+	border: solid 1px #99CCFF;
+	background: #0166ff;
+	spacing: 1px;
+	padding: 3px;
+}
+
+/* coloring and spacing of search table cells */
+.searchTableTD
+{
+	background: #0166ff;
+	/*height: 28px;*/	
+}
+/*this class is only used on the message board*/
+.redText {
+	font-size: 10px;
+	color: #FF6600;
+	letter-spacing: .02em;
+	line-height: 12px;
+}
+
+.tableHead
+{
+	padding: 5px;
+	font-size: 12px;
+	color: #0066FF;
+	font-weight: bold;
+}
+
+.blueTableBG
+{
+ 	font-family: Verdana, Sans-Serif;
+	background-color: #f1f1f1;
+	font-size: 10px;
+	color: #000000;
+	padding-bottom: 6px;
+	padding-left: 6px;
+	font-family: Verdana, Sans-Serif;
+}
+
+.blackTableContent {
+	font-size: 10px;
+	color: #000000;
+	font-family: Verdana, Sans-Serif;
+}
+
+.dynamicFontSize
+{
+	font-size:10px;	
+}
+
+.signin 
+{
+	display:block;
+	margin: 0 0 2px 9px;
+	padding:0 0 0 9px;
+	border-left:1px solid #B5D3E6
+}
+
+/******************************************Styles added for making gdn a css driven site**********************************************/
+
+.fontSize_smallest
+{
+	font-family: Verdana, Sans-Serif;
+	font-size: 10px;
+}
+
+.fontSize_verySmall
+{
+	font-family: Verdana, Sans-Serif;
+	font-size: 8px;
+}
+
+.fontSize_bigger
+{
+	font-family: Verdana, Sans-Serif;
+	font-size: 12px;
+}
+
+.fontSize_smallestItalic
+{
+	font-family: Verdana, Sans-Serif;
+	font-size: 10px;
+	font-style: italic;
+}
+
+.fontSize_smallestBoldBlue
+{
+	font-family: Verdana, Sans-Serif;
+	font-size: 10px;
+	font-WEIGHT: Bold;
+	color: #3399FF;
+}
+
+.fontSize_bigBoldBlue
+{
+	font-family: Verdana, Sans-Serif;
+	font-size: 12px;
+	font-WEIGHT: Bold;
+	color: #3399FF;
+}
+
+.validationSummaryText
+{
+	font-weight: bold;
+	font-size:10px;	
+}
+
+.messageText
+{
+	FONT-WEIGHT:bold;
+	FONT-SIZE:10px;
+	COLOR:#339900;
+}
+
+.mostPopular
+{
+	font-size:10px;
+	line-height:11px;
+	font-family:verdana, Sans-Serif;	
+}
+
+.featuredSiteSpan
+{
+	font-size:10px;
+	line-height:16px;
+	font-family:verdana, Sans-Serif;	
+}
+
+.ratingRadioButtonPosition
+{
+	position:relative;
+	left:14;
+	top:14;
+	font-size:10;	
+}
+
+.microsoftRPN_style
+{
+	PADDING-LEFT:4px; 
+	FONT-WEIGHT:bold; 
+	FONT-SIZE:10px; 
+	COLOR:#3366cc; 
+	FONT-FAMILY:verdana, Sans-Serif;	
+}
+
+.pageTitle
+{
+	MARGIN-TOP: 16px;
+	FONT-WEIGHT: bold;
+	FONT-SIZE: 14px; 
+	MARGIN-BOTTOM: 10px; 
+	COLOR: #333333; 
+	FONT-FAMILY: Verdana, Sans-Serif; 
+	LETTER-SPACING: 0.08em;	
+}
+
+.whiteSmallBoldText
+{
+	font-size:16px;
+	font-weight: bold; 
+	color: #FFFFFF;	
+}
+
+.fontSizeX-small
+{
+	FONT-FAMILY: Verdana, Sans-Serif;
+	FONT-SIZE: 13px;
+}

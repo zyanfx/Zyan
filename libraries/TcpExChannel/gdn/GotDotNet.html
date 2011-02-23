@@ -1,0 +1,1791 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
+
+<HTML> 
+	<HEAD id="ctl00_PageHeading"><title>
+	GotDotNet User Sample: TcpEx Remoting Channel
+	</title>
+	<meta name="DESCRIPTION" content="The TcpEx channel is a replacement for the built-in Tcp remoting channel. It improves on the standard tcp channel by allowing communication in both directions on a single tcp connection, instead of opening a second connection for events and callbacks. The channel has similar goals to Ingo Rammer's Bidirectional Tcp Channel; however, it does not use any explicit threads and supports hostnames as well as IP addresses.  Updated: 14/4/03 - See TcpExChannel.html for details.  Updated v1.2 - 19/11/03 - check http://g2.fit.qut.edu.au/G2P2P/Utilities/ for any further developments." />
+	<meta name="KEYWORDS" content="Remoting, .NET Framework, C#" />
+	<meta name="MS.LOCALE" content="en-US" />
+	<meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8" />
+	<link rel="stylesheet" type="text/css" href="style.css" />
+	</HEAD>
+	<body BGCOLOR="" background="" style="height: 100%"><form name="PageForm" method="post" action="Details.aspx?SampleGuid=3F46C102-9970-48B1-9225-8758C38905B1" id="PageForm">
+
+<a href="/community/usersamples/" style="font-weight:bold; font-style:italic;">Return to User Samples home</a>
+
+<p>
+
+<div id="PanelMain">
+
+	
+
+
+
+<TABLE class="tables_table" id="Table1" cellSpacing="0" cellPadding="0" width="100%" border="0">
+
+	<TR>
+
+		<TD class="tables_headercell" colSpan="4">
+
+			<table cellPadding="0" width="100%" border="0">
+
+				<tr>
+
+					<td style="COLOR: white"><a id="SampleInfoControl_HyperLinkTitle" class="HeaderSmall" onclick="return DownloadClick('Samples available on GotDotNet have been contributed by both Microsoft and GotDotNet users.  Samples have not been formally tested by Microsoft, and Microsoft makes no claims and implies no warranties regarding the samples.  For more information, see the Terms of Use.  Do you wish to continue with this download?')" href="/Community/UserSamples/Download.aspx?SampleGuid=3F46C102-9970-48B1-9225-8758C38905B1"><b>TcpEx Remoting Channel</b></a><a id="SampleInfoControl_HyperlinkDownloadIcon" onclick="return DownloadClick('Samples available on GotDotNet have been contributed by both Microsoft and GotDotNet users.  Samples have not been formally tested by Microsoft, and Microsoft makes no claims and implies no warranties regarding the samples.  For more information, see the Terms of Use.  Do you wish to continue with this download?')" href="/Community/UserSamples/Download.aspx?SampleGuid=3F46C102-9970-48B1-9225-8758C38905B1"><img src="/images/download_gdn.gif" border="0" /></a><BR>
+
+						<span class="smalltext"><b>
+
+								Uploaded by
+
+							</b>
+
+							<a id="SampleInfoControl_HyperLinkUser" class="HeaderXXSmall" href="/Community/User/viewprofile.aspx?UserGuid=8224BFE9-0605-4AD8-BFEC-0257C6E5DED4">Deason</a></span>
+
+					</td>
+
+					<td align="right">
+
+						&nbsp;
+
+						
+
+					</td>
+
+				</tr>
+
+			</table>
+
+		</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD class="tables_2ndheadercell" vAlign="top" noWrap width="20%">Description</TD>
+
+		<TD class="tables_contentcell" colSpan="3"><span id="SampleInfoControl_LabelDescription">The TcpEx channel is a replacement for the built-in Tcp remoting channel. It improves on the standard tcp channel by allowing communication in both directions on a single tcp connection, instead of opening a second connection for events and callbacks. The channel has similar goals to Ingo Rammer's Bidirectional Tcp Channel; however, it does not use any explicit threads and supports hostnames as well as IP addresses.  Updated: 14/4/03 - See TcpExChannel.html for details.  Updated v1.2 - 19/11/03 - check http://g2.fit.qut.edu.au/G2P2P/Utilities/ for any further developments.</span></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD class="tables_2ndheadercell" vAlign="top" noWrap width="20%">Downloads</TD>
+
+		<TD class="tables_contentcell" width="29%"><span id="SampleInfoControl_LabelDownloadCount">2451</span></TD>
+
+		<TD class="tables_2ndheadercell" vAlign="top" noWrap>Target audience</TD>
+
+		<TD class="tables_contentcell"><span id="SampleInfoControl_LabelExperience">Intermediate</span></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD class="tables_2ndheadercell" style="HEIGHT: 18px" vAlign="top" noWrap>Uploaded date</TD>
+
+		<TD class="tables_contentcell" style="HEIGHT: 18px"><span id="SampleInfoControl_LabelCreationDate">4/9/2003</span></TD>
+
+		<TD class="tables_2ndheadercell" vAlign="top" noWrap>Edited date</TD>
+
+		<TD class="tables_contentcell"><span id="SampleInfoControl_LabelModifiedDate">11/18/2003</span></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD class="tables_2ndheadercell" style="HEIGHT: 18px" vAlign="top" noWrap>Technologies</TD>
+
+		<TD class="tables_contentcell" style="HEIGHT: 18px" vAlign="top">
+
+					<li>
+
+						Remoting
+
+					</li>
+
+				
+
+					<li>
+
+						.NET Framework
+
+					</li>
+
+				<br>
+
+		</TD>
+
+		<TD class="tables_2ndheadercell" vAlign="top" noWrap width="20%">Languages</TD>
+
+		<TD class="tables_contentcell" vAlign="top" width="29%">
+
+					<li>
+
+						C#
+
+					</li>
+
+				<br>
+
+		</TD>
+
+	</TR>
+
+</TABLE>
+
+
+
+
+
+<hr class="black">
+
+
+
+
+
+<TABLE class="tables_table" id="Table1" cellSpacing="0" cellPadding="0" width="100%" border="0">
+
+	<TBODY>
+
+		<TR>
+
+			<TD class="tables_headercell" colSpan="4"><span id="RatingControl_LabelTitle">Rating for TcpEx Remoting Channel</span></TD>
+
+		</TR>
+
+		<TR>
+
+			<TD class="tables_2ndheadercell" vAlign="top" width="20%"><span id="RatingControl_LabelRateThisSample">Rate this resource</span>
+
+				
+
+
+
+				</TD>
+
+			<TD class="tables_contentcell" colSpan="3">
+
+				<TABLE id="Table2" cellSpacing="0" cellPadding="0" border="0">
+
+					<TBODY>
+
+						<TR>
+
+							<TD><span id="RatingControl_RadiobuttonlistVotes"><label for="RatingControl_RadiobuttonlistVotes_0">
+
+										<span class="ratingRadioButtonPosition">1</span></label><input id="RatingControl_RadiobuttonlistVotes_0" type="radio" name="RatingControl$RadiobuttonlistVotes" value="1" /><label for="RatingControl_RadiobuttonlistVotes_1">
+
+										<span class="ratingRadioButtonPosition">2</span></label><input id="RatingControl_RadiobuttonlistVotes_1" type="radio" name="RatingControl$RadiobuttonlistVotes" value="2" /><label for="RatingControl_RadiobuttonlistVotes_2">
+
+										<span class="ratingRadioButtonPosition">3</span></label><input id="RatingControl_RadiobuttonlistVotes_2" type="radio" name="RatingControl$RadiobuttonlistVotes" value="3" /><label for="RatingControl_RadiobuttonlistVotes_3">
+
+										<span class="ratingRadioButtonPosition">4</span></label><input id="RatingControl_RadiobuttonlistVotes_3" type="radio" name="RatingControl$RadiobuttonlistVotes" value="4" /><label for="RatingControl_RadiobuttonlistVotes_4">
+
+										<span class="ratingRadioButtonPosition">5</span></label><input id="RatingControl_RadiobuttonlistVotes_4" type="radio" name="RatingControl$RadiobuttonlistVotes" value="5" /></span>
+
+							</TD>
+
+							<td><img src="/images/1pix.gif" width="15"></td>
+
+							<td valign="center" rowspan="2"><input type="submit" name="RatingControl$ButtonSubmit" value="Submit" onclick="javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(&quot;RatingControl$ButtonSubmit&quot;, &quot;&quot;, true, &quot;&quot;, &quot;&quot;, false, false))" id="RatingControl_ButtonSubmit" class="gdnbutton" /></td>
+
+							<td><img src="/images/1pix.gif" width="15"></td>
+
+							<td valign="center" rowspan="2">
+
+							&nbsp;
+
+							
+
+							</td>
+
+						</TR>
+
+						<TR>
+
+							<td height="15"></td>
+
+						</TR>
+
+					</TBODY>
+
+				</TABLE>
+
+			</TD>
+
+		</TR>
+
+		<TR>
+
+			<TD class="tables_2ndheadercell" vAlign="top" nowrap>Overall rating
+
+			</TD>
+
+			<TD class="tables_contentcell" width="29%"><span id="RatingControl_LabelRating"><span id="RatingControl_Rating"><img src="/images/star-full.gif" border="0" /><img src="/images/star-full.gif" border="0" /><img src="/images/star-full.gif" border="0" /><img src="/images/star-half.gif" border="0" /></span></span></TD>
+
+			<TD class="tables_2ndheadercell" vAlign="top" width="20%" nowrap>Number of votes
+
+			</TD>
+
+			<TD class="tables_contentcell" width="29%"><span id="RatingControl_LabelTotalVotes">12</span></TD>
+
+		</TR>
+
+	</TBODY>
+
+</TABLE>
+
+
+
+
+
+<hr class="black">
+
+
+
+
+
+		<table width="100%" cellpadding="0" cellspacing="0">
+
+			<tr>
+
+				<td class="tableHead" colspan="2">
+
+					<b>Comments</b>
+
+				</td>
+
+			</tr>
+
+			<tr>
+
+				<td colspan="2" class="tableHead"><span class="pagingRepeater_Message">The comments below are provided by GotDotNet 
+
+users and in no way reflect the opinions of Microsoft Corporation and/or the 
+
+GotDotNet team.</span>
+
+				</td>
+
+			</tr>
+
+			<tr>
+
+				<td class="tableHead" width="1%">
+
+					<b>Posted by</b>
+
+				</td>
+
+				<td class="tableHead">
+
+					<b></b>&nbsp;
+
+				</td>
+
+			</tr>
+
+	
+
+		<tr>
+
+			<td class="blueTableBG" valign="top" >
+
+			<a name="91668"></a>
+
+				<table>
+
+					<tr>
+
+						<td width="1%">
+
+						<div class="blackTableContent">
+
+							<a href='/Community/User/viewprofile.aspx?userid=000118F82E026F2B'>
+
+							<b>GuyEttinger</b></a><br/>
+
+							
+
+							
+
+							<img src="/images/1pix.GIF" width="95" height="1" alt="" border="0">
+
+						</div>
+
+						</td>
+
+					</tr>
+
+					<tr>
+
+						<td>
+
+						<div class="blackTableContent">
+
+							User Posts:<br/>
+
+							1
+
+						</div>
+
+						</td>
+
+					</tr>
+
+				</table>
+
+			</td>
+
+			<td class="blueTableBG">
+
+				<table border="0" width="100%">
+
+					<tr>
+
+						<td align="left">
+
+							<div class="blackTableContent"><b>Great Channel</div>
+
+						</td>
+
+						<td align="right" class="fontSize_smallest">
+
+							<div class="blackTableContent">
+
+							Posted on:&nbsp;
+
+							04/16/2003 09:29:05
+
+							</div>
+
+						</td>
+
+					</tr>
+
+					
+
+					<tr>
+
+						<td align="right" colspan="2" class="fontSize_smallest">
+
+							
+
+							
+
+							<input type="submit" name="ctl04$threadRepeater$ctl01$ctl00" value="Reply" Class="gdnbutton" />
+
+						</td>
+
+					</tr>
+
+					
+
+					<tr>
+
+						<td colspan="2">
+
+							<p><br/></p>
+
+							<div class="blackTableContent">This is definately looking to be a strong implementation of a bidirectional tcp channel.&#160;Keep up the good work!</div>
+
+						</td>
+
+					</tr>
+
+
+
+					<tr>
+
+						<td class="fontSize_smallestBoldBlue">
+
+							
+
+						</td>
+
+					</tr>
+
+				</table>
+
+			</td>
+
+		</tr>
+
+	
+
+		<tr>
+
+			<td valign="top" class="tables_contentcell_altern">
+
+			<div class="blackTableContent"><a name="132612"></a></div>
+
+				<table>
+
+					<tr>
+
+						<td width="1%">
+
+						<div class="blackTableContent">
+
+							<a href='/Community/User/viewprofile.aspx?userid=00016F513D70DB95'>
+
+							<b>dcazzulino</b></a><br/>
+
+							
+
+							
+
+							<img src="/images/1pix.GIF" width="95" height="1" alt="" border="0">
+
+						</div>
+
+						</td>
+
+					</tr>
+
+					<tr>
+
+						<td class="fontSize_smallest">
+
+							<div class="blackTableContent">
+
+							User Posts:<br/>
+
+							2
+
+							</div>
+
+						</td>
+
+					</tr>
+
+				</table>
+
+			</td>
+
+			<td class="tables_contentcell_altern">
+
+				<table border="0" width="100%">
+
+					<tr>
+
+						<td align="left">
+
+							<div class="blackTableContent"><b> Great Channel</div>
+
+						</td>
+
+						<td align="right" class="fontSize_smallest">
+
+						<div class="blackTableContent">
+
+							Posted on:&nbsp;
+
+							08/07/2003 12:04:31
+
+						</div>
+
+						</td>
+
+					</tr>
+
+					
+
+					<tr>
+
+						<td colspan="2" align="right" class="fontSize_smallest">
+
+							
+
+							
+
+							<input type="submit" name="ctl04$threadRepeater$ctl02$ctl00" value="Reply" Class="gdnbutton" />
+
+						</td>
+
+					</tr>
+
+					
+
+					<tr>
+
+						<td>
+
+							<p><br/></p>
+
+							<div class="blackTableContent">A trivial but almost required and urgent update is to make the private MessageException class derive from IOException, to keep catch blocks (usually trapping SocketException and IOException) compatible with built-in channel.</div>
+
+						</td>
+
+					</tr>
+
+
+
+					<tr>
+
+						<td class="fontSize_smallestBoldBlue">
+
+							
+
+						</td>
+
+					</tr>
+
+				</table>
+
+			</td>
+
+		</tr>
+
+	
+
+		<tr>
+
+			<td class="blueTableBG" valign="top" >
+
+			<a name="148459"></a>
+
+				<table>
+
+					<tr>
+
+						<td width="1%">
+
+						<div class="blackTableContent">
+
+							<a href='/Community/User/viewprofile.aspx?userid=0003BFFD83C9906F'>
+
+							<b>KimmoK</b></a><br/>
+
+							
+
+							
+
+							<img src="/images/1pix.GIF" width="95" height="1" alt="" border="0">
+
+						</div>
+
+						</td>
+
+					</tr>
+
+					<tr>
+
+						<td>
+
+						<div class="blackTableContent">
+
+							User Posts:<br/>
+
+							1
+
+						</div>
+
+						</td>
+
+					</tr>
+
+				</table>
+
+			</td>
+
+			<td class="blueTableBG">
+
+				<table border="0" width="100%">
+
+					<tr>
+
+						<td align="left">
+
+							<div class="blackTableContent"><b> Great Channel</div>
+
+						</td>
+
+						<td align="right" class="fontSize_smallest">
+
+							<div class="blackTableContent">
+
+							Posted on:&nbsp;
+
+							09/25/2003 06:23:42
+
+							</div>
+
+						</td>
+
+					</tr>
+
+					
+
+					<tr>
+
+						<td align="right" colspan="2" class="fontSize_smallest">
+
+							
+
+							
+
+							<input type="submit" name="ctl04$threadRepeater$ctl03$ctl00" value="Reply" Class="gdnbutton" />
+
+						</td>
+
+					</tr>
+
+					
+
+					<tr>
+
+						<td colspan="2">
+
+							<p><br/></p>
+
+							<div class="blackTableContent">Updating due to .NET framework 1.1 is also required. To get the sample working in 1.1 you need to modify TcpExChannel.cs. Changes below. Two lines are added and one line changed. Note that only relevant code is shown below (e.g. two unchanged lines are missing from the code below. They are not deleted, just not shown)  
+<pre> 
+void Initialise( ... ) 
+{ 
+&#160;&#160;&#160;IDictionary props = new Hashtable(); // for .NET 1.1  
+&#160;&#160;&#160;props[&quot;typeFilterLevel&quot;] = &quot;Full&quot;;&#160;&#160;&#160;// for .NET 1.1 
+ 
+&#160;&#160;&#160;if (serverSinkProvider == null) 
+&#160;&#160;&#160;&#160;&#160;&#160;serverSinkProvider = new BinaryServerFormatterSinkProvider(props, null); // params added
+</pre></div>
+
+						</td>
+
+					</tr>
+
+
+
+					<tr>
+
+						<td class="fontSize_smallestBoldBlue">
+
+							
+
+						</td>
+
+					</tr>
+
+				</table>
+
+			</td>
+
+		</tr>
+
+	
+
+		<tr>
+
+			<td valign="top" class="tables_contentcell_altern">
+
+			<div class="blackTableContent"><a name="161029"></a></div>
+
+				<table>
+
+					<tr>
+
+						<td width="1%">
+
+						<div class="blackTableContent">
+
+							<a href='/Community/User/viewprofile.aspx?userid=00037FFE808502C8'>
+
+							<b>Geco</b></a><br/>
+
+							
+
+							
+
+							<img src="/images/1pix.GIF" width="95" height="1" alt="" border="0">
+
+						</div>
+
+						</td>
+
+					</tr>
+
+					<tr>
+
+						<td class="fontSize_smallest">
+
+							<div class="blackTableContent">
+
+							User Posts:<br/>
+
+							1
+
+							</div>
+
+						</td>
+
+					</tr>
+
+				</table>
+
+			</td>
+
+			<td class="tables_contentcell_altern">
+
+				<table border="0" width="100%">
+
+					<tr>
+
+						<td align="left">
+
+							<div class="blackTableContent"><b> Great Channel</div>
+
+						</td>
+
+						<td align="right" class="fontSize_smallest">
+
+						<div class="blackTableContent">
+
+							Posted on:&nbsp;
+
+							11/06/2003 03:14:48
+
+						</div>
+
+						</td>
+
+					</tr>
+
+					
+
+					<tr>
+
+						<td colspan="2" align="right" class="fontSize_smallest">
+
+							
+
+							
+
+							<input type="submit" name="ctl04$threadRepeater$ctl04$ctl00" value="Reply" Class="gdnbutton" />
+
+						</td>
+
+					</tr>
+
+					
+
+					<tr>
+
+						<td>
+
+							<p><br/></p>
+
+							<div class="blackTableContent">What about scalability?</div>
+
+						</td>
+
+					</tr>
+
+
+
+					<tr>
+
+						<td class="fontSize_smallestBoldBlue">
+
+							
+
+						</td>
+
+					</tr>
+
+				</table>
+
+			</td>
+
+		</tr>
+
+	
+
+		<tr>
+
+			<td class="blueTableBG" valign="top" >
+
+			<a name="194347"></a>
+
+				<table>
+
+					<tr>
+
+						<td width="1%">
+
+						<div class="blackTableContent">
+
+							<a href='/Community/User/viewprofile.aspx?userid=000161308A0FB42D'>
+
+							<b>TheLoneCabbage</b></a><br/>
+
+							
+
+							
+
+							<img src="/images/1pix.GIF" width="95" height="1" alt="" border="0">
+
+						</div>
+
+						</td>
+
+					</tr>
+
+					<tr>
+
+						<td>
+
+						<div class="blackTableContent">
+
+							User Posts:<br/>
+
+							1
+
+						</div>
+
+						</td>
+
+					</tr>
+
+				</table>
+
+			</td>
+
+			<td class="blueTableBG">
+
+				<table border="0" width="100%">
+
+					<tr>
+
+						<td align="left">
+
+							<div class="blackTableContent"><b> Great Channel</div>
+
+						</td>
+
+						<td align="right" class="fontSize_smallest">
+
+							<div class="blackTableContent">
+
+							Posted on:&nbsp;
+
+							02/18/2004 04:47:20
+
+							</div>
+
+						</td>
+
+					</tr>
+
+					
+
+					<tr>
+
+						<td align="right" colspan="2" class="fontSize_smallest">
+
+							
+
+							
+
+							<input type="submit" name="ctl04$threadRepeater$ctl05$ctl00" value="Reply" Class="gdnbutton" />
+
+						</td>
+
+					</tr>
+
+					
+
+					<tr>
+
+						<td colspan="2">
+
+							<p><br/></p>
+
+							<div class="blackTableContent">For those of us who detest (or are simply to daft to understand) config files. 
+ 
+The moral of the following story, is that both the marshaled class, and the class remoting it, must be marshelable...&#160; 
+ 
+Now feel free to critisize me for the bad programming practices you see in the following code. 
+<pre> 
+namespace TestServer 
+{ 
+&#160;&#160;&#160;class TestServer 
+&#160;&#160;&#160;{ 
+&#160;&#160;&#160;&#160;&#160;&#160;[STAThread] 
+&#160;&#160;&#160;&#160;&#160;&#160;static void Main(string[] args) 
+&#160;&#160;&#160;&#160;&#160;&#160;{ 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;ChannelServices.RegisterChannel(new TcpExChannel(TypeFilterLevel.Full,1948)); 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; testclass.TestClass tc=new testclass.TestClass(); 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;RemotingServices.Marshal(tc,&quot;TLC8675309&quot;); 
+ 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;Console.WriteLine(&quot;Press Enter to close server.&quot;); 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;Console.ReadLine(); 
+&#160;&#160;&#160;&#160;&#160;&#160;} 
+&#160;&#160;&#160;&#160;&#160;&#160;} 
+} 
+ 
+ 
+ 
+ 
+namespace TestClass 
+{ 
+&#160;&#160;&#160;[Serializable] 
+&#160;&#160;&#160;public class TestClass: MarshalByRefObject 
+&#160;&#160;&#160;{ 
+&#160;&#160;&#160;&#160;&#160;&#160;private int cnt=0; 
+&#160;&#160;&#160;&#160;&#160;&#160;public delegate void dPoke(int x); 
+&#160;&#160;&#160;&#160;&#160;&#160;public event dPoke OnPoked; 
+ 
+&#160;&#160;&#160;&#160;&#160;&#160;public TestClass() 
+&#160;&#160;&#160;&#160;&#160;&#160;{} 
+ 
+&#160;&#160;&#160;&#160;&#160;&#160;public string SayHello() 
+&#160;&#160;&#160;&#160;&#160;&#160;{ 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;cnt++; 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;Console.WriteLine(&quot;I'm saying 'Hello'. Are you happy? This is the &quot; 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;+cnt.ToString()+&quot; time!&quot;); 
+ 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;return &quot;Hello, putz!&quot;; 
+&#160;&#160;&#160;&#160;&#160;&#160;} 
+ 
+&#160;&#160;&#160;&#160;&#160;&#160;public void PokeBack(int x) 
+&#160;&#160;&#160;&#160;&#160;&#160;{ 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;Console.WriteLine(&quot;Poking Client!&quot;); 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;if(OnPoked!=null) 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;if(OnPoked.GetInvocationList().Length&gt;0) 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;{ 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;OnPoked(x); 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;Console.WriteLine(&quot;I poked the client.&quot;); 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;return; 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;} 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;Console.WriteLine(&quot;No Events Registered.&quot;); 
+ 
+&#160;&#160;&#160;&#160;&#160;&#160;} 
+ 
+&#160;&#160;&#160;&#160;&#160;&#160;public override object InitializeLifetimeService() 
+&#160;&#160;&#160;&#160;&#160;&#160;{ return null; //return base.InitializeLifetimeService (); } 
+ 
+&#160;&#160;&#160;} 
+} 
+ 
+ 
+ 
+namespace TestClient 
+{ 
+&#160;&#160;&#160;[Serializable] 
+&#160;&#160;&#160;class TestClient :MarshalByRefObject 
+&#160;&#160;&#160;{ 
+&#160;&#160;&#160;&#160;&#160;&#160;public void pk(int x) 
+&#160;&#160;&#160;&#160;&#160;&#160;{ 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;Console.WriteLine(&quot;I've been poked (&quot;+x.ToString()+&quot;)!&quot;); 
+&#160;&#160;&#160;&#160;&#160;&#160;} 
+ 
+ 
+&#160;&#160;&#160;&#160;&#160;&#160;public TestClient(int timeout) 
+&#160;&#160;&#160;&#160;&#160;&#160;{ 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;Console.WriteLine(&quot;Press Enter to start client.&quot;); 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;Console.ReadLine(); 
+&#160;&#160;&#160; 
+ 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;ChannelServices.RegisterChannel(new TcpEx.TcpExChannel(TypeFilterLevel.Full,true)); 
+ 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;TestClass tc=(TestClass)Activator.GetObject(typeof(testclass.TestClass), @&quot;tcpex://localhost:1948/TLC8675309&quot;); 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;tc.OnPoked+=new TestClass.dPoke(pk); 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;Console.WriteLine(tc.SayHello()); 
+ 
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;tc.PokeBack(42); 
+&#160;&#160;&#160;} 
+}</pre></div>
+
+						</td>
+
+					</tr>
+
+
+
+					<tr>
+
+						<td class="fontSize_smallestBoldBlue">
+
+							
+
+						</td>
+
+					</tr>
+
+				</table>
+
+			</td>
+
+		</tr>
+
+	
+
+		<tr>
+
+			<td valign="top" class="tables_contentcell_altern">
+
+			<div class="blackTableContent"><a name="327047"></a></div>
+
+				<table>
+
+					<tr>
+
+						<td width="1%">
+
+						<div class="blackTableContent">
+
+							<a href='/Community/User/viewprofile.aspx?userid=00016160974FBEBD'>
+
+							<b>BobishKindaGuy</b></a><br/>
+
+							
+
+							
+
+							<img src="/images/1pix.GIF" width="95" height="1" alt="" border="0">
+
+						</div>
+
+						</td>
+
+					</tr>
+
+					<tr>
+
+						<td class="fontSize_smallest">
+
+							<div class="blackTableContent">
+
+							User Posts:<br/>
+
+							3
+
+							</div>
+
+						</td>
+
+					</tr>
+
+				</table>
+
+			</td>
+
+			<td class="tables_contentcell_altern">
+
+				<table border="0" width="100%">
+
+					<tr>
+
+						<td align="left">
+
+							<div class="blackTableContent"><b> Great Channel</div>
+
+						</td>
+
+						<td align="right" class="fontSize_smallest">
+
+						<div class="blackTableContent">
+
+							Posted on:&nbsp;
+
+							06/30/2005 09:42:15
+
+						</div>
+
+						</td>
+
+					</tr>
+
+					
+
+					<tr>
+
+						<td colspan="2" align="right" class="fontSize_smallest">
+
+							
+
+							
+
+							<input type="submit" name="ctl04$threadRepeater$ctl06$ctl00" value="Reply" Class="gdnbutton" />
+
+						</td>
+
+					</tr>
+
+					
+
+					<tr>
+
+						<td>
+
+							<p><br/></p>
+
+							<div class="blackTableContent">Just a VB guy, trying to implement the TheLoneCabbage's replacement code so as not to have to use a config file....  
+ 
+When I replace the original TestServer code with the suggested code, I get one error: &quot; } expected &quot; 
+ 
+If I add the brace, I get several errors: 
+The name 'tc' does not exist in the class or namespace 'TestServer.TestServer' 
+ 
+and some errors like this: 
+ 
+The type or namespace name 'ChannelServices' could not be found (are you missing a using directive or an assembly reference?) 
+ 
+The others are similar (&quot;could not be found&quot;), regarding &quot;TcpExChannel&quot;, &quot;testclass&quot;, and &quot;TypeFilterLevel&quot;  
+ 
+Thanks for any clarification. 
+Bob</div>
+
+						</td>
+
+					</tr>
+
+
+
+					<tr>
+
+						<td class="fontSize_smallestBoldBlue">
+
+							
+
+						</td>
+
+					</tr>
+
+				</table>
+
+			</td>
+
+		</tr>
+
+	
+
+		<tr>
+
+			<td class="blueTableBG" valign="top" >
+
+			<a name="327121"></a>
+
+				<table>
+
+					<tr>
+
+						<td width="1%">
+
+						<div class="blackTableContent">
+
+							<a href='/Community/User/viewprofile.aspx?userid=00016160974FBEBD'>
+
+							<b>BobishKindaGuy</b></a><br/>
+
+							
+
+							
+
+							<img src="/images/1pix.GIF" width="95" height="1" alt="" border="0">
+
+						</div>
+
+						</td>
+
+					</tr>
+
+					<tr>
+
+						<td>
+
+						<div class="blackTableContent">
+
+							User Posts:<br/>
+
+							3
+
+						</div>
+
+						</td>
+
+					</tr>
+
+				</table>
+
+			</td>
+
+			<td class="blueTableBG">
+
+				<table border="0" width="100%">
+
+					<tr>
+
+						<td align="left">
+
+							<div class="blackTableContent"><b> Great Channel</div>
+
+						</td>
+
+						<td align="right" class="fontSize_smallest">
+
+							<div class="blackTableContent">
+
+							Posted on:&nbsp;
+
+							06/30/2005 16:04:31
+
+							</div>
+
+						</td>
+
+					</tr>
+
+					
+
+					<tr>
+
+						<td align="right" colspan="2" class="fontSize_smallest">
+
+							
+
+							
+
+							<input type="submit" name="ctl04$threadRepeater$ctl07$ctl00" value="Reply" Class="gdnbutton" />
+
+						</td>
+
+					</tr>
+
+					
+
+					<tr>
+
+						<td colspan="2">
+
+							<p><br/></p>
+
+							<div class="blackTableContent">I've converted this project to VB.NET, and got it down to 1 build error. 
+Would anyone like to review my code and make it work?</div>
+
+						</td>
+
+					</tr>
+
+
+
+					<tr>
+
+						<td class="fontSize_smallestBoldBlue">
+
+							
+
+						</td>
+
+					</tr>
+
+				</table>
+
+			</td>
+
+		</tr>
+
+	
+
+		<tr>
+
+			<td valign="top" class="tables_contentcell_altern">
+
+			<div class="blackTableContent"><a name="332167"></a></div>
+
+				<table>
+
+					<tr>
+
+						<td width="1%">
+
+						<div class="blackTableContent">
+
+							<a href='/Community/User/viewprofile.aspx?userid=0003400180BBC5C7'>
+
+							<b>chrislove</b></a><br/>
+
+							
+
+							
+
+							<img src="/images/1pix.GIF" width="95" height="1" alt="" border="0">
+
+						</div>
+
+						</td>
+
+					</tr>
+
+					<tr>
+
+						<td class="fontSize_smallest">
+
+							<div class="blackTableContent">
+
+							User Posts:<br/>
+
+							1
+
+							</div>
+
+						</td>
+
+					</tr>
+
+				</table>
+
+			</td>
+
+			<td class="tables_contentcell_altern">
+
+				<table border="0" width="100%">
+
+					<tr>
+
+						<td align="left">
+
+							<div class="blackTableContent"><b> Great Channel</div>
+
+						</td>
+
+						<td align="right" class="fontSize_smallest">
+
+						<div class="blackTableContent">
+
+							Posted on:&nbsp;
+
+							07/29/2005 09:22:11
+
+						</div>
+
+						</td>
+
+					</tr>
+
+					
+
+					<tr>
+
+						<td colspan="2" align="right" class="fontSize_smallest">
+
+							
+
+							
+
+							<input type="submit" name="ctl04$threadRepeater$ctl08$ctl00" value="Reply" Class="gdnbutton" />
+
+						</td>
+
+					</tr>
+
+					
+
+					<tr>
+
+						<td>
+
+							<p><br/></p>
+
+							<div class="blackTableContent">I'm not a VB user but that sounds like an error you would get if you didn't have  
+ 
+System.Runtime.Remoting 
+ 
+listed as one of your references.&#160;Project/Add Reference.. then choose System.Runtime.Remoting. 
+ 
+Hope that helps!</div>
+
+						</td>
+
+					</tr>
+
+
+
+					<tr>
+
+						<td class="fontSize_smallestBoldBlue">
+
+							
+
+						</td>
+
+					</tr>
+
+				</table>
+
+			</td>
+
+		</tr>
+
+	
+
+		<tr>
+
+			<td class="blueTableBG" valign="top" >
+
+			<a name="357107"></a>
+
+				<table>
+
+					<tr>
+
+						<td width="1%">
+
+						<div class="blackTableContent">
+
+							<a href='/Community/User/viewprofile.aspx?userid=0003BFFD853DB1ED'>
+
+							<b>Igilima</b></a><br/>
+
+							
+
+							
+
+							<img src="/images/1pix.GIF" width="95" height="1" alt="" border="0">
+
+						</div>
+
+						</td>
+
+					</tr>
+
+					<tr>
+
+						<td>
+
+						<div class="blackTableContent">
+
+							User Posts:<br/>
+
+							1
+
+						</div>
+
+						</td>
+
+					</tr>
+
+				</table>
+
+			</td>
+
+			<td class="blueTableBG">
+
+				<table border="0" width="100%">
+
+					<tr>
+
+						<td align="left">
+
+							<div class="blackTableContent"><b> Great Channel</div>
+
+						</td>
+
+						<td align="right" class="fontSize_smallest">
+
+							<div class="blackTableContent">
+
+							Posted on:&nbsp;
+
+							01/17/2006 11:32:37
+
+							</div>
+
+						</td>
+
+					</tr>
+
+					
+
+					<tr>
+
+						<td align="right" colspan="2" class="fontSize_smallest">
+
+							
+
+							
+
+							<input type="submit" name="ctl04$threadRepeater$ctl09$ctl00" value="Reply" Class="gdnbutton" />
+
+						</td>
+
+					</tr>
+
+					
+
+					<tr>
+
+						<td colspan="2">
+
+							<p><br/></p>
+
+							<div class="blackTableContent">I have spent some time putting together a fairly robust client/server application that requires bi-directional communication over a TCP connection. 
+ 
+I used this channel for a long while but found that it has a pretty significant bug that shows up under heavy multi-threaded use.&#160;The gist of it is that server-to-client calls will sometimes block indefinitely.&#160;In my case this caused a slow &quot;thread leak&quot; and loss of server-to-client messages.&#160;One solution might be to allow only one thread to make calls back to the client at a time but that won't work for me. 
+ 
+I have a client object that inherits from an abstract class and a server object that implements an interface.&#160;This allows the client and server implementations to know nothing about each other except for the other's interface methods.&#160;The client gets a reference to the remoted server object via the TcpEx remoting channel and then passes a reference to itself to the server with each client-to-server request.&#160;Later, when the server has a response, it will call a method on the client reference to return the response.&#160;My requests are all numbered and the client object uses that number (returned in the response) for correlation to outstanding requests.&#160;Every time the server sends a response to the client it spawns a worker thread to execute the client-side method. 
+ 
+Unfortunately, when a number of calls are made to the client in rapid succession a few of them will get &quot;lost&quot; and the server-side worker thread stays blocked inside of TcpEx indefinitely.&#160;The place where it gets blocked is at the ar.AsyncWaithandle.WaitOne(); in TcpEx's ClientTransportSink.ProcessMessage(...) (ClientTransportSink.cs).&#160;It is blocked here waiting for the result of the remote method execution on the client. 
+ 
+Meanwhile, on the client, the &quot;lost&quot; messages never get translated into the intended method execution because they are sitting in the outstandingMessages hashtable declared in Manager.cs.&#160;They are queue'd there by the ReceiveMessage() method when the listeners hashtable is empty.&#160;This rarely happens because there is usually at least one listener (placed there by the BeginReadMessage() method).&#160;The main problem is that whenever ReceiveMessage() finds a listener in the listeners hashtable to handle an incoming message, it removes that listener (which may be the only one there) and if messages are piling in they could lock and access the empty listeners hashtable before BeginReadMessage() can repopulate it with a listener. 
+ 
+Unhandled messages get queue'd into the outstandingMessages hashtable using connection.LocalAddress as key.&#160;BeginReadMessage() does attempt to process queue'd messages out of outstandingMessages but it almost always tries to locate them using a guid as the key whereas they were usually placed there using an IP address as the key. 
+ 
+My attempted fix was to change the key being used to queue into outstandingMessages and use the LocalGuid instead of LocalAddress.&#160;Now all my method calls completed but I suddenly found that my client-side messages were getting &quot;messed up&quot; because either wrong methods were being called or wrong message bodies were being used. 
+ 
+Anyway, I don't have time to pursue a fix for this right now but I figured I would post what I know for posterity before I swap in a different channel implementation. 
+</div>
+
+						</td>
+
+					</tr>
+
+
+
+					<tr>
+
+						<td class="fontSize_smallestBoldBlue">
+
+							
+
+						</td>
+
+					</tr>
+
+				</table>
+
+			</td>
+
+		</tr>
+
+	
+
+		<tr>
+
+			<td valign="top" class="tables_contentcell_altern">
+
+			<div class="blackTableContent"><a name="357110"></a></div>
+
+				<table>
+
+					<tr>
+
+						<td width="1%">
+
+						<div class="blackTableContent">
+
+							<a href='/Community/User/viewprofile.aspx?userid=00016160974FBEBD'>
+
+							<b>BobishKindaGuy</b></a><br/>
+
+							
+
+							
+
+							<img src="/images/1pix.GIF" width="95" height="1" alt="" border="0">
+
+						</div>
+
+						</td>
+
+					</tr>
+
+					<tr>
+
+						<td class="fontSize_smallest">
+
+							<div class="blackTableContent">
+
+							User Posts:<br/>
+
+							3
+
+							</div>
+
+						</td>
+
+					</tr>
+
+				</table>
+
+			</td>
+
+			<td class="tables_contentcell_altern">
+
+				<table border="0" width="100%">
+
+					<tr>
+
+						<td align="left">
+
+							<div class="blackTableContent"><b> Great Channel</div>
+
+						</td>
+
+						<td align="right" class="fontSize_smallest">
+
+						<div class="blackTableContent">
+
+							Posted on:&nbsp;
+
+							01/17/2006 11:52:33
+
+						</div>
+
+						</td>
+
+					</tr>
+
+					
+
+					<tr>
+
+						<td colspan="2" align="right" class="fontSize_smallest">
+
+							
+
+							
+
+							<input type="submit" name="ctl04$threadRepeater$ctl10$ctl00" value="Reply" Class="gdnbutton" />
+
+						</td>
+
+					</tr>
+
+					
+
+					<tr>
+
+						<td>
+
+							<p><br/></p>
+
+							<div class="blackTableContent">Well, I found that if a function call (as opposed to a sub) was &quot;pending&quot; or &quot;being processed&quot; and therefore incomplete, that is, the function (in the server module) had not done a &quot;return&quot; yet..... 
+ 
+In that case, if the server module tried to send some message &quot;back&quot; to the client, that would hang remoting. 
+ 
+So what I did was, firstly, limited the number of function calls to ones that would simply do the work and return right away. 
+ 
+Secondly, I set up a queueing system for the &quot;subs&quot; sent to and from the client(s).  
+ 
+So whenever the server remoting functionality sees an incoming message, it doesn't try to &quot;process&quot; it, but just sticks every incoming message into a little class (say, &quot;Thingy&quot;) containing the vital info passed in, and sticks the class on the queue. (Thingy.Enqueue). 
+ 
+Same thing for the outgoing messages (server to client). Server puts the message data into the little class and sticks the class on the outgoing queue. 
+ 
+Next, I set up a thread to process the queues. (note: do not use peek!!! use Dequeue and if you can't process it at that time, requeue it with Enqueue) 
+ 
+My strategy ended up being this: The queue checker thread loops through the following steps: 
+1. Dequeues one incoming item, processes whatever has to be done for that item.... (which may generate some outgoing message(s)... but that's okay because they just go on the outgoing queue anyway) 
+2. Processes *all* of the outgoing queue items. That way, if several outgoing messages were associated with some complicated functionality, they would all go back to the client before another message is processed. 
+ 
+After a LOT of trial and error, this seems to be working, because the queue processor guarantees that one message and only one message is processed at the server side at a time, but allows many messages to go back to client for status, etc 
+ 
+Let me know if anything needs clarification.</div>
+
+						</td>
+
+					</tr>
+
+
+
+					<tr>
+
+						<td class="fontSize_smallestBoldBlue">
+
+							<div id="ctl04_threadRepeater_ctl10_EditedPanel">
+
+		
+
+							<div>
+
+								Post edited by BobishKindaGuy 
+
+								on <span id="ctl04_threadRepeater_ctl10_EditedLabel">01/17/2006 11:56:52</span>
+
+							</div>
+
+							
+
+	</div>
+
+						</td>
+
+					</tr>
+
+				</table>
+
+			</td>
+
+		</tr>
+
+	
+
+		</table>
+
+	
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+<BR>
+
+<img align="right" src="/images/icon_watermark.gif">
+
+<span id="ctl02_BottomNavigation"></span><br clear="all">
+
+<a id="ctl02_PrintVersionBottomButton" class="fontSize_smallestItalic" href="javascript:__doPostBack('ctl02$PrintVersionBottomButton','')">[Printer friendly version]</a>
+
+<HR color="#3399ff" size="1">
+
+<span class="fontSize_smallest">
+
+	<span id="ctl02_CopyRightLabel">&copy; Copyright 2006 Microsoft Corporation. All Rights Reserved.</span><br>
+
+	<a id="ctl02_TermsOfUseLink" href="/content/legal/tou.aspx">Terms of Use</a>
+
+	|
+
+	<a id="ctl02_PrivacyStatement" href="/content/legal/privacy.aspx">Privacy Statement</a>
+
+	|
+
+	<a id="ctl02_CodeOfConduct" href="/content/legal/conduct.aspx">Code of Conduct</a>
+
+	|
+
+	<a id="ctl02_AboutUs" href="/team/gdnteam.aspx">About the team</a>
+
+	|
+
+	<a id="ctl02_ContactUs" href="/content/about/contactus.aspx">Contact Us</a>
+
+</span></TD>
+
+<td width="10"><img src="/images/1pix.gif" width="10"></td>
+
+</tr> </table> </td> </tr>
+
+</table>
+
+
+
+</form>
+
+</body> 
+</html>
