@@ -54,6 +54,8 @@
     <Compile Include="ComponentInfo.cs" />
     <Compile Include="DelegateCorrelationInfo.cs" />
     <Compile Include="DynamicWireFactory.cs" />
+    <Compile Include="CallInterceptData.cs" />
+    <Compile Include="CallInterceptor.cs" />
     <Compile Include="InvalidSessionException.cs" />
     <Compile Include="InvokeCanceledEventArgs.cs" />
     <Compile Include="InvokeCanceledException.cs" />
@@ -74,6 +76,14 @@
     <Compile Include="Protocols\Http\HttpCustomServerProtocolSetup.cs" />
     <Compile Include="Protocols\Ipc\IpcBinaryClientProtocolSetup.cs" />
     <Compile Include="Protocols\Ipc\IpcBinaryServerProtocolSetup.cs" />
+    <Compile Include="Protocols\Tcp\DuplexChannel\ClientTransportSink.cs" />
+    <Compile Include="Protocols\Tcp\DuplexChannel\Connection.cs" />
+    <Compile Include="Protocols\Tcp\DuplexChannel\Diagnostics\Trace.cs" />
+    <Compile Include="Protocols\Tcp\DuplexChannel\Manager.cs" />
+    <Compile Include="Protocols\Tcp\DuplexChannel\Message.cs" />
+    <Compile Include="Protocols\Tcp\DuplexChannel\ServerTransportSink.cs" />
+    <Compile Include="Protocols\Tcp\DuplexChannel\TcpExChannel.cs" />
+    <Compile Include="Protocols\Tcp\DuplexChannel\TcpExChannelData.cs" />
     <Compile Include="Protocols\Tcp\TcpCustomClientProtocolSetup.cs" />
     <Compile Include="Protocols\Tcp\TcpCustomServerProtocolSetup.cs" />
     <Compile Include="Protocols\Tcp\TcpBinaryClientProtocolSetup.cs" />
@@ -88,6 +98,8 @@
     <Compile Include="ChannelSinks\Encryption\CryptoServerChannelSinkProvider.cs" />
     <Compile Include="Protocols\IClientProtocolSetup.cs" />
     <Compile Include="Protocols\IServerProtocolSetup.cs" />
+    <Compile Include="Protocols\Tcp\TcpDuplexClientProtocolSetup.cs" />
+    <Compile Include="Protocols\Tcp\TcpDuplexServerProtocolSetup.cs" />
     <Compile Include="Scripting\ScriptEngine.cs" />
     <Compile Include="Security\BasicWindowsAuthProvider.cs" />
     <Compile Include="Security\WindowsSecurityTools.cs" />
