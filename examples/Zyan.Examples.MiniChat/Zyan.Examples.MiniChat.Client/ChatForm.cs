@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using Zyan.Communication;
 using Zyan.Examples.MiniChat.Shared;
 using System.Threading;
+using Zyan.Communication.Protocols.Tcp;
 
 namespace Zyan.Examples.MiniChat.Client
 {
@@ -21,7 +22,8 @@ namespace Zyan.Examples.MiniChat.Client
         {
             InitializeComponent();
 
-            _connection = new ZyanConnection(Properties.Settings.Default.ServerUrl);
+            TcpDuplexClientProtocolSetup protocol = new TcpDuplexClientProtocolSetup(false);
+            ZyanConnection _connection = new ZyanConnection(Properties.Settings.Default.ServerUrl, protocol);
             _chatProxy = _connection.CreateProxy<IMiniChat>();
             _chatProxy.MessageReceived += new Action<string, string>(_chatProxy_MessageReceived);
         }
