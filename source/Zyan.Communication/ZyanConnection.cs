@@ -538,5 +538,11 @@ namespace Zyan.Communication
         }
 
         #endregion
+
+        #region Fehlerbehandlung
+
+        
+
+        #endregion
     }
 }
