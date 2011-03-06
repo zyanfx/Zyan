@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using Zyan.Communication.Scripting;
+using System.IO;
 
 namespace Zyan.Communication
 {
@@ -155,6 +156,31 @@ namespace Zyan.Communication
         }
 
         /// <summary>
+        /// Gibt alle Verweise eines bestimmten Komponententyp zurück.
+        /// </summary>
+        /// <param name="componentType">Komponententyp</param>
+        /// <returns>Array mit Pfadangaben zu abhängigen Assemblies</returns>
+        private string[] GetComponentReferences(Type componentType)
+        {
+            // Verweise der Komponenten-Assembly übernehmen
+            List<string> componentReferences = (from assy in componentType.Assembly.GetReferencedAssemblies()
+                                                select Assembly.Load(assy).Location).ToList();
+
+            // Nach Zyan.Communication.dll in Komponentenverweisen suchen
+            int foundZyan = (from reference in componentReferences
+                             where Path.GetFileName(reference).Equals("Zyan.Communication.dll", StringComparison.InvariantCultureIgnoreCase)
+                             select reference).Count();
+
+            // Wenn Zyan.Communication.dll nicht in den Verweisen enthalten ist ...
+            if (foundZyan == 0)
+                // Verweis auf Zyan zufügen
+                componentReferences.Add(Assembly.GetExecutingAssembly().Location);
+
+            // Array mit Verweisen erstellen und zurückgeben
+            return componentReferences.ToArray();
+        }
+
+        /// <summary>
         /// Erzeugt den Typen für einen dynamischen Draht für ein bestimmtes Ereignis einer Komponente.
         /// </summary>
         /// <param name="componentType">Typ der Komponente</param>
@@ -162,10 +188,9 @@ namespace Zyan.Communication
         /// <param name="clientInterceptor">Client-Abfangvorrichtung</param>
         /// <returns>Typ des dynamischen Drahts</returns>
         private Type BuildDynamicWireType(Type componentType, Type delegateType, DelegateInterceptor clientInterceptor)
-        {
-            // Verweise der Komponenten-Assembly übernehmen
-            string[] references = (from assy in componentType.Assembly.GetReferencedAssemblies()
-                                   select Assembly.Load(assy).Location).ToArray();
+        {            
+            // Array mit Verweisen erstellen
+            string[] references = GetComponentReferences(componentType);
 
             // Variable für Quellcode
             string sourceCode = string.Empty;
@@ -192,10 +217,9 @@ namespace Zyan.Communication
         /// <returns>Typ des dynamischen Drahts</returns>
         private Type BuildDynamicWireType(Type componentType,string eventMemberName, bool isEvent)
         {
-            // Verweise der Komponenten-Assembly übernehmen
-            string[] references = (from assy in componentType.Assembly.GetReferencedAssemblies()
-                                   select Assembly.Load(assy).Location).ToArray();
-            
+            // Array mit Verweisen erstellen
+            string[] references = GetComponentReferences(componentType);
+
             // Variable für Quellcode
             string sourceCode = string.Empty;
 
