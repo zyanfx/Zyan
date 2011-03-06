@@ -5,6 +5,7 @@ using System.Text;
 using System.Reflection;
 using System.CodeDom.Compiler;
 using Microsoft.CSharp;
+using System.CodeDom;
 
 namespace Zyan.Communication.Scripting
 {
@@ -52,6 +53,33 @@ namespace Zyan.Communication.Scripting
             }
             // Nichts zurückgeben
             return null;
+        }
+
+        /// <summary>
+        /// Gibt den C#-Namen eines bestimmten Typs zurück.
+        /// </summary>
+        /// <param name="type">Typ</param>
+        /// <returns>C# Name des Typs</returns>
+        public static string GetCSharpNameOfType(Type type)
+        {
+            // Wenn kein Typ angegeben wurde ...
+            if (type == null)
+                // Ausnahme werden
+                throw new ArgumentNullException("type");
+
+            // Wenn der Typ kein generischer Typ ist ...
+            if (!type.IsGenericType)
+                // Vollständigen Namen zurückgeben
+                return type.FullName;
+
+            // Quellcode-Typverweis erzeugen
+            CodeTypeReference typeRef = new CodeTypeReference(type);
+
+            // C#-Quellcodeanbieter erzeugen
+            CSharpCodeProvider provider = new CSharpCodeProvider();
+
+            // Quellcodename des Typs ermitteln und zurückgeben
+            return provider.GetTypeOutput(typeRef);
         }
     }
 }

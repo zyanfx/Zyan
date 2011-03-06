@@ -287,7 +287,7 @@ namespace Zyan.Communication
                 code.Append("       public void In(");
             else
                 // Rückgabetyp verwenden
-                code.AppendFormat("       public {0} In(", eventMethod.ReturnType.FullName);
+                code.AppendFormat("       public {0} In(", ScriptEngine.GetCSharpNameOfType(eventMethod.ReturnType));
 
             // Variable für Anzahl der Parameter, die der Delegat bescheibt
             int argCount = 0;
@@ -302,7 +302,7 @@ namespace Zyan.Communication
                 argCount++;
 
                 // Parameterdefinition in Quellcode schreiben
-                code.AppendFormat("{0} {1}", argInfo.ParameterType.FullName, argInfo.Name);
+                code.AppendFormat("{0} {1}", ScriptEngine.GetCSharpNameOfType(argInfo.ParameterType), argInfo.Name);
 
                 // Wenn es nicht der letzte Parameter ist ...
                 if (argCount < argInfos.Length)
@@ -320,7 +320,7 @@ namespace Zyan.Communication
                 code.Append("try { Interceptor.InvokeClientDelegate(");
             else
                 // InvokeClientDelegate aufrufen und Rückgabewert zurückgeben (Typenumwandlung durchführen)
-                code.AppendFormat("try { return ({0})Interceptor.InvokeClientDelegate(", eventMethod.ReturnType.FullName);
+                code.AppendFormat("try { return ({0})Interceptor.InvokeClientDelegate(", ScriptEngine.GetCSharpNameOfType(eventMethod.ReturnType));
 
             // Parameterzähler zurücksetzen
             argCount = 0;
@@ -395,7 +395,7 @@ namespace Zyan.Communication
                 code.Append("       public void In(");
             else
                 // Rückgabetyp verwenden
-                code.AppendFormat("       public {0} In(", delegateMethod.ReturnType.FullName);
+                code.AppendFormat("       public {0} In(", ScriptEngine.GetCSharpNameOfType(delegateMethod.ReturnType));
 
             // Variable für Anzahl der Parameter, die der Delegat bescheibt
             int argCount = 0;
@@ -410,7 +410,7 @@ namespace Zyan.Communication
                 argCount++;
 
                 // Parameterdefinition in Quellcode schreiben
-                code.AppendFormat("{0} {1}", argInfo.ParameterType.FullName, argInfo.Name);
+                code.AppendFormat("{0} {1}", ScriptEngine.GetCSharpNameOfType(argInfo.ParameterType), argInfo.Name);
 
                 // Wenn es nicht der letzte Parameter ist ...
                 if (argCount < argInfos.Length)
@@ -429,7 +429,7 @@ namespace Zyan.Communication
                 code.Append("Interceptor.InvokeClientDelegate(");
             else
                 // InvokeClientDelegate aufrufen und Rückgabewert zurückgeben (Typenumwandlung durchführen)
-                code.AppendFormat("return ({0})Interceptor.InvokeClientDelegate(", delegateMethod.ReturnType.FullName);
+                code.AppendFormat("return ({0})Interceptor.InvokeClientDelegate(", ScriptEngine.GetCSharpNameOfType(delegateMethod.ReturnType));
 
             // Parameterzähler zurücksetzen
             argCount = 0;
