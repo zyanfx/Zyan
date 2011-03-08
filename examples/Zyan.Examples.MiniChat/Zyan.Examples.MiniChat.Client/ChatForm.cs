@@ -22,8 +22,25 @@ namespace Zyan.Examples.MiniChat.Client
         {
             InitializeComponent();
 
-            TcpDuplexClientProtocolSetup protocol = new TcpDuplexClientProtocolSetup(false);
+            TcpCustomClientProtocolSetup protocol = new TcpCustomClientProtocolSetup(false);
             ZyanConnection _connection = new ZyanConnection(Properties.Settings.Default.ServerUrl, protocol);
+
+            _connection.CallInterceptors.Add(new CallInterceptor(typeof(IMiniChat),
+                                                    System.Reflection.MemberTypes.Method,
+                                                    "SendMessage",
+                                                    new Type[] { typeof(string), typeof(string) },
+                                                    data =>
+                                                    {
+                                                        string text2 = (string)data.Parameters[1];
+
+                                                        if (text2.Contains("fuck") || text2.Contains("sex"))
+                                                        {
+                                                            MessageBox.Show("TEXT CONTAINS FORBIDDEN WORDS!");
+                                                            data.Intercepted = true;
+                                                        }
+                                                    }));
+            _connection.CallInterceptionEnabled = true;
+            
             _chatProxy = _connection.CreateProxy<IMiniChat>();
             _chatProxy.MessageReceived += new Action<string, string>(_chatProxy_MessageReceived);
         }

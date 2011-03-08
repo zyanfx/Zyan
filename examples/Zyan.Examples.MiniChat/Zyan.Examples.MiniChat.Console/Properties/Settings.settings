@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="ServerUrl" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">tcpex://localhost:9010/MiniChat</Value>
+      <Value Profile="(Default)">tcp://localhost:9010/MiniChat</Value>
     </Setting>
   </Settings>
 </SettingsFile>
