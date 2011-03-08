@@ -10,10 +10,10 @@ namespace Zyan.Communication
     /// Delegat für benutzerdefinierte Aufrufabfanglogik.
     /// </summary>
     /// <param name="action">Aufrufabfang-Aktion</param>
-    public delegate void InterceptDelegate(CallInterceptData action);
+    public delegate void CallInterceptionDelegate(CallInterceptionData action);
         
     /// <summary>
-    /// Beschreibt ein Aufrufabfang-Abo.
+    /// Allgemeine Implementierung einer Aufrufabfangvorrichtung.
     /// </summary>
     public class CallInterceptor
     {
@@ -24,15 +24,15 @@ namespace Zyan.Communication
         /// <param name="memberType">Art des Members, dessen Aufrufe abgefangen werden sollen</param>
         /// <param name="memberName">Name des Members, dessen Aufrufe abgefangen werden sollen</param>
         /// <param name="parameterTypes">Array mit den Typen der Parameter des abzufangenden Members</param>
-        /// <param name="onIntercept">Delegat, der beim Abfangen aufgerufen wird</param>
-        public CallInterceptor(Type interfaceType,MemberTypes memberType, string memberName, Type[] parameterTypes, InterceptDelegate onIntercept)
+        /// <param name="onInterception">Delegat, der beim Abfangen aufgerufen wird</param>
+        public CallInterceptor(Type interfaceType,MemberTypes memberType, string memberName, Type[] parameterTypes, CallInterceptionDelegate onInterception)
         {
             // Eigenschaften füllen
             InterfaceType = interfaceType;
             MemberType = memberType;
             MemberName = memberName;
             ParameterTypes = parameterTypes;
-            OnIntercept = onIntercept;
+            OnInterception = onInterception;
         }
 
         /// <summary>
@@ -58,6 +58,6 @@ namespace Zyan.Communication
         /// <summary>
         /// Gibt den Delegaten zurück, der beim Abfangen des Aufrufs anstelle dessen aufgerufen wird, oder legt ihn fest.
         /// </summary>
-        public InterceptDelegate OnIntercept { get; private set; }
+        public CallInterceptionDelegate OnInterception { get; private set; }
     }
 }

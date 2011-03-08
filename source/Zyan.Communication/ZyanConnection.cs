@@ -23,46 +23,16 @@ namespace Zyan.Communication
     /// </summary>
     public class ZyanConnection : IDisposable
     {
+        #region Konfiguration
+
         // URL zum Server-Prozess
         private string _serverUrl = string.Empty;
-
-        // Liste mit allen registrierten Komponenten des verbundenen Servers
-        private List<ComponentInfo> _registeredComponents = null;
-
-        // Sitzungsschlüssel
-        private Guid _sessionID = Guid.Empty;
-
-        // Protokoll-Einstellungen
-        private IClientProtocolSetup _protocolSetup = null;
 
         // Name des entfernten Komponentenhosts
         private string _componentHostName = string.Empty;
 
-        // Schalter für automatisches Anmelden, bei abgelaufender Sitzung
-        private bool _autoLoginOnExpiredSession = false;
-
-        // Anmeldeinformationen für automatisches Anmelden
-        private Hashtable _autoLoginCredentials = null;
-
-        // Auflistung der bekannten Verbindungen
-        private static List<ZyanConnection> _connections = new List<ZyanConnection>();
-
-        // Schalter für automatische Sitzungsverlängerung
-        private bool _keepSessionAlive = true;
-
-        // Zeitgeber
-        private Timer _keepSessionAliveTimer = null;
-
-        // Maximale Sitzungslebensdauer in Minuten
-        private int _sessionAgeLimit = 0;
-
-        /// <summary>
-        /// Gibt eine Auflistung aller bekanten Verbindungen Hosts zurück.
-        /// </summary>
-        public static List<ZyanConnection> Connections
-        {
-            get { return _connections.ToList<ZyanConnection>(); }
-        }
+        // Protokoll-Einstellungen
+        private IClientProtocolSetup _protocolSetup = null;
 
         /// <summary>
         /// Gibt den URL zum Server-Prozess zurück.
@@ -79,6 +49,10 @@ namespace Zyan.Communication
         {
             get { return _componentHostName; }
         }
+
+        #endregion
+
+        #region Konstruktoren
 
         /// <summary>
         /// Konstruktor.
@@ -167,6 +141,12 @@ namespace Zyan.Communication
             // Verwaltung für Serialisierungshandling erzeugen
             _serializationHandling = new SerializationHandlerRepository();
 
+            // Standardmäßig keine Aufrufabfangvorrichtungen verarbeiten
+            CallInterceptionEnabled = false;
+
+            // Auflistung für Aufrufabfangvorrichtungen erzeugen
+            _callInterceptors = new CallInterceptorCollection();
+
             // Server-URL in Bestandteile zerlegen
             string[] addressParts = _serverUrl.Split('/');
 
@@ -204,6 +184,28 @@ namespace Zyan.Communication
             // Verbindung der Auflistung zufügen
             _connections.Add(this);
         }
+
+        #endregion
+        
+        #region Sitzungsverwaltung
+
+        // Sitzungsschlüssel
+        private Guid _sessionID = Guid.Empty;
+
+        // Schalter für automatisches Anmelden, bei abgelaufender Sitzung
+        private bool _autoLoginOnExpiredSession = false;
+
+        // Anmeldeinformationen für automatisches Anmelden
+        private Hashtable _autoLoginCredentials = null;
+
+        // Schalter für automatische Sitzungsverlängerung
+        private bool _keepSessionAlive = true;
+
+        // Zeitgeber
+        private Timer _keepSessionAliveTimer = null;
+
+        // Maximale Sitzungslebensdauer in Minuten
+        private int _sessionAgeLimit = 0;
 
         /// <summary>
         /// Bereitet den Aufrufkontext für die Übertragung vor.
@@ -285,6 +287,13 @@ namespace Zyan.Communication
             { }
         }
 
+        #endregion
+
+        #region Komponentenzugriff
+
+        // Liste mit allen registrierten Komponenten des verbundenen Servers
+        private List<ComponentInfo> _registeredComponents = null;
+
         /// <summary>
         /// Erzeugt im Server-Prozess eine neue Instanz einer bestimmten Komponente und gibt einen Proxy dafür zurück.
         /// </summary>
@@ -353,60 +362,7 @@ namespace Zyan.Communication
             }
         }
 
-        // Schalter der angibt, ob Dispose bereits aufgerufen wurde
-        private bool _isDisposed = false;
-
-        /// <summary>
-        /// Verwaltete Ressourcen freigeben.
-        /// </summary>
-        public void Dispose()
-        {
-            // Wenn Dispose nicht bereits ausgeführt wurde ...
-            if (!_isDisposed)
-            {
-                // Schalter setzen
-                _isDisposed = true;
-
-                // Verbindung aus der Auflistung entfernen
-                _connections.Remove(this);
-
-                // Wenn der Zeitgeber noch existiert ...
-                if (_keepSessionAliveTimer != null)
-                {
-                    // Zeitgeber entsorgen
-                    _keepSessionAliveTimer.Dispose();
-                    _keepSessionAliveTimer = null;
-                }
-                try
-                {
-                    // Vom Server abmelden
-                    RemoteComponentFactory.Logoff(_sessionID);
-                }
-                catch (RemotingException)
-                { }
-                catch (SocketException)
-                { }
-                catch (WebException)
-                { }
-                // Variablen freigeben
-                _registeredComponents = null;
-                _remoteComponentFactory = null;
-                _serverUrl = string.Empty;
-                _sessionID = Guid.Empty;
-
-                // Nicht auf Finalisierer warten (da keine unverwalteten Ressourcen freigegeben werden müssen)
-                GC.SuppressFinalize(this);
-            }
-        }
-
-        /// <summary>
-        /// Destruktor.
-        /// </summary>
-        ~ZyanConnection()
-        {
-            // Ressourcen freigeben
-            Dispose();
-        }
+        #endregion
 
         #region Benutzerdefinierte Serialisierung
 
@@ -539,9 +495,107 @@ namespace Zyan.Communication
 
         #endregion
 
+        #region Aufrufe abfangen
+
+        /// <summary>
+        /// Gibt zurück, ob registrierte Aufrufabfangvorrichtungen verarbeitet werden, oder legt diest fest.
+        /// </summary>
+        public bool CallInterceptionEnabled
+        {
+            get;
+            set;
+        }
+
+        // Auflistung für Aufrufabfangvorrichtungen
+        private CallInterceptorCollection _callInterceptors = null;
+
+        /// <summary>
+        /// Gibt eine Auflistung der registrierten Aufrufabfangvorrichtungen zurück.
+        /// </summary>
+        public CallInterceptorCollection CallInterceptors
+        {
+            get { return _callInterceptors; }
+        }
+
+        #endregion
+
         #region Fehlerbehandlung
 
-        
+
+
+        #endregion
+
+        #region Dispose-Implementierung
+
+        // Schalter der angibt, ob Dispose bereits aufgerufen wurde
+        private bool _isDisposed = false;
+
+        /// <summary>
+        /// Verwaltete Ressourcen freigeben.
+        /// </summary>
+        public void Dispose()
+        {
+            // Wenn Dispose nicht bereits ausgeführt wurde ...
+            if (!_isDisposed)
+            {
+                // Schalter setzen
+                _isDisposed = true;
+
+                // Verbindung aus der Auflistung entfernen
+                _connections.Remove(this);
+
+                // Wenn der Zeitgeber noch existiert ...
+                if (_keepSessionAliveTimer != null)
+                {
+                    // Zeitgeber entsorgen
+                    _keepSessionAliveTimer.Dispose();
+                    _keepSessionAliveTimer = null;
+                }
+                try
+                {
+                    // Vom Server abmelden
+                    RemoteComponentFactory.Logoff(_sessionID);
+                }
+                catch (RemotingException)
+                { }
+                catch (SocketException)
+                { }
+                catch (WebException)
+                { }
+                // Variablen freigeben
+                _registeredComponents = null;
+                _remoteComponentFactory = null;
+                _serverUrl = string.Empty;
+                _sessionID = Guid.Empty;
+
+                // Nicht auf Finalisierer warten (da keine unverwalteten Ressourcen freigegeben werden müssen)
+                GC.SuppressFinalize(this);
+            }
+        }
+
+        /// <summary>
+        /// Destruktor.
+        /// </summary>
+        ~ZyanConnection()
+        {
+            // Ressourcen freigeben
+            Dispose();
+        }
+
+        #endregion
+
+        #region Statischer Zugriff auf alle Verbindungen
+
+        // Auflistung der bekannten Verbindungen
+        private static List<ZyanConnection> _connections = new List<ZyanConnection>();
+
+        /// <summary>
+        /// Gibt eine Auflistung aller bekanten Verbindungen Hosts zurück.
+        /// </summary>
+        public static List<ZyanConnection> Connections
+        {
+            get { return _connections.ToList<ZyanConnection>(); }
+        }
 
         #endregion
     }

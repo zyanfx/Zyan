@@ -7,21 +7,19 @@ using System.Reflection;
 namespace Zyan.Communication
 {
     /// <summary>
-    /// Konkrete Aufrufabfangaktion.
+    /// Beschreibt eine konkretee Aufrufabfangaktion.
     /// </summary>
-    public class CallInterceptData
-    {
+    public class CallInterceptionData
+    {        
         /// <summary>
-        /// Erstellt eine neue Instanz der CallInterceptData-Klasse.
-        /// </summary>
-        /// <param name="subscription">Aufrufabfangregistrierung</param>
+        /// Erstellt eine neue Instanz der CallInterceptionData-Klasse.
+        /// </summary>        
         /// <param name="parameters">Parameterwerte des abgefangenen Aufrufs</param>
-        public CallInterceptData(CallInterceptor subscription, object[] parameters)
+        public CallInterceptionData(object[] parameters)
         {
             // Felder füllen
             Intercepted = false;
-            ReturnValue = null;
-            Subscription = subscription;
+            ReturnValue = null;            
             Parameters = parameters;
         }
 
@@ -41,12 +39,6 @@ namespace Zyan.Communication
         {
             get;
             set;
-        }
-
-        public CallInterceptor Subscription
-        {
-            get;
-            private set;
         }
 
         /// <summary>
