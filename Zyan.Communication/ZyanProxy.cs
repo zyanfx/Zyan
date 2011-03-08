@@ -242,40 +242,73 @@ namespace Zyan.Communication
                 }
                 // Parametertypen ermitteln
                 ParameterInfo[] paramDefs = methodCallMessage.MethodBase.GetParameters();
+                                                    
+                // Abfragen, ob Abfangvorrichtungen verarbeitet werden sollen
+                bool callInterception = _connection.CallInterceptionEnabled;
 
-                try
+                // Wenn Aufrufabfangvorrichtungen verarbeitet werden sollen ...
+                if (callInterception)
                 {
-                    // Ggf. Delegaten-Parameter abfangen
-                    object[] checkedArgs = InterceptDelegateParameters(methodCallMessage);
+                    // Passende Aufrufabfangvorrichtung suchen
+                    CallInterceptor interceptor = _connection.CallInterceptors.FindMatchingInterceptor(_interfaceType, methodCallMessage);
 
-                    // Entfernten Methodenaufruf durchführen
-                    returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, correlationSet, methodCallMessage.MethodName, paramDefs, checkedArgs);
+                    // Wenn eine passende Aufrufabfangvorrichtung gefunden wurde ...
+                    if (interceptor != null)
+                    { 
+                        // Aufrufdaten zusammenstellen
+                        CallInterceptionData interceptionData = new CallInterceptionData(methodCallMessage.Args);
 
-                    // Ereignisargumente für AfterInvoke erstellen
-                    AfterInvokeEventArgs afterInvokeArgs = new AfterInvokeEventArgs()
-                    {
-                        TrackingID = trackingID,
-                        InterfaceName = _interfaceType.FullName,
-                        DelegateCorrelationSet = correlationSet,
-                        MethodName = methodCallMessage.MethodName,
-                        Arguments = methodCallMessage.Args,
-                        ReturnValue = returnValue
-                    };
-                    // AfterInvoke-Ereignis feuern
-                    _connection.OnAfterInvoke(afterInvokeArgs);
-                }
-                catch (InvalidSessionException)
-                {
-                    // Wenn automatisches Anmelden bei abgelaufener Sitzung aktiviert ist ...
-                    if (_autoLoginOnExpiredSession)
-                    {
-                        // Neu anmelden
-                        _remoteInvoker.Logon(_sessionID, _autoLoginCredentials);
-
-                        // Entfernten Methodenaufruf erneut versuchen                        
-                        returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, correlationSet, methodCallMessage.MethodName, paramDefs, methodCallMessage.Args);
+                        // Wenn ein Delegat für die Behandlung der Abfangaktion hinterlegt ist ...
+                        if (interceptor.OnInterception != null)                             
+                            // Aufruf abfangen
+                            interceptor.OnInterception(interceptionData);
+                            
+                        // Wenn der Aufruf abgefangen wurde ...
+                        if (interceptionData.Intercepted)
+                            // Rückgabewert übernehmen
+                            returnValue = interceptionData.ReturnValue;
+                        else
+                            // Schalter für Aufrufabfangverarbeitung zurücksetzen
+                            callInterception = false;
                     }
-                }
+                }                    
+                // Wenn der Aufruf nicht abgefangen wurde ...
+                if (!callInterception)
+                {
+                    try
+                    {
+                        // Ggf. Delegaten-Parameter abfangen
+                        object[] checkedArgs = InterceptDelegateParameters(methodCallMessage);
+
+                        // Entfernten Methodenaufruf durchführen
+                        returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, correlationSet, methodCallMessage.MethodName, paramDefs, checkedArgs);
+
+                        // Ereignisargumente für AfterInvoke erstellen
+                        AfterInvokeEventArgs afterInvokeArgs = new AfterInvokeEventArgs()
+                        {
+                            TrackingID = trackingID,
+                            InterfaceName = _interfaceType.FullName,
+                            DelegateCorrelationSet = correlationSet,
+                            MethodName = methodCallMessage.MethodName,
+                            Arguments = methodCallMessage.Args,
+                            ReturnValue = returnValue
+                        };
+                        // AfterInvoke-Ereignis feuern
+                        _connection.OnAfterInvoke(afterInvokeArgs);
+                    }                 
+                    catch (InvalidSessionException)
+                    {
+                        // Wenn automatisches Anmelden bei abgelaufener Sitzung aktiviert ist ...
+                        if (_autoLoginOnExpiredSession)
+                        {
+                            // Neu anmelden
+                            _remoteInvoker.Logon(_sessionID, _autoLoginCredentials);
+
+                            // Entfernten Methodenaufruf erneut versuchen                        
+                            returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, correlationSet, methodCallMessage.MethodName, paramDefs, methodCallMessage.Args);
+                        }                    
+                    }                    
+                }                
                 // Versuchen den Rückgabewert in einen Serialisierungscontainer zu casten
                 CustomSerializationContainer container = returnValue as CustomSerializationContainer;
 

@@ -373,8 +373,7 @@ namespace Zyan.Communication
         #endregion               
 
         #region Netzwerk-Kommunikation
-
-
+        
         // Name dieses Komponentenhosts
         private string _name = string.Empty;
 

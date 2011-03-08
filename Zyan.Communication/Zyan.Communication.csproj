@@ -50,11 +50,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CallInterceptorCollection.cs" />
     <Compile Include="ComponentCatalog.cs" />
     <Compile Include="ComponentInfo.cs" />
     <Compile Include="DelegateCorrelationInfo.cs" />
     <Compile Include="DynamicWireFactory.cs" />
-    <Compile Include="CallInterceptData.cs" />
+    <Compile Include="CallInterceptionData.cs" />
     <Compile Include="CallInterceptor.cs" />
     <Compile Include="InvalidSessionException.cs" />
     <Compile Include="InvokeCanceledEventArgs.cs" />
