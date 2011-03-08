@@ -13,7 +13,7 @@ namespace Zyan.Examples.MiniChat.Server
     {
         static void Main(string[] args)
         {
-            TcpDuplexServerProtocolSetup protocol=new TcpDuplexServerProtocolSetup(Properties.Settings.Default.TcpPort,new NullAuthenticationProvider(),false);
+            TcpCustomServerProtocolSetup protocol = new TcpCustomServerProtocolSetup(Properties.Settings.Default.TcpPort, new NullAuthenticationProvider(), false);
 
             using (ZyanComponentHost host = new ZyanComponentHost("MiniChat",protocol))
             {

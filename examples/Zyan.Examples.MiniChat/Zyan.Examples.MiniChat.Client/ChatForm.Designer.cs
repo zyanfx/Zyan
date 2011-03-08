@@ -50,7 +50,7 @@
             this._sendButton.Name = "_sendButton";
             this._sendButton.Size = new System.Drawing.Size(75, 20);
             this._sendButton.TabIndex = 1;
-            this._sendButton.Text = "Senden";
+            this._sendButton.Text = "Send";
             this._sendButton.UseVisualStyleBackColor = true;
             this._sendButton.Click += new System.EventHandler(this._sendButton_Click);
             // 

@@ -25,7 +25,7 @@ namespace Zyan.Examples.MiniChat.Console.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("tcpex://localhost:9010/MiniChat")]
+        [global::System.Configuration.DefaultSettingValueAttribute("tcp://localhost:9010/MiniChat")]
         public string ServerUrl {
             get {
                 return ((string)(this["ServerUrl"]));
