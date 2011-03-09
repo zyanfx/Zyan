@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using System.Runtime.Remoting.Messaging;
 
 namespace Zyan.Communication
 {
@@ -10,17 +11,48 @@ namespace Zyan.Communication
     /// Beschreibt eine konkretee Aufrufabfangaktion.
     /// </summary>
     public class CallInterceptionData
-    {        
+    {
+        // Delegat für den Aufruf von InvokeRemoteMethod (bei Bedarf)
+        InvokeRemoteMethodDelegate _remoteInvoker = null;
+
+        // Remoting-Nachricht
+        IMethodCallMessage _remotingMessage = null;
+
         /// <summary>
         /// Erstellt eine neue Instanz der CallInterceptionData-Klasse.
         /// </summary>        
         /// <param name="parameters">Parameterwerte des abgefangenen Aufrufs</param>
-        public CallInterceptionData(object[] parameters)
+        /// <param name="remoteInvoker">Delegat für den Aufruf von InvokeRemoteMethod (bei Bedarf)</param>
+        /// <param name="remotingMessage">Remoting-nachricht</param>
+        public CallInterceptionData(object[] parameters, InvokeRemoteMethodDelegate remoteInvoker, IMethodCallMessage remotingMessage)
         {
             // Felder füllen
             Intercepted = false;
             ReturnValue = null;            
             Parameters = parameters;
+            _remoteInvoker = remoteInvoker;
+            _remotingMessage = remotingMessage;
+        }
+
+        /// <summary>
+        /// Führt den entfernten Methodenaufruf aus.
+        /// </summary>
+        /// <returns>Rückgabewert</returns>
+        public object MakeRemoteCall()
+        { 
+            // Entfernte Methode aufrufen
+            IMessage result = _remoteInvoker(_remotingMessage, false);
+
+            // Rückgabenachricht casten
+            ReturnMessage returnMessage = result as ReturnMessage;
+
+            // Wenn eine gültige Rückgabenachricht zurückgegeben wurde ...
+            if (returnMessage != null)
+                // Rückgabewert zurückgeben
+                return returnMessage.ReturnValue;
+
+            // null zurückgeben
+            return null;
         }
 
         /// <summary>
