@@ -11,6 +11,14 @@ using System.Transactions;
 namespace Zyan.Communication
 {
     /// <summary>
+    /// Delegat für den Aufruf von InvokeRemoteMethod.
+    /// </summary>
+    /// <param name="methodCallMessage">Remoting-Nachricht</param>
+    /// <param name="allowCallInterception">Gibt an, ob das Abfangen von Aufrufen zugelassen wird, oder nicht</param>
+    /// <returns>Antwortnachricht</returns>
+    public delegate IMessage InvokeRemoteMethodDelegate(IMethodCallMessage methodCallMessage,bool allowCallInterception);
+
+    /// <summary>
     /// Stellvertreterobjekt für den Zugriff auf eine entfernte Komponente.
     /// </summary>
     public class ZyanProxy : RealProxy
@@ -186,7 +194,7 @@ namespace Zyan.Communication
                 _connection.PrepareCallContext(_implicitTransactionTransfer);
 
                 // Entfernten Methodenaufruf durchführen und jede Antwortnachricht sofort über einen Rückkanal empfangen
-                return InvokeRemoteMethod(methodCallMessage);
+                return InvokeRemoteMethod(methodCallMessage, true);
             }
         }
 
@@ -194,8 +202,9 @@ namespace Zyan.Communication
         /// Führt einen entfernten Methodenaufruf aus.
         /// </summary>
         /// <param name="methodCallMessage">Remoting-Nachricht mit Details für den entfernten Methodenaufruf</param>
+        /// <param name="allowCallInterception">Gibt an, ob das Abfangen von Aufrufen zugelassen wird, oder nicht</param>
         /// <returns>Remoting Antwortnachricht</returns>
-        private IMessage InvokeRemoteMethod(IMethodCallMessage methodCallMessage)
+        internal IMessage InvokeRemoteMethod(IMethodCallMessage methodCallMessage,bool allowCallInterception)
         {
             // Aufrufschlüssel vergeben
             Guid trackingID = Guid.NewGuid();
@@ -244,7 +253,7 @@ namespace Zyan.Communication
                 ParameterInfo[] paramDefs = methodCallMessage.MethodBase.GetParameters();
                                                     
                 // Abfragen, ob Abfangvorrichtungen verarbeitet werden sollen
-                bool callInterception = _connection.CallInterceptionEnabled;
+                bool callInterception = _connection.CallInterceptionEnabled && allowCallInterception;
 
                 // Wenn Aufrufabfangvorrichtungen verarbeitet werden sollen ...
                 if (callInterception)
@@ -256,7 +265,7 @@ namespace Zyan.Communication
                     if (interceptor != null)
                     { 
                         // Aufrufdaten zusammenstellen
-                        CallInterceptionData interceptionData = new CallInterceptionData(methodCallMessage.Args);
+                        CallInterceptionData interceptionData = new CallInterceptionData(methodCallMessage.Args,new InvokeRemoteMethodDelegate(this.InvokeRemoteMethod),methodCallMessage);
 
                         // Wenn ein Delegat für die Behandlung der Abfangaktion hinterlegt ist ...
                         if (interceptor.OnInterception != null)                             
