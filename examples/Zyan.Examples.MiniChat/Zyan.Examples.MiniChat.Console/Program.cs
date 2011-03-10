@@ -14,7 +14,7 @@ namespace Zyan.Examples.MiniChat.Console
 
         static void Main(string[] args)
         {
-            System.Console.Write("Nickname:");
+            System.Console.Write("Nickname: ");
             _nickName = System.Console.ReadLine();
 
             System.Console.WriteLine("-----------------------------------------------");
@@ -23,20 +23,17 @@ namespace Zyan.Examples.MiniChat.Console
             TcpCustomClientProtocolSetup protocol = new TcpCustomClientProtocolSetup(false);
             ZyanConnection connection = new ZyanConnection(Properties.Settings.Default.ServerUrl,protocol);
 
-            connection.CallInterceptors.Add(new CallInterceptor(typeof(IMiniChat),
-                                                                System.Reflection.MemberTypes.Method,
-                                                                "SendMessage",
-                                                                new Type[] { typeof(string), typeof(string) },
-                                                                data =>
-                                                                {
-                                                                    string text2 = (string)data.Parameters[1];
+            connection.CallInterceptors.For<IMiniChat>().Add(
+                (IMiniChat chat, string nickname, string message) => chat.SendMessage(nickname, message),
+                (data, nickname, message) =>
+                {
+                    if (message.Contains("fuck") || message.Contains("sex"))
+                    {
+                        System.Console.WriteLine("TEXT CONTAINS FORBIDDEN WORDS!");
+                        data.Intercepted = true;
+                    }
+                });
 
-                                                                    if (text2.Contains("fuck") || text2.Contains("sex"))
-                                                                    {
-                                                                        System.Console.WriteLine("TEXT CONTAINS FORBIDDEN WORDS!");
-                                                                        data.Intercepted = true;
-                                                                    }
-                                                                }));
             connection.CallInterceptionEnabled = true;
             
             IMiniChat chatProxy = connection.CreateProxy<IMiniChat>();
