@@ -91,5 +91,13 @@ namespace Zyan.Communication
                           string.Join("|", (from paramType in interceptor.ParameterTypes select paramType.FullName).ToArray()) == string.Join("|", (from paramType2 in remotingMessage.MethodBase.GetParameters() select paramType2.ParameterType.FullName).ToArray())
                     select interceptor).FirstOrDefault();
         }
+
+        /// <summary>
+        /// Creates call interceptor helper for the given interface
+        /// </summary>
+        public CallInterceptorHelper<T> For<T>()
+        {
+            return new CallInterceptorHelper<T>(this);
+        }
     }
 }

@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CallInterceptorCollection.cs" />
+    <Compile Include="CallInterceptorHelper.cs" />
     <Compile Include="ComponentCatalog.cs" />
     <Compile Include="ComponentInfo.cs" />
     <Compile Include="DelegateCorrelationInfo.cs" />

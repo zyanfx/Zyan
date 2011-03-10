@@ -18,6 +18,7 @@ namespace Zyan.Examples.MiniChat.Server
             using (ZyanComponentHost host = new ZyanComponentHost("MiniChat",protocol))
             {
                 host.RegisterComponent<IMiniChat, MiniChat>(ActivationType.Singleton);
+                Console.WriteLine("Chat server started. Press Enter to exit.");
                 Console.ReadLine();
             }
         }
