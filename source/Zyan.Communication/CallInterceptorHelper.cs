@@ -10,7 +10,7 @@ namespace Zyan.Communication
 	/// <summary>
 	/// Allows building call interceptors with strong-typed fluent interface
 	/// </summary>
-	public class CallInterceptorHelper<T>
+	public class CallInterceptorHelper<T> : IEnumerable<CallInterceptor>
 	{
 		CallInterceptorCollection Interceptors { get; set; }
 
@@ -264,20 +264,20 @@ namespace Zyan.Communication
 			return lambda.Body as MemberExpression;
 		}
 
-		// <summary>
-		// Returns call interceptors for the given interface
-		// </summary>
-		//public IEnumerator<CallInterceptor> GetEnumerator()
-		//{
-		//	return Interceptors.Where(c => c.InterfaceType == typeof(T)).GetEnumerator();
-		//}
+		/// <summary>
+		/// Returns call interceptors for the given interface
+		/// </summary>
+		public IEnumerator<CallInterceptor> GetEnumerator()
+		{
+			return Interceptors.Where(c => c.InterfaceType == typeof(T)).GetEnumerator();
+		}
 
-		// <summary>
-		// Returns call interceptors for the given interface
-		// </summary>
-		//IEnumerator IEnumerable.GetEnumerator()
-		//{
-		//	return Interceptors.Where(c => c.InterfaceType == typeof(T)).GetEnumerator();
-		//}
+		/// <summary>
+		/// Returns call interceptors for the given interface
+		/// </summary>
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		{
+			return Interceptors.Where(c => c.InterfaceType == typeof(T)).GetEnumerator();
+		}
 	}
 }
