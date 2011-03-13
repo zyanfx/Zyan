@@ -34,10 +34,12 @@ namespace Zyan.Communication
         private Hashtable _autoLoginCredentials = null;
         private ZyanConnection _connection = null;
         private ActivationType _activationType = ActivationType.SingleCall;
+        private string _uniqueName = string.Empty;
 
         /// <summary>
         /// Konstruktor.
         /// </summary>
+        /// <param name="uniqueName">Eindeutiger Komponentenname</param>
         /// <param name="type">Schnittstelle der entfernten Komponente</param>
         /// <param name="connection">Verbindungsobjekt</param>
         /// <param name="implicitTransactionTransfer">Implizite Transaktionsübertragung</param>
@@ -46,7 +48,7 @@ namespace Zyan.Communication
         /// <param name="autoLoginOnExpiredSession">Gibt an, ob sich der Proxy automatisch neu anmelden soll, wenn die Sitzung abgelaufen ist</param>
         /// <param name="autoLogoninCredentials">Optional! Anmeldeinformationen, die nur benötigt werden, wenn autoLoginOnExpiredSession auf Wahr eingestellt ist</param>              
         /// <param name="activationType">Aktivierungsart</param>
-        public ZyanProxy(Type type, ZyanConnection connection, bool implicitTransactionTransfer, Guid sessionID, string componentHostName, bool autoLoginOnExpiredSession, Hashtable autoLogoninCredentials, ActivationType activationType)
+        public ZyanProxy(string uniqueName, Type type, ZyanConnection connection, bool implicitTransactionTransfer, Guid sessionID, string componentHostName, bool autoLoginOnExpiredSession, Hashtable autoLogoninCredentials, ActivationType activationType)
             : base(type)
         {
             // Wenn kein Typ angegeben wurde ...
@@ -59,6 +61,13 @@ namespace Zyan.Communication
                 // Ausnahme werfen
                 throw new ArgumentNullException("connection");
 
+            // Wenn kein eindeutiger Name angegeben wurde ...
+            if (string.IsNullOrEmpty(uniqueName))
+                // Name der Schnittstelle verwenden
+                _uniqueName = type.FullName;
+            else
+                _uniqueName = uniqueName;
+            
             // Sitzungsschlüssel übernehmen
             _sessionID = sessionID;
 
@@ -290,7 +299,7 @@ namespace Zyan.Communication
                         object[] checkedArgs = InterceptDelegateParameters(methodCallMessage);
 
                         // Entfernten Methodenaufruf durchführen
-                        returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, correlationSet, methodCallMessage.MethodName, paramDefs, checkedArgs);
+                        returnValue = _remoteInvoker.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, paramDefs, checkedArgs);
 
                         // Ereignisargumente für AfterInvoke erstellen
                         AfterInvokeEventArgs afterInvokeArgs = new AfterInvokeEventArgs()
@@ -314,7 +323,7 @@ namespace Zyan.Communication
                             _remoteInvoker.Logon(_sessionID, _autoLoginCredentials);
 
                             // Entfernten Methodenaufruf erneut versuchen                        
-                            returnValue = _remoteInvoker.Invoke(trackingID, _interfaceType.FullName, correlationSet, methodCallMessage.MethodName, paramDefs, methodCallMessage.Args);
+                            returnValue = _remoteInvoker.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, paramDefs, methodCallMessage.Args);
                         }                    
                     }                    
                 }                

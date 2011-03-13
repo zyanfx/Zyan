@@ -240,6 +240,16 @@ namespace Zyan.Communication
         }
 
         /// <summary>
+        /// Hebt die Registrierung einer bestimmten Komponente auf.
+        /// </summary>
+        /// <param name="uniqueName">Eindeutiger Name</param>
+        public void UnregisterComponent(string uniqueName)
+        {
+            // Aufruf an Komponentenkatalog weiterleiten
+            _catalog.UnregisterComponent(uniqueName);
+        }
+
+        /// <summary>
         /// Registriert eine bestimmte Komponente.
         /// </summary>        
         /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
@@ -302,11 +312,11 @@ namespace Zyan.Communication
         /// </summary>        
         /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
         /// <typeparam name="T">Implementierungstyp der Komponente</typeparam>
-        /// <param name="moduleName">Modulname</param>
-        public void RegisterComponent<I, T>(string moduleName)
+        /// <param name="uniqueName">Eindeutiger Name</param>
+        public void RegisterComponent<I, T>(string uniqueName)
         {
             // Aufruf an Komponentenkatalog weiterleiten
-            _catalog.RegisterComponent<I, T>(moduleName);            
+            _catalog.RegisterComponent<I, T>(uniqueName);            
         }
 
         /// <summary>
@@ -314,37 +324,37 @@ namespace Zyan.Communication
         /// </summary>        
         /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
         /// <typeparam name="T">Implementierungstyp der Komponente</typeparam>
-        /// <param name="moduleName">Modulname</param>
+        /// <param name="uniqueName">Eindeutiger Name</param>
         /// <param name="activationType">Aktivierungstyp</param>
-        public void RegisterComponent<I, T>(string moduleName,ActivationType activationType)
+        public void RegisterComponent<I, T>(string uniqueName, ActivationType activationType)
         {
             // Aufruf an Komponentenkatalog weiterleiten
-            _catalog.RegisterComponent<I, T>(moduleName,activationType);
+            _catalog.RegisterComponent<I, T>(uniqueName, activationType);
         }
 
         /// <summary>
         /// Registriert eine bestimmte Komponente.
         /// </summary>
         /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
-        /// <param name="moduleName">Modulname</param>
+        /// <param name="uniqueName">Eindeutiger Name</param>
         /// <param name="factoryMethod">Delegat auf Fabrikmethode, die sich um die Erzeugung und Inizialisierung der Komponente kümmert</param>
-        public void RegisterComponent<I>(string moduleName, Func<object> factoryMethod)
+        public void RegisterComponent<I>(string uniqueName, Func<object> factoryMethod)
         {
             // Aufruf an Komponentenkatalog weiterleiten
-            _catalog.RegisterComponent<I>(moduleName, factoryMethod);            
+            _catalog.RegisterComponent<I>(uniqueName, factoryMethod);            
         }
 
         /// <summary>
         /// Registriert eine bestimmte Komponente.
         /// </summary>
         /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
-        /// <param name="moduleName">Modulname</param>
+        /// <param name="uniqueName">Eindeutiger Name</param>
         /// <param name="factoryMethod">Delegat auf Fabrikmethode, die sich um die Erzeugung und Inizialisierung der Komponente kümmert</param>
         /// <param name="activationType">Aktivierungstyp</param>
-        public void RegisterComponent<I>(string moduleName, Func<object> factoryMethod, ActivationType activationType)
+        public void RegisterComponent<I>(string uniqueName, Func<object> factoryMethod, ActivationType activationType)
         {
             // Aufruf an Komponentenkatalog weiterleiten
-            _catalog.RegisterComponent<I>(moduleName, factoryMethod, activationType);
+            _catalog.RegisterComponent<I>(uniqueName, factoryMethod, activationType);
         }
 
         /// <summary>
@@ -352,12 +362,12 @@ namespace Zyan.Communication
         /// </summary>
         /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
         /// <typeparam name="T">Implementierungstyp der Komponente</typeparam>
-        /// <param name="moduleName">Modulname</param>
+        /// <param name="uniqueName">Eindeutiger Name</param>
         /// <param name="instance">Instanz</param>        
-        public void RegisterComponent<I, T>(string moduleName, T instance)
+        public void RegisterComponent<I, T>(string uniqueName, T instance)
         {
             // Aufruf an Komponentenkatalog weiterleiten
-            _catalog.RegisterComponent<I, T>(moduleName,instance);            
+            _catalog.RegisterComponent<I, T>(uniqueName, instance);            
         }
 
         /// <summary>

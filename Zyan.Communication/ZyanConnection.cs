@@ -302,7 +302,19 @@ namespace Zyan.Communication
         public T CreateProxy<T>()
         {
             // Andere Überladung aufrufen
-            return CreateProxy<T>(false);
+            return CreateProxy<T>(string.Empty, false);
+        }
+
+        /// <summary>
+        /// Erzeugt im Server-Prozess eine neue Instanz einer bestimmten Komponente und gibt einen Proxy dafür zurück.
+        /// </summary>
+        /// <typeparam name="T">Typ der öffentlichen Schnittstelle der zu konsumierenden Komponente</typeparam>        
+        /// <param name="uniqueName">Eindeutiger Name der Komponente</param>
+        /// <returns>Proxy</returns>
+        public T CreateProxy<T>(string uniqueName)
+        {
+            // Andere Überladung aufrufen
+            return CreateProxy<T>(uniqueName, false);
         }
 
         /// <summary>
@@ -313,29 +325,43 @@ namespace Zyan.Communication
         /// <returns>Proxy</returns>
         public T CreateProxy<T>(bool implicitTransactionTransfer)
         {
+            return CreateProxy<T>(string.Empty, implicitTransactionTransfer);
+        }
+
+        /// <summary>
+        /// Erzeugt im Server-Prozess eine neue Instanz einer bestimmten Komponente und gibt einen Proxy dafür zurück.
+        /// </summary>
+        /// <typeparam name="T">Typ der öffentlichen Schnittstelle der zu konsumierenden Komponente</typeparam>
+        /// <param name="uniqueName">Eindeutiger Name der Komponente</param>
+        /// <param name="implicitTransactionTransfer">Implizite Transaktionsübertragung</param>
+        /// <returns>Proxy</returns>
+        public T CreateProxy<T>(string uniqueName, bool implicitTransactionTransfer)
+        {
             // Typeninformationen lesen
             Type interfaceType = typeof(T);
 
-            // Schnittstellenname lesen
-            string interfaceName = interfaceType.FullName;
+            // Wenn kein eindeutiger Name angegeben ist ...
+            if (string.IsNullOrEmpty(uniqueName))
+                // Name der Schnittstelle verwenden
+                uniqueName = interfaceType.FullName;
 
             // Wenn keine Schnittstelle angegeben wurde ...
             if (!interfaceType.IsInterface)
                 // Ausnahme werfen
-                throw new ApplicationException(string.Format("Der angegebene Typ '{0}' ist keine Schnittstelle! Für die Erzeugung einer entfernten Komponenteninstanz, wird deren öffentliche Schnittstelle benötigt!", interfaceName));
+                throw new ApplicationException(string.Format("Der angegebene Typ '{0}' ist keine Schnittstelle! Für die Erzeugung einer entfernten Komponenteninstanz, wird deren öffentliche Schnittstelle benötigt!", interfaceType.FullName));
             
             // Komponenteninformation abrufen
             ComponentInfo info = (from entry in _registeredComponents
-                                  where entry.InterfaceName.Equals(interfaceName)
+                                  where entry.UniqueName.Equals(uniqueName)
                                   select entry).FirstOrDefault();
 
             // Wenn für die Schnittstelle auf dem verbundenen Server keine Komponente registriert ist ...
             if (info==null)
                 // Ausnahme werfne
-                throw new ApplicationException(string.Format("Für Schnittstelle '{0}' ist auf dem Server '{1}' keine Komponente registriert.", interfaceName, _serverUrl));
+                throw new ApplicationException(string.Format("Für Schnittstelle '{0}' ist auf dem Server '{1}' keine Komponente registriert.", interfaceType.FullName, _serverUrl));
 
             // Proxy erzeugen
-            ZyanProxy proxy = new ZyanProxy(typeof(T), this, implicitTransactionTransfer, _sessionID, _componentHostName, _autoLoginOnExpiredSession, _autoLoginCredentials, info.ActivationType);
+            ZyanProxy proxy = new ZyanProxy(info.UniqueName, typeof(T), this, implicitTransactionTransfer, _sessionID, _componentHostName, _autoLoginOnExpiredSession, _autoLoginCredentials, info.ActivationType);
 
             // Proxy transparent machen und zurückgeben
             return (T)proxy.GetTransparentProxy();
