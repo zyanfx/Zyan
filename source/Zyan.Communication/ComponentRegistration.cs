@@ -68,6 +68,7 @@ namespace Zyan.Communication
             this.InterfaceType = interfaceType;
             this.ImplementationType = implementationType;
             this.ActivationType = ActivationType.SingleCall;
+            this.UniqueName = interfaceType.FullName;
         }
 
         /// <summary>
@@ -83,6 +84,7 @@ namespace Zyan.Communication
             this.InterfaceType = interfaceType;
             this.ImplementationType = implementationType;
             this.ActivationType = activationType;
+            this.UniqueName = interfaceType.FullName;
         }
 
         /// <summary>
@@ -97,6 +99,7 @@ namespace Zyan.Communication
             this.InterfaceType = interfaceType;            
             this.InitializationHandler = intializationHandler;
             this.ActivationType = ActivationType.SingleCall;
+            this.UniqueName = interfaceType.FullName;
         }
 
         /// <summary>
@@ -112,6 +115,7 @@ namespace Zyan.Communication
             this.InterfaceType = interfaceType;
             this.InitializationHandler = intializationHandler;
             this.ActivationType = activationType;
+            this.UniqueName = interfaceType.FullName;
         }
 
         /// <summary>
@@ -127,6 +131,7 @@ namespace Zyan.Communication
             this.ImplementationType = singletonInstance.GetType();
             this.SingletonInstance = singletonInstance;
             this.ActivationType = ActivationType.Singleton;
+            this.UniqueName = interfaceType.FullName;
         }
                 
         /// <summary>
@@ -134,14 +139,14 @@ namespace Zyan.Communication
         /// </summary>
         /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
         /// <param name="implementationType">Implementierungstyp der Komponente</param>        
-        /// <param name="moduleName">Modulname</param>
-        public ComponentRegistration(Type interfaceType, Type implementationType, string moduleName)
+        /// <param name="uniqueName">Eindeutiger Name</param>
+        public ComponentRegistration(Type interfaceType, Type implementationType, string uniqueName)
             : this()
         {
             // Werte übernehmen
             this.InterfaceType = interfaceType;
             this.ImplementationType = implementationType;
-            this.ModuleName = moduleName;
+            this.UniqueName = uniqueName;
             this.ActivationType = ActivationType.SingleCall;
         }
 
@@ -150,15 +155,15 @@ namespace Zyan.Communication
         /// </summary>
         /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
         /// <param name="implementationType">Implementierungstyp der Komponente</param>        
-        /// <param name="moduleName">Modulname</param>
+        /// <param name="uniqueName">Eindeutiger Name</param>
         /// <param name="activationType">Aktivierungsart</param>
-        public ComponentRegistration(Type interfaceType, Type implementationType, string moduleName, ActivationType activationType)
+        public ComponentRegistration(Type interfaceType, Type implementationType, string uniqueName, ActivationType activationType)
             : this()
         {
             // Werte übernehmen
             this.InterfaceType = interfaceType;
             this.ImplementationType = implementationType;
-            this.ModuleName = moduleName;
+            this.UniqueName = uniqueName;
             this.ActivationType = activationType;
         }
 
@@ -167,14 +172,14 @@ namespace Zyan.Communication
         /// </summary>
         /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
         /// <param name="intializationHandler">Delegat auf Inizialisierungsfunktion</param>        
-        /// <param name="moduleName">Modulname</param>
-        public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, string moduleName)
+        /// <param name="uniqueName">Eindeutiger Name</param>
+        public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, string uniqueName)
             : this()
         {
             // Werte übernehmen
             this.InterfaceType = interfaceType;
             this.InitializationHandler = intializationHandler;
-            this.ModuleName = moduleName;
+            this.UniqueName = uniqueName;
             this.ActivationType = ActivationType.SingleCall;
         }
 
@@ -183,15 +188,15 @@ namespace Zyan.Communication
         /// </summary>
         /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
         /// <param name="intializationHandler">Delegat auf Inizialisierungsfunktion</param>        
-        /// <param name="moduleName">Modulname</param>
+        /// <param name="uniqueName">Eindeutiger Name</param>
         /// <param name="activationType">Aktivierungsart</param>
-        public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, string moduleName, ActivationType activationType)
+        public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, string uniqueName, ActivationType activationType)
             : this()
         {
             // Werte übernehmen
             this.InterfaceType = interfaceType;
             this.InitializationHandler = intializationHandler;
-            this.ModuleName = moduleName;
+            this.UniqueName = uniqueName;
             this.ActivationType = activationType;
         }
 
@@ -200,22 +205,22 @@ namespace Zyan.Communication
         /// </summary>
         /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
         /// <param name="singletonInstance">Singleton-Instanz der Komponente</param>
-        /// <param name="moduleName">Modulname</param>
-        public ComponentRegistration(Type interfaceType, object singletonInstance, string moduleName)
+        /// <param name="uniqueName">Eindeutiger Name</param>
+        public ComponentRegistration(Type interfaceType, object singletonInstance, string uniqueName)
             : this()
         {
             // Werte übernehmen
             this.InterfaceType = interfaceType;
             this.ImplementationType = singletonInstance.GetType();
             this.SingletonInstance = singletonInstance;
-            this.ModuleName = moduleName;
+            this.UniqueName = uniqueName;
             this.ActivationType = ActivationType.Singleton;
         }
 
         /// <summary>
-        /// Gibt den Modulnamen zurück, oder legt ihn fest.        
+        /// Gibt den eindeutigen Namen zurück, oder legt ihn fest.        
         /// </summary>
-        public string ModuleName
+        public string UniqueName
         {
             get;
             set;
@@ -276,8 +281,8 @@ namespace Zyan.Communication
         /// <returns>Als Zeichenkette ausgedrückte Objektdaten</returns>
         public override string ToString()
         {
-            // Vollständiger Name der Schnittstelle zurückgeben
-            return this.InterfaceType.FullName;
+            // Eindeutigen Namen zurückgeben
+            return this.UniqueName;
         }
     }
 }

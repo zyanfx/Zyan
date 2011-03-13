@@ -83,6 +83,20 @@ namespace Zyan.Communication
         }
 
         /// <summary>
+        /// Hebt die Registrierung einer bestimmten Komponente auf.
+        /// </summary>
+        /// <param name="uniqueName">Eindeutiger Name</param>
+        public void UnregisterComponent(string uniqueName)
+        {
+            // Wenn eine Komponente mit der angegebenen Schnittstelle registriert ist ...
+            if (ComponentRegistry.ContainsKey(uniqueName))
+            {
+                // Registrierung aufheben
+                ComponentRegistry.Remove(uniqueName);
+            }
+        }
+
+        /// <summary>
         /// Registriert eine bestimmte Komponente.
         /// </summary>        
         /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
@@ -98,8 +112,32 @@ namespace Zyan.Communication
         /// </summary>        
         /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
         /// <typeparam name="T">Implementierungstyp der Komponente</typeparam>
+        /// <param name="uniqueName">Eindeutiger Name der Komponente</param>
+        public void RegisterComponent<I, T>(string uniqueName)
+        {
+            // Andere Überladung aufrufen
+            RegisterComponent<I, T>(uniqueName, ActivationType.SingleCall);
+        }
+
+        /// <summary>
+        /// Registriert eine bestimmte Komponente.
+        /// </summary>        
+        /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
+        /// <typeparam name="T">Implementierungstyp der Komponente</typeparam>
         /// <param name="activationType">Aktivierungsart</param>
         public void RegisterComponent<I, T>(ActivationType activationType)
+        {
+            RegisterComponent<I, T>(string.Empty, activationType);
+        }
+
+        /// <summary>
+        /// Registriert eine bestimmte Komponente.
+        /// </summary>        
+        /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
+        /// <typeparam name="T">Implementierungstyp der Komponente</typeparam>
+        /// <param name="uniqueName">Eindeutiger Name der Komponente</param>
+        /// <param name="activationType">Aktivierungsart</param>
+        public void RegisterComponent<I, T>(string uniqueName, ActivationType activationType)
         {
             // Typinformationen abrufen
             Type interfaceType = typeof(I);
@@ -115,17 +153,19 @@ namespace Zyan.Communication
                 // Ausnahme werfen
                 throw new ArgumentException(LanguageResource.ArgumentException_TypeIsNotAClass, "interfaceType");
 
-            // Name der Schnittstelle abfragen
-            string interfaceName = interfaceType.FullName;
+            // Wenn kein eindeutiger Name angegeben ist ...
+            if (string.IsNullOrEmpty(uniqueName))
+                // Name der Schnittstelle verwenden
+                uniqueName = interfaceType.FullName;
 
             // Wenn für die angegebene Schnittstelle noch keine Komponente registriert wurde ...
-            if (!ComponentRegistry.ContainsKey(interfaceName))
+            if (!ComponentRegistry.ContainsKey(uniqueName))
             {
                 // Registrierungseintrag erstellen
-                ComponentRegistration registration = new ComponentRegistration(interfaceType, implementationType, activationType);
+                ComponentRegistration registration = new ComponentRegistration(interfaceType, implementationType, uniqueName, activationType);
 
                 // Registrierungseintrag der Liste zufügen
-                ComponentRegistry.Add(interfaceName, registration);
+                ComponentRegistry.Add(uniqueName, registration);
             }
         }
 
@@ -144,9 +184,33 @@ namespace Zyan.Communication
         /// Registriert eine bestimmte Komponente.
         /// </summary>
         /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
+        /// <param name="uniqueName">Eindeutiger Name der Komponente</param>
+        /// <param name="factoryMethod">Delegat auf Fabrikmethode, die sich um die Erzeugung und Inizialisierung der Komponente kümmert</param>
+        public void RegisterComponent<I>(string uniqueName, Func<object> factoryMethod)
+        {
+            // Andere Überladung aufrufen
+            RegisterComponent<I>(uniqueName, factoryMethod, ActivationType.SingleCall);
+        }
+
+        /// <summary>
+        /// Registriert eine bestimmte Komponente.
+        /// </summary>
+        /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
         /// <param name="factoryMethod">Delegat auf Fabrikmethode, die sich um die Erzeugung und Inizialisierung der Komponente kümmert</param>
         /// <param name="activationType">Aktivierungsart</param>
         public void RegisterComponent<I>(Func<object> factoryMethod, ActivationType activationType)
+        {
+            RegisterComponent<I>(string.Empty, factoryMethod, activationType);
+        }
+
+        /// <summary>
+        /// Registriert eine bestimmte Komponente.
+        /// </summary>
+        /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
+        /// <param name="uniqueName">Eindeutiger Name, über den die Komponente gefunden werden kann</param>
+        /// <param name="factoryMethod">Delegat auf Fabrikmethode, die sich um die Erzeugung und Inizialisierung der Komponente kümmert</param>
+        /// <param name="activationType">Aktivierungsart</param>
+        public void RegisterComponent<I>(string uniqueName, Func<object> factoryMethod, ActivationType activationType)
         {
             // Typinformationen abrufen
             Type interfaceType = typeof(I);
@@ -161,17 +225,19 @@ namespace Zyan.Communication
                 // Ausnahme werfen
                 throw new ArgumentException(LanguageResource.ArgumentException_FactoryMethodDelegateMissing, "factoryMethod");
 
-            // Name der Schnittstelle abfragen
-            string interfaceName = interfaceType.FullName;
-
+            // Wenn kein eindeutiger Name angegeben ist ...
+            if (string.IsNullOrEmpty(uniqueName))
+                // Name der Schnittstelle verwenden
+                uniqueName = interfaceType.FullName;
+            
             // Wenn für die angegebene Schnittstelle noch keine Komponente registriert wurde ...
-            if (!ComponentRegistry.ContainsKey(interfaceName))
+            if (!ComponentRegistry.ContainsKey(uniqueName))
             {
                 // Registrierungseintrag erstellen
-                ComponentRegistration registration = new ComponentRegistration(interfaceType, factoryMethod, activationType);
+                ComponentRegistration registration = new ComponentRegistration(interfaceType, factoryMethod, uniqueName, activationType);
 
                 // Registrierungseintrag der Liste zufügen
-                ComponentRegistry.Add(interfaceName, registration);
+                ComponentRegistry.Add(uniqueName, registration);
             }
         }
 
@@ -183,139 +249,17 @@ namespace Zyan.Communication
         /// <param name="instance">Instanz</param>
         public void RegisterComponent<I, T>(T instance)
         {
-            // Typinformationen abrufen
-            Type interfaceType = typeof(I);
-            Type implementationType = typeof(T);
-
-            // Wenn der Schnittstellentyp keine Schnittstelle ist ...
-            if (!interfaceType.IsInterface)
-                // Ausnahme werfen
-                throw new ArgumentException(LanguageResource.ArgumentException_TypeIsNotAInterface, "interfaceType");
-
-            // Wenn der Implementierungstyp keine Klasse ist ...
-            if (!implementationType.IsClass)
-                // Ausnahme werfen
-                throw new ArgumentException(LanguageResource.ArgumentException_TypeIsNotAClass, "interfaceType");
-
-            // Name der Schnittstelle abfragen
-            string interfaceName = interfaceType.FullName;
-
-            // Wenn für die angegebene Schnittstelle noch keine Komponente registriert wurde ...
-            if (!ComponentRegistry.ContainsKey(interfaceName))
-            {
-                // Registrierungseintrag erstellen
-                ComponentRegistration registration = new ComponentRegistration(interfaceType, instance);
-
-                // Registrierungseintrag der Liste zufügen
-                ComponentRegistry.Add(interfaceName, registration);
-            }
-        }
-
-        /// <summary>
-        /// Registriert eine bestimmte Komponente.
-        /// </summary>        
-        /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
-        /// <typeparam name="T">Implementierungstyp der Komponente</typeparam>
-        /// <param name="moduleName">Modulname</param>
-        public void RegisterComponent<I, T>(string moduleName)
-        {
-            // Andere Überladung aufrufen
-            RegisterComponent<I, T>(moduleName, ActivationType.SingleCall);
-        }
-
-        /// <summary>
-        /// Registriert eine bestimmte Komponente.
-        /// </summary>        
-        /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
-        /// <typeparam name="T">Implementierungstyp der Komponente</typeparam>
-        /// <param name="moduleName">Modulname</param>
-        /// <param name="activationType">Aktivierungsart</param>
-        public void RegisterComponent<I, T>(string moduleName, ActivationType activationType)
-        {
-            // Typinformationen abrufen
-            Type interfaceType = typeof(I);
-            Type implementationType = typeof(T);
-
-            // Wenn der Schnittstellentyp keine Schnittstelle ist ...
-            if (!interfaceType.IsInterface)
-                // Ausnahme werfen
-                throw new ArgumentException(LanguageResource.ArgumentException_TypeIsNotAInterface, "interfaceType");
-
-            // Wenn der Implementierungstyp keine Klasse ist ...
-            if (!implementationType.IsClass)
-                // Ausnahme werfen
-                throw new ArgumentException(LanguageResource.ArgumentException_TypeIsNotAClass, "interfaceType");
-
-            // Name der Schnittstelle abfragen
-            string interfaceName = interfaceType.FullName;
-
-            // Wenn für die angegebene Schnittstelle noch keine Komponente registriert wurde ...
-            if (!ComponentRegistry.ContainsKey(interfaceName))
-            {
-                // Registrierungseintrag erstellen
-                ComponentRegistration registration = new ComponentRegistration(interfaceType, implementationType, moduleName, activationType);
-
-                // Registrierungseintrag der Liste zufügen
-                ComponentRegistry.Add(interfaceName, registration);
-            }
-        }
-
-        /// <summary>
-        /// Registriert eine bestimmte Komponente.
-        /// </summary>
-        /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
-        /// <param name="moduleName">Modulname</param>
-        /// <param name="factoryMethod">Delegat auf Fabrikmethode, die sich um die Erzeugung und Inizialisierung der Komponente kümmert</param>
-        public void RegisterComponent<I>(string moduleName, Func<object> factoryMethod)
-        {
-            // Andere Überladung aufrufen
-            RegisterComponent<I>(moduleName, factoryMethod, ActivationType.SingleCall);
-        }
-
-        /// <summary>
-        /// Registriert eine bestimmte Komponente.
-        /// </summary>
-        /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
-        /// <param name="moduleName">Modulname</param>
-        /// <param name="factoryMethod">Delegat auf Fabrikmethode, die sich um die Erzeugung und Inizialisierung der Komponente kümmert</param>
-        /// <param name="activationType">Aktivierungsart</param>
-        public void RegisterComponent<I>(string moduleName, Func<object> factoryMethod, ActivationType activationType)
-        {
-            // Typinformationen abrufen
-            Type interfaceType = typeof(I);
-
-            // Wenn der Schnittstellentyp keine Schnittstelle ist ...
-            if (!interfaceType.IsInterface)
-                // Ausnahme werfen
-                throw new ApplicationException(LanguageResource.ArgumentException_TypeIsNotAInterface);
-
-            // Wenn kein Delegat auf eine Fabrikmethode angegeben wurde ...
-            if (factoryMethod == null)
-                // Ausnahme werfen
-                throw new ArgumentException(LanguageResource.ArgumentException_FactoryMethodDelegateMissing, "factoryMethod");
-
-            // Name der Schnittstelle abfragen
-            string interfaceName = interfaceType.FullName;
-
-            // Wenn für die angegebene Schnittstelle noch keine Komponente registriert wurde ...
-            if (!ComponentRegistry.ContainsKey(interfaceName))
-            {
-                // Registrierungseintrag erstellen
-                ComponentRegistration registration = new ComponentRegistration(interfaceType, factoryMethod, moduleName, activationType);
-
-                // Registrierungseintrag der Liste zufügen
-                ComponentRegistry.Add(interfaceName, registration);
-            }
+            RegisterComponent<I, T>(string.Empty, instance);
         }
 
         /// <summary>
         /// Registriert eine bestimmte Komponenteninstanz.
         /// </summary>
         /// <typeparam name="I">Schnittstellentyp der Komponente</typeparam>
-        /// <typeparam name="T">Implementierungstyp der Komponente</typeparam>
-        /// <param name="moduleName">Modulname</param>
+        /// <typeparam name="T">Implementierungstyp der Komponente</typeparam>        
+        /// <param name="uniqueName">Eindeutiger Name der Komponente</param>
         /// <param name="instance">Instanz</param>
-        public void RegisterComponent<I, T>(string moduleName, T instance)
+        public void RegisterComponent<I, T>(string uniqueName,T instance)
         {
             // Typinformationen abrufen
             Type interfaceType = typeof(I);
@@ -331,19 +275,22 @@ namespace Zyan.Communication
                 // Ausnahme werfen
                 throw new ArgumentException(LanguageResource.ArgumentException_TypeIsNotAClass, "interfaceType");
 
-            // Name der Schnittstelle abfragen
-            string interfaceName = interfaceType.FullName;
+            // Wenn kein eindeutiger Name angegeben ist ...
+            if (string.IsNullOrEmpty(uniqueName))
+                // Name der Schnittstelle verwenden
+                uniqueName = interfaceType.FullName;
 
             // Wenn für die angegebene Schnittstelle noch keine Komponente registriert wurde ...
-            if (!ComponentRegistry.ContainsKey(interfaceName))
+            if (!ComponentRegistry.ContainsKey(uniqueName))
             {
                 // Registrierungseintrag erstellen
-                ComponentRegistration registration = new ComponentRegistration(interfaceType, instance, moduleName);
+                ComponentRegistration registration = new ComponentRegistration(interfaceType, instance, uniqueName);
 
                 // Registrierungseintrag der Liste zufügen
-                ComponentRegistry.Add(interfaceName, registration);
+                ComponentRegistry.Add(uniqueName, registration);
             }
         }
+        
                 
         /// <summary>
         /// Gibt eine Liste mit allen registrierten Komponenten zurück.
@@ -361,6 +308,7 @@ namespace Zyan.Communication
                 result.Add(new ComponentInfo()
                            {
                                InterfaceName = registration.InterfaceType.FullName,
+                               UniqueName = registration.UniqueName,
                                ActivationType = registration.ActivationType
                            });
             }
@@ -432,6 +380,17 @@ namespace Zyan.Communication
 
             // Komponenteninstanz erzeugen und zurückgeben
             return (I)GetComponentInstance(ComponentRegistry[interfaceName]);
+        }
+
+        /// <summary>
+        /// Gibt eine Instanz einer bestimmten Komponente zurück.
+        /// </summary>
+        /// <param name="uniqueName">Eindeutiger Name der Komponente</param>
+        /// <returns>Komponenteninstanz</returns>
+        public object GetComponent(string uniqueName)
+        {            
+            // Komponenteninstanz erzeugen und zurückgeben
+            return GetComponentInstance(ComponentRegistry[uniqueName]);
         }
         
         #endregion               
