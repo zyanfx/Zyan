@@ -166,16 +166,23 @@ namespace IntegrationTest_DistributedEvents
         }
 
         private ZyanComponentHost _host;
-
+        private ZyanComponentHost _duplexHost;
+        private ComponentCatalog _catalog;
+        
         private EventServer ()
 	    {
+            _catalog = new ComponentCatalog();
+            _catalog.RegisterComponent<IEventComponentSingleton, EventComponentSingleton>(ActivationType.Singleton);
+            _catalog.RegisterComponent<IEventComponentSingleCall, EventComponentSingleCall>(ActivationType.SingleCall);
+            _catalog.RegisterComponent<ICallbackComponentSingleton, CallbackComponentSingleton>(ActivationType.Singleton);
+            _catalog.RegisterComponent<ICallbackComponentSingleCall, CallbackComponentSingleCall>(ActivationType.SingleCall);
+            _catalog.RegisterComponent<IRequestResponseCallbackSingleCall, RequestResponseCallbackSingleCall>(ActivationType.SingleCall);
+            
             TcpCustomServerProtocolSetup protocol = new TcpCustomServerProtocolSetup(8083, new NullAuthenticationProvider(), true);
-            _host = new ZyanComponentHost("EventTest", protocol);
-            _host.RegisterComponent<IEventComponentSingleton, EventComponentSingleton>(ActivationType.Singleton);
-            _host.RegisterComponent<IEventComponentSingleCall, EventComponentSingleCall>(ActivationType.SingleCall);
-            _host.RegisterComponent<ICallbackComponentSingleton, CallbackComponentSingleton>(ActivationType.Singleton);
-            _host.RegisterComponent<ICallbackComponentSingleCall, CallbackComponentSingleCall>(ActivationType.SingleCall);
-            _host.RegisterComponent<IRequestResponseCallbackSingleCall, RequestResponseCallbackSingleCall>(ActivationType.SingleCall);
+            _host = new ZyanComponentHost("EventTest", protocol, _catalog);            
+
+            TcpDuplexServerProtocolSetup protocol2 = new TcpDuplexServerProtocolSetup(8084, new NullAuthenticationProvider(), false);
+            _duplexHost = new ZyanComponentHost("DuplexEventTest", protocol2, _catalog);            
 	    }
 
         public void Dispose()
@@ -184,6 +191,11 @@ namespace IntegrationTest_DistributedEvents
             {
                 _host.Dispose();
                 _host = null;
+            }
+            if (_duplexHost != null)
+            {
+                _duplexHost.Dispose();
+                _duplexHost = null;
             }
         }
     }
