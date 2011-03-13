@@ -21,6 +21,15 @@ namespace Zyan.Communication
         }
 
         /// <summary>
+        /// Gibt den eindeutigen Namen der Komponente zurück, oder legt ihn fest.
+        /// </summary>
+        public string UniqueName
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gibt den Aktivierungstyp zurück, oder legt ihn fest.
         /// </summary>
         public ActivationType ActivationType
