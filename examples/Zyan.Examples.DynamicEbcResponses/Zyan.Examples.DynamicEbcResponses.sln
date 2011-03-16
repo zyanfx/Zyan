@@ -1,0 +1,84 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Examples.DynamicEbcResponses.Shared", "Zyan.Examples.DynamicEbcResponses.Shared\Zyan.Examples.DynamicEbcResponses.Shared.csproj", "{0DF79C4C-D4A1-4586-9982-AD2CEE35A4EB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Examples.DynamicEbcResponses.Server", "Zyan.Examples.DynamicEbcResponses.Server\Zyan.Examples.DynamicEbcResponses.Server.csproj", "{DA0017E3-7BE7-4EFE-8DEC-005D8A5700FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Examples.DynamicEbcResponses.Client", "Zyan.Examples.DynamicEbcResponses.Client\Zyan.Examples.DynamicEbcResponses.Client.csproj", "{2966F843-01EC-4067-B455-7E8DE4A31410}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Communication", "..\..\source\Zyan.Communication\Zyan.Communication.csproj", "{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 5
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs15
+		SccProjectUniqueName0 = ..\\..\\source\\Zyan.Communication\\Zyan.Communication.csproj
+		SccProjectName0 = ../../source/Zyan.Communication
+		SccLocalPath0 = ..\\..\\source\\Zyan.Communication
+		SccLocalPath1 = .
+		SccProjectUniqueName2 = Zyan.Examples.DynamicEbcResponses.Client\\Zyan.Examples.DynamicEbcResponses.Client.csproj
+		SccProjectName2 = Zyan.Examples.DynamicEbcResponses.Client
+		SccLocalPath2 = Zyan.Examples.DynamicEbcResponses.Client
+		SccProjectUniqueName3 = Zyan.Examples.DynamicEbcResponses.Server\\Zyan.Examples.DynamicEbcResponses.Server.csproj
+		SccProjectName3 = Zyan.Examples.DynamicEbcResponses.Server
+		SccLocalPath3 = Zyan.Examples.DynamicEbcResponses.Server
+		SccProjectUniqueName4 = Zyan.Examples.DynamicEbcResponses.Shared\\Zyan.Examples.DynamicEbcResponses.Shared.csproj
+		SccProjectName4 = Zyan.Examples.DynamicEbcResponses.Shared
+		SccLocalPath4 = Zyan.Examples.DynamicEbcResponses.Shared
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0DF79C4C-D4A1-4586-9982-AD2CEE35A4EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DF79C4C-D4A1-4586-9982-AD2CEE35A4EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DF79C4C-D4A1-4586-9982-AD2CEE35A4EB}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{0DF79C4C-D4A1-4586-9982-AD2CEE35A4EB}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{0DF79C4C-D4A1-4586-9982-AD2CEE35A4EB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0DF79C4C-D4A1-4586-9982-AD2CEE35A4EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DF79C4C-D4A1-4586-9982-AD2CEE35A4EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DF79C4C-D4A1-4586-9982-AD2CEE35A4EB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{0DF79C4C-D4A1-4586-9982-AD2CEE35A4EB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{0DF79C4C-D4A1-4586-9982-AD2CEE35A4EB}.Release|x86.ActiveCfg = Release|Any CPU
+		{DA0017E3-7BE7-4EFE-8DEC-005D8A5700FB}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{DA0017E3-7BE7-4EFE-8DEC-005D8A5700FB}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{DA0017E3-7BE7-4EFE-8DEC-005D8A5700FB}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{DA0017E3-7BE7-4EFE-8DEC-005D8A5700FB}.Debug|x86.ActiveCfg = Debug|x86
+		{DA0017E3-7BE7-4EFE-8DEC-005D8A5700FB}.Debug|x86.Build.0 = Debug|x86
+		{DA0017E3-7BE7-4EFE-8DEC-005D8A5700FB}.Release|Any CPU.ActiveCfg = Release|x86
+		{DA0017E3-7BE7-4EFE-8DEC-005D8A5700FB}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{DA0017E3-7BE7-4EFE-8DEC-005D8A5700FB}.Release|Mixed Platforms.Build.0 = Release|x86
+		{DA0017E3-7BE7-4EFE-8DEC-005D8A5700FB}.Release|x86.ActiveCfg = Release|x86
+		{DA0017E3-7BE7-4EFE-8DEC-005D8A5700FB}.Release|x86.Build.0 = Release|x86
+		{2966F843-01EC-4067-B455-7E8DE4A31410}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{2966F843-01EC-4067-B455-7E8DE4A31410}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{2966F843-01EC-4067-B455-7E8DE4A31410}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{2966F843-01EC-4067-B455-7E8DE4A31410}.Debug|x86.ActiveCfg = Debug|x86
+		{2966F843-01EC-4067-B455-7E8DE4A31410}.Debug|x86.Build.0 = Debug|x86
+		{2966F843-01EC-4067-B455-7E8DE4A31410}.Release|Any CPU.ActiveCfg = Release|x86
+		{2966F843-01EC-4067-B455-7E8DE4A31410}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{2966F843-01EC-4067-B455-7E8DE4A31410}.Release|Mixed Platforms.Build.0 = Release|x86
+		{2966F843-01EC-4067-B455-7E8DE4A31410}.Release|x86.ActiveCfg = Release|x86
+		{2966F843-01EC-4067-B455-7E8DE4A31410}.Release|x86.Build.0 = Release|x86
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Release|x86.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
