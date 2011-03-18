@@ -20,37 +20,31 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
-	delegate void MessageHandler(Message m);
+	public delegate void MessageHandler(Message m);
 
-	#region MessageException : IOException
-	class MessageException : IOException
+	public class MessageException : IOException
 	{
-		Connection connection;
-
 		public MessageException(string msg, Exception innerException, Connection connection) : base(msg, innerException)
 		{
-			this.connection = connection;
+			Connection = connection;
 		}
 
-		public Connection Connection
-		{
-			get
-			{
-				return connection;
-			}
-		}
+        public Connection Connection
+        {
+            get;
+            private set;
+        }
 	}
-	#endregion
 
-	class Message
+	public class Message
 	{
-		static readonly BinaryFormatter formatter = new BinaryFormatter();
+		private static readonly BinaryFormatter formatter = new BinaryFormatter();
 		internal const int SizeOfGuid = 16;
 
 		public Guid Guid;
 		public ITransportHeaders Headers;
-		Stream messageBody;
-		byte[] messageBodyBytes;
+		private Stream messageBody;
+		private byte[] messageBodyBytes;
 
 		protected Message()
 		{
@@ -87,7 +81,8 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				
 				writer.Write((int)MessageBody.Length);
 				MemoryStream ms = MessageBody as MemoryStream;
-				if (ms == null)
+				
+                if (ms == null)
 				{
 					byte[] msgBuffer = new byte[MessageBody.Length];
 					MessageBody.Read(msgBuffer, 0, (int)MessageBody.Length);
@@ -95,7 +90,8 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				}
 				else
 					writer.Write(ms.GetBuffer(), 0, (int)MessageBody.Length);
-				writer.Flush();
+				
+                writer.Flush();
 			}
 			finally
 			{
@@ -163,12 +159,19 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 					retVal.Headers = (ITransportHeaders)formatter.Deserialize(headerStream);
 
 					int bodyLength = reader.ReadInt32();
-					retVal.messageBodyBytes = reader.ReadBytes(bodyLength);
-					if (retVal.messageBodyBytes.Length != bodyLength)
-						throw new Exception("Not enough body read...");
 
-					System.Diagnostics.Debug.Assert(retVal.MessageBody.CanRead);
-					Message.BeginReceive(connection, myAr.Callback, myAr.AsyncState);
+                    if (bodyLength > 0)
+                    {
+
+                        retVal.messageBodyBytes = reader.ReadBytes(bodyLength);
+                        if (retVal.messageBodyBytes.Length != bodyLength)
+                            throw new Exception("Not enough body read...");
+                        
+                        System.Diagnostics.Debug.Assert(retVal.MessageBody.CanRead);
+                    }
+                    
+                    Message.BeginReceive(connection, myAr.Callback, myAr.AsyncState);
+                    
 					return retVal;
 				}
 				else if (bytesRead == 0)
@@ -203,6 +206,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			AsyncCallback callback;
 			IAsyncResult internalAsyncResult;
 			System.Threading.ManualResetEvent waitHandle;
+            private object _lockObject = new object();
 
 			public AsyncResult(Connection connection, byte[] buffer, AsyncCallback callback, object asyncState)
 			{
@@ -214,7 +218,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 			public void Complete(IAsyncResult ar)
 			{
-				lock (this)
+                lock (_lockObject)
 				{
 					internalAsyncResult = ar;
 					isCompleted = true;

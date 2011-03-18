@@ -13,309 +13,414 @@
  --------------------------------------------------------------------------------------------------------------
 */
 using System;
+using System.Linq;
 using System.IO;
 using System.Net;
 using System.Threading;
 using System.Net.Sockets;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Runtime.Serialization.Formatters.Binary;
 using Zyan.Communication.Protocols.Tcp.DuplexChannel.Diagnostics;
 
+//TODO: Localize Exceptions.
+
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
+    /// <summary>
+    /// This exception should be thrown, when an attempt to create a duplicate connection is detected.
+    /// </summary>
 	internal class DuplicateConnectionException : Exception
 	{
-		Guid guid;
-
-		public DuplicateConnectionException(Guid guid)
+        /// <summary>
+        /// Creates a new instance of the DuplicateConnectionException class.
+        /// </summary>
+        /// <param name="channelID">Unique channel identifier</param>
+		public DuplicateConnectionException(Guid channelID)
 		{
-			this.guid = guid;
+            ChannelID = channelID;
 		}
 
-		public Guid Guid
-		{
-			get
-			{
-				return guid;
-			}
-		}
+        /// <summary>
+        /// Gets the unique channel identifier.
+        /// </summary>
+        public Guid ChannelID
+        {
+            get;
+            private set;
+        }
 	}
 
 	/// <summary>
 	/// Encapsulates a connection, providing read/write locking for synchronisation.  
 	/// Additionally, this should provide a useful position for adding reconnection abilities.
 	/// </summary>
-	class Connection
-	{
-		#region Statics
-		// Hashtable<string(address), Connection>
-		static readonly Hashtable connections = new Hashtable();
-		static readonly Regex regServerAddress = new Regex(@"^(?<address>[^:]+)(:(?<port>\d+))?$", RegexOptions.Compiled);
-
+	public class Connection
+    {
+        #region Connection management
+                
+        private static readonly Dictionary<string, Connection> _connections=new Dictionary<string, Connection>();
+        private static object _connectionsLockObject = new object();
+        
+        private static readonly Regex _addressRegEx=new Regex(@"^(?<address>[^:]+)(:(?<port>\d+))?$", RegexOptions.Compiled);
+                    
+        /// <summary>
+        /// Gets a specified connection.
+        /// </summary>
+        /// <param name="address">Address of the connection</param>
+        /// <param name="channel">Channel of the connection</param>
+        /// <returns>Connection</returns>
 		public static Connection GetConnection(string address, TcpExChannel channel)
 		{
-			if (address == null)
-				throw new ArgumentNullException("address");
+			if (string.IsNullOrEmpty(address))
+                throw new ArgumentException("Address must not be empty.", "address");
 
-			lock (connections)
+            if (channel == null)
+                throw new ArgumentNullException("channel");
+
+			lock (_connectionsLockObject)
 			{
-				Connection retVal = (Connection)connections[address];
-				if (retVal == null)
-				{
-					try
-					{
-						retVal = new Connection(address, channel);
-						if (!connections.Contains(address))
-							connections.Add(address, retVal); // This most often happens when using the loopback address
-						Manager.StartListening(retVal);
-					}
-					catch (DuplicateConnectionException ex)
-					{
-						Trace.WriteLine("Detected attempt to create new duplicate connection");
-						retVal = (Connection)connections[ex.Guid.ToString()];
-						connections.Add(address, retVal);
-					}
-				}
-				return retVal;
+                if (_connections.ContainsKey(address))
+                    return _connections[address];
+                
+                Connection connection=null;
+
+                try
+                {
+                    connection = new Connection(address, channel);
+                    if (!_connections.ContainsKey(address))
+                        _connections.Add(address, connection); // This most often happens when using the loopback address
+                    
+                    Manager.StartListening(connection);
+                }
+                catch (DuplicateConnectionException ex)
+                {                    
+                    connection = (Connection)_connections[ex.ChannelID.ToString()];
+                    _connections.Add(address, connection);
+                }                
+				return connection;
 			}
 		}
 
-		public static Connection RegisterConnection(Socket socket, TcpExChannel channel)
+        /// <summary>
+        /// Creates a connection object.
+        /// </summary>
+        /// <param name="socket">Connection socket</param>
+        /// <param name="channel">Connection channel</param>
+        /// <returns>Connection</returns>
+		public static Connection CreateConnection(Socket socket, TcpExChannel channel)
 		{
+            if (socket==null)
+                throw new ArgumentNullException("socket");
+
+            if (channel == null)
+                throw new ArgumentNullException("channel");
+
 			return new Connection(socket, channel);
-		}
+		}               
 
-		public static IList GetAddresses(Connection connection)
-		{
-			lock (connections)
-			{
-				ArrayList retVal = new ArrayList();
-				foreach (object key in connections.Keys)
-					if (connections[key] == connection)
-						retVal.Add(key);
-				return retVal;
-			}
-		}
-		#endregion
-
-		public static int BufferSize = 10 * (2 << 10); // 10K
-
-		protected Socket socket;
-		protected Stream stream;
-		protected BinaryReader reader;
-		protected BinaryWriter writer;
-		protected TcpExChannel channel;
-		protected TcpExChannelData remoteData;
-
-		object readLock = new object(), writeLock = new object();
+        #endregion
 
 		#region Constructors
-		protected Connection(string address, TcpExChannel channel)
+		
+        /// <summary>
+        /// Creates a new instance of the Connection class.
+        /// </summary>
+        /// <param name="address">Address (IP oder DNS based)</param>
+        /// <param name="channel">Remoting channel</param>
+        protected Connection(string address, TcpExChannel channel)
 		{
-			this.channel = channel;
+            if (string.IsNullOrEmpty(address))
+                throw new ArgumentException("Address must not be empty.", "address");
 
-			Match m = regServerAddress.Match(address);
-			if (!m.Success)
+            if (channel == null)
+                throw new ArgumentNullException("channel");
+
+			_channel = channel;
+
+			Match m = _addressRegEx.Match(address);
+			
+            if (!m.Success)
 				throw new FormatException(string.Format("Invalid format for 'address' parameter - {0}", address));
 
-			Trace.WriteLine("Creating connection - {0}", address);
-
-			socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-			socket.Connect(new IPEndPoint(Manager.GetHostByName(m.Groups["address"].Value), int.Parse(m.Groups["port"].Value)));
+			_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+			_socket.Connect(new IPEndPoint(Manager.GetHostByName(m.Groups["address"].Value), int.Parse(m.Groups["port"].Value)));
 
 			SendChannelInfo();
-			RecvChannelInfo();
+			ReceiveChannelInfo();
 
-			if (connections.Contains(remoteData.Guid.ToString()))
+			if (_connections.ContainsKey(_remoteChannelData.ChannelID.ToString()))
 			{
-				socket.Close();
-				throw new DuplicateConnectionException(remoteData.Guid);
+				_socket.Close();
+				throw new DuplicateConnectionException(_remoteChannelData.ChannelID);
 			}
-
 			AddToConnectionList();
 		}
 
+        /// <summary>
+        /// Creates a new instance of the Connection class.
+        /// </summary>
+        /// <param name="socket">Socket which sould be used</param>
+        /// <param name="channel">Remoting channel</param>
 		protected Connection(Socket socket, TcpExChannel channel)
 		{
-			this.channel = channel;
+            if (socket == null)
+                throw new ArgumentNullException("socket");
 
-			Trace.WriteLine("Linking connection - {0}", socket.RemoteEndPoint);
-			this.socket = socket;
+            if (channel == null)
+                throw new ArgumentNullException("channel");
 
-			RecvChannelInfo();
+			this._channel = channel;            		
+			this._socket = socket;
+
+			ReceiveChannelInfo();
 			SendChannelInfo();
 
-			if (connections.Contains(remoteData.Guid.ToString()))
+			if (_connections.ContainsKey(_remoteChannelData.ChannelID.ToString()))
 			{
 				socket.Close();
-				throw new DuplicateConnectionException(remoteData.Guid);
+				throw new DuplicateConnectionException(_remoteChannelData.ChannelID);
 			}
-
 			AddToConnectionList();
 		}
+
 		#endregion
 
-		void SendChannelInfo()
+        #region Connection logic
+
+        public static int BufferSize = 10 * (2 << 10); // 10K
+
+        protected Socket _socket;
+        protected Stream _stream;
+        protected BinaryReader _reader;
+        protected BinaryWriter _writer;
+        protected TcpExChannel _channel;
+        protected TcpExChannelData _remoteChannelData;
+
+        /// <summary>
+        /// Sends channel data.
+        /// </summary>
+		private void SendChannelInfo()
 		{
 			BinaryFormatter formatter = new BinaryFormatter();
-			formatter.Serialize(Stream, channel.ChannelData);
+			formatter.Serialize(Stream, _channel.ChannelData);
 		}
 
-		void RecvChannelInfo()
+        /// <summary>
+        /// Receives channel data.
+        /// </summary>
+		private void ReceiveChannelInfo()
 		{
 			BinaryFormatter formatter = new BinaryFormatter();
-			remoteData = (TcpExChannelData)formatter.Deserialize(Stream);
+			_remoteChannelData = (TcpExChannelData)formatter.Deserialize(Stream);
 		}
 
-		void AddToConnectionList()
+        /// <summary>
+        /// Adds the connection to the connection list.
+        /// </summary>
+		private void AddToConnectionList()
 		{
-			lock (connections)
-			{
-				Trace.WriteLine("Remote GUID: {0}", remoteData.Guid);
-				connections.Add(remoteData.Guid.ToString(), this);
-				if (remoteData.Addresses != null)
-					foreach (string address in remoteData.Addresses)
-					{
-						Trace.WriteLine("Remote Address: {0}", address);
-						connections.Add(address, this);
-					}
+			lock (_connectionsLockObject)
+			{				
+				_connections.Add(_remoteChannelData.ChannelID.ToString(), this);
+
+                if (_remoteChannelData.Addresses != null)
+                {
+                    foreach (string address in _remoteChannelData.Addresses)
+                    {                     
+                        _connections.Add(address, this);
+                    }
+                }
 			}
 		}
 
-		void AddLoopback()
+        /// <summary>
+        /// Add connections for loopback to the connection list.
+        /// </summary>
+		private void AddLoopbackConnections()
 		{
-			connections.Add("localhost", this);
-			connections.Add(IPAddress.Loopback.ToString(), this);
+            lock (_connectionsLockObject)
+            {
+                _connections.Add("localhost", this);
+                _connections.Add(IPAddress.Loopback.ToString(), this);
+            }
 		}
 
+        /// <summary>
+        /// Closes the connection.
+        /// </summary>
 		public void Close()
 		{
 			// TODO: Handling disconnections...
 			// Maybe leave this around then next time it's requested we can reconnect...
-			// But, if the other side reconnects we need to match them up in the RegisterConnection method.
-			lock (connections)
+			// But, if the other side reconnects we need to match them up in the CreateConnection method.
+			lock (_connectionsLockObject)
 			{
-				ArrayList toBeDeleted = new ArrayList();
-				foreach (object key in connections.Keys)
-					if (connections[key] == this)
-						toBeDeleted.Add(key);
+                List<string> toBeDeleted = (from pair in _connections
+                                            where pair.Value == this
+                                            select pair.Key).ToList();
 
-				foreach (object key in toBeDeleted)
-					connections.Remove(key);
+                foreach (string key in toBeDeleted)
+                {
+                    _connections.Remove(key);
+                }
 			}
-			socket.Close();
+			_socket.Close();
 		}
 
-		#region Properties
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Gets the underlying socket of the connection.
+        /// </summary>
 		public Socket Socket
 		{
-			get
-			{
-				return socket;
-			}
+			get { return _socket; }
 		}
 
+        /// <summary>
+        /// Gets the Network stream.
+        /// </summary>
 		public Stream Stream
 		{
 			get
 			{
-				if (stream == null)
-					stream = new NetworkStream(socket, FileAccess.ReadWrite, false);
-				return stream;
+                if (_stream == null)
+                    _stream = new NetworkStream(_socket, FileAccess.ReadWrite, false);
+                
+				return _stream;
 			}
 		}
 
+        /// <summary>
+        /// Gets a binary reader for reading raw data from the network stream.
+        /// </summary>
 		public BinaryReader Reader
 		{
 			get
 			{
-				if (reader == null)
-					reader = new BinaryReader(Stream);
-				return reader;
+				if (_reader == null)
+					_reader = new BinaryReader(Stream);
+				
+                return _reader;
 			}
 		}
 
+        /// <summary>
+        /// Gets a binary writer for writing raw data from the network stream.
+        /// </summary>
 		public BinaryWriter Writer
 		{
 			get
 			{
-				if (writer == null)
-					writer = new BinaryWriter(new BufferedStream(Stream, BufferSize));
-				return writer;
+				if (_writer == null)
+					_writer = new BinaryWriter(new BufferedStream(Stream, BufferSize));
+				
+                return _writer;
 			}
 		}
 
+        /// <summary>
+        /// Checks, if the connection is a local connection or not.
+        /// </summary>
 		public bool IsLocalHost
 		{
 			get
 			{
-				IPAddress address = ((IPEndPoint)socket.RemoteEndPoint).Address;
+				IPAddress address = ((IPEndPoint)_socket.RemoteEndPoint).Address;
 				return IPAddress.IsLoopback(address) || IsLocalIP(address);
 			}
 		}
 
-		bool IsLocalIP(IPAddress remoteAddress)
+        /// <summary>
+        /// Checks if a specified IP address is a local IP or not.
+        /// </summary>
+        /// <param name="remoteAddress">IP address to check</param>
+        /// <returns>true, if local, otherwise false</returns>
+		private bool IsLocalIP(IPAddress remoteAddress)
 		{
-			foreach (IPAddress address in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
-				if (address.Equals(remoteAddress))
-					return true;
+            foreach (IPAddress address in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
+            {
+                if (address.Equals(remoteAddress))
+                    return true;
+            }
 			return false;
 		}
 
-		public Guid RemoteGuid
+        /// <summary>
+        /// Gets the unique identifier of the remote channel.
+        /// </summary>
+		public Guid RemoteChannelID
 		{
-			get
-			{
-				return remoteData.Guid;
-			}
+			get { return _remoteChannelData.ChannelID; }
 		}
 
-		public IList RemoteAddresses // IList<string>
+        /// <summary>
+        /// Gets a list of all registered addresses of the remote channel.
+        /// </summary>
+		public List<string> RemoteAddresses
 		{
-			get
-			{
-				return remoteData.Addresses;
-			}
+            get { return _remoteChannelData.Addresses; }
 		}
 
-		public Guid LocalGuid
+        /// <summary>
+        /// Gets the unique identifier of the local channel.
+        /// </summary>
+		public Guid LocalChannelID
 		{
-			get
-			{
-				return channel.Guid;
-			}
+			get { return _channel.ChannelID; }
 		}
 
+        /// <summary>
+        /// Gets the address of the local channel.
+        /// </summary>
 		public string LocalAddress
 		{
-			get
-			{
-				return socket.LocalEndPoint.ToString();
-			}
+			get { return _socket.LocalEndPoint.ToString(); }
 		}
+
 		#endregion
 
 		#region Locking
+
+        private object _readLock = new object();
+        private object _writeLock = new object();
+
+        /// <summary>
+        /// Locks the connection for reading through other threads.
+        /// </summary>
 		public void LockRead()
 		{
-			Monitor.Enter(readLock);
+			Monitor.Enter(_readLock);
 		}
 
+        /// <summary>
+        /// Releases the read lock.
+        /// </summary>
 		public void ReleaseRead()
 		{
-			Monitor.Exit(readLock);
+			Monitor.Exit(_readLock);
 		}
 
+        /// <summary>
+        /// Locks the connection for writing through other threads.
+        /// </summary>
 		public void LockWrite()
 		{
-			Monitor.Enter(writeLock);
+			Monitor.Enter(_writeLock);
 		}
 
+        /// <summary>
+        /// Releases the write lock.
+        /// </summary>
 		public void ReleaseWrite()
 		{
-			Monitor.Exit(writeLock);
+			Monitor.Exit(_writeLock);
 		}
+
 		#endregion
 	}
 }
