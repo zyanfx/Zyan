@@ -52,7 +52,7 @@ namespace IntegrationTest_DistributedEvents
 
             // Test TCP Custom
             int tcpCustomTestResult = TcpCustomTest.RunTest();
-
+            
             // Test TCP Duplex
             int tcpDuplexTestResult = TcpDuplexTest.RunTest();
             

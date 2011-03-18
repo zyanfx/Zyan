@@ -20,6 +20,7 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Messaging;
 using System.Runtime.Serialization.Formatters.Binary;
 using Zyan.Communication.Protocols.Tcp.DuplexChannel.Diagnostics;
+using System.Threading;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
@@ -91,9 +92,9 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 			Guid msgGuid = Guid.NewGuid();
 			IAsyncResult ar = Manager.BeginReadMessage(msgGuid, connection, null, null);
-			Message.Send(connection, msgGuid, requestHeaders, requestStream);
+            Message.Send(connection, msgGuid, requestHeaders, requestStream); 
 
-			ar.AsyncWaitHandle.WaitOne();
+          	ar.AsyncWaitHandle.WaitOne();
 			Connection replyConnection;
 			Message reply = Manager.EndReadMessage(out replyConnection, ar);
 			Debug.Assert(connection == replyConnection);

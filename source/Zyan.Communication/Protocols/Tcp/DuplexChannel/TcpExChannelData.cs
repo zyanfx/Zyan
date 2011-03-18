@@ -17,91 +17,112 @@ using System.Net;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Runtime.Remoting.Channels;
+using System.Collections.Generic;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
+    /// <summary>
+    /// Describes configuration data of a TcpEx channel.
+    /// </summary>
 	[Serializable]
 	public class TcpExChannelData : IChannelDataStore
-	{
-		int port;
-		Guid guid;
-		ArrayList addresses; // ArrayList<string>
-		HybridDictionary properties;
-		[NonSerialized]
-		string[] channelUris;
+	{	
+		private HybridDictionary _properties;
+		
+        [NonSerialized]
+		private string[] _channelUris;
 
+        /// <summary>
+        /// Creates a new instance of the TcpExChannelData class.
+        /// </summary>
+        /// <param name="channel">Remoting channel</param>
 		public TcpExChannelData(TcpExChannel channel)
 		{
-			this.port = channel.Port;
-			this.guid = channel.Guid;
+			Port = channel.Port;
+			ChannelID = channel.ChannelID;
 
-			if (port != 0)
+			if (Port != 0)
 			{
-				addresses = new ArrayList();
+				Addresses = new List<string>();
 				IPHostEntry hostEntry = Dns.GetHostEntry(Dns.GetHostName());
-				foreach (IPAddress address in hostEntry.AddressList)
-					addresses.Add(string.Format("{0}:{1}", address, port));
+
+                foreach (IPAddress address in hostEntry.AddressList)
+                {
+                    Addresses.Add(string.Format("{0}:{1}", address, Port));
+                }
 			}
 		}
 		
 		#region Properties
-		public int Port
-		{
-			get
-			{
-				return port;
-			}
-		}
 
-		public Guid Guid
-		{
-			get
-			{
-				return guid;
-			}
+        /// <summary>
+        /// Gets the TCP port number of the channel.
+        /// </summary>
+        public int Port
+        {
+            get;
+            private set;
+        }
 
-			set
-			{
-				guid = value;
-			}
-		}
+        /// <summary>
+        /// Gets or sets the unique identifier of the channel.
+        /// </summary>
+        public Guid ChannelID
+        {
+            get;
+            set;
+        }
 
-		public IList Addresses // IList<string>
-		{
-			get
-			{
-				return addresses;
-			}
-		}
-		#endregion
+        /// <summary>
+        /// Gets the registered addresses of the channel.
+        /// </summary>
+        public List<string> Addresses
+        {
+            get;
+            private set;
+        }
+		
+        #endregion
 
 		#region IChannelDataStore Members
-		public object this[object key]
+		
+        /// <summary>
+        /// Gets the value of a channel property by its name.
+        /// </summary>
+        /// <param name="key">Property name</param>
+        /// <returns>Property value</returns>
+        public object this[object key]
 		{
 			get
 			{
-				if (properties == null)
+				if (_properties == null)
 					return null;
-				return properties[key];
+				
+                return _properties[key];
 			}
-
 			set
 			{
-				if (properties == null)
-					properties = new HybridDictionary();
-				properties[key] = value;
+				if (_properties == null)
+					_properties = new HybridDictionary();
+				
+                _properties[key] = value;
 			}
 		}
 
+        /// <summary>
+        /// Gets an array of all registered channel URIs.
+        /// </summary>
 		public string[] ChannelUris
 		{
 			get
 			{
-				if (channelUris == null)
-					channelUris = Manager.GetUrlsForUri(null, port, guid);
-				return channelUris;
+				if (_channelUris == null)
+					_channelUris = Manager.GetUrlsForUri(null, Port, ChannelID);
+				
+                return _channelUris;
 			}
 		}
+
 		#endregion
 	}
 }
