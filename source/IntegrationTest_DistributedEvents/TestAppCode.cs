@@ -181,7 +181,7 @@ namespace IntegrationTest_DistributedEvents
             TcpCustomServerProtocolSetup protocol = new TcpCustomServerProtocolSetup(8083, new NullAuthenticationProvider(), true);
             _host = new ZyanComponentHost("EventTest", protocol, _catalog);            
 
-            TcpDuplexServerProtocolSetup protocol2 = new TcpDuplexServerProtocolSetup(8084, new NullAuthenticationProvider(), false);
+            TcpDuplexServerProtocolSetup protocol2 = new TcpDuplexServerProtocolSetup(8084, new NullAuthenticationProvider(), true);
             _duplexHost = new ZyanComponentHost("DuplexEventTest", protocol2, _catalog);            
 	    }
 

@@ -15,6 +15,7 @@
 using System;
 using System.IO;
 using System.Net;
+using System.Linq;
 using System.Threading;
 using System.Diagnostics;
 using System.Net.Sockets;
@@ -125,7 +126,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		{
 			Message.BeginReceive(connection, new AsyncCallback(ReceiveMessage), null);
 		}
-
+        
 		public static int StartListening(int port, TcpExChannel channel)
 		{
 			Socket listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -145,7 +146,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 			try
 			{
-				StartListening(Connection.RegisterConnection(client, channel));
+				StartListening(Connection.CreateConnection(client, channel));
 			}
 			catch (DuplicateConnectionException)
 			{
@@ -177,10 +178,10 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				if (!listeners.Contains(m.Guid))
 				{
 					// New incoming message
-					if (listeners.Contains(connection.LocalGuid))
+					if (listeners.Contains(connection.LocalChannelID))
 					{
-						AsyncResult myAr = (AsyncResult)listeners[connection.LocalGuid];
-						listeners.Remove(connection.LocalGuid);
+						AsyncResult myAr = (AsyncResult)listeners[connection.LocalChannelID];
+						listeners.Remove(connection.LocalChannelID);
 						myAr.Complete(connection, m);
 					}
 					else if (listeners.Contains(connection.LocalAddress))

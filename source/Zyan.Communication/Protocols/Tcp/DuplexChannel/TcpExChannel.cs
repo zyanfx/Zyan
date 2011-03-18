@@ -27,7 +27,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 	{
 		int port = 0;
 		int priority;
-		Guid guid = Guid.NewGuid();
+		Guid _channelID = Guid.NewGuid();
 		string name = "ExtendedTcp";
 		TcpExChannelData channelData;
 		internal ServerTransportSink messageSink;
@@ -118,21 +118,21 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			else
 				channelData = new TcpExChannelData(this);
 
-			Manager.BeginReadMessage(guid, null, new AsyncCallback(messageSink.ReceiveMessage), guid);
+			Manager.BeginReadMessage(_channelID, null, new AsyncCallback(messageSink.ReceiveMessage), _channelID);
 		}
 		#endregion
 
 		internal string[] GetAddresses()
 		{
-			return Manager.GetAddresses(port, guid);
+			return Manager.GetAddresses(port, _channelID);
 		}
 
 		#region Properties
-		public Guid Guid
+		public Guid ChannelID
 		{
 			get
 			{
-				return guid;
+				return _channelID;
 			}
 		}
 
@@ -183,7 +183,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			{
 				TcpExChannelData channelData = remoteChannelData as TcpExChannelData;
 				if (channelData != null)
-					url = Manager.CreateUrl(channelData.Guid);
+					url = Manager.CreateUrl(channelData.ChannelID);
 				else
 				{
 					objectURI = null;
@@ -208,19 +208,21 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			{
 				this.port = Manager.StartListening((int)data, this);
 				channelData = new TcpExChannelData(this);
-				foreach (string url in Manager.GetAddresses(this.port, Guid.Empty))
-					Manager.BeginReadMessage(url, null, new AsyncCallback(messageSink.ReceiveMessage), url);
+                foreach (string url in Manager.GetAddresses(this.port, Guid.Empty))
+                {
+                    Manager.BeginReadMessage(url, null, new AsyncCallback(messageSink.ReceiveMessage), url);
+                }
 			}
 		}
 
 		public void StopListening(object data)
 		{
-			throw new NotImplementedException();
+            //TODO: Close Sockets here.
 		}
 
 		public string[] GetUrlsForUri(string objectURI)
 		{
-			return Manager.GetUrlsForUri(objectURI, port, guid);
+			return Manager.GetUrlsForUri(objectURI, port, _channelID);
 		}
 
 		public object ChannelData
