@@ -55,6 +55,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\source\Zyan.Communication\Zyan.Communication.csproj">
+      <Project>{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}</Project>
+      <Name>Zyan.Communication</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GenericWrappers\GenericWrappers.csproj">
       <Project>{C3CDD4F3-900E-4996-9F6C-429918755927}</Project>
       <Name>GenericWrapper</Name>
