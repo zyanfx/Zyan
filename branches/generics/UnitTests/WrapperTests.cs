@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using NUnit.Framework;
 using UnitTests.Model;
+using Zyan.Communication;
+using Zyan.Communication.Protocols.Ipc;
 
 namespace UnitTests
 {
@@ -124,6 +123,71 @@ namespace UnitTests
 		public void TestGenericWrapper()
 		{
 			var test = new GenericWrapper(new NonGenericWrapper(new GenericClass()));
+			var prioritySet = false;
+
+			// GetDefault
+			Assert.AreEqual(default(int), test.GetDefault<int>());
+			Assert.AreEqual(default(string), test.GetDefault<string>());
+			Assert.AreEqual(default(Guid), test.GetDefault<Guid>());
+
+			// Equals
+			Assert.IsTrue(test.Equals(123, 123));
+			Assert.IsFalse(test.Equals("Some", null));
+
+			// GetVersion
+			Assert.AreEqual("DoSomething wasn't called yet", test.GetVersion());
+
+			// DoSomething
+			test.DoSomething(123, 'x', "y");
+			Assert.AreEqual("DoSomething: A = 123, B = x, C = y", test.GetVersion());
+
+			// Compute
+			var dt = test.Compute<Guid, DateTime>(Guid.Empty, 123, "123");
+			Assert.AreEqual(default(DateTime), dt);
+
+			// CreateGuid
+			var guid = test.CreateGuid(dt, 12345);
+			Assert.AreEqual("00003039-0001-0001-0000-000000000000", guid.ToString());
+
+			// LastDate
+			Assert.AreEqual(dt, test.LastDate);
+			test.LastDate = dt = DateTime.Now;
+			Assert.AreEqual(dt, test.LastDate);
+
+			// Name
+			Assert.AreEqual("GenericClass, priority = 123", test.Name);
+
+			// add OnPrioritySet
+			EventHandler<EventArgs> handler = (s, a) => prioritySet = true;
+			test.OnPrioritySet += handler;
+			Assert.IsFalse(prioritySet);
+
+			// Priority
+			test.Priority = 321;
+			Assert.IsTrue(prioritySet);
+			Assert.AreEqual("GenericClass, priority = 321", test.Name);
+
+			// remove OnPrioritySet
+			prioritySet = false;
+			test.OnPrioritySet -= handler;
+			test.Priority = 111;
+			Assert.IsFalse(prioritySet);
+		}
+
+		[Test]
+		public void TestGenericWrapperOverZyan()
+		{
+			var serverProto = new IpcBinaryServerProtocolSetup("Test");
+			var clientProto = new IpcBinaryClientProtocolSetup();
+
+			var host = new ZyanComponentHost("TestServer", serverProto);
+			host.RegisterComponent<INonGenericInterface>(() => new NonGenericWrapper(new GenericClass()), ActivationType.Singleton);
+
+			var conn = new ZyanConnection("ipc://Test/TestServer");
+			var proxy = conn.CreateProxy<INonGenericInterface>();
+
+			// same as usual
+			var test = new GenericWrapper(proxy);
 			var prioritySet = false;
 
 			// GetDefault
