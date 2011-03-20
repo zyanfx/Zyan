@@ -384,7 +384,7 @@ namespace Zyan.Communication
                 object arg = message.Args[i];
 
                 // Wenn der aktuelle Parameter ein Delegat ist ...
-                if (typeof(Delegate).IsAssignableFrom(arg.GetType()))
+                if (arg != null && typeof(Delegate).IsAssignableFrom(arg.GetType()))
                 {
                     // Abfangvorrichtung erzeugen
                     DelegateInterceptor interceptor = new DelegateInterceptor()
