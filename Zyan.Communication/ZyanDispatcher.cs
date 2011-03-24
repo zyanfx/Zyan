@@ -239,263 +239,164 @@ namespace Zyan.Communication
             }
         }
 
+        //TODO: This method needs refactoring. It´s too big.
         /// <summary>
-        /// Ruft eine bestimmte Methode einer Komponente auf und übergibt die angegebene Nachricht als Parameter.
-        /// Für jeden Aufruf wird temporär eine neue Instanz der Komponente erstellt.
+        /// Processes remote method invocation.        
         /// </summary>
-        /// <param name="trackingID">Aufrufschlüssel zur Nachverfolgung</param>
-        /// <param name="interfaceName">Name der Komponentenschnittstelle</param>
-        /// <param name="delegateCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Delegaten oder Ereignisse mit entfernten Methoden</param>
-        /// <param name="methodName">Methodenname</param>
-        /// <param name="paramDefs">Parameter-Definitionen</param>
-        /// <param name="args">Parameter</param>        
-        /// <returns>Rückgabewert</returns>
+        /// <param name="trackingID">Key for call tracking</param>
+        /// <param name="interfaceName">Name of the component interface</param>
+        /// <param name="delegateCorrelationSet">Correlation set for dynamic event and delegate wiring</param>
+        /// <param name="methodName">Name of the invoked method</param>
+        /// <param name="paramDefs">Reflection info of parameter types</param>
+        /// <param name="args">Parameter values</param>        
+        /// <returns>Return value</returns>
         public object Invoke(Guid trackingID, string interfaceName, List<DelegateCorrelationInfo> delegateCorrelationSet, string methodName, ParameterInfo[] paramDefs, params object[] args)
-        {
-            // Wenn kein Schnittstellenname angegeben wurde ...
-            if (string.IsNullOrEmpty(interfaceName))
-                // Ausnahme werfen
+        {   
+            if (string.IsNullOrEmpty(interfaceName))         
                 throw new ArgumentException(LanguageResource.ArgumentException_InterfaceNameMissing, "interfaceName");
-
-            // Wenn kein Methodenname angegben wurde ...
-            if (string.IsNullOrEmpty(methodName))
-                // Ausnahme werfen
+                        
+            if (string.IsNullOrEmpty(methodName))            
                 throw new ArgumentException(LanguageResource.ArgumentException_MethodNameMissing, "methodName");
 
-            // Ggf. BeforeInvoke-Abos verarbeiten
             ProcessBeforeInvoke(trackingID, ref interfaceName, ref delegateCorrelationSet, ref methodName, ref args);
-
-            // Wenn für den angegebenen Schnittstellennamen keine Komponente registriert ist ...
+                        
             if (!_host.ComponentRegistry.ContainsKey(interfaceName))
-            {
-                // Ausnahme erzeugen
-                KeyNotFoundException ex = new KeyNotFoundException(string.Format("Für die angegebene Schnittstelle '{0}' ist keine Komponente registiert.", interfaceName));
-
-                // InvokeCanceled-Ereignis feuern
+            {            
+                //TODO: Localize the exception text.
+                KeyNotFoundException ex = new KeyNotFoundException(string.Format("Cannot find component for interface '{0}'.", interfaceName));
                 _host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
-
-                // Ausnahme werfen
                 throw ex;
             }
-            // Komponentenregistrierung abrufen
             ComponentRegistration registration = _host.ComponentRegistry[interfaceName];
-
-            // Komponenteninstanz erzeugen
             object instance = _host.GetComponentInstance(registration);
-
-            // Implementierungstyp abrufen
             Type type = instance.GetType();
 
-            // Auflistung für Ereignisverdrahtungen
             Dictionary<Guid, Delegate> wiringList = null;
 
-            // Wenn die Komponente SingleCallaktiviert ist ...
             if (registration.ActivationType == ActivationType.SingleCall)
             {
-                // Auflistung für Ereignisverdrahtungen erzeugen
-                wiringList = new Dictionary<Guid, Delegate>();
-                
-                // Bei Bedarf Client- und Server-Komponente miteinander verdrahten
+                wiringList = new Dictionary<Guid, Delegate>();               
                 CreateClientServerWires(type, instance, delegateCorrelationSet, wiringList);
-            }
-            // Transaktionsbereich
+            }            
             TransactionScope scope = null;
-
-            // Kontextdaten aus dem Aufrufkontext lesen (Falls welche hinterlegt sind)
+            
             LogicalCallContextData data = CallContext.GetData("__ZyanContextData_" + _host.Name) as LogicalCallContextData;
 
-            // Wenn Kontextdaten übertragen wurden ...
             if (data != null)
             {
-                // Wenn ein Sitzungsschlüssel übertragen wurde ...
                 if (data.Store.ContainsKey("sessionid"))
                 {
-                    // Sitzungsschlüssel lesen
                     Guid sessionID = (Guid)data.Store["sessionid"];
 
-                    // Wenn eine Sitzung mit dem angegebenen Schlüssel existiert ...
                     if (_host.SessionManager.ExistSession(sessionID))
                     {
-                        // Sitzung abrufen
                         ServerSession session = _host.SessionManager.GetSessionBySessionID(sessionID);
-
-                        // Sitzung verlängern
                         session.Timestamp = DateTime.Now;
-
-                        // Aktuelle Sitzung im Threadspeicher ablegen
                         ServerSession.CurrentSession = session;
                     }
                     else
                     {
-                        // Ausnahme erzeugen
-                        InvalidSessionException ex = new InvalidSessionException(string.Format("Sitzungsschlüssel '{0}' ist ungültig! Bitte melden Sie sich erneut am Server an.", sessionID.ToString()));
-
-                        // InvokeCanceled-Ereignis feuern
+                        //TODO: Locaize the exception text.
+                        InvalidSessionException ex = new InvalidSessionException(string.Format("Session ID '{0}' is invalid. Please log on first.", sessionID.ToString()));
                         _host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
-
-                        // Ausnahme werfen
                         throw ex;
                     }
                 }
-                // Wenn eine Transaktion übertragen wurde ...
                 if (data.Store.ContainsKey("transaction"))
-                    // Transaktionsbereich erzeugen
                     scope = new TransactionScope((Transaction)data.Store["transaction"]);
             }
             else
             {
-                // Ausnahme erzeugen
                 SecurityException ex = new SecurityException(LanguageResource.SecurityException_ContextInfoMissing);
-
-                // InvokeCanceled-Ereignis feuern
                 _host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
-
-                // Ausnahme werfen
                 throw ex;
             }
-            // Rückgabewert
             object returnValue = null;
 
-            // Typen-Array (zur Ermittlung der passenden Signatur) erzeugen
             Type[] types = new Type[paramDefs.Length];
 
-            // Auflistung der Indizes von Parametern, für die eine Delegatenverdrahtung notwendig ist
             Dictionary<int,DelegateInterceptor> delegateParamIndexes=new Dictionary<int,DelegateInterceptor>();
 
-            // Alle Parametertypen durchlaufen
             for (int i = 0; i < paramDefs.Length; i++)
             {   
-                // Typ in Array einfügen
                 types[i] = paramDefs[i].ParameterType;
-
-                // Versuchen den aktuellen Parameter in eine Delegaten-Abfangvorrichtung zu casten
                 DelegateInterceptor delegateParamInterceptor = args[i] as DelegateInterceptor;
 
-                // Wenn aktuelle Parameter eine Delegaten-Abfangvorrichtung ist ...
                 if (delegateParamInterceptor != null)
-                    // Parameter der Delegaten-Verdrahtungsliste zufügen
                     delegateParamIndexes.Add(i, delegateParamInterceptor);
                 else
                 { 
-                    // Versuchen den aktuellen Parameter in einen Serialisierungscontainer zu casten
                     CustomSerializationContainer container = args[i] as CustomSerializationContainer;
 
-                    // Wenn der aktuelle Parameter ein Serialisierungscontainer ist ...
                     if (container != null)
                     { 
-                        // Passenden Serialisierungshandler suchen                        
                         ISerializationHandler serializationHandler = _host.SerializationHandling[container.HandledType];
 
-                        // Wenn kein passender Serialisierungshandler registriert ist ...
                         if (serializationHandler == null)
                         {
-                            // Ausnahme erzeugen
                             KeyNotFoundException ex = new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_SerializationHandlerNotFound,container.HandledType.FullName));
-
-                            // InvokeCanceled-Ereignis feuern
                             _host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
-
-                            // Ausnahme werfen
                             throw ex;
                         }
-                        // Deserialisierung durchführen
                         args[i] = serializationHandler.Deserialize(container.DataType, container.Data);
                     }
                 }
             }
-            // Ausnahme-Schalter
             bool exceptionThrown = false;
 
             try
             {
-                // Metadaten der aufzurufenden Methode abrufen
                 MethodInfo methodInfo = type.GetMethod(methodName, types);
-
-                // Metadaten der Parameter abrufen
                 ParameterInfo[] serverMethodParamDefs = methodInfo.GetParameters();
 
-                // Delegaten-Verdrahtungsliste durchlaufen
                 foreach(int index in delegateParamIndexes.Keys)
                 { 
-                    // Abfangvorrichtung adressieren
                     DelegateInterceptor delegateParamInterceptor = delegateParamIndexes[index];
-
-                    // Metadaten des passenden Parameters der Serverkomponenten-Methode adressieren
                     ParameterInfo serverMethodParamDef = serverMethodParamDefs[index];
                     
-                    // Dynamischen Draht erzeugen
                     object dynamicWire = DynamicWireFactory.Instance.CreateDynamicWire(type, serverMethodParamDef.ParameterType, delegateParamInterceptor);
-
-                    // Typ des dynamischen Drahtes ermitteln
                     Type dynamicWireType = dynamicWire.GetType();
-
-                    // Dynamischen Draht mit Client-Fernsteuerung verdrahten
                     dynamicWireType.GetProperty("Interceptor").SetValue(dynamicWire, delegateParamInterceptor, null);
-                                        
-                    // Delegat zu dynamischem Draht erzeugen
                     Delegate dynamicWireDelegate = Delegate.CreateDelegate(serverMethodParamDef.ParameterType, dynamicWire, dynamicWireType.GetMethod("In"));
-                    
-                    // Abfangvorrichtung durch dynamischen Draht austauschen
                     args[index] = dynamicWireDelegate;
                 }            
-                // Methode aufrufen
                 returnValue = methodInfo.Invoke(instance, args);
 
-                // Wenn der Rückgabewert nicht null ist ...
                 if (returnValue != null)
                 {
-                    // Typ des Rückgabewerts abfragen
                     Type returnValueType = returnValue.GetType();
 
-                    // Passenden Serialisierungshandler suchen
                     Type handledType;
                     ISerializationHandler handler;
                     _host.SerializationHandling.FindMatchingSerializationHandler(returnValueType, out handledType, out handler);
 
-                    // Wenn für diesen Typ ein passender Serialisierungshandler registriert ist ...
                     if (handler != null)
                     {
-                        // Serialisierung durchführen
                         byte[] raw = handler.Serialize(returnValue);
-
-                        // Rückgabewert durch Serialisierungscontainer ersetzen
                         returnValue = new CustomSerializationContainer(handledType, returnValueType, raw);
                     }                    
                 }
             }
             catch (Exception ex)
             {
-                // Ausnahme-Schalter setzen
                 exceptionThrown = true;
-
-                // InvokeCanceled-Ereignis feuern
                 _host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
-
-                // Ausnahme weiterwerfen
                 throw ex;
             }
             finally
             {
-                // Wenn ein Transaktionsbereich existiert ...
                 if (scope != null)
                 {
-                    // Wenn keine Ausnahme aufgetreten ist ...
                     if (!exceptionThrown)
-                        // Transaktionsbereich abschließen
                         scope.Complete();
 
-                    // Transaktionsbereich entsorgen
                     scope.Dispose();
                 }
-                // Wenn die Komponente SingleCallaktiviert ist ...
                 if (registration.ActivationType == ActivationType.SingleCall)
-                    // Verdrahtung aufheben
                     RemoveClientServerWires(type, instance, delegateCorrelationSet, wiringList);
             }
-            // Ggf. AfterInvoke-Abos verarbeiten
             ProcessAfterInvoke(trackingID, ref interfaceName, ref delegateCorrelationSet, ref methodName, ref args, ref returnValue);
 
-            // Rückgabewert zurückgeben
             return returnValue;
         }
 
