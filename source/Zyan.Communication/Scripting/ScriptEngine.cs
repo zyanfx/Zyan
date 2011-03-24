@@ -79,7 +79,7 @@ namespace Zyan.Communication.Scripting
             CSharpCodeProvider provider = new CSharpCodeProvider();
 
             // Quellcodename des Typs ermitteln und zurückgeben
-            return provider.GetTypeOutput(typeRef);
+            return provider.GetTypeOutput(typeRef).Replace('+','.');
         }
     }
 }
