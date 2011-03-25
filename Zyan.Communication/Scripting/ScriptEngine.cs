@@ -30,8 +30,13 @@ namespace Zyan.Communication.Scripting
             };            
             // Wenn zusätzliche Verweise angegeben wurden ...
             if (referenceAsseblies.Length > 0)
+            {
                 // Zusätzliche Verweise anfügen
                 cp.ReferencedAssemblies.AddRange(referenceAsseblies);
+
+                if ((from referenceAssembly in referenceAsseblies where referenceAssembly.Equals("System.Xml.dll",StringComparison.InvariantCultureIgnoreCase) select referenceAssembly).Count()==0)
+                    cp.ReferencedAssemblies.Add("System.Xml.dll");
+            }
             else
                 // Standardverweise anfügen
                 cp.ReferencedAssemblies.AddRange(new string[] 
