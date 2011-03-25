@@ -37,7 +37,8 @@ namespace Zyan.Communication.Scripting
                 cp.ReferencedAssemblies.AddRange(new string[] 
                 {
                     "System.dll",
-                    "System.Core.dll"
+                    "System.Core.dll",
+                    "System.Xml.dll"
                 });
 
             // C#-Compiler erzeugen
@@ -70,7 +71,7 @@ namespace Zyan.Communication.Scripting
             // Wenn der Typ kein generischer Typ ist ...
             if (!type.IsGenericType)
                 // Vollständigen Namen zurückgeben
-                return type.FullName;
+                return type.FullName.Replace('+','.');
 
             // Quellcode-Typverweis erzeugen
             CodeTypeReference typeRef = new CodeTypeReference(type);
