@@ -19,9 +19,8 @@ namespace Zyan.Communication.Toolbox
 		public static string Dump(this Exception ex, string title)
 		{
 			var sb = new StringBuilder(title);
-			var count = 0;
 
-			while (ex != null || count++ < 10)
+			while (ex != null)
 			{
 				sb.AppendFormat("{0} ({1})", ex.Message, ex.GetType());
 				sb.AppendLine();
