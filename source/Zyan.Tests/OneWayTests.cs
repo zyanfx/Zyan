@@ -25,6 +25,8 @@ namespace Zyan.Tests
 			string NonOneWayMethod(Action callback);
 
 			void NonOneWayMethod(ref int value, Action callback);
+
+			void OneWayMethodWithException(Action callback);
 		}
 
 		/// <summary>
@@ -52,6 +54,24 @@ namespace Zyan.Tests
 			{
 				callback();
  			}
+
+			[OneWay]
+			public void OneWayMethodWithException(Action callback)
+			{
+				try
+				{
+					checked
+					{
+						var mul = int.MaxValue;
+						mul *= mul;
+					}
+				}
+				catch (Exception ex)
+				{
+					callback();
+					throw new ApplicationException("Something bad happened", ex);
+				}
+			}
 		}
 
 		public TestContext TestContext { get; set; }
@@ -138,6 +158,25 @@ namespace Zyan.Tests
 			});
 
 			// make sure method call was completed synchronously
+			Assert.IsTrue(callbackExecuted);
+		}
+
+		[TestMethod]
+		public void OneWayMethodDoesntThrowExceptions()
+		{
+			var proxy = ZyanConnection.CreateProxy<ISampleServer>();
+			var callbackExecuted = false;
+			var mre = new ManualResetEvent(false);
+
+			// this should return immediatelly
+			proxy.OneWayMethodWithException(() =>
+			{
+				callbackExecuted = true;
+				mre.Set();
+			});
+
+			// check if exception was caught
+			Assert.IsTrue(mre.WaitOne(100));
 			Assert.IsTrue(callbackExecuted);
 		}
 	}
