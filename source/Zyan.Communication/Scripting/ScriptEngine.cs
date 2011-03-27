@@ -36,6 +36,12 @@ namespace Zyan.Communication.Scripting
 
                 if ((from referenceAssembly in referenceAsseblies where referenceAssembly.Equals("System.Xml.dll",StringComparison.InvariantCultureIgnoreCase) select referenceAssembly).Count()==0)
                     cp.ReferencedAssemblies.Add("System.Xml.dll");
+
+                if ((from referenceAssembly in referenceAsseblies where referenceAssembly.Equals("System.Data.dll", StringComparison.InvariantCultureIgnoreCase) select referenceAssembly).Count() == 0)
+                    cp.ReferencedAssemblies.Add("System.Data.dll");
+
+                if ((from referenceAssembly in referenceAsseblies where referenceAssembly.Equals("System.Data.DataSetExtensions.dll", StringComparison.InvariantCultureIgnoreCase) select referenceAssembly).Count() == 0)
+                    cp.ReferencedAssemblies.Add("System.Data.DataSetExtensions.dll");
             }
             else
                 // Standardverweise anfügen
@@ -43,7 +49,9 @@ namespace Zyan.Communication.Scripting
                 {
                     "System.dll",
                     "System.Core.dll",
-                    "System.Xml.dll"
+                    "System.Xml.dll",
+                    "System.Data.dll",
+                    "System.Data.DataSetExtensions.dll"
                 });
 
             // C#-Compiler erzeugen
