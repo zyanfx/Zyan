@@ -156,6 +156,7 @@ namespace Zyan.Communication.Protocols.Tcp
                 System.Collections.IDictionary channelSettings = new System.Collections.Hashtable();
                 channelSettings["name"] = _channelName;
                 channelSettings["port"] = _tcpPort;
+                channelSettings["listen"] = true;
                 channelSettings["typeFilterLevel"] = TypeFilterLevel.Full;
                 
                 // Binären Clientformatierer erzeugen
