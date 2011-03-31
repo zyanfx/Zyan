@@ -83,6 +83,7 @@
     <Compile Include="Protocols\Tcp\DuplexChannel\Diagnostics\Trace.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\Manager.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\Message.cs" />
+    <Compile Include="Protocols\Tcp\DuplexChannel\MessageException.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\ServerTransportSink.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\TcpExChannel.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\TcpExChannelData.cs" />
@@ -140,6 +141,9 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="LanguageResource.ru.resx" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Protocols\Tcp\DuplexChannel\DuplexChannel.cd" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
