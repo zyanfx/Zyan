@@ -37,5 +37,14 @@ namespace Zyan.Communication
             // Aufruf ausführen
             return clientDelegate.DynamicInvoke(args);            
         }
+
+        /// <summary>
+        /// Ensures unlimited Remoting lifetime.
+        /// </summary>
+        /// <returns>Always null</returns>
+        public override object InitializeLifetimeService()
+        {
+            return null;
+        }
     }
 }
