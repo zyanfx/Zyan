@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections;
+using System.Linq;
 using InterLinq;
 using InterLinq.Communication;
 using InterLinq.Expressions;
-using System.Linq;
 
 namespace Zyan.InterLinq
 {
