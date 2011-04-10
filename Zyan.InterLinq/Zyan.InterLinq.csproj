@@ -47,8 +47,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IBaseSource.cs" />
+    <Compile Include="IEntitySource.cs" />
     <Compile Include="IObjectSource.cs" />
     <Compile Include="ZyanClientQueryHandler.cs" />
+    <Compile Include="ZyanEntityQueryHandler.cs" />
     <Compile Include="ZyanExtensions.cs" />
     <Compile Include="ZyanObjectQueryHandler.cs" />
     <Compile Include="ZyanQueryHandler.cs" />

@@ -1,6 +1,8 @@
 ﻿using Zyan.Communication;
 using InterLinq;
 using System;
+using System.Collections;
+using System.Linq;
 
 namespace Zyan.InterLinq
 {
@@ -50,13 +52,65 @@ namespace Zyan.InterLinq
 		}
 
 		/// <summary>
+		/// Creates function returning ZyanServerQueryHandler for the given instance
+		/// </summary>
+		/// <typeparam name="T">Type (either IObjectSource or IEntitySource)</typeparam>
+		private static Func<object> CreateServerHandler<T>(T instance) where T : IBaseSource
+		{
+			Func<object> handler = null;
+
+			if (instance is IObjectSource)
+			{
+				handler = () => new ZyanServerQueryHandler(instance as IObjectSource);
+			}
+
+			if (instance is IEntitySource)
+			{
+				handler = () => new ZyanServerQueryHandler(instance as IEntitySource);
+			}
+
+			if (handler == null)
+			{
+				throw new NotSupportedException("Type not supported: " + typeof(T).Name);
+			}
+
+			return handler;
+		}
+
+		/// <summary>
+		/// Creates function returning ZyanServerQueryHandler for the given type
+		/// </summary>
+		/// <typeparam name="T">Type (either IObjectSource or IEntitySource)</typeparam>
+		private static Func<object> CreateServerHandler<T>() where T : IBaseSource, new()
+		{
+			Func<object> handler = null;
+
+			if (typeof(IObjectSource).IsAssignableFrom(typeof(T)))
+			{
+				handler = () => new ZyanServerQueryHandler(new T() as IObjectSource);
+			}
+
+			if (typeof(IEntitySource).IsAssignableFrom(typeof(T)))
+			{
+				handler = () => new ZyanServerQueryHandler(new T() as IEntitySource);
+			}
+
+			if (handler == null)
+			{
+				throw new NotSupportedException("Type not supported: " + typeof(T).Name);
+			}
+
+			return handler;
+		}
+
+		/// <summary>
 		/// Registers IQueryable component
 		/// </summary>
 		/// <typeparam name="T">Component type</typeparam>
 		/// <param name="host">Component host</param>
-		public static void RegisterQueryableComponent<T>(this ZyanComponentHost host) where T : IObjectSource, new()
+		public static void RegisterQueryableComponent<T>(this ZyanComponentHost host) where T : IBaseSource, new()
 		{
-			host.RegisterComponent<IQueryRemoteHandler>(() => new ZyanServerQueryHandler(new T()));
+			host.RegisterComponent<IQueryRemoteHandler>(CreateServerHandler<T>());
 		}
 
 		/// <summary>
@@ -65,9 +119,9 @@ namespace Zyan.InterLinq
 		/// <typeparam name="T">Component type</typeparam>
 		/// <param name="host">Component host</param>
 		/// <param name="activationType">Activation type</param>
-		public static void RegisterQueryableComponent<T>(this ZyanComponentHost host, ActivationType activationType) where T : IObjectSource, new()
+		public static void RegisterQueryableComponent<T>(this ZyanComponentHost host, ActivationType activationType) where T : IBaseSource, new()
 		{
-			host.RegisterComponent<IQueryRemoteHandler>(() => new ZyanServerQueryHandler(new T()), activationType);
+			host.RegisterComponent<IQueryRemoteHandler>(CreateServerHandler<T>(), activationType);
 		}
 
 		/// <summary>
@@ -76,9 +130,9 @@ namespace Zyan.InterLinq
 		/// <typeparam name="T">Component type</typeparam>
 		/// <param name="host">Component host</param>
 		/// <param name="uniqueName">Unique component name</param>
-		public static void RegisterQueryableComponent<T>(this ZyanComponentHost host, string uniqueName) where T : IObjectSource, new()
+		public static void RegisterQueryableComponent<T>(this ZyanComponentHost host, string uniqueName) where T : IBaseSource, new()
 		{
-			host.RegisterComponent<IQueryRemoteHandler>(uniqueName, () => new ZyanServerQueryHandler(new T()));
+			host.RegisterComponent<IQueryRemoteHandler>(uniqueName, CreateServerHandler<T>());
 		}
 
 		/// <summary>
@@ -87,9 +141,9 @@ namespace Zyan.InterLinq
 		/// <typeparam name="T">Component type</typeparam>
 		/// <param name="host">Component host</param>
 		/// <param name="instance">Component instance</param>
-		public static void RegisterQueryableComponent<T>(this ZyanComponentHost host, T instance) where T : IObjectSource
+		public static void RegisterQueryableComponent<T>(this ZyanComponentHost host, T instance) where T : IBaseSource
 		{
-			host.RegisterComponent<IQueryRemoteHandler>(() => new ZyanServerQueryHandler(instance));
+			host.RegisterComponent<IQueryRemoteHandler>(CreateServerHandler<T>(instance));
 		}
 
 		/// <summary>
@@ -99,9 +153,9 @@ namespace Zyan.InterLinq
 		/// <param name="host">Component host</param>
 		/// <param name="uniqueName">Unique component name</param>
 		/// <param name="instance">Component instance</param>
-		public static void RegisterQueryableComponent<T>(this ZyanComponentHost host, string uniqueName, T instance) where T : IObjectSource
+		public static void RegisterQueryableComponent<T>(this ZyanComponentHost host, string uniqueName, T instance) where T : IBaseSource
 		{
-			host.RegisterComponent<IQueryRemoteHandler>(uniqueName, () => new ZyanServerQueryHandler(instance));
+			host.RegisterComponent<IQueryRemoteHandler>(uniqueName, CreateServerHandler<T>(instance));
 		}
 
 		/// <summary>
@@ -111,9 +165,75 @@ namespace Zyan.InterLinq
 		/// <param name="host">Component host</param>
 		/// <param name="uniqueName">Unique component name</param>
 		/// <param name="activationType">Activation type</param>
-		public static void RegisterQueryableComponent<T>(this ZyanComponentHost host, string uniqueName, ActivationType activationType) where T : IObjectSource, new()
+		public static void RegisterQueryableComponent<T>(this ZyanComponentHost host, string uniqueName, ActivationType activationType) where T : IBaseSource, new()
 		{
-			host.RegisterComponent<IQueryRemoteHandler>(uniqueName, () => new ZyanServerQueryHandler(new T()), activationType);
+			host.RegisterComponent<IQueryRemoteHandler>(uniqueName, CreateServerHandler<T>(), activationType);
+		}
+
+		/// <summary>
+		/// Registers IQueryable component factory
+		/// </summary>
+		/// <param name="host">Component host</param>
+		/// <param name="getMethod">Method returning IEnumerable instances of the given type</param>
+		public static void RegisterQueryableComponent(this ZyanComponentHost host, Func<Type, IEnumerable> getMethod)
+		{
+			host.RegisterComponent<IQueryRemoteHandler>(() => new ZyanServerQueryHandler(getMethod));
+		}
+
+		/// <summary>
+		/// Registers IQueryable component factory
+		/// </summary>
+		/// <param name="host">Component host</param>
+		/// <param name="getMethod">Method returning IQueryable instances of the given type</param>
+		public static void RegisterQueryableComponent(this ZyanComponentHost host, Func<Type, IQueryable> getMethod)
+		{
+			host.RegisterComponent<IQueryRemoteHandler>(() => new ZyanServerQueryHandler(getMethod));
+		}
+
+		/// <summary>
+		/// Registers IQueryable component factory
+		/// </summary>
+		/// <param name="host">Component host</param>
+		/// <param name="uniqueName">Unique component name</param>
+		/// <param name="getMethod">Method returning IEnumerable instances of the given type</param>
+		public static void RegisterQueryableComponent(this ZyanComponentHost host, string uniqueName, Func<Type, IEnumerable> getMethod)
+		{
+			host.RegisterComponent<IQueryRemoteHandler>(uniqueName, () => new ZyanServerQueryHandler(getMethod));
+		}
+
+		/// <summary>
+		/// Registers IQueryable component factory
+		/// </summary>
+		/// <param name="host">Component host</param>
+		/// <param name="uniqueName">Unique component name</param>
+		/// <param name="getMethod">Method returning IQueryable instances of the given type</param>
+		public static void RegisterQueryableComponent(this ZyanComponentHost host, string uniqueName, Func<Type, IQueryable> getMethod)
+		{
+			host.RegisterComponent<IQueryRemoteHandler>(uniqueName, () => new ZyanServerQueryHandler(getMethod));
+		}
+
+		/// <summary>
+		/// Registers IQueryable component factory
+		/// </summary>
+		/// <param name="host">Component host</param>
+		/// <param name="uniqueName">Unique component name</param>
+		/// <param name="getMethod">Method returning IEnumerable instances of the given type</param>
+		/// <param name="activationType">Activation type</param>
+		public static void RegisterQueryableComponent(this ZyanComponentHost host, string uniqueName, Func<Type, IEnumerable> getMethod, ActivationType activationType)
+		{
+			host.RegisterComponent<IQueryRemoteHandler>(uniqueName, () => new ZyanServerQueryHandler(getMethod), activationType);
+		}
+
+		/// <summary>
+		/// Registers IQueryable component factory
+		/// </summary>
+		/// <param name="host">Component host</param>
+		/// <param name="uniqueName">Unique component name</param>
+		/// <param name="getMethod">Method returning IQueryable instances of the given type</param>
+		/// <param name="activationType">Activation type</param>
+		public static void RegisterQueryableComponent(this ZyanComponentHost host, string uniqueName, Func<Type, IQueryable> getMethod, ActivationType activationType)
+		{
+			host.RegisterComponent<IQueryRemoteHandler>(uniqueName, () => new ZyanServerQueryHandler(getMethod), activationType);
 		}
 
 		/// <summary>
@@ -122,6 +242,16 @@ namespace Zyan.InterLinq
 		/// <param name="host">Component host</param>
 		/// <param name="factoryMethod">Factory method to create component instance</param>
 		public static void RegisterQueryableComponent(this ZyanComponentHost host, Func<IObjectSource> factoryMethod)
+		{
+			host.RegisterComponent<IQueryRemoteHandler>(() => new ZyanServerQueryHandler(factoryMethod()));
+		}
+
+		/// <summary>
+		/// Registers IQueryable component factory
+		/// </summary>
+		/// <param name="host">Component host</param>
+		/// <param name="factoryMethod">Factory method to create component instance</param>
+		public static void RegisterQueryableComponent(this ZyanComponentHost host, Func<IEntitySource> factoryMethod)
 		{
 			host.RegisterComponent<IQueryRemoteHandler>(() => new ZyanServerQueryHandler(factoryMethod()));
 		}
@@ -141,9 +271,31 @@ namespace Zyan.InterLinq
 		/// Registers IQueryable component factory
 		/// </summary>
 		/// <param name="host">Component host</param>
+		/// <param name="uniqueName">Unique component name</param>
+		/// <param name="factoryMethod">Factory method to create component instance</param>
+		public static void RegisterQueryableComponent(this ZyanComponentHost host, string uniqueName, Func<IEntitySource> factoryMethod)
+		{
+			host.RegisterComponent<IQueryRemoteHandler>(uniqueName, () => new ZyanServerQueryHandler(factoryMethod()));
+		}
+
+		/// <summary>
+		/// Registers IQueryable component factory
+		/// </summary>
+		/// <param name="host">Component host</param>
 		/// <param name="factoryMethod">Factory method to create component instance</param>
 		/// <param name="activationType">Activation type</param>
 		public static void RegisterQueryableComponent(this ZyanComponentHost host, Func<IObjectSource> factoryMethod, ActivationType activationType)
+		{
+			host.RegisterComponent<IQueryRemoteHandler>(() => new ZyanServerQueryHandler(factoryMethod()), activationType);
+		}
+
+		/// <summary>
+		/// Registers IQueryable component factory
+		/// </summary>
+		/// <param name="host">Component host</param>
+		/// <param name="factoryMethod">Factory method to create component instance</param>
+		/// <param name="activationType">Activation type</param>
+		public static void RegisterQueryableComponent(this ZyanComponentHost host, Func<IEntitySource> factoryMethod, ActivationType activationType)
 		{
 			host.RegisterComponent<IQueryRemoteHandler>(() => new ZyanServerQueryHandler(factoryMethod()), activationType);
 		}
@@ -156,6 +308,18 @@ namespace Zyan.InterLinq
 		/// <param name="factoryMethod">Factory method to create component instance</param>
 		/// <param name="activationType">Activation type</param>
 		public static void RegisterQueryableComponent(this ZyanComponentHost host, string uniqueName, Func<IObjectSource> factoryMethod, ActivationType activationType)
+		{
+			host.RegisterComponent<IQueryRemoteHandler>(uniqueName, () => new ZyanServerQueryHandler(factoryMethod()), activationType);
+		}
+
+		/// <summary>
+		/// Registers IQueryable component factory
+		/// </summary>
+		/// <param name="host">Component host</param>
+		/// <param name="uniqueName">Unique component name</param>
+		/// <param name="factoryMethod">Factory method to create component instance</param>
+		/// <param name="activationType">Activation type</param>
+		public static void RegisterQueryableComponent(this ZyanComponentHost host, string uniqueName, Func<IEntitySource> factoryMethod, ActivationType activationType)
 		{
 			host.RegisterComponent<IQueryRemoteHandler>(uniqueName, () => new ZyanServerQueryHandler(factoryMethod()), activationType);
 		}

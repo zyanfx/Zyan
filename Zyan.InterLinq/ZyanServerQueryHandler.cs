@@ -3,6 +3,7 @@ using System.Collections;
 using InterLinq;
 using InterLinq.Communication;
 using InterLinq.Expressions;
+using System.Linq;
 
 namespace Zyan.InterLinq
 {
@@ -47,6 +48,20 @@ namespace Zyan.InterLinq
 		/// <summary>
 		/// Creates ZyanServerQueryHandler instance.
 		/// </summary>
+		/// <param name="handler">IQueryable delegate</param>
+		public ZyanServerQueryHandler(Func<Type, IQueryable> handler)
+		{
+			if (handler == null)
+			{
+				throw new ArgumentNullException("handler");
+			}
+
+			InnerHandler = new ServerQueryHandler(new ZyanEntityQueryHandler(handler));
+		}
+
+		/// <summary>
+		/// Creates ZyanServerQueryHandler instance.
+		/// </summary>
 		/// <param name="source">IObjectSource instance</param>
 		public ZyanServerQueryHandler(IObjectSource source)
 		{
@@ -56,6 +71,20 @@ namespace Zyan.InterLinq
 			}
 
 			InnerHandler = new ServerQueryHandler(new ZyanObjectQueryHandler(source));
+		}
+
+		/// <summary>
+		/// Creates ZyanServerQueryHandler instance.
+		/// </summary>
+		/// <param name="source">IEntitySource instance</param>
+		public ZyanServerQueryHandler(IEntitySource source)
+		{
+			if (source == null)
+			{
+				throw new ArgumentNullException("source");
+			}
+
+			InnerHandler = new ServerQueryHandler(new ZyanEntityQueryHandler(source));
 		}
 
 		/// <summary>
