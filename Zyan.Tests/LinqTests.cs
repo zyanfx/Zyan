@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Zyan.InterLinq;
 using Zyan.Communication;
 using Zyan.Communication.Protocols.Ipc;
-using System.Text.RegularExpressions;
-using System.Collections;
+using Zyan.InterLinq;
 
 namespace Zyan.Tests
 {
@@ -17,49 +14,6 @@ namespace Zyan.Tests
 	[TestClass]
 	public class LinqTests
 	{
-		/// <summary>
-		/// Sample queryable component implementation
-		/// </summary>
-		public class SampleObjectSource : IObjectSource
-		{
-			IEnumerable<string> Strings { get; set; }
-
-			public SampleObjectSource()
-			{
-				Strings = new[] { "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog" };
-			}
-
-			public SampleObjectSource(string[] strings)
-			{ 
-				Strings = strings;
-			}
-
-			public IEnumerable<T> Get<T>() where T : class
-			{
-				if (typeof(T) == typeof(string))
-				{
-					foreach (var s in Strings)
-					{
-						yield return (T)(object)s;
-					}
-				}
-			}
-		}
-
-		public class SampleEntity
-		{
-			public int ID { get; set; }
-			public string Name { get; set; }
-
-			public class Sample1 : SampleEntity { }
-			public class Sample2 : SampleEntity { }
-			public class Sample3 : SampleEntity { }
-			public class Sample4 : SampleEntity { }
-			public class Sample5 : SampleEntity { }
-			public class Sample6 : SampleEntity { }
-			public class Sample7 : SampleEntity { }
-		}
-
 		public TestContext TestContext { get; set; }
 
 		static ZyanComponentHost ZyanHost { get; set; }
@@ -80,6 +34,7 @@ namespace Zyan.Tests
 			ZyanHost.RegisterQueryableComponent("Sample5", (Type t) => (new object[] { "stepping", "outside", "she", "is", "free" }).AsQueryable());
 			ZyanHost.RegisterQueryableComponent<SampleObjectSource>("Sample6");
 			ZyanHost.RegisterQueryableComponent<SampleObjectSource>("Sample7", ActivationType.SingleCall);
+			ZyanHost.RegisterQueryableComponent("DbSample", new DataWrapper());
 
 			var clientSetup = new IpcBinaryClientProtocolSetup();
 			ZyanConnection = new ZyanConnection("ipc://LinqTest/SampleQueryableServer", clientSetup);
@@ -196,6 +151,34 @@ namespace Zyan.Tests
 
 			var result = String.Join(" ", query);
 			Assert.AreEqual("brown lazy dog", result);
+		}
+
+		[TestMethod]
+		public void TestDbSampleComponent1()
+		{
+			var proxy = ZyanConnection.CreateQueryableProxy("DbSample");
+			var query =
+				from s in proxy.Get<SampleEntity>()
+				where Regex.IsMatch(s.FirstName, "[rt]$")
+				select s.LastName;
+
+			var result = String.Join(" ", query);
+			Assert.AreEqual("Einstein Friedmann Kapitsa Oppenheimer Compton Lawrence Wilson Kurchatov", result);
+		}
+
+		[TestMethod]
+		public void TestDbSampleComponent2()
+		{
+			var proxy = ZyanConnection.CreateQueryableProxy("DbSample");
+			var query =
+				from s in proxy.Get<SampleEntity>()
+				orderby s.FirstName.Length, s.FirstName
+				select s.FirstName;
+
+			var result = String.Join(", ", query);
+			Assert.AreEqual(
+				"Leó, Lev, Hans, Igor, Glenn, James, Klaus, Leona, Niels, Pyotr, Ralph, Albert, Arthur, Edward, Emilio, " +
+				"Enrico, Ernest, George, Harold, Robert, Robert, Richard, William, Alexander, Stanislaw, Chien-Shiung", result);
 		}
 	}
 }

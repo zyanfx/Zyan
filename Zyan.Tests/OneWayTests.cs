@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
+using System.Runtime.Remoting.Messaging;
+using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Zyan.Communication;
 using Zyan.Communication.Protocols.Ipc;
-using System.Threading;
-using System.Runtime.Remoting.Messaging;
 
 namespace Zyan.Tests
 {
