@@ -7,6 +7,7 @@ using Zyan.InterLinq;
 using Zyan.Communication;
 using Zyan.Communication.Protocols.Ipc;
 using System.Text.RegularExpressions;
+using System.Collections;
 
 namespace Zyan.Tests
 {
@@ -45,6 +46,20 @@ namespace Zyan.Tests
 			}
 		}
 
+		public class SampleEntity
+		{
+			public int ID { get; set; }
+			public string Name { get; set; }
+
+			public class Sample1 : SampleEntity { }
+			public class Sample2 : SampleEntity { }
+			public class Sample3 : SampleEntity { }
+			public class Sample4 : SampleEntity { }
+			public class Sample5 : SampleEntity { }
+			public class Sample6 : SampleEntity { }
+			public class Sample7 : SampleEntity { }
+		}
+
 		public TestContext TestContext { get; set; }
 
 		static ZyanComponentHost ZyanHost { get; set; }
@@ -61,8 +76,10 @@ namespace Zyan.Tests
 			ZyanHost.RegisterQueryableComponent("Sample1", new SampleObjectSource(new[] { "this", "is", "an", "example" }));
 			ZyanHost.RegisterQueryableComponent("Sample2", () => new SampleObjectSource(new[] { "lorem", "ipsum", "dolor", "sit", "amet" }));
 			ZyanHost.RegisterQueryableComponent("Sample3", () => new SampleObjectSource(new[] { "consectetur", "adipisicing", "elit" }), ActivationType.SingleCall);
-			ZyanHost.RegisterQueryableComponent<SampleObjectSource>("Sample4");
-			ZyanHost.RegisterQueryableComponent<SampleObjectSource>("Sample5", ActivationType.SingleCall);
+			ZyanHost.RegisterQueryableComponent("Sample4", (Type t) => new object[] { "quietly", "turning", "the", "backdoor", "key" });
+			ZyanHost.RegisterQueryableComponent("Sample5", (Type t) => (new object[] { "stepping", "outside", "she", "is", "free" }).AsQueryable());
+			ZyanHost.RegisterQueryableComponent<SampleObjectSource>("Sample6");
+			ZyanHost.RegisterQueryableComponent<SampleObjectSource>("Sample7", ActivationType.SingleCall);
 
 			var clientSetup = new IpcBinaryClientProtocolSetup();
 			ZyanConnection = new ZyanConnection("ipc://LinqTest/SampleQueryableServer", clientSetup);
@@ -135,6 +152,32 @@ namespace Zyan.Tests
 			var proxy = ZyanConnection.CreateQueryableProxy("Sample4");
 			var query =
 				from s in proxy.Get<string>()
+				orderby s
+				select s.Substring(0, 1);
+
+			var result = String.Concat(query);
+			Assert.AreEqual("bkqtt", result);
+		}
+
+		[TestMethod]
+		public void TestSample5Component()
+		{
+			var proxy = ZyanConnection.CreateQueryableProxy("Sample5");
+			var query =
+				from s in proxy.Get<string>()
+				orderby s descending
+				select s.Substring(0, 1);
+
+			var result = String.Concat(query);
+			Assert.AreEqual("ssoif", result);
+		}
+
+		[TestMethod]
+		public void TestSample6Component()
+		{
+			var proxy = ZyanConnection.CreateQueryableProxy("Sample6");
+			var query =
+				from s in proxy.Get<string>()
 				where s == "fox" || s == "dog" || s == "frog" || s == "mouse"
 				select s.Replace('o', 'i');
 
@@ -143,9 +186,9 @@ namespace Zyan.Tests
 		}
 
 		[TestMethod]
-		public void TestSample5Component()
+		public void TestSample7Component()
 		{
-			var proxy = ZyanConnection.CreateQueryableProxy("Sample5");
+			var proxy = ZyanConnection.CreateQueryableProxy("Sample7");
 			var query =
 				from s in proxy.Get<string>()
 				where Regex.IsMatch(s, "[nyg]$")
