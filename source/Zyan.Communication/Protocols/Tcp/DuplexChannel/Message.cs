@@ -239,6 +239,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			IAsyncResult internalAsyncResult;
 			System.Threading.ManualResetEvent waitHandle;
             private object _lockObject = new object();
+            private object _internalAsyncResultLockObject = new object();
 
             /// <summary>
             /// Creates a new instance of the AsyncResult class.
@@ -303,9 +304,8 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			{
 				get { return internalAsyncResult; }
 				set 
-                { 		
-                    //TODO: lock (this) is evil and should be refactored.
-                    lock (this) 
+                {   
+                    lock (_internalAsyncResultLockObject) 
 					{
 						internalAsyncResult = value;
 					}
@@ -315,7 +315,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			#region Implementation of IAsyncResult
 			
             /// <summary>
-            /// Gets des pass through state object.
+            /// Gets the pass through state object.
             /// </summary>
             public object AsyncState
 			{
@@ -337,7 +337,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			{
 				get
 				{
-					lock (this)
+                    lock (_internalAsyncResultLockObject)
 					{
 						if (waitHandle == null)
 							waitHandle = new System.Threading.ManualResetEvent(isCompleted);

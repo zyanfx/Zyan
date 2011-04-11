@@ -25,15 +25,15 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
 	class ServerTransportSink : IServerChannelSink
 	{
-		static readonly BinaryFormatter formatter = new BinaryFormatter();
+		private static readonly BinaryFormatter _formatter = new BinaryFormatter();
 
-		TcpExChannel channel;
-		IServerChannelSink nextSink;
+		private TcpExChannel _channel;
+		private IServerChannelSink _nextSink;
 
 		public ServerTransportSink(IServerChannelSink nextSink, TcpExChannel channel)
 		{
-			this.nextSink = nextSink;
-			this.channel = channel;
+			this._nextSink = nextSink;
+			this._channel = channel;
 		}
 
 		public void ReceiveMessage(IAsyncResult ar)
@@ -59,6 +59,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		}
 
 		#region Implementation of IServerChannelSink
+
 		public Stream GetResponseStream(IServerResponseChannelSinkStack sinkStack, object state, IMessage msg, ITransportHeaders headers)
 		{
 			return null;
@@ -67,7 +68,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		public ServerProcessing ProcessMessage(IServerChannelSinkStack sinkStack, IMessage requestMsg, ITransportHeaders requestHeaders, Stream requestStream, out IMessage responseMsg, out ITransportHeaders responseHeaders, out Stream responseStream)
 		{
 			sinkStack.Push(this, null);
-			ServerProcessing serverProcessing = nextSink.ProcessMessage(sinkStack, requestMsg, requestHeaders, requestStream, out responseMsg, out responseHeaders, out responseStream);
+			ServerProcessing serverProcessing = _nextSink.ProcessMessage(sinkStack, requestMsg, requestHeaders, requestStream, out responseMsg, out responseHeaders, out responseStream);
 			switch (serverProcessing)
 			{
 				case ServerProcessing.Async:
@@ -89,21 +90,18 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 		public IServerChannelSink NextChannelSink
 		{
-			get
-			{
-				return nextSink;
-			}
+			get { return _nextSink; }
 		}
+
 		#endregion
 
 		#region Implementation of IChannelSinkBase
-		public IDictionary Properties
+		
+        public IDictionary Properties
 		{
-			get
-			{
-				return null;
-			}
+			get { return null; }
 		}
+
 		#endregion
 	}
 }
