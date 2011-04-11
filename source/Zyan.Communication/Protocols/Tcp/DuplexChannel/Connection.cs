@@ -104,6 +104,24 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		}
 
         /// <summary>
+        /// Get all currently running connection of a specified channel.
+        /// </summary>
+        /// <param name="channel">TcpEx Channel</param>
+        /// <returns>Running connections</returns>
+        public static IEnumerable<Connection> GetRunningConnectionsOfChannel(TcpExChannel channel)
+        { 
+            if (channel == null)
+                throw new ArgumentNullException("channel");
+
+            lock (_connectionsLockObject)
+            {
+                return from connection in _connections.Values
+                       where connection._channel.ChannelID.Equals(channel.ChannelID)
+                       select connection;
+            }
+        }
+
+        /// <summary>
         /// Creates a connection object.
         /// </summary>
         /// <param name="socket">Connection socket</param>
@@ -189,13 +207,39 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
         #region Connection logic
 
+        /// <summary>
+        /// Defines the buffer size (Default = 10K).
+        /// </summary>
         public static int BufferSize = 10 * (2 << 10); // 10K
 
+        /// <summary>
+        /// Socket used for TCP communication.
+        /// </summary>
         protected Socket _socket;
+        
+        /// <summary>
+        /// Networkstream for sending and receiving raw data.
+        /// </summary>
         protected Stream _stream;
+        
+        /// <summary>
+        /// Reader for reading binary raw data from network stream.
+        /// </summary>
         protected BinaryReader _reader;
+        
+        /// <summary>
+        /// Writer for writing binary raw data to network stream.
+        /// </summary>
         protected BinaryWriter _writer;
+        
+        /// <summary>
+        /// Parent Remoting channel of this connection.
+        /// </summary>
         protected TcpExChannel _channel;
+        
+        /// <summary>
+        /// Configuration data of the remoting channel.
+        /// </summary>
         protected TcpExChannelData _remoteChannelData;
 
         /// <summary>
@@ -266,7 +310,8 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
                     _connections.Remove(key);
                 }
 			}
-			_socket.Close();
+            if (_socket!=null)
+			    _socket.Close();
 		}
 
         #endregion

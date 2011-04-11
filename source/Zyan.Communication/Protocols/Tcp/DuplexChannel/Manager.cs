@@ -28,6 +28,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 	internal class Manager
 	{
 		#region Uri Utilities
+
 		static readonly Regex regUrl = new Regex("tcpex://(?<server>[^/]+)/?(?<objectID>.*)", RegexOptions.Compiled);
 
 		public static string Parse(string url, out string objectID)
@@ -89,7 +90,8 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		}
 
 		static readonly Regex regServer = new Regex("(?<address>[^:]+):(?<port>.+)", RegexOptions.Compiled);
-		static string ResolveHostName(string server)
+		
+        static string ResolveHostName(string server)
 		{
 			if (server == null)
 				return "";
@@ -116,11 +118,14 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 			throw new ArgumentOutOfRangeException("IPv4 address not found for host " + name);
 		}
-		#endregion
+		
+        #endregion
 
 		#region Listening
-		// Hashtable<Guid|string, AsyncResult>
-		static readonly Hashtable listeners = new Hashtable();
+		
+        // Hashtable<Guid|string, AsyncResult>
+		private static readonly Hashtable _listeners = new Hashtable();
+        private static object _listenersLockObject=new object();
 
 		public static void StartListening(Connection connection)
 		{
@@ -136,6 +141,26 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 			return ((IPEndPoint)listener.LocalEndPoint).Port;
 		}
+
+        /// <summary>
+        /// Stops listening of a specified channel. 
+        /// </summary>
+        /// <param name="channel">TcpEx Channel</param>
+        public static void StopListening(TcpExChannel channel)
+        {
+            if (channel == null)
+                throw new ArgumentNullException("channel");
+
+            var runningConnections = Connection.GetRunningConnectionsOfChannel(channel);
+
+            if (runningConnections != null)
+            {
+                while(runningConnections.Count()>0)                
+                {
+                    runningConnections.First().Close();
+                }
+            }
+        }
 
 		static void listener_Accept(IAsyncResult ar)
 		{
@@ -173,21 +198,21 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				return;
 			}
 
-			lock (listeners)
+            lock (_listenersLockObject)
 			{
-				if (!listeners.Contains(m.Guid))
+				if (!_listeners.Contains(m.Guid))
 				{
 					// New incoming message
-					if (listeners.Contains(connection.LocalChannelID))
+					if (_listeners.Contains(connection.LocalChannelID))
 					{
-						AsyncResult myAr = (AsyncResult)listeners[connection.LocalChannelID];
-						listeners.Remove(connection.LocalChannelID);
+						AsyncResult myAr = (AsyncResult)_listeners[connection.LocalChannelID];
+						_listeners.Remove(connection.LocalChannelID);
 						myAr.Complete(connection, m);
 					}
-					else if (listeners.Contains(connection.LocalAddress))
+					else if (_listeners.Contains(connection.LocalAddress))
 					{
-						AsyncResult myAr = (AsyncResult)listeners[connection.LocalAddress];
-						listeners.Remove(connection.LocalAddress);
+						AsyncResult myAr = (AsyncResult)_listeners[connection.LocalAddress];
+						_listeners.Remove(connection.LocalAddress);
 						myAr.Complete(connection, m);
 					}
 					else
@@ -204,8 +229,8 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				else
 				{
 					// Response to previous message
-					AsyncResult myAr = (AsyncResult)listeners[m.Guid];
-					listeners.Remove(m.Guid);
+					AsyncResult myAr = (AsyncResult)_listeners[m.Guid];
+					_listeners.Remove(m.Guid);
 					myAr.Complete(connection, m);
 				}
 			}
@@ -213,13 +238,13 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 		static void TriggerException(MessageException e)
 		{
-			lock (listeners)
+            lock (_listenersLockObject)
 			{
 				ArrayList toBeDeleted = new ArrayList();
 
-				foreach (object key in listeners.Keys)
+				foreach (object key in _listeners.Keys)
 				{
-					AsyncResult myAr = (AsyncResult)listeners[key];
+					AsyncResult myAr = (AsyncResult)_listeners[key];
 					if (myAr != null && myAr.Connection == e.Connection)
 					{
 						myAr.Complete(e);
@@ -227,7 +252,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 					}
 				}
 				foreach (object o in toBeDeleted)
-					listeners.Remove(o);
+					_listeners.Remove(o);
 			}
 			e.Connection.Close();
 		}
@@ -236,9 +261,9 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		#region ReadMessage
 		public static IAsyncResult BeginReadMessage(object guidOrServer, Connection connection, AsyncCallback callback, object asyncState)
 		{
-			lock (listeners)
+            lock (_listenersLockObject)
 			{
-				Debug.Assert(!listeners.Contains(guidOrServer), "Handler for this guid already registered.");
+				Debug.Assert(!_listeners.Contains(guidOrServer), "Handler for this guid already registered.");
 
 				AsyncResult ar = new AsyncResult(connection, callback, asyncState);
 				if (outstandingMessages.Contains(guidOrServer))
@@ -252,7 +277,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 					}
 				}
 				
-				listeners.Add(guidOrServer, ar);
+				_listeners.Add(guidOrServer, ar);
 				return ar;
 			}
 		}
