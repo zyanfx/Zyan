@@ -6,6 +6,7 @@ using Zyan.Communication;
 using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp;
 using Zyan.Communication.Security;
+using System.Timers;
 
 namespace IntegrationTest_DistributedEvents
 {
@@ -142,6 +143,45 @@ namespace IntegrationTest_DistributedEvents
         }
     }
 
+    public interface ITimerTriggeredEvent
+    {
+        event Action<DateTime> Tick;
+
+        void StartTimer();
+        void StopTimer();
+    }
+
+    public class TimerTriggeredEvent : ITimerTriggeredEvent
+    {
+        private Timer _timer = null;
+
+        public TimerTriggeredEvent()
+        {
+            _timer = new Timer(300);
+            _timer.Elapsed += new ElapsedEventHandler(_timer_Elapsed);
+        }
+
+
+
+        private void _timer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            if (Tick != null)
+                Tick(DateTime.Now);
+        }
+
+        public event Action<DateTime> Tick;
+        
+        public void StartTimer()
+        {
+            _timer.Start();
+        }
+
+        public void StopTimer()
+        {
+            _timer.Stop();
+        }
+    }
+
     public class EventServerLocator : MarshalByRefObject
     { 
         public EventServer GetEventServer()
@@ -149,7 +189,7 @@ namespace IntegrationTest_DistributedEvents
             return EventServer.Instance;
         }
     }
-
+    
     public class EventServer : MarshalByRefObject, IDisposable
     {
         private static EventServer _instance = null;
@@ -177,6 +217,7 @@ namespace IntegrationTest_DistributedEvents
             _catalog.RegisterComponent<ICallbackComponentSingleton, CallbackComponentSingleton>(ActivationType.Singleton);
             _catalog.RegisterComponent<ICallbackComponentSingleCall, CallbackComponentSingleCall>(ActivationType.SingleCall);
             _catalog.RegisterComponent<IRequestResponseCallbackSingleCall, RequestResponseCallbackSingleCall>(ActivationType.SingleCall);
+            _catalog.RegisterComponent<ITimerTriggeredEvent, TimerTriggeredEvent>(ActivationType.Singleton);
             
             TcpCustomServerProtocolSetup protocol = new TcpCustomServerProtocolSetup(8083, new NullAuthenticationProvider(), true);
             _host = new ZyanComponentHost("EventTest", protocol, _catalog);            

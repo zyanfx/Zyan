@@ -25,16 +25,17 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 	/// <include file='TcpExChannel.docs' path='TcpExChannel/summary[@name="TcpExChannel"]'/>
 	public class TcpExChannel : IChannel, IChannelSender, IChannelReceiver
 	{
-		int port = 0;
-		int priority;
-		Guid _channelID = Guid.NewGuid();
-		string name = "ExtendedTcp";
-		TcpExChannelData channelData;
+		private int port = 0;
+		private int priority;
+		private Guid _channelID = Guid.NewGuid();
+		private string name = "ExtendedTcp";
+		private TcpExChannelData channelData;
 		internal ServerTransportSink messageSink;
-		IClientChannelSinkProvider clientSinkProvider;
+		private IClientChannelSinkProvider clientSinkProvider;
 
 		#region Constructors
-		public TcpExChannel()
+		
+        public TcpExChannel()
 		{
 			Initialise(TypeFilterLevel.Low, null, null, 0, false);
 		}
@@ -88,7 +89,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			Initialise(typeFilterLevel, clientSinkProvider, serverSinkProvider, port, listen);
 		}
 
-		void Initialise(TypeFilterLevel typeFilterLevel, IClientChannelSinkProvider clientSinkProvider, IServerChannelSinkProvider serverSinkProvider, int port, bool listen)
+		private void Initialise(TypeFilterLevel typeFilterLevel, IClientChannelSinkProvider clientSinkProvider, IServerChannelSinkProvider serverSinkProvider, int port, bool listen)
 		{
 			if (clientSinkProvider == null)
 				clientSinkProvider = new BinaryClientFormatterSinkProvider();
@@ -120,7 +121,8 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 			Manager.BeginReadMessage(_channelID, null, new AsyncCallback(messageSink.ReceiveMessage), _channelID);
 		}
-		#endregion
+		
+        #endregion
 
 		internal string[] GetAddresses()
 		{
@@ -128,32 +130,26 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		}
 
 		#region Properties
-		public Guid ChannelID
+		
+        public Guid ChannelID
 		{
-			get
-			{
-				return _channelID;
-			}
+			get { return _channelID; }
 		}
 
 		public int Port
 		{
-			get
-			{
-				return port;
-			}
+			get { return port; }
 		}
 
 		public bool IsListening
 		{
-			get
-			{
-				return port != 0;
-			}
+			get { return port != 0;	}
 		}
-		#endregion
+		
+        #endregion
 
 		#region Implementation of IChannel
+
 		public string Parse(string url, out string objectURI)
 		{
 			return Manager.Parse(url, out objectURI);
@@ -161,22 +157,18 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 		public string ChannelName
 		{
-			get
-			{
-				return name;
-			}
+			get { return name; }
 		}
 
 		public int ChannelPriority
 		{
-			get
-			{
-				return priority;
-			}
+			get { return priority; }
 		}
+
 		#endregion
 
 		#region Implementation of IChannelSender
+
 		public IMessageSink CreateMessageSink(string url, object remoteChannelData, out string objectURI)
 		{
 			if (url == null)
@@ -196,9 +188,11 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			else
 				return null;
 		}
+
 		#endregion
 
 		#region Implementation of IChannelReceiver
+
 		public void StartListening(object data)
 		{
 			if (this.port != 0)
@@ -208,6 +202,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			{
 				this.port = Manager.StartListening((int)data, this);
 				channelData = new TcpExChannelData(this);
+
                 foreach (string url in Manager.GetAddresses(this.port, Guid.Empty))
                 {
                     Manager.BeginReadMessage(url, null, new AsyncCallback(messageSink.ReceiveMessage), url);
@@ -217,7 +212,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 		public void StopListening(object data)
 		{
-            //TODO: Close Sockets here.
+            Manager.StopListening(this);
 		}
 
 		public string[] GetUrlsForUri(string objectURI)
@@ -227,11 +222,9 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 		public object ChannelData
 		{
-			get
-			{
-				return channelData;
-			}
+			get { return channelData; }
 		}
+
 		#endregion
 	}
 }

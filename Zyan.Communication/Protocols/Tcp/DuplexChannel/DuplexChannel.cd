@@ -15,7 +15,7 @@
       </Class>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAggEgAAAAIAAAAAAAAAAAHgAKAAAAQUAAQAAAAAAJA=</HashCode>
+      <HashCode>AAggEgAAAAIgEAAAAAAAAAHgACAAAAQUAAQAAAAAAJA=</HashCode>
       <FileName>Protocols\Tcp\DuplexChannel\Manager.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -23,6 +23,7 @@
     <Position X="3.75" Y="0.5" Width="2.25" />
     <Compartments>
       <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
     <NestedTypes>
       <Class Name="Zyan.Communication.Protocols.Tcp.DuplexChannel.Message.AsyncResult" Collapsed="true">
@@ -46,6 +47,17 @@
       <HashCode>AEEAADABAAAQAAEAGAAACAMBEgAIAwABABCASFGABNA=</HashCode>
       <FileName>Protocols\Tcp\DuplexChannel\Connection.cs</FileName>
     </TypeIdentifier>
+  </Class>
+  <Class Name="Zyan.Communication.Protocols.Tcp.DuplexChannel.TcpExChannel">
+    <Position X="9.25" Y="0.5" Width="2.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAQgAAAAAAQAARAAAAAIAABACgAEQAoQAAQAEABAAIA=</HashCode>
+      <FileName>Protocols\Tcp\DuplexChannel\TcpExChannel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>
