@@ -110,13 +110,18 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 		public static IPAddress GetHostByName(string name)
 		{
-			foreach (var ip in Dns.GetHostEntry(name).AddressList)
-			{
-				if (ip.AddressFamily == AddressFamily.InterNetwork)
-					return ip;
-			}
+            IPAddress ipAddress=null;
 
-			throw new ArgumentOutOfRangeException("IPv4 address not found for host " + name);
+            if (!IPAddress.TryParse(name, out ipAddress))
+            {
+                foreach (var ip in Dns.GetHostEntry(name).AddressList)
+                {
+                    if (ip.AddressFamily == AddressFamily.InterNetwork)
+                        return ip;
+                }
+                throw new ArgumentOutOfRangeException("IPv4 address not found for host " + name);
+            }
+            return ipAddress;
 		}
 		
         #endregion
