@@ -22,7 +22,7 @@ namespace Zyan.Examples.MiniChat.Client
         {
             InitializeComponent();
 
-            TcpCustomClientProtocolSetup protocol = new TcpCustomClientProtocolSetup(false);
+            TcpDuplexClientProtocolSetup protocol = new TcpDuplexClientProtocolSetup(false);
             ZyanConnection _connection = new ZyanConnection(Properties.Settings.Default.ServerUrl, protocol);
 
             _connection.CallInterceptors.For<IMiniChat>()
