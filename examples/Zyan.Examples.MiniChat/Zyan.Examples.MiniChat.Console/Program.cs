@@ -20,7 +20,7 @@ namespace Zyan.Examples.MiniChat.Console
             System.Console.WriteLine("-----------------------------------------------");
 
 
-            TcpCustomClientProtocolSetup protocol = new TcpCustomClientProtocolSetup(false);
+            TcpDuplexClientProtocolSetup protocol = new TcpDuplexClientProtocolSetup(false);
             ZyanConnection connection = new ZyanConnection(Properties.Settings.Default.ServerUrl,protocol);
 
             connection.CallInterceptors.For<IMiniChat>().Add(

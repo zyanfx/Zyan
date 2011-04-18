@@ -567,9 +567,6 @@ namespace Zyan.Communication
                 // Schalter setzen
                 _isDisposed = true;
 
-                // Verbindung aus der Auflistung entfernen
-                _connections.Remove(this);
-
                 // Wenn der Zeitgeber noch existiert ...
                 if (_keepSessionAliveTimer != null)
                 {
@@ -588,6 +585,11 @@ namespace Zyan.Communication
                 { }
                 catch (WebException)
                 { }
+                finally
+                {
+                    // Verbindung aus der Auflistung entfernen
+                    _connections.Remove(this);
+                }
                 // Variablen freigeben
                 _registeredComponents = null;
                 _remoteComponentFactory = null;

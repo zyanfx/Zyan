@@ -76,6 +76,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			try
 			{
 				connection.LockWrite();
+
 				BinaryWriter writer = connection.Writer;
 				writer.Write(Guid.ToByteArray());
 				MemoryStream headerStream = new MemoryStream();

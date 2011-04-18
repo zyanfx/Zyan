@@ -13,7 +13,16 @@ namespace Zyan.Examples.MiniChat.Server
         public void SendMessage(string nickname, string text)
         {
             if (MessageReceived != null)
-                MessageReceived(nickname, text);
+            {
+                try
+                {
+                    MessageReceived(nickname, text);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
         }
     }
 }
