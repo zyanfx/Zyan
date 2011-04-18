@@ -296,9 +296,6 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
         /// </summary>
 		public void Close()
 		{
-			// TODO: Handling disconnections...
-			// Maybe leave this around then next time it's requested we can reconnect...
-			// But, if the other side reconnects we need to match them up in the CreateConnection method.
 			lock (_connectionsLockObject)
 			{
                 List<string> toBeDeleted = (from pair in _connections
@@ -310,8 +307,37 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
                     _connections.Remove(key);
                 }
 			}
-            if (_socket!=null)
-			    _socket.Close();
+            LockRead();
+            LockWrite();
+                        
+            if (_reader != null)
+            {
+                _reader.Close();
+                _reader = null;
+            }
+            if (_writer != null)
+            {
+                _writer.Close();
+                _writer = null;
+            }
+            if (_stream != null)
+            {                
+                _stream.Close();
+                _stream = null;
+            }
+            if (_socket != null)
+            {
+                _socket.Close();
+                _socket = null;
+            }
+            if (_channel != null)            
+                _channel = null;
+
+            if (_remoteChannelData != null)
+                _remoteChannelData = null;
+
+            ReleaseRead();
+            ReleaseWrite();
 		}
 
         #endregion
@@ -432,7 +458,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		#region Locking
 
         private object _readLock = new object();
-        private object _writeLock = new object();
+        private object _writeLock = new object();        
 
         /// <summary>
         /// Locks the connection for reading through other threads.
