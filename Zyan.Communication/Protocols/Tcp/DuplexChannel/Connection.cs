@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Runtime.Serialization.Formatters.Binary;
 using Zyan.Communication.Protocols.Tcp.DuplexChannel.Diagnostics;
+using System.Runtime.Remoting;
 
 //TODO: Localize Exceptions.
 
@@ -91,14 +92,18 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
                     connection = new Connection(address, channel);
                     if (!_connections.ContainsKey(address))
                         _connections.Add(address, connection); // This most often happens when using the loopback address
-                    
+
                     Manager.StartListening(connection);
                 }
                 catch (DuplicateConnectionException ex)
-                {                    
+                {
                     connection = (Connection)_connections[ex.ChannelID.ToString()];
                     _connections.Add(address, connection);
-                }                
+                }
+                catch (FormatException formatEx)
+                {
+                    throw new RemotingException(string.Format(LanguageResource.RemotingException_ConnectionError, formatEx.Message), formatEx);
+                }
 				return connection;
 			}
 		}
@@ -162,7 +167,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
             if (!m.Success)
 				throw new FormatException(string.Format("Invalid format for 'address' parameter - {0}", address));
 
-			_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 			_socket.Connect(new IPEndPoint(Manager.GetHostByName(m.Groups["address"].Value), int.Parse(m.Groups["port"].Value)));
 
 			SendChannelInfo();
