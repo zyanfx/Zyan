@@ -317,23 +317,59 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
                         
             if (_reader != null)
             {
-                _reader.Close();
-                _reader = null;
+                try
+                {
+                    _reader.Close();
+                }
+                catch (ObjectDisposedException)
+                {
+                }
+                finally
+                {
+                    _reader = null;
+                }
             }
             if (_writer != null)
             {
-                _writer.Close();
-                _writer = null;
+                try
+                {
+                    _writer.Close();
+                }
+                catch (ObjectDisposedException)
+                {
+                }
+                finally
+                {
+                    _writer = null;
+                }
             }
             if (_stream != null)
-            {                
-                _stream.Close();
-                _stream = null;
+            {
+                try
+                {
+                    _stream.Close();
+                }
+                catch (ObjectDisposedException)
+                {
+                }
+                finally
+                {
+                    _stream = null;
+                }
             }
             if (_socket != null)
             {
-                _socket.Close();
-                _socket = null;
+                try
+                {
+                    _socket.Close();
+                }
+                catch (ObjectDisposedException)
+                {
+                }
+                finally
+                {
+                    _socket = null;
+                }
             }
             if (_channel != null)            
                 _channel = null;
