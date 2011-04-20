@@ -222,4 +222,7 @@
   <data name="KeyNotFoundException_SerializationHandlerNotFound" xml:space="preserve">
     <value>Für Typ '{0}' ist kein Serialisierungshandler registriert.</value>
   </data>
+  <data name="RemotingException_ConnectionError" xml:space="preserve">
+    <value>Fehler beim Verbinden mit dem Remotehost: {0}.</value>
+  </data>
 </root>

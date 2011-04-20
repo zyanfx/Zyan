@@ -42,6 +42,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		}
 
 		#region Implementation of IClientChannelSink
+
 		Connection PrepareRequest(IMessage msg, ref ITransportHeaders requestHeaders)
 		{
 			string url = (string)msg.Properties["__Uri"];
