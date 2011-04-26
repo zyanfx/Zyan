@@ -121,6 +121,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ZyanDispatcher.cs" />
     <Compile Include="ZyanConnectionSetup.cs" />
+    <Compile Include="ZyanErrorEventArgs.cs" />
     <Compile Include="ZyanProxy.cs" />
     <Compile Include="DelegateInterceptor.cs" />
     <Compile Include="Security\AuthRequestMessage.cs" />
