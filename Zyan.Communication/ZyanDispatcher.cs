@@ -44,67 +44,45 @@ namespace Zyan.Communication
 		private ZyanComponentHost _host = null;
 
 		/// <summary>
-		/// Erstellt Drähte zwischen Client- und Server-Komponente (wenn im Korrelationssatz angegeben).
+		/// Creates wires between client component and server component.
 		/// </summary>
-		/// <param name="type">Implementierungstyp der Server-Komponente</param>
-		/// <param name="instance">Instanz der Serverkomponente</param>
-		/// <param name="delegateCorrelationSet">Korrelationssatz mit Verdrahtungsinformationen</param>
-		/// <param name="wiringList">Auflistung mit gespeicherten Verdrahtungen</param>
+		/// <param name="type">Implementation type of the server component</param>
+		/// <param name="instance">Instance of the server component</param>
+		/// <param name="delegateCorrelationSet">Correlation set (say how to wire)</param>
+		/// <param name="wiringList">Collection of built wires</param>
 		private void CreateClientServerWires(Type type, object instance, List<DelegateCorrelationInfo> delegateCorrelationSet, Dictionary<Guid, Delegate> wiringList)
-		{
-			// Wenn kein Korrelationssatz angegeben wurde ...
+		{			
 			if (delegateCorrelationSet == null)
-				// Prozedur abbrechen
-				return;
-
-			// Alle Einträge des Korrelationssatzes durchlaufen
+		    	return;
+			
 			foreach (DelegateCorrelationInfo correlationInfo in delegateCorrelationSet)
-			{
-				// Wenn mit diesem Korrelationsschlüssel schon verdrahtet wurde ...
-				if (wiringList.ContainsKey(correlationInfo.CorrelationID))
-					// Mit dem nächsten Eintrag weitermachen
+			{				
+				if (wiringList.ContainsKey(correlationInfo.CorrelationID))					
 					continue;
 
-				// Dynamischen Draht erzeugen
 				object dynamicWire = DynamicWireFactory.Instance.CreateDynamicWire(type, correlationInfo.DelegateMemberName, correlationInfo.IsEvent);
-
-				// Typ des dynamischen Drahtes ermitteln
 				Type dynamicWireType = dynamicWire.GetType();
-
-				// Dynamischen Draht mit Client-Fernsteuerung verdrahten
 				dynamicWireType.GetProperty("Interceptor").SetValue(dynamicWire, correlationInfo.ClientDelegateInterceptor, null);
 
-				// wenn es sich um ein Ereignis handelt ...
 				if (correlationInfo.IsEvent)
 				{
-					// Metadaten des Ereignisses abufen                
 					EventInfo eventInfo = type.GetEvent(correlationInfo.DelegateMemberName);
 
-					// Zusatzinformationen übergeben
 					dynamicWireType.GetProperty("ServerEventInfo").SetValue(dynamicWire, eventInfo, null);
 					dynamicWireType.GetProperty("Component").SetValue(dynamicWire, instance, null);
 
-					// Delegat zu dynamischem Draht erzeugen
 					Delegate dynamicWireDelegate = Delegate.CreateDelegate(eventInfo.EventHandlerType, dynamicWire, dynamicWireType.GetMethod("In"));
 
-					// Ausgehende Nachrichten mit passender Abfangvorrichtung verdrahten 
 					eventInfo.AddEventHandler(instance, dynamicWireDelegate);
-
-					// Verdrahtung speichern
-					wiringList.Add(correlationInfo.CorrelationID, dynamicWireDelegate);
+					
+                    wiringList.Add(correlationInfo.CorrelationID, dynamicWireDelegate);
 				}
 				else
 				{
-					// Metadaten des aktuellen Ausgabe-Pins abufen                
 					PropertyInfo outputPinMetaData = type.GetProperty(correlationInfo.DelegateMemberName);
-
-					// Delegat zu dynamischem Draht erzeugen
 					Delegate dynamicWireDelegate = Delegate.CreateDelegate(outputPinMetaData.PropertyType, dynamicWire, dynamicWireType.GetMethod("In"));
-
-					// Ausgehende Nachrichten mit passender Abfangvorrichtung verdrahten 
 					outputPinMetaData.SetValue(instance, dynamicWireDelegate, null);
 
-					// Verdrahtung speichern
 					wiringList.Add(correlationInfo.CorrelationID, dynamicWireDelegate);
 				}
 			}

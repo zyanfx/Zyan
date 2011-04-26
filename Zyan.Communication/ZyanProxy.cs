@@ -120,90 +120,120 @@ namespace Zyan.Communication
             MethodInfo methodInfo = (MethodInfo)methodCallMessage.MethodBase;
             methodInfo.GetParameters();
 
-            // Wenn die Methode ein Delegat ist ...
-            if (methodInfo.ReturnType.Equals(typeof(void)) &&
-                methodCallMessage.InArgCount == 1 &&
-                methodCallMessage.ArgCount == 1 &&
-                methodCallMessage.Args[0] != null &&
-                typeof(Delegate).IsAssignableFrom(methodCallMessage.Args[0].GetType()) &&
-                (methodCallMessage.MethodName.StartsWith("set_") || methodCallMessage.MethodName.StartsWith("add_")))
+            try
             {
-                // Delegat auf zu verdrahtende Client-Methode abrufen
-                object receiveMethodDelegate = methodCallMessage.GetArg(0);
-
-                // "set_" wegschneiden
-                string propertyName = methodCallMessage.MethodName.Substring(4);
-
-                // Verdrahtungskonfiguration festschreiben
-                DelegateInterceptor wiring = new DelegateInterceptor()
+                // Wenn die Methode ein Delegat ist ...
+                if (methodInfo.ReturnType.Equals(typeof(void)) &&
+                    methodCallMessage.InArgCount == 1 &&
+                    methodCallMessage.ArgCount == 1 &&
+                    methodCallMessage.Args[0] != null &&
+                    typeof(Delegate).IsAssignableFrom(methodCallMessage.Args[0].GetType()) &&
+                    (methodCallMessage.MethodName.StartsWith("set_") || methodCallMessage.MethodName.StartsWith("add_")))
                 {
-                    ClientDelegate = receiveMethodDelegate                
-                };
-                // Korrelationsinformation zusammenstellen
-                DelegateCorrelationInfo correlationInfo = new DelegateCorrelationInfo()
-                {
-                    IsEvent = methodCallMessage.MethodName.StartsWith("add_"),
-                    DelegateMemberName = propertyName,
-                    ClientDelegateInterceptor=wiring
-                };
-                // Wenn die Serverkomponente Singletonaktiviert ist ...
-                if (_activationType == ActivationType.Singleton)                    
-                    // Ereignis der Serverkomponente abonnieren
-                    _connection.RemoteComponentFactory.AddEventHandler(_interfaceType.FullName, correlationInfo);
+                    // Delegat auf zu verdrahtende Client-Methode abrufen
+                    object receiveMethodDelegate = methodCallMessage.GetArg(0);
 
-                // Verdrahtung in der Sammlung ablegen
-                _delegateCorrelationSet.Add(correlationInfo);
-                
-                // Leere Remoting-Antwortnachricht erstellen und zurückgeben
-                return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
-            }
-            else if (methodInfo.ReturnType.Equals(typeof(void)) &&
-                methodCallMessage.InArgCount == 1 &&
-                methodCallMessage.ArgCount == 1 &&
-                methodCallMessage.Args[0] != null &&
-                typeof(Delegate).IsAssignableFrom(methodCallMessage.Args[0].GetType()) &&
-                (methodCallMessage.MethodName.StartsWith("remove_")))
-            {
-                // EBC-Eingangsnachricht abrufen
-                object inputMessage = methodCallMessage.GetArg(0);
+                    // "set_" wegschneiden
+                    string propertyName = methodCallMessage.MethodName.Substring(4);
 
-                // "remove_" wegschneiden
-                string propertyName = methodCallMessage.MethodName.Substring(7);
-
-                // Wenn Verdrahtungen gespeichert sind ...
-                if (_delegateCorrelationSet.Count > 0)
-                {
-                    // Verdrahtungskonfiguration suchen
-                    DelegateCorrelationInfo found = (from correlationInfo in (DelegateCorrelationInfo[])_delegateCorrelationSet.ToArray()
-                                                     where correlationInfo.DelegateMemberName.Equals(propertyName) && correlationInfo.ClientDelegateInterceptor.ClientDelegate.Equals(inputMessage)
-                                                     select correlationInfo).FirstOrDefault();
-
-                    // Wenn eine passende Verdrahtungskonfiguration gefunden wurde ...
-                    if (found != null)
+                    // Verdrahtungskonfiguration festschreiben
+                    DelegateInterceptor wiring = new DelegateInterceptor()
                     {
-                        // Wenn die Serverkomponente SingleCallaktiviert ist ...
-                        if (_activationType == ActivationType.SingleCall)
+                        ClientDelegate = receiveMethodDelegate
+                    };
+                    // Korrelationsinformation zusammenstellen
+                    DelegateCorrelationInfo correlationInfo = new DelegateCorrelationInfo()
+                    {
+                        IsEvent = methodCallMessage.MethodName.StartsWith("add_"),
+                        DelegateMemberName = propertyName,
+                        ClientDelegateInterceptor = wiring
+                    };
+                    // Wenn die Serverkomponente Singletonaktiviert ist ...
+                    if (_activationType == ActivationType.Singleton)
+                        // Ereignis der Serverkomponente abonnieren
+                        _connection.RemoteComponentFactory.AddEventHandler(_interfaceType.FullName, correlationInfo);
+
+                    // Verdrahtung in der Sammlung ablegen
+                    _delegateCorrelationSet.Add(correlationInfo);
+
+                    // Leere Remoting-Antwortnachricht erstellen und zurückgeben
+                    return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
+                }
+                else if (methodInfo.ReturnType.Equals(typeof(void)) &&
+                    methodCallMessage.InArgCount == 1 &&
+                    methodCallMessage.ArgCount == 1 &&
+                    methodCallMessage.Args[0] != null &&
+                    typeof(Delegate).IsAssignableFrom(methodCallMessage.Args[0].GetType()) &&
+                    (methodCallMessage.MethodName.StartsWith("remove_")))
+                {
+                    // EBC-Eingangsnachricht abrufen
+                    object inputMessage = methodCallMessage.GetArg(0);
+
+                    // "remove_" wegschneiden
+                    string propertyName = methodCallMessage.MethodName.Substring(7);
+
+                    // Wenn Verdrahtungen gespeichert sind ...
+                    if (_delegateCorrelationSet.Count > 0)
+                    {
+                        // Verdrahtungskonfiguration suchen
+                        DelegateCorrelationInfo found = (from correlationInfo in (DelegateCorrelationInfo[])_delegateCorrelationSet.ToArray()
+                                                         where correlationInfo.DelegateMemberName.Equals(propertyName) && correlationInfo.ClientDelegateInterceptor.ClientDelegate.Equals(inputMessage)
+                                                         select correlationInfo).FirstOrDefault();
+
+                        // Wenn eine passende Verdrahtungskonfiguration gefunden wurde ...
+                        if (found != null)
                         {
-                            // Verdrahtungskonfiguration entfernen
-                            _delegateCorrelationSet.Remove(found);
-                        }
-                        else
-                        {
-                            // Ereignisabo entfernen
-                            _connection.RemoteComponentFactory.RemoveEventHandler(_interfaceType.FullName, found);
+                            // Wenn die Serverkomponente SingleCallaktiviert ist ...
+                            if (_activationType == ActivationType.SingleCall)
+                            {
+                                // Verdrahtungskonfiguration entfernen
+                                _delegateCorrelationSet.Remove(found);
+                            }
+                            else
+                            {
+                                // Ereignisabo entfernen
+                                _connection.RemoteComponentFactory.RemoveEventHandler(_interfaceType.FullName, found);
+                            }
                         }
                     }
+                    // Leere Remoting-Antwortnachricht erstellen und zurückgeben
+                    return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
                 }
-                // Leere Remoting-Antwortnachricht erstellen und zurückgeben
-                return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
-            }
-            else
-            {
-                // Aufrufkontext vorbereiten
-                _connection.PrepareCallContext(_implicitTransactionTransfer);
+                else
+                {
+                    // Aufrufkontext vorbereiten
+                    _connection.PrepareCallContext(_implicitTransactionTransfer);
 
-                // Entfernten Methodenaufruf durchführen und jede Antwortnachricht sofort über einen Rückkanal empfangen
-                return InvokeRemoteMethod(methodCallMessage, true);
+                    // Entfernten Methodenaufruf durchführen und jede Antwortnachricht sofort über einen Rückkanal empfangen
+                    return InvokeRemoteMethod(methodCallMessage, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                if (_connection.ErrorHandlingEnabled)
+                {
+                    ZyanErrorEventArgs e=new ZyanErrorEventArgs() 
+                    {
+                        Exception=ex,
+                        RemotingMessage=methodCallMessage,
+                        ServerComponentType=_interfaceType,
+                        RemoteMemberName=methodCallMessage.MethodName
+                    };
+
+                    _connection.OnError(e);
+
+                    switch (e.Action)
+                    { 
+                        case ZyanErrorAction.ThrowException:
+                            throw ex;
+                        case ZyanErrorAction.Retry:
+                            Invoke(message);
+                            break;
+                        case ZyanErrorAction.Ignore:
+                            return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
+                    }
+                }
+                throw ex;
             }
         }
 
@@ -347,21 +377,13 @@ namespace Zyan.Communication
                 // Remoting-Antwortnachricht erstellen und zurückgeben
                 return new ReturnMessage(returnValue, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
             }
-            catch (TargetInvocationException targetInvocationException)
+            catch (Exception ex)
             {
-                // Aufrufausnahme als Remoting-Nachricht zurückgeben
-                return new ReturnMessage(targetInvocationException, methodCallMessage);
-            }
-            catch (SocketException socketException)
-            {
-                // TCP-Sockelfehler als Remoting-Nachricht zurückgeben
-                return new ReturnMessage(socketException, methodCallMessage);
-            }
-            catch (InvalidSessionException sessionException)
-            {
-                // Sitzungsfehler als Remoting-Nachricht zurückgeben
-                return new ReturnMessage(sessionException, methodCallMessage);
-            }
+                if (_connection.ErrorHandlingEnabled)
+                    throw ex;
+                else
+                    return new ReturnMessage(ex, methodCallMessage);
+            }            
         }
 
         /// <summary>

@@ -19,7 +19,7 @@ using System.Transactions;
 namespace Zyan.Communication
 {
     /// <summary>
-    /// Verbindung zu einem Zyan Applikatonsserver oder einer benutzerdefinierten Zyan-Serveranwendung.
+    /// Maintains a connection to a Zyan component host.
     /// </summary>
     public class ZyanConnection : IDisposable
     {
@@ -547,7 +547,28 @@ namespace Zyan.Communication
 
         #region Fehlerbehandlung
 
+        /// <summary>
+        /// Occures when a error is detected.
+        /// </summary>
+        public event EventHandler<ZyanErrorEventArgs> Error;
 
+        /// <summary>
+        /// Fires the Error event.
+        /// </summary>
+        /// <param name="e">Event arguments</param>
+        protected internal void OnError(ZyanErrorEventArgs e)
+        {
+            if (Error != null)
+                Error(this, e);
+        }
+
+        /// <summary>
+        /// Gets if errors should be handled or not.
+        /// </summary>
+        internal bool ErrorHandlingEnabled
+        {
+            get { return Error != null; }
+        }
 
         #endregion
 

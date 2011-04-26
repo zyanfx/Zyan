@@ -9,261 +9,237 @@ using System.IO;
 namespace Zyan.Communication
 {
     /// <summary>
-    /// Fabrik für dynamische Drähte.
+    /// Factory class for creation of dynamic wires.    
     /// </summary>
     internal sealed class DynamicWireFactory
     {
-        // Sperrobjekt für Threadsynchronisierung bei Zugriff auf die Singlton-Instanz
+        // Locking object
         private static object _singltonLockObject = new object();
 
-        // Singleton-Instanz
+        // Singleton instance
         private static volatile DynamicWireFactory _singleton=null;
 
-        // Wörterbuch zur Zwischenspeicherung von dynamischen Drahttypen
+        // Cache for created dynamic wire types (creation is very expensive, so the types are cached)
         private Dictionary<string, Type> _wireTypeCache = null;
 
         /// <summary>
-        /// Gibt die Singleton-Instanz der fabrik zurück.
+        /// Gets a singleton instance of the DynamicWirefactory class.
         /// </summary>
         public static DynamicWireFactory Instance
         {
             get 
             {
-                // Wenn noch keine Singlton-Instanz existiert ...
                 if (_singleton == null)
                 {
                     lock (_singltonLockObject)
                     {
-                        // Wenn nicht zwischenzeitlich eine Singleton-Instanz durch einen anderen Thread erstellt wurde ...
                         if (_singleton == null)
-                            // Singleton-Instanz erstellen
                             _singleton = new DynamicWireFactory();
                     }
                 }
-                // Singleton-Instanz zurückgeben
                 return _singleton;
             }
         }
 
         /// <summary>
-        ///  Erzeugt eine neue Instanz von DynamicWireFactory.
+        /// Creates a new instance of the DynamicWireFactory class.
         /// </summary>
         private DynamicWireFactory()
         {
-            // Drahttyp-Cache erzeugen
             _wireTypeCache = new Dictionary<string, Type>();
         }
 
-        // Objekt zur Threadsynchnonisierung beim Zugriff auf den Drahtypen-Zwischenspeicher
+        // Locking object for thread sync of the wire type cache
         private object _wireTypeCacheLockObject = new object();
 
         /// <summary>
-        /// Erzeugt einen dynamischen Draht für ein bestimmtes Ereignis einer Komponente. 
+        /// Creates a dynamic wire for a specified event or delegate property of a component.        
         /// </summary>
-        /// <param name="componentType">Typ der Komponente</param>
-        /// <param name="eventMemberName">Name des Ereignisses oder der Delegat-Eigenschaft</param>
-        /// <param name="isEvent">Gibt an, ob der Draht als Ereignis implementiert ist, oder nicht</param>
-        /// <returns>Instanz des passenden dynamischen Drahts</returns>
+        /// <param name="componentType">Component type</param>
+        /// <param name="eventMemberName">Event name or name of the delegate property</param>
+        /// <param name="isEvent">Sets if the member is a event (if false, the memeber must be a delegate property)</param>
+        /// <returns>Instance of the created dynamic wire type (ready to use)</returns>
         public object CreateDynamicWire(Type componentType, string eventMemberName, bool isEvent)
         {
-            // Wenn kein Komponententyp angegeben wurde ...
             if (componentType == null)
-                // Ausnahme werfen
                 throw new ArgumentNullException("componentType");
 
-            // Wenn kein Ereignisname angegeben wurde ...
             if (string.IsNullOrEmpty(eventMemberName))
-                // Ausnahme werfen
                 throw new ArgumentException(LanguageResource.ArgumentException_OutPutPinNameMissing, "eventMemberName");
 
-            // Schlüssel aus Komponententyp und Ereignisnamen erzeugen
             StringBuilder wireKeyBuilder = new StringBuilder();
             wireKeyBuilder.Append(componentType.FullName);
             wireKeyBuilder.Append("|");
             wireKeyBuilder.Append(eventMemberName);
             string wireKey = wireKeyBuilder.ToString();
 
-            // Variable für Drahttyp
             Type wireType=null;
 
-            // Schalter, der angibt, ob bereits ein passender Drahttyp vorhanden ist
             bool wireTypeAlreadyCreated=false;
 
             lock (_wireTypeCacheLockObject)
             {
-                // Prüfen ob bereits ein passender dynamischer Draht für das Ereignis existiert ...
                 wireTypeAlreadyCreated=_wireTypeCache.ContainsKey(wireKey);
             }
-            // Wenn bereits ein passender dynamischer Draht für dieses Ereignis ezeugt wurde ...
             if (wireTypeAlreadyCreated)
-                // Bestehenden Drahttyp verwenden
                 wireType = _wireTypeCache[wireKey];
             else
             {                
-                // Passenden Drahtyp erzeugen
                 wireType = BuildDynamicWireType(componentType, eventMemberName, isEvent);
 
                 lock (_wireTypeCacheLockObject)
                 {
-                    // Wenn in der Zwischenzeit ein passender Drahttyp durch einen anderen Thread erzeugt wurde ...
                     if (_wireTypeCache.ContainsKey(wireKey))
-                        // Bestehenden Drahttyp verwenden
                         wireType = _wireTypeCache[wireKey];
                     else
-                        // Drahttyp zwischenspeichern
                         _wireTypeCache.Add(wireKey, wireType);
                 }
             }
-            // Drahtinstanz erzeugen 
             object wire = Activator.CreateInstance(wireType);
-
-            // Drahtinstanz zurückgeben
             return wire;
         }
 
         /// <summary>
-        /// Erzeugt einen dynamischen Draht für ein bestimmtes Ereignis einer Komponente. 
+        /// Creates a dynamic wire for a specified event or delegate property of a component.        
         /// </summary>
-        /// <param name="componentType">Typ der Komponente</param>
-        /// <param name="delegateType">Delegattyp</param>
-        /// <param name="clientInterceptor">Client-Abfangvorrichtung</param>
-        /// <returns>Instanz des passenden dynamischen Drahts</returns>
+        /// <param name="componentType">Component type</param>
+        /// <param name="delegateType">Type of the delegate</param>
+        /// <param name="clientInterceptor">Interceptor object form client</param>
+        /// <returns>Instance of the created dynamic wire type (ready to use)</returns>
         public object CreateDynamicWire(Type componentType, Type delegateType, DelegateInterceptor clientInterceptor)
         {
-            // Wenn kein Komponententyp angegeben wurde ...
             if (componentType == null)
-                // Ausnahme werfen
                 throw new ArgumentNullException("componentType");
 
-            // Wenn kein Delegattyp angegeben wurde ...
             if (delegateType == null)
-                // Ausnahme werfen
                 throw new ArgumentNullException("delegateType");
 
-            // Wenn keine Client-Abfangeinrichtung angegeben wurde ...
             if (clientInterceptor == null)
-                // Ausnahme werfen
                 throw new ArgumentNullException("clientInterceptor");
                         
-            // Passenden Drahtyp erzeugen
             Type wireType = BuildDynamicWireType(componentType, delegateType, clientInterceptor);
                                     
-            // Drahtinstanz erzeugen 
             object wire = Activator.CreateInstance(wireType);
-
-            // Drahtinstanz zurückgeben
             return wire;
         }
 
         /// <summary>
-        /// Gibt alle Verweise eines bestimmten Komponententyp zurück.
+        /// Returns all direct and indirect references of a specified component type. 
         /// </summary>
-        /// <param name="componentType">Komponententyp</param>
-        /// <returns>Array mit Pfadangaben zu abhängigen Assemblies</returns>
+        /// <param name="componentType">Component type</param>
+        /// <returns>Array with full paths to the referenced assemblies</returns>
         private string[] GetComponentReferences(Type componentType)
         {
-            // Verweise der Komponenten-Assembly übernehmen
-            List<string> componentReferences = (from assy in componentType.Assembly.GetReferencedAssemblies()
-                                                select Assembly.Load(assy).Location).ToList();
+            if (componentType == null)
+                throw new ArgumentNullException("componentType");
 
-            // Nach Zyan.Communication.dll in Komponentenverweisen suchen
-            int foundZyan = (from reference in componentReferences
-                             where Path.GetFileName(reference).Equals("Zyan.Communication.dll", StringComparison.InvariantCultureIgnoreCase)
-                             select reference).Count();
+            List<string> componentReferences = new List<string>();
+            FindAssemblyReferences(Assembly.GetExecutingAssembly(), componentReferences);
+            FindAssemblyReferences(componentType.Assembly, componentReferences);
 
-            // Wenn Zyan.Communication.dll nicht in den Verweisen enthalten ist ...
-            if (foundZyan == 0)
-                // Verweis auf Zyan zufügen
-                componentReferences.Add(Assembly.GetExecutingAssembly().Location);
-
-            // Array mit Verweisen erstellen und zurückgeben
             return componentReferences.ToArray();
         }
 
         /// <summary>
-        /// Erzeugt den Typen für einen dynamischen Draht für ein bestimmtes Ereignis einer Komponente.
+        /// Adds a path to the path list, if the list doesn´t contain the path already. 
         /// </summary>
-        /// <param name="componentType">Typ der Komponente</param>
-        /// <param name="delegateType">Delegattyp</param>
-        /// <param name="clientInterceptor">Client-Abfangvorrichtung</param>
-        /// <returns>Typ des dynamischen Drahts</returns>
+        /// <param name="path">Path to add</param>
+        /// <param name="paths">path list</param>
+        /// <returns>Returns true if added and false, if the list contains this path aleady</returns>
+        private bool AddReferencePathToList(string path, List<string> paths)
+        {
+            int found = (from p in paths
+                         where p.Equals(path, StringComparison.InvariantCultureIgnoreCase)
+                         select p).Count();
+
+            if (found == 0)
+            {
+                paths.Add(path);
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Obtains all direct and indirect references of a specified Assembly.
+        /// </summary>
+        /// <param name="assembly">Assembly to scan for references</param>
+        /// <param name="paths">List of file paths</param>
+        private void FindAssemblyReferences(Assembly assembly, List<string> paths)
+        {
+            if (assembly == null)
+                throw new ArgumentNullException("assembly");
+
+            if (paths == null)
+                throw new ArgumentNullException("paths");
+
+            AddReferencePathToList(assembly.Location, paths);
+                        
+            foreach (AssemblyName refName in assembly.GetReferencedAssemblies())
+            {
+                Assembly reference = Assembly.Load(refName);
+                if (AddReferencePathToList(reference.Location, paths))
+                    FindAssemblyReferences(reference, paths);
+            }            
+        }
+
+        /// <summary>
+        /// Creates a dynamic wire type dynamicly.
+        /// </summary>
+        /// <param name="componentType">Type of server component</param>
+        /// <param name="delegateType">Delegate type of the wire</param>
+        /// <param name="clientInterceptor">Interceptor object from client</param>
+        /// <returns>Type of dynamic wire</returns>
         private Type BuildDynamicWireType(Type componentType, Type delegateType, DelegateInterceptor clientInterceptor)
         {            
-            // Array mit Verweisen erstellen
             string[] references = GetComponentReferences(componentType);
-
-            // Variable für Quellcode
             string sourceCode = string.Empty;
-            
-            // Quellcode für dynamischen Draht erzeugen
             sourceCode = CreateDynamicWireSourceCodeForDelegate(delegateType);
             
-            // Dynamischen Draht kompilieren
             Assembly assembly = ScriptEngine.CompileScriptToAssembly(sourceCode, references);
 
-            // Typinformationen des dynamischen Drahtes abrufen
             Type dynamicWireType = assembly.GetType("Zyan.Communication.DynamicWire");
-
-            // Typ des dynamischen Drahtes zurückgeben
             return dynamicWireType;
         }
 
         /// <summary>
-        /// Erzeugt den Typen für einen dynamischen Draht für ein bestimmtes Ereignis einer Komponente.
+        /// Creates a dynamic wire type dynamicly.
         /// </summary>
-        /// <param name="componentType">Typ der Komponente</param>
-        /// <param name="eventMemberName">Name des Ereignisses oder der Delegat-Eigenschaft</param>
-        /// <param name="isEvent">Gibt an, ob der Draht als Ereignis implementiert ist, oder nicht</param>
-        /// <returns>Typ des dynamischen Drahts</returns>
+        /// <param name="componentType">Type of server component</param>
+        /// <param name="eventMemberName">Event name or name of the delegate property</param>
+        /// <param name="isEvent">Sets if the member is a event (if false, the memeber must be a delegate property)</param>
+        /// <returns>Type of dynamic wire</returns>
         private Type BuildDynamicWireType(Type componentType,string eventMemberName, bool isEvent)
         {
-            // Array mit Verweisen erstellen
             string[] references = GetComponentReferences(componentType);
-
-            // Variable für Quellcode
             string sourceCode = string.Empty;
 
-            // Wenn der Draht als Ereignis implementiert ist ...
             if (isEvent)
             {
-                // Metadaten des Ereignisses abrufen
                 EventInfo eventInfo = componentType.GetEvent(eventMemberName);
-
-                // Quellcode für dynamischen Draht erzeugen
                 sourceCode = CreateDynamicWireSourceCodeForEvent(eventInfo);
             }
             else
             {
-                // Metadaten der Delegat-Eigenschaft abrufen
                 PropertyInfo delegatePropInfo = componentType.GetProperty(eventMemberName);
-
-                // Quellcode für dynamischen Draht erzeugen
                 sourceCode = CreateDynamicWireSourceCodeForDelegate(delegatePropInfo);
             }
-            // Dynamischen Draht kompilieren
             Assembly assembly = ScriptEngine.CompileScriptToAssembly(sourceCode, references);
-
-            // Typinformationen des dynamischen Drahtes abrufen
+            
             Type dynamicWireType = assembly.GetType("Zyan.Communication.DynamicWire");
-
-            // Typ des dynamischen Drahtes zurückgeben
             return dynamicWireType;
         }
 
         /// <summary>
-        /// Erzeugt den Quellcode für einen dynamischen Draht, der zu einem bestimmten Ereignis passt.
+        /// Generates source code for dynamic wiring of a specified server component event.
         /// </summary>
-        /// <param name="eventInfo">Metadaten des Ereignisses</param>
-        /// <returns>Quellcode (C#)</returns>
+        /// <param name="eventInfo">Event member metadata</param>
+        /// <returns>Generated C# source code</returns>
         private string CreateDynamicWireSourceCodeForEvent(EventInfo eventInfo)
         {
-            // Delegat-Typ des Ereignisses ermitteln
             Type eventType = eventInfo.EventHandlerType;
-
-            // Metadaten des Delegaten abrufen
             MethodInfo eventMethod = eventType.GetMethod("Invoke");
 
-            // Quellcode für dynamischen Draht zusammensetzen
             StringBuilder code = new StringBuilder();
             code.AppendLine("namespace Zyan.Communication");
             code.AppendLine("{");
@@ -278,68 +254,44 @@ namespace Zyan.Communication
             code.AppendLine("       private DelegateInterceptor _interceptor = null;");
             code.AppendLine("       public DelegateInterceptor Interceptor { get { return _interceptor; } set { _interceptor = value; } }");
             
-            // Ermitteln, ob der Delegat einen Rückgabewert bescheibt
             bool hasReturnValue = !eventMethod.ReturnType.Name.Equals("Void");
 
-            // Wenn der Delegat keinen Rückgabewert bescheibt ...
             if (!hasReturnValue)
-                // void verwenden
                 code.Append("       public void In(");
             else
-                // Rückgabetyp verwenden
                 code.AppendFormat("       public {0} In(", ScriptEngine.GetCSharpNameOfType(eventMethod.ReturnType));
 
-            // Variable für Anzahl der Parameter, die der Delegat bescheibt
             int argCount = 0;
-
-            // Parameter des Delegaten abrufen
             ParameterInfo[] argInfos = eventMethod.GetParameters();
 
-            // Alle Parameter durchlaufen
             foreach (ParameterInfo argInfo in argInfos)
             {
-                // Parameterzähler erhöhen
                 argCount++;
 
-                // Parameterdefinition in Quellcode schreiben
                 code.AppendFormat("{0} {1}", ScriptEngine.GetCSharpNameOfType(argInfo.ParameterType), argInfo.Name);
 
-                // Wenn es nicht der letzte Parameter ist ...
                 if (argCount < argInfos.Length)
-                    // Komma in Quellcode schreiben
                     code.Append(", ");
             }
-            // Weiteren Quellcode schreiben
             code.Append(")");
             code.AppendLine();
             code.AppendLine("       {");
                         
-            // Wenn der Delegat keinen Rückgabewert beschreibt ...
             if (!hasReturnValue)
-                // InvokeClientDelegate aufrufen
                 code.Append("try { Interceptor.InvokeClientDelegate(");
             else
-                // InvokeClientDelegate aufrufen und Rückgabewert zurückgeben (Typenumwandlung durchführen)
                 code.AppendFormat("try { return ({0})Interceptor.InvokeClientDelegate(", ScriptEngine.GetCSharpNameOfType(eventMethod.ReturnType));
 
-            // Parameterzähler zurücksetzen
             argCount = 0;
 
-            // Alle Parameter des Delegaten durchlaufen
             foreach (ParameterInfo argInfo in argInfos)
             {
-                // Parameterzähler erhöhen
                 argCount++;
-
-                // Paramtername an Quellcode anfügen
                 code.Append(argInfo.Name);
 
-                // Wenn es nicht der letzte Parameter ist ...
                 if (argCount < argInfos.Length)
-                    // Komma an Quellcode anfügen
                     code.Append(", ");
             }
-            // Restlichen Quellcode schreiben
             code.Append("); } catch (Exception ex) {");
             code.AppendLine("           Type dynamicWireType = this.GetType();");
             code.AppendLine("           Delegate dynamicWireDelegate = Delegate.CreateDelegate(ServerEventInfo.EventHandlerType, this, dynamicWireType.GetMethod(\"In\"));");
@@ -349,35 +301,29 @@ namespace Zyan.Communication
             code.AppendLine("   }");
             code.AppendLine("}");
 
-            // Quellcode zurückgeben
             return code.ToString();
         }
 
         /// <summary>
-        /// Erzeugt den Quellcode für einen dynamischen Draht, der zu einem bestimmten Delegat passt.
+        /// Generates source code for dynamic wiring of a specified server component delegate property.
         /// </summary>
-        /// <param name="delegatePropInfo">Metadaten der Delegat-Eigenschaft</param>
-        /// <returns>Quellcode (C#)</returns>
+        /// <param name="delegatePropInfo">Metadata of the delegate proerty</param>
+        /// <returns>Generated C# source code</returns>
         private string CreateDynamicWireSourceCodeForDelegate(PropertyInfo delegatePropInfo)
         {
-            // Delegat-Typ ermitteln
             Type delegateType = delegatePropInfo.PropertyType;
-
-            // Andere Überladung aufrufen
             return CreateDynamicWireSourceCodeForDelegate(delegateType);
         }
 
         /// <summary>
-        /// Erzeugt den Quellcode für einen dynamischen Draht, der zu einem bestimmten Delegat passt.
+        /// Generates source code for dynamic wiring of a specified server component delegate property.
         /// </summary>
-        /// <param name="delegateType">Delegattyp</param>
-        /// <returns>Quellcode (C#)</returns>
+        /// <param name="delegateType">Delegate type</param>
+        /// <returns>Generated C# source code</returns>
         private string CreateDynamicWireSourceCodeForDelegate(Type delegateType)
         {
-            // Metadaten des Delegaten abrufen
             MethodInfo delegateMethod = delegateType.GetMethod("Invoke");
 
-            // Quellcode für dynamischen Draht zusammensetzen
             StringBuilder code = new StringBuilder();
             code.AppendLine("namespace Zyan.Communication");
             code.AppendLine("{");
@@ -386,75 +332,50 @@ namespace Zyan.Communication
             code.AppendLine("       private DelegateInterceptor _interceptor = null;");
             code.AppendLine("       public DelegateInterceptor Interceptor { get {return _interceptor;} set { _interceptor = value; } }");
 
-            // Ermitteln, ob der Delegat einen Rückgabewert bescheibt
             bool hasReturnValue = !delegateMethod.ReturnType.Name.Equals("Void");
 
-            // Wenn der Delegat keinen Rückgabewert bescheibt ...
             if (!hasReturnValue)
-                // void verwenden
                 code.Append("       public void In(");
             else
-                // Rückgabetyp verwenden
                 code.AppendFormat("       public {0} In(", ScriptEngine.GetCSharpNameOfType(delegateMethod.ReturnType));
 
-            // Variable für Anzahl der Parameter, die der Delegat bescheibt
             int argCount = 0;
-
-            // Parameter des Delegaten abrufen
             ParameterInfo[] argInfos = delegateMethod.GetParameters();
 
-            // Alle Parameter durchlaufen
             foreach (ParameterInfo argInfo in argInfos)
             {
-                // Parameterzähler erhöhen
                 argCount++;
 
-                // Parameterdefinition in Quellcode schreiben
                 code.AppendFormat("{0} {1}", ScriptEngine.GetCSharpNameOfType(argInfo.ParameterType), argInfo.Name);
 
-                // Wenn es nicht der letzte Parameter ist ...
                 if (argCount < argInfos.Length)
-                    // Komma in Quellcode schreiben
                     code.Append(", ");
             }
-            // Weiteren Quellcode schreiben
             code.Append(")");
             code.AppendLine();
             code.AppendLine("       {");
             code.Append("           ");
 
-            // Wenn der Delegat keinen Rückgabewert beschreibt ...
             if (!hasReturnValue)
-                // InvokeClientDelegate aufrufen
                 code.Append("Interceptor.InvokeClientDelegate(");
             else
-                // InvokeClientDelegate aufrufen und Rückgabewert zurückgeben (Typenumwandlung durchführen)
                 code.AppendFormat("return ({0})Interceptor.InvokeClientDelegate(", ScriptEngine.GetCSharpNameOfType(delegateMethod.ReturnType));
 
-            // Parameterzähler zurücksetzen
             argCount = 0;
 
-            // Alle Parameter des Delegaten durchlaufen
             foreach (ParameterInfo argInfo in argInfos)
             {
-                // Parameterzähler erhöhen
                 argCount++;
-
-                // Paramtername an Quellcode anfügen
                 code.Append(argInfo.Name);
 
-                // Wenn es nicht der letzte Parameter ist ...
                 if (argCount < argInfos.Length)
-                    // Komma an Quellcode anfügen
                     code.Append(", ");
             }
-            // Restlichen Quellcode schreiben
             code.AppendLine(");");
             code.AppendLine("       }");
             code.AppendLine("   }");
             code.AppendLine("}");
 
-            // Quellcode zurückgeben
             return code.ToString();
         }
     }

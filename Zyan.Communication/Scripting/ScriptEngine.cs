@@ -6,45 +6,31 @@ using System.Reflection;
 using System.CodeDom.Compiler;
 using Microsoft.CSharp;
 using System.CodeDom;
+using System.IO;
 
 namespace Zyan.Communication.Scripting
 {
     /// <summary>
-    /// Kompiliert dynamisch C#-Quellcode zur Luafzeit.
+    /// Compiles C# source code on runtime.
     /// </summary>
     public static class ScriptEngine
     {
         /// <summary>
-        /// Erzeugt aus C#-Quellcode eine ausführbare Assembly im Speicher.
+        /// Creates a compiled assembly from source code.
         /// </summary>
-        /// <param name="scriptCode">C#-Quellcode</param>
-        /// <param name="referenceAsseblies">Array mit referenzierten Assemblynamen</param>
-        /// <returns>Kompilierte Assembly</returns>
+        /// <param name="scriptCode">C# source code</param>
+        /// <param name="referenceAsseblies">Array with assembly file paths to reference</param>
+        /// <returns>Compiled assembly</returns>
         public static Assembly CompileScriptToAssembly(string scriptCode, params string[] referenceAsseblies)
         {
-            // Parameter für den Kompilierung festlegen
             CompilerParameters cp = new CompilerParameters()
             {
                 GenerateExecutable=false,
                 GenerateInMemory=true,                
             };            
-            // Wenn zusätzliche Verweise angegeben wurden ...
             if (referenceAsseblies.Length > 0)
-            {
-                // Zusätzliche Verweise anfügen
                 cp.ReferencedAssemblies.AddRange(referenceAsseblies);
-
-                if ((from referenceAssembly in referenceAsseblies where referenceAssembly.Equals("System.Xml.dll",StringComparison.InvariantCultureIgnoreCase) select referenceAssembly).Count()==0)
-                    cp.ReferencedAssemblies.Add("System.Xml.dll");
-
-                if ((from referenceAssembly in referenceAsseblies where referenceAssembly.Equals("System.Data.dll", StringComparison.InvariantCultureIgnoreCase) select referenceAssembly).Count() == 0)
-                    cp.ReferencedAssemblies.Add("System.Data.dll");
-
-                if ((from referenceAssembly in referenceAsseblies where referenceAssembly.Equals("System.Data.DataSetExtensions.dll", StringComparison.InvariantCultureIgnoreCase) select referenceAssembly).Count() == 0)
-                    cp.ReferencedAssemblies.Add("System.Data.DataSetExtensions.dll");
-            }
             else
-                // Standardverweise anfügen
                 cp.ReferencedAssemblies.AddRange(new string[] 
                 {
                     "System.dll",
@@ -53,46 +39,33 @@ namespace Zyan.Communication.Scripting
                     "System.Data.dll",
                     "System.Data.DataSetExtensions.dll"
                 });
-
-            // C#-Compiler erzeugen
+            
             using (CSharpCodeProvider codeProvider = new CSharpCodeProvider())
             {
-                // C#-Skript kompilieren
                 CompilerResults results = codeProvider.CompileAssemblyFromSource(cp, scriptCode);
 
-                // Wenn keine Fehler aufgetreten sind ...
                 if (results.Errors.Count == 0)
-                    // Assembly zurückgeben
                     return results.CompiledAssembly;
             }
-            // Nichts zurückgeben
             return null;
         }
 
         /// <summary>
-        /// Gibt den C#-Namen eines bestimmten Typs zurück.
+        /// Gets the C# name of a specified type.
         /// </summary>
-        /// <param name="type">Typ</param>
-        /// <returns>C# Name des Typs</returns>
+        /// <param name="type">Type</param>
+        /// <returns>C# name</returns>
         public static string GetCSharpNameOfType(Type type)
         {
-            // Wenn kein Typ angegeben wurde ...
             if (type == null)
-                // Ausnahme werden
                 throw new ArgumentNullException("type");
 
-            // Wenn der Typ kein generischer Typ ist ...
             if (!type.IsGenericType)
-                // Vollständigen Namen zurückgeben
                 return type.FullName.Replace('+','.');
 
-            // Quellcode-Typverweis erzeugen
             CodeTypeReference typeRef = new CodeTypeReference(type);
-
-            // C#-Quellcodeanbieter erzeugen
             CSharpCodeProvider provider = new CSharpCodeProvider();
 
-            // Quellcodename des Typs ermitteln und zurückgeben
             return provider.GetTypeOutput(typeRef).Replace('+','.');
         }
     }
