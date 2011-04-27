@@ -212,12 +212,12 @@ namespace Zyan.Communication
             {
                 if (_connection.ErrorHandlingEnabled)
                 {
-                    ZyanErrorEventArgs e=new ZyanErrorEventArgs() 
+                    ZyanErrorEventArgs e = new ZyanErrorEventArgs() 
                     {
-                        Exception=ex,
-                        RemotingMessage=methodCallMessage,
-                        ServerComponentType=_interfaceType,
-                        RemoteMemberName=methodCallMessage.MethodName
+                        Exception = ex,
+                        RemotingMessage = methodCallMessage,
+                        ServerComponentType = _interfaceType,
+                        RemoteMemberName = methodCallMessage.MethodName
                     };
 
                     _connection.OnError(e);
@@ -227,12 +227,12 @@ namespace Zyan.Communication
                         case ZyanErrorAction.ThrowException:
                             throw ex;
                         case ZyanErrorAction.Retry:
-                            Invoke(message);
-                            break;
+                            return Invoke(message);
                         case ZyanErrorAction.Ignore:
                             return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
                     }
                 }
+
                 throw ex;
             }
         }
