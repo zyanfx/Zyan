@@ -16,8 +16,7 @@ namespace Zyan.Examples.Linq.Server
 				var folder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 				foreach (var s in Directory.GetFiles(folder))
 				{
-					var fi = new FileInfo(s);
-					yield return (T)(object)fi;
+					yield return new FileInfo(s).As<T>();
 				}
 
 				yield break;
@@ -28,14 +27,21 @@ namespace Zyan.Examples.Linq.Server
 			{
 				foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
 				{
-					var asm = (T)(object)assembly;
-					yield return asm;
+					yield return assembly.As<T>();
 				}
 
 				yield break;
 			}
 
 			throw new NotSupportedException(string.Format("Type {0} is not supported", typeof(T).Name));
+		}
+	}
+
+	internal static class ObjectExtensions
+	{
+		public static T As<T>(this object obj)
+		{
+			return (T)obj;
 		}
 	}
 }
