@@ -376,6 +376,15 @@ namespace Zyan.Communication {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Lost connection to server &apos;{0}&apos;. ähnelt.
+        /// </summary>
+        internal static string SocketException_LostConnectionToServer {
+            get {
+                return ResourceManager.GetString("SocketException_LostConnectionToServer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die User is not authenticated by operating system. ähnelt.
         /// </summary>
         internal static string UserNotAuthenicatedByWindows {
