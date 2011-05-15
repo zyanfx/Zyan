@@ -38,7 +38,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			this.server = server;
 			this.channel = channel;
 
-			Connection.GetConnection(server, channel); // Try to connect so we fail during creation if the other side isn't listening
+			Connection.GetConnection(server, channel, channel.TcpKeepAliveEnabled, channel.TcpKeepAliveTime, channel.TcpKeepAliveInterval); // Try to connect so we fail during creation if the other side isn't listening
 		}
 
 		#region Implementation of IClientChannelSink
@@ -53,7 +53,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			else
 				requestHeaders["__RequestUri"] = url;
 
-			Connection connection = Connection.GetConnection(server, channel);
+            Connection connection = Connection.GetConnection(server, channel, channel.TcpKeepAliveEnabled, channel.TcpKeepAliveTime, channel.TcpKeepAliveInterval);
 
 			System.Diagnostics.Debug.Assert(connection != null, "Manager.GetConnection returned null", "Manager.GetConnection returned null in ClientTransportSink.ProcessMessage for server - " + server);
 			return connection;

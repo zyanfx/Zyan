@@ -225,4 +225,7 @@
   <data name="RemotingException_ConnectionError" xml:space="preserve">
     <value>Fehler beim Verbinden mit dem Remotehost: {0}.</value>
   </data>
+  <data name="SocketException_LostConnectionToServer" xml:space="preserve">
+    <value>Verbindung zu Server '{0}' ist abgebrochen.</value>
+  </data>
 </root>

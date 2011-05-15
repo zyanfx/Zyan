@@ -71,8 +71,11 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
         /// </summary>
         /// <param name="address">Address of the connection</param>
         /// <param name="channel">Channel of the connection</param>
+        /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
+        /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
+        /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
         /// <returns>Connection</returns>
-		public static Connection GetConnection(string address, TcpExChannel channel)
+        public static Connection GetConnection(string address, TcpExChannel channel, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
 		{
 			if (string.IsNullOrEmpty(address))
                 throw new ArgumentException("Address must not be empty.", "address");
@@ -89,7 +92,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
                 try
                 {
-                    connection = new Connection(address, channel);
+                    connection = new Connection(address, channel, keepAlive, keepAliveTime, KeepAliveInterval);
                     if (!_connections.ContainsKey(address))
                         _connections.Add(address, connection); // This most often happens when using the loopback address
 
@@ -131,8 +134,11 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
         /// </summary>
         /// <param name="socket">Connection socket</param>
         /// <param name="channel">Connection channel</param>
+        /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
+        /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
+        /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
         /// <returns>Connection</returns>
-		public static Connection CreateConnection(Socket socket, TcpExChannel channel)
+        public static Connection CreateConnection(Socket socket, TcpExChannel channel, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
 		{
             if (socket==null)
                 throw new ArgumentNullException("socket");
@@ -140,7 +146,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
             if (channel == null)
                 throw new ArgumentNullException("channel");
 
-			return new Connection(socket, channel);
+            return new Connection(socket, channel, keepAlive, keepAliveTime, KeepAliveInterval);            
 		}               
 
         #endregion
@@ -152,7 +158,10 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
         /// </summary>
         /// <param name="address">Address (IP oder DNS based)</param>
         /// <param name="channel">Remoting channel</param>
-        protected Connection(string address, TcpExChannel channel)
+        /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
+        /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
+        /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
+        protected Connection(string address, TcpExChannel channel, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
 		{
             if (string.IsNullOrEmpty(address))
                 throw new ArgumentException("Address must not be empty.", "address");
@@ -169,7 +178,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
             _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 			_socket.Connect(new IPEndPoint(Manager.GetHostByName(m.Groups["address"].Value), int.Parse(m.Groups["port"].Value)));
-
+            
 			SendChannelInfo();
 			ReceiveChannelInfo();
 
@@ -178,6 +187,10 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				_socket.Close();
 				throw new DuplicateConnectionException(_remoteChannelData.ChannelID);
 			}
+            TcpKeepAliveTime = keepAliveTime;
+            TcpKeepAliveInterval = KeepAliveInterval;
+            TcpKeepAliveEnabled = keepAlive;
+
 			AddToConnectionList();
 		}
 
@@ -186,7 +199,10 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
         /// </summary>
         /// <param name="socket">Socket which sould be used</param>
         /// <param name="channel">Remoting channel</param>
-		protected Connection(Socket socket, TcpExChannel channel)
+        /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
+        /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
+        /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
+        protected Connection(Socket socket, TcpExChannel channel, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
 		{
             if (socket == null)
                 throw new ArgumentNullException("socket");
@@ -205,6 +221,10 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				socket.Close();
 				throw new DuplicateConnectionException(_remoteChannelData.ChannelID);
 			}
+            TcpKeepAliveTime = keepAliveTime;
+            TcpKeepAliveInterval = KeepAliveInterval;
+            TcpKeepAliveEnabled = keepAlive;
+
 			AddToConnectionList();
 		}
 
@@ -534,5 +554,89 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		}
 
 		#endregion
-	}
+
+        #region TCP KeepAlive
+
+        private bool _tcpKeepAliveEnabled = true;
+        private ulong _tcpKeepAliveTime = 30000;
+        private ulong _tcpKeepAliveInterval = 1000;
+
+        const int BYTES_PER_LONG = 4; 
+        const int BITS_PER_BYTE = 8;
+
+        /// <summary>
+        /// Enables or disables TCP KeepAlive.        
+        /// </summary>
+        public bool TcpKeepAliveEnabled
+        {
+            get { return _tcpKeepAliveEnabled; }
+            set 
+            { 
+                _tcpKeepAliveEnabled = value; 
+                
+                if (_socket!=null)                
+                    SetTcpKeepAlive(_socket, _tcpKeepAliveEnabled ? TcpKeepAliveTime : 0, _tcpKeepAliveEnabled ? TcpKeepAliveInterval : 0);                
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the TCP KeepAlive time in milliseconds.
+        /// </summary>
+        public ulong TcpKeepAliveTime
+        {
+            get { return _tcpKeepAliveTime; }
+            set { _tcpKeepAliveTime = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the TCP KeepAlive interval in milliseconds
+        /// </summary>
+        public ulong TcpKeepAliveInterval
+        {
+            get { return _tcpKeepAliveInterval; }
+            set { _tcpKeepAliveInterval = value; }
+        }
+
+        /// <summary>
+        /// Sets TCP-KeepAlive option for a specified socket.
+        /// </summary>        
+        /// <param name="socket">Socket</param>
+        /// <param name="time">Time in milliseconds</param>
+        /// <param name="interval">Interval in milliseconds</param>
+        /// <returns>True if successful, otherwiese false</returns>
+        private bool SetTcpKeepAlive(Socket socket, ulong time, ulong interval)
+        {            
+            try
+            {                
+                byte[] sioKeepAliveValues = new byte[3 * BYTES_PER_LONG];
+                ulong[] input = new ulong[3];
+                                
+                if (time == 0 || interval == 0)
+                    input[0] = (0UL); // Off
+                else
+                    input[0] = (1UL); // On
+
+                input[1] = time;
+                input[2] = interval;
+                                
+                for (int i = 0; i < input.Length; i++)
+                {
+                    sioKeepAliveValues[i * BYTES_PER_LONG + 3] = (byte)(input[i] >> ((BYTES_PER_LONG - 1) * BITS_PER_BYTE) & 0xff);
+                    sioKeepAliveValues[i * BYTES_PER_LONG + 2] = (byte)(input[i] >> ((BYTES_PER_LONG - 2) * BITS_PER_BYTE) & 0xff);
+                    sioKeepAliveValues[i * BYTES_PER_LONG + 1] = (byte)(input[i] >> ((BYTES_PER_LONG - 3) * BITS_PER_BYTE) & 0xff);
+                    sioKeepAliveValues[i * BYTES_PER_LONG + 0] = (byte)(input[i] >> ((BYTES_PER_LONG - 4) * BITS_PER_BYTE) & 0xff);
+                }                
+                byte[] result = BitConverter.GetBytes(0);
+                                
+                socket.IOControl(IOControlCode.KeepAliveValues, sioKeepAliveValues, result);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        #endregion
+    }
 }

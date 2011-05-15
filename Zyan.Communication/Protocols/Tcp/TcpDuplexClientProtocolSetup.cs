@@ -26,6 +26,37 @@ namespace Zyan.Communication.Protocols.Tcp
         private bool _oaep = false;
         private int _maxAttempts = 2;
 
+        private bool _tcpKeepAliveEnabled = true;
+        private ulong _tcpKeepAliveTime = 30000;
+        private ulong _tcpKeepAliveInterval = 1000;
+
+        /// <summary>
+        /// Enables or disables TCP KeepAlive.        
+        /// </summary>
+        public bool TcpKeepAliveEnabled
+        {
+            get { return _tcpKeepAliveEnabled; }
+            set { _tcpKeepAliveEnabled = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the TCP KeepAlive time in milliseconds.
+        /// </summary>
+        public ulong TcpKeepAliveTime
+        {
+            get { return _tcpKeepAliveTime; }
+            set { _tcpKeepAliveTime = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the TCP KeepAlive interval in milliseconds
+        /// </summary>
+        public ulong TcpKeepAliveInterval
+        {
+            get { return _tcpKeepAliveInterval; }
+            set { _tcpKeepAliveInterval = value; }
+        }
+
         /// <summary>
         /// Erzeugt eine neue Instanz von TcpDuplexClientProtocolSetup.
         /// </summary>
@@ -50,6 +81,23 @@ namespace Zyan.Communication.Protocols.Tcp
         /// Erzeugt eine neue Instanz von TcpDuplexClientProtocolSetup.
         /// </summary>
         /// <param name="encryption">Gibt an, ob die Kommunikation verschlüssel werden soll</param>
+        /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
+        /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
+        /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
+        public TcpDuplexClientProtocolSetup(bool encryption, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
+            : this()
+        {
+            // Werte übernehmen
+            _encryption = encryption;
+            TcpKeepAliveEnabled = keepAlive;
+            TcpKeepAliveTime = keepAliveTime;
+            TcpKeepAliveInterval = KeepAliveInterval;
+        }
+
+        /// <summary>
+        /// Erzeugt eine neue Instanz von TcpDuplexClientProtocolSetup.
+        /// </summary>
+        /// <param name="encryption">Gibt an, ob die Kommunikation verschlüssel werden soll</param>
         /// <param name="algorithm">Verschlüsselungsalgorithmus (z.B. "3DES")</param>
         public TcpDuplexClientProtocolSetup(bool encryption, string algorithm)
             : this()
@@ -57,6 +105,25 @@ namespace Zyan.Communication.Protocols.Tcp
             // Werte übernehmen
             _encryption = encryption;
             _algorithm = algorithm;
+        }
+
+        /// <summary>
+        /// Erzeugt eine neue Instanz von TcpDuplexClientProtocolSetup.
+        /// </summary>
+        /// <param name="encryption">Gibt an, ob die Kommunikation verschlüssel werden soll</param>
+        /// <param name="algorithm">Verschlüsselungsalgorithmus (z.B. "3DES")</param>
+        /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
+        /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
+        /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
+        public TcpDuplexClientProtocolSetup(bool encryption, string algorithm, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
+            : this()
+        {
+            // Werte übernehmen
+            _encryption = encryption;
+            _algorithm = algorithm;
+            TcpKeepAliveEnabled = keepAlive;
+            TcpKeepAliveTime = keepAliveTime;
+            TcpKeepAliveInterval = KeepAliveInterval;
         }
 
         /// <summary>
@@ -78,6 +145,27 @@ namespace Zyan.Communication.Protocols.Tcp
         /// Erzeugt eine neue Instanz von TcpDuplexClientProtocolSetup.
         /// </summary>
         /// <param name="encryption">Gibt an, ob die Kommunikation verschlüssel werden soll</param>
+        /// <param name="algorithm">Verschlüsselungsalgorithmus (z.B. "3DES")</param>
+        /// <param name="maxAttempts">Anzahl der maximalen Verbindungsversuche</param>
+        /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
+        /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
+        /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
+        public TcpDuplexClientProtocolSetup(bool encryption, string algorithm, int maxAttempts, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
+            : this()
+        {
+            // Werte übernehmen
+            _encryption = encryption;
+            _algorithm = algorithm;
+            _maxAttempts = maxAttempts;
+            TcpKeepAliveEnabled = keepAlive;
+            TcpKeepAliveTime = keepAliveTime;
+            TcpKeepAliveInterval = KeepAliveInterval;
+        }
+
+        /// <summary>
+        /// Erzeugt eine neue Instanz von TcpDuplexClientProtocolSetup.
+        /// </summary>
+        /// <param name="encryption">Gibt an, ob die Kommunikation verschlüssel werden soll</param>
         /// <param name="algorithm">Verschlüsselungsalgorithmus (z.B. "3DES")</param>        
         /// <param name="oaep">Gibt an, ob OAEP Padding verwendet werden soll</param>
         public TcpDuplexClientProtocolSetup(bool encryption, string algorithm, bool oaep)
@@ -87,6 +175,27 @@ namespace Zyan.Communication.Protocols.Tcp
             _encryption = encryption;
             _algorithm = algorithm;
             _oaep = oaep;
+        }
+
+        /// <summary>
+        /// Erzeugt eine neue Instanz von TcpDuplexClientProtocolSetup.
+        /// </summary>
+        /// <param name="encryption">Gibt an, ob die Kommunikation verschlüssel werden soll</param>
+        /// <param name="algorithm">Verschlüsselungsalgorithmus (z.B. "3DES")</param>        
+        /// <param name="oaep">Gibt an, ob OAEP Padding verwendet werden soll</param>
+        /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
+        /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
+        /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
+        public TcpDuplexClientProtocolSetup(bool encryption, string algorithm, bool oaep, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
+            : this()
+        {
+            // Werte übernehmen
+            _encryption = encryption;
+            _algorithm = algorithm;
+            _oaep = oaep;
+            TcpKeepAliveEnabled = keepAlive;
+            TcpKeepAliveTime = keepAliveTime;
+            TcpKeepAliveInterval = KeepAliveInterval;
         }
 
         /// <summary>
@@ -104,6 +213,29 @@ namespace Zyan.Communication.Protocols.Tcp
             _algorithm = algorithm;
             _maxAttempts = maxAttempts;
             _oaep = oaep;
+        }
+
+        /// <summary>
+        /// Erzeugt eine neue Instanz von TcpDuplexClientProtocolSetup.
+        /// </summary>
+        /// <param name="encryption">Gibt an, ob die Kommunikation verschlüssel werden soll</param>
+        /// <param name="algorithm">Verschlüsselungsalgorithmus (z.B. "3DES")</param>
+        /// <param name="maxAttempts">Anzahl der maximalen Verbindungsversuche</param>
+        /// <param name="oaep">Gibt an, ob OAEP Padding verwendet werden soll</param>
+        /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
+        /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
+        /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
+        public TcpDuplexClientProtocolSetup(bool encryption, string algorithm, int maxAttempts, bool oaep, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
+            : this()
+        {
+            // Werte übernehmen
+            _encryption = encryption;
+            _algorithm = algorithm;
+            _maxAttempts = maxAttempts;
+            _oaep = oaep;
+            TcpKeepAliveEnabled = keepAlive;
+            TcpKeepAliveTime = keepAliveTime;
+            TcpKeepAliveInterval = KeepAliveInterval;
         }
 
         /// <summary>
@@ -154,6 +286,9 @@ namespace Zyan.Communication.Protocols.Tcp
                 channelSettings["port"] = 0;
                 channelSettings["listen"] = true;
                 channelSettings["typeFilterLevel"] = TypeFilterLevel.Full;
+                channelSettings["keepAliveEnabled"] = _tcpKeepAliveEnabled;
+                channelSettings["keepAliveTime"] = _tcpKeepAliveTime;
+                channelSettings["keepAliveInterval"] = _tcpKeepAliveInterval;
                 
                 // Binären Clientformatierer erzeugen
                 BinaryClientFormatterSinkProvider clientFormatter = new BinaryClientFormatterSinkProvider();
