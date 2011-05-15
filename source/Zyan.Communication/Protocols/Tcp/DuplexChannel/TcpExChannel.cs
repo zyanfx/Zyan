@@ -32,37 +32,71 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		private TcpExChannelData channelData;
 		internal ServerTransportSink messageSink;
 		private IClientChannelSinkProvider clientSinkProvider;
+        private bool _tcpKeepAliveEnabled = true;
+        private ulong _tcpKeepAliveTime = 30000;
+        private ulong _tcpKeepAliveInterval = 1000;
 
-		#region Constructors
-		
+        #region TCP KeepAlive
+
+        /// <summary>
+        /// Enables or disables TCP KeepAlive.        
+        /// </summary>
+        public bool TcpKeepAliveEnabled
+        {
+            get { return _tcpKeepAliveEnabled; }            
+        }
+
+        /// <summary>
+        /// Gets or sets the TCP KeepAlive time in milliseconds.
+        /// </summary>
+        public ulong TcpKeepAliveTime
+        {
+            get { return _tcpKeepAliveTime; }            
+        }
+
+        /// <summary>
+        /// Gets or sets the TCP KeepAlive interval in milliseconds
+        /// </summary>
+        public ulong TcpKeepAliveInterval
+        {
+            get { return _tcpKeepAliveInterval; }            
+        }
+
+        #endregion
+
+        #region Constructors
+
         public TcpExChannel()
 		{
-			Initialise(TypeFilterLevel.Low, null, null, 0, false);
+            Initialise(TypeFilterLevel.Low, null, null, 0, false, true, 30000, 1000);
 		}
 
 		public TcpExChannel(int port)
 		{
-			Initialise(TypeFilterLevel.Low, null, null, port, true);
+            Initialise(TypeFilterLevel.Low, null, null, port, true, true, 30000, 1000);
 		}
 
 		public TcpExChannel(bool listen)
 		{
-			Initialise(TypeFilterLevel.Low, null, null, 0, listen);
+            Initialise(TypeFilterLevel.Low, null, null, 0, listen, true, 30000, 1000);
 		}
 
 		public TcpExChannel(TypeFilterLevel filterLevel, bool listen)
 		{
-			Initialise(filterLevel, null, null, 0, listen);
+            Initialise(filterLevel, null, null, 0, listen, true, 30000, 1000);
 		}
 
 		public TcpExChannel(TypeFilterLevel filterLevel, int port)
 		{
-			Initialise(filterLevel, null, null, port, true);
+			Initialise(filterLevel, null, null, port, true, true, 30000, 1000);
 		}
 
 		public TcpExChannel(IDictionary properties, IClientChannelSinkProvider clientSinkProvider, IServerChannelSinkProvider serverSinkProvider)
 		{
 			int port = 0;
+            bool tcpKeepAliveEnabled = true;
+            ulong tcpKeepAliveTime = 30000;
+            ulong tcpKeepAliveInterval = 1000;
 			bool listen = false;
 			TypeFilterLevel typeFilterLevel = TypeFilterLevel.Low;
 
@@ -79,6 +113,14 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				listen = Convert.ToBoolean(properties["listen"]);
 			if (properties.Contains("bufferSize"))
 				Connection.BufferSize = Convert.ToInt32(properties["bufferSize"]);
+            if (properties.Contains("keepAlive"))
+                tcpKeepAliveEnabled = Convert.ToBoolean(properties["keepAlive"]);
+            if (properties.Contains("keepAliveEnabled"))
+                tcpKeepAliveEnabled = Convert.ToBoolean(properties["keepAliveEnabled"]);
+            if (properties.Contains("keepAliveTime"))
+                tcpKeepAliveTime = Convert.ToUInt64(properties["keepAliveTime"]);
+            if (properties.Contains("keepAliveInterval"))
+                tcpKeepAliveInterval = Convert.ToUInt64(properties["keepAliveInterval"]);
             if (properties.Contains("typeFilterLevel"))
             {
                 if (properties["typeFilterLevel"] is string)
@@ -86,11 +128,15 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
                 else
                     typeFilterLevel = (TypeFilterLevel)properties["typeFilterLevel"];
             }
-			Initialise(typeFilterLevel, clientSinkProvider, serverSinkProvider, port, listen);
+			Initialise(typeFilterLevel, clientSinkProvider, serverSinkProvider, port, listen, tcpKeepAliveEnabled, tcpKeepAliveTime, tcpKeepAliveInterval);
 		}
 
-		private void Initialise(TypeFilterLevel typeFilterLevel, IClientChannelSinkProvider clientSinkProvider, IServerChannelSinkProvider serverSinkProvider, int port, bool listen)
+        private void Initialise(TypeFilterLevel typeFilterLevel, IClientChannelSinkProvider clientSinkProvider, IServerChannelSinkProvider serverSinkProvider, int port, bool listen, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
 		{
+            _tcpKeepAliveEnabled = keepAlive;
+            _tcpKeepAliveTime = keepAliveTime;
+            _tcpKeepAliveInterval = KeepAliveInterval;
+
 			if (clientSinkProvider == null)
 				clientSinkProvider = new BinaryClientFormatterSinkProvider();
 			if (serverSinkProvider == null)

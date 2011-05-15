@@ -176,7 +176,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 			try
 			{
-				StartListening(Connection.CreateConnection(client, channel));
+				StartListening(Connection.CreateConnection(client, channel, channel.TcpKeepAliveEnabled, channel.TcpKeepAliveTime, channel.TcpKeepAliveInterval));
 			}
 			catch (DuplicateConnectionException)
 			{

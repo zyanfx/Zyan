@@ -225,4 +225,7 @@
   <data name="RemotingException_ConnectionError" xml:space="preserve">
     <value>Error connecting remote host: {0}.</value>
   </data>
+  <data name="SocketException_LostConnectionToServer" xml:space="preserve">
+    <value>Lost connection to server '{0}'.</value>
+  </data>
 </root>

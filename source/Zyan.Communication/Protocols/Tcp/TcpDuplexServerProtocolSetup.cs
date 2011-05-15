@@ -28,6 +28,37 @@ namespace Zyan.Communication.Protocols.Tcp
         private int _tcpPort = 0;
         private IAuthenticationProvider _authProvider = null;
 
+        private bool _tcpKeepAliveEnabled = true;
+        private ulong _tcpKeepAliveTime = 30000;
+        private ulong _tcpKeepAliveInterval = 1000;
+        
+        /// <summary>
+        /// Enables or disables TCP KeepAlive.        
+        /// </summary>
+        public bool TcpKeepAliveEnabled
+        {
+            get { return _tcpKeepAliveEnabled; }
+            set { _tcpKeepAliveEnabled = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the TCP KeepAlive time in milliseconds.
+        /// </summary>
+        public ulong TcpKeepAliveTime
+        {
+            get { return _tcpKeepAliveTime; }
+            set { _tcpKeepAliveTime = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the TCP KeepAlive interval in milliseconds
+        /// </summary>
+        public ulong TcpKeepAliveInterval
+        {
+            get { return _tcpKeepAliveInterval; }
+            set { _tcpKeepAliveInterval = value; }
+        }
+
         /// <summary>
         /// Gibt die TCP-Anschlußnummer zurück, oder legt sie fest.
         /// </summary>
@@ -87,6 +118,25 @@ namespace Zyan.Communication.Protocols.Tcp
         }
 
         /// <summary>
+        /// Erstellt eine neue Instanz von TcpDuplexServerProtocolSetup.
+        /// </summary>
+        /// <param name="tcpPort">TCP-Anschlußnummer</param>
+        /// <param name="authProvider">Authentifizierungsanbieter</param>
+        /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
+        /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
+        /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
+        public TcpDuplexServerProtocolSetup(int tcpPort, IAuthenticationProvider authProvider, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
+            : this()
+        {
+            // Werte übernehmen
+            TcpPort = tcpPort;
+            AuthenticationProvider = authProvider;
+            TcpKeepAliveEnabled = keepAlive;
+            TcpKeepAliveTime = keepAliveTime;
+            TcpKeepAliveInterval = KeepAliveInterval;
+        }
+
+        /// <summary>
         /// Erzeugt eine neue Instanz von TcpDuplexServerProtocolSetup.
         /// </summary>
         /// <param name="tcpPort">TCP-Anschlußnummer</param>
@@ -99,6 +149,27 @@ namespace Zyan.Communication.Protocols.Tcp
             TcpPort = tcpPort;
             AuthenticationProvider = authProvider;
             _encryption = encryption;
+        }
+
+        /// <summary>
+        /// Erzeugt eine neue Instanz von TcpDuplexServerProtocolSetup.
+        /// </summary>
+        /// <param name="tcpPort">TCP-Anschlußnummer</param>
+        /// <param name="authProvider">Authentifizierungsanbieter</param>
+        /// <param name="encryption">Gibt an, ob die Kommunikation verschlüssel werden soll</param>
+        /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
+        /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
+        /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
+        public TcpDuplexServerProtocolSetup(int tcpPort, IAuthenticationProvider authProvider, bool encryption, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
+            : this()
+        {
+            // Werte übernehmen
+            TcpPort = tcpPort;
+            AuthenticationProvider = authProvider;
+            _encryption = encryption;
+            TcpKeepAliveEnabled = keepAlive;
+            TcpKeepAliveTime = keepAliveTime;
+            TcpKeepAliveInterval = KeepAliveInterval;
         }
 
         /// <summary>
@@ -124,6 +195,29 @@ namespace Zyan.Communication.Protocols.Tcp
         /// <param name="tcpPort">TCP-Anschlußnummer</param>
         /// <param name="authProvider">Authentifizierungsanbieter</param>
         /// <param name="encryption">Gibt an, ob die Kommunikation verschlüssel werden soll</param>
+        /// <param name="algorithm">Verschlüsselungsalgorithmus (z.B. "3DES")</param>
+        /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
+        /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
+        /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
+        public TcpDuplexServerProtocolSetup(int tcpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
+            : this()
+        {
+            // Werte übernehmen
+            TcpPort = tcpPort;
+            AuthenticationProvider = authProvider;
+            _encryption = encryption;
+            _algorithm = algorithm;
+            TcpKeepAliveEnabled = keepAlive;
+            TcpKeepAliveTime = keepAliveTime;
+            TcpKeepAliveInterval = KeepAliveInterval;
+        }
+
+        /// <summary>
+        /// Erzeugt eine neue Instanz von TcpDuplexServerProtocolSetup.
+        /// </summary>
+        /// <param name="tcpPort">TCP-Anschlußnummer</param>
+        /// <param name="authProvider">Authentifizierungsanbieter</param>
+        /// <param name="encryption">Gibt an, ob die Kommunikation verschlüssel werden soll</param>
         /// <param name="algorithm">Verschlüsselungsalgorithmus (z.B. "3DES")</param>        
         /// <param name="oaep">Gibt an, ob OAEP Padding verwendet werden soll</param>
         public TcpDuplexServerProtocolSetup(int tcpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm, bool oaep)
@@ -135,6 +229,31 @@ namespace Zyan.Communication.Protocols.Tcp
             _encryption = encryption;
             _algorithm = algorithm;
             _oaep = oaep;
+        }
+
+        /// <summary>
+        /// Erzeugt eine neue Instanz von TcpDuplexServerProtocolSetup.
+        /// </summary>
+        /// <param name="tcpPort">TCP-Anschlußnummer</param>
+        /// <param name="authProvider">Authentifizierungsanbieter</param>
+        /// <param name="encryption">Gibt an, ob die Kommunikation verschlüssel werden soll</param>
+        /// <param name="algorithm">Verschlüsselungsalgorithmus (z.B. "3DES")</param>        
+        /// <param name="oaep">Gibt an, ob OAEP Padding verwendet werden soll</param>
+        /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
+        /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
+        /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
+        public TcpDuplexServerProtocolSetup(int tcpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm, bool oaep, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
+            : this()
+        {
+            // Werte übernehmen
+            TcpPort = tcpPort;
+            AuthenticationProvider = authProvider;
+            _encryption = encryption;
+            _algorithm = algorithm;
+            _oaep = oaep;
+            TcpKeepAliveEnabled = keepAlive;
+            TcpKeepAliveTime = keepAliveTime;
+            TcpKeepAliveInterval = KeepAliveInterval;
         }
 
         /// <summary>
@@ -158,6 +277,9 @@ namespace Zyan.Communication.Protocols.Tcp
                 channelSettings["port"] = _tcpPort;
                 channelSettings["listen"] = true;
                 channelSettings["typeFilterLevel"] = TypeFilterLevel.Full;
+                channelSettings["keepAliveEnabled"] = _tcpKeepAliveEnabled;
+                channelSettings["keepAliveTime"] = _tcpKeepAliveTime;
+                channelSettings["keepAliveInterval"] = _tcpKeepAliveInterval;
                 
                 // Binären Clientformatierer erzeugen
                 BinaryClientFormatterSinkProvider clientFormatter = new BinaryClientFormatterSinkProvider();
