@@ -222,4 +222,10 @@
   <data name="KeyNotFoundException_SerializationHandlerNotFound" xml:space="preserve">
     <value>Обработчик сериализации для типа '{0}' не зарегистрирован.</value>
   </data>
+  <data name="RemotingException_ConnectionError" xml:space="preserve">
+    <value>Ошибка соединения с удаленным хостом: {0}.</value>
+  </data>
+  <data name="SocketException_LostConnectionToServer" xml:space="preserve">
+    <value>Потеряно соединение с сервером '{0}'.</value>
+  </data>
 </root>
