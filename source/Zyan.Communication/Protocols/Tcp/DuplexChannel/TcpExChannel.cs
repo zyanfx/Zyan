@@ -35,6 +35,8 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
         private bool _tcpKeepAliveEnabled = true;
         private ulong _tcpKeepAliveTime = 30000;
         private ulong _tcpKeepAliveInterval = 1000;
+        private short _maxRetries = 10;
+        private int _retryDelay = 1000;
 
         #region TCP KeepAlive
 
@@ -68,27 +70,27 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
         public TcpExChannel()
 		{
-            Initialise(TypeFilterLevel.Low, null, null, 0, false, true, 30000, 1000);
+            Initialise(TypeFilterLevel.Low, null, null, 0, false, true, 30000, 1000, 10, 1000);
 		}
 
 		public TcpExChannel(int port)
 		{
-            Initialise(TypeFilterLevel.Low, null, null, port, true, true, 30000, 1000);
+            Initialise(TypeFilterLevel.Low, null, null, port, true, true, 30000, 1000, 10, 1000);
 		}
 
 		public TcpExChannel(bool listen)
 		{
-            Initialise(TypeFilterLevel.Low, null, null, 0, listen, true, 30000, 1000);
+            Initialise(TypeFilterLevel.Low, null, null, 0, listen, true, 30000, 1000, 10, 1000);
 		}
 
 		public TcpExChannel(TypeFilterLevel filterLevel, bool listen)
 		{
-            Initialise(filterLevel, null, null, 0, listen, true, 30000, 1000);
+            Initialise(filterLevel, null, null, 0, listen, true, 30000, 1000, 10, 1000);
 		}
 
 		public TcpExChannel(TypeFilterLevel filterLevel, int port)
 		{
-			Initialise(filterLevel, null, null, port, true, true, 30000, 1000);
+			Initialise(filterLevel, null, null, port, true, true, 30000, 1000,10,1000);
 		}
 
 		public TcpExChannel(IDictionary properties, IClientChannelSinkProvider clientSinkProvider, IServerChannelSinkProvider serverSinkProvider)
@@ -97,6 +99,8 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
             bool tcpKeepAliveEnabled = true;
             ulong tcpKeepAliveTime = 30000;
             ulong tcpKeepAliveInterval = 1000;
+            short maxRetries = 10;
+            int retryDelay = 1000;
 			bool listen = false;
 			TypeFilterLevel typeFilterLevel = TypeFilterLevel.Low;
 
@@ -121,6 +125,10 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
                 tcpKeepAliveTime = Convert.ToUInt64(properties["keepAliveTime"]);
             if (properties.Contains("keepAliveInterval"))
                 tcpKeepAliveInterval = Convert.ToUInt64(properties["keepAliveInterval"]);
+            if (properties.Contains("maxRetries"))
+                maxRetries = Convert.ToInt16(properties["maxRetries"]);
+            if (properties.Contains("retryDelay"))
+                retryDelay = Convert.ToInt32(properties["retryDelay"]);
             if (properties.Contains("typeFilterLevel"))
             {
                 if (properties["typeFilterLevel"] is string)
@@ -128,14 +136,16 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
                 else
                     typeFilterLevel = (TypeFilterLevel)properties["typeFilterLevel"];
             }
-			Initialise(typeFilterLevel, clientSinkProvider, serverSinkProvider, port, listen, tcpKeepAliveEnabled, tcpKeepAliveTime, tcpKeepAliveInterval);
+			Initialise(typeFilterLevel, clientSinkProvider, serverSinkProvider, port, listen, tcpKeepAliveEnabled, tcpKeepAliveTime, tcpKeepAliveInterval, maxRetries, retryDelay);
 		}
 
-        private void Initialise(TypeFilterLevel typeFilterLevel, IClientChannelSinkProvider clientSinkProvider, IServerChannelSinkProvider serverSinkProvider, int port, bool listen, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
+        private void Initialise(TypeFilterLevel typeFilterLevel, IClientChannelSinkProvider clientSinkProvider, IServerChannelSinkProvider serverSinkProvider, int port, bool listen, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval, short maxRetries, int retryDelay)
 		{
             _tcpKeepAliveEnabled = keepAlive;
             _tcpKeepAliveTime = keepAliveTime;
             _tcpKeepAliveInterval = KeepAliveInterval;
+            _maxRetries = maxRetries;
+            _retryDelay = retryDelay;
 
 			if (clientSinkProvider == null)
 				clientSinkProvider = new BinaryClientFormatterSinkProvider();
@@ -191,7 +201,17 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		{
 			get { return port != 0;	}
 		}
-		
+
+        public short MaxRetries
+        {
+            get { return _maxRetries; }
+        }
+
+        public int RetryDelay
+        {
+            get { return _retryDelay; }
+        }
+
         #endregion
 
 		#region Implementation of IChannel
