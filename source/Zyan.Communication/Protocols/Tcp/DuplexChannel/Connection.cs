@@ -53,6 +53,15 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
         }
 	}
 
+    /// <summary>
+    /// Defines connection roles. A connection may act as Server or as Client.
+    /// </summary>
+    public enum ConnectionRole
+    { 
+        ActAsClient = 1,
+        ActAsServer
+    }
+
 	/// <summary>
 	/// Encapsulates a connection, providing read/write locking for synchronisation.  
 	/// Additionally, this should provide a useful position for adding reconnection abilities.
@@ -74,8 +83,10 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
         /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
         /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
         /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
+        /// <param name="maxRetries">Maximum number of connection retry attempts</param>
+        /// <param name="retryDelay">Delay after connection retry in milliseconds</param>
         /// <returns>Connection</returns>
-        public static Connection GetConnection(string address, TcpExChannel channel, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
+        public static Connection GetConnection(string address, TcpExChannel channel, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval, short maxRetries, int retryDelay)
 		{
 			if (string.IsNullOrEmpty(address))
                 throw new ArgumentException("Address must not be empty.", "address");
@@ -92,7 +103,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
                 try
                 {
-                    connection = new Connection(address, channel, keepAlive, keepAliveTime, KeepAliveInterval);
+                    connection = new Connection(address, channel, keepAlive, keepAliveTime, KeepAliveInterval, maxRetries, retryDelay);
                     if (!_connections.ContainsKey(address))
                         _connections.Add(address, connection); // This most often happens when using the loopback address
 
@@ -137,8 +148,10 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
         /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
         /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
         /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
+        /// <param name="maxRetries">Maximum number of connection retry attempts</param>
+        /// <param name="retryDelay">Delay after connection retry in milliseconds</param>
         /// <returns>Connection</returns>
-        public static Connection CreateConnection(Socket socket, TcpExChannel channel, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
+        public static Connection CreateConnection(Socket socket, TcpExChannel channel, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval, short maxRetries, int retryDelay)
 		{
             if (socket==null)
                 throw new ArgumentNullException("socket");
@@ -146,7 +159,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
             if (channel == null)
                 throw new ArgumentNullException("channel");
 
-            return new Connection(socket, channel, keepAlive, keepAliveTime, KeepAliveInterval);            
+            return new Connection(socket, channel, keepAlive, keepAliveTime, KeepAliveInterval, maxRetries, retryDelay);            
 		}               
 
         #endregion
@@ -161,23 +174,32 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
         /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
         /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
         /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
-        protected Connection(string address, TcpExChannel channel, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
+        /// <param name="maxRetries">Maximum number of connection retry attempts</param>
+        /// <param name="retryDelay">Delay after connection retry in milliseconds</param>
+        protected Connection(string address, TcpExChannel channel, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval, short maxRetries, int retryDelay)
 		{
             if (string.IsNullOrEmpty(address))
                 throw new ArgumentException("Address must not be empty.", "address");
 
             if (channel == null)
                 throw new ArgumentNullException("channel");
-
-			_channel = channel;
+            			
+            _connectionRole = ConnectionRole.ActAsClient;
+            _maxRetries = maxRetries;
+            _retryDelay = retryDelay;
+            _channel = channel;
 
 			Match m = _addressRegEx.Match(address);
 			
             if (!m.Success)
 				throw new FormatException(string.Format("Invalid format for 'address' parameter - {0}", address));
 
+            IPAddress remoteIPAddress = Manager.GetHostByName(m.Groups["address"].Value);
+            _socketRemoteAddress = remoteIPAddress.ToString();
+            _socketRemotePort = int.Parse(m.Groups["port"].Value);
+
             _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-			_socket.Connect(new IPEndPoint(Manager.GetHostByName(m.Groups["address"].Value), int.Parse(m.Groups["port"].Value)));
+			_socket.Connect(new IPEndPoint(remoteIPAddress, _socketRemotePort));
             
 			SendChannelInfo();
 			ReceiveChannelInfo();
@@ -202,7 +224,9 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
         /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
         /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
         /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
-        protected Connection(Socket socket, TcpExChannel channel, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
+        /// <param name="maxRetries">Maximum number of connection retry attempts</param>
+        /// <param name="retryDelay">Delay after connection retry in milliseconds</param>
+        protected Connection(Socket socket, TcpExChannel channel, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval, short maxRetries, int retryDelay)
 		{
             if (socket == null)
                 throw new ArgumentNullException("socket");
@@ -210,9 +234,16 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
             if (channel == null)
                 throw new ArgumentNullException("channel");
 
-			this._channel = channel;            		
-			this._socket = socket;
-
+            _connectionRole = ConnectionRole.ActAsServer;
+            _maxRetries = maxRetries;
+            _retryDelay = retryDelay;
+			_channel = channel;            		
+			_socket = socket;
+            
+            IPEndPoint remoteEndPoint = socket.RemoteEndPoint as IPEndPoint;
+            _socketRemoteAddress = remoteEndPoint.Address.ToString();
+            _socketRemotePort = remoteEndPoint.Port;
+            
 			ReceiveChannelInfo();
 			SendChannelInfo();
 
@@ -238,10 +269,25 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
         public static int BufferSize = 10 * (2 << 10); // 10K
 
         /// <summary>
+        /// Defines the connection role.
+        /// </summary>
+        protected ConnectionRole _connectionRole;
+
+        /// <summary>
         /// Socket used for TCP communication.
         /// </summary>
         protected Socket _socket;
+
+        /// <summary>
+        /// Address of the remote socket endpoint.
+        /// </summary>
+        protected string _socketRemoteAddress;
         
+        /// <summary>
+        /// Port of the remote socket endpoint.
+        /// </summary>
+        protected int _socketRemotePort;               
+
         /// <summary>
         /// Networkstream for sending and receiving raw data.
         /// </summary>
@@ -266,6 +312,65 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
         /// Configuration data of the remoting channel.
         /// </summary>
         protected TcpExChannelData _remoteChannelData;
+
+        /// <summary>
+        /// Maximum number of connection retry attempts.
+        /// </summary>
+        protected short _maxRetries = 10;
+
+        /// <summary>
+        /// Delay after retry attempt in milliseconds. 
+        /// </summary>
+        protected int _retryDelay = 1000;
+
+        /// <summary>
+        /// Tries to reconnect, if the socket was closed unexpected.
+        /// </summary>
+        private void CheckSocket()
+        {
+            if (_socket != null)
+                return;
+
+            if (!string.IsNullOrEmpty(_socketRemoteAddress))
+                throw new RemotingException("No remote address specified for reconnet.");
+
+            short retryCount = 0;
+
+            while (_socket == null)
+            {
+                retryCount++;
+
+                if (retryCount <= _maxRetries)
+                {
+                    switch (_connectionRole)
+                    {
+                        case ConnectionRole.ActAsClient:
+
+                            IPAddress remoteAddress = IPAddress.Parse(_socketRemoteAddress);
+
+                            _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                            _socket.Connect(new IPEndPoint(remoteAddress, _socketRemotePort));
+
+                            SendChannelInfo();
+                            ReceiveChannelInfo();
+
+                            break;
+
+                        case ConnectionRole.ActAsServer:
+                            
+                            // Wait for connection from client
+                  
+                            break;
+                    }
+                    if (_retryDelay > 0)
+                        Thread.Sleep(_retryDelay);
+
+                    continue;
+                }
+                else
+                    break;
+            }
+        }
 
         /// <summary>
         /// Sends channel data.
@@ -334,7 +439,10 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			}
             LockRead();
             LockWrite();
-                        
+
+            _socketRemoteAddress = null;
+            _socketRemotePort = 0;
+
             if (_reader != null)
             {
                 try
@@ -421,8 +529,11 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			get
 			{
                 if (_stream == null)
+                {
+                    CheckSocket();
+
                     _stream = new NetworkStream(_socket, FileAccess.ReadWrite, false);
-                
+                }
 				return _stream;
 			}
 		}
@@ -513,6 +624,24 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		{
 			get { return _socket.LocalEndPoint.ToString(); }
 		}
+
+        /// <summary>
+        /// Gets or sets the maximum number of connection retry attempts.
+        /// </summary>
+        public short MaxRetries
+        {
+            get { return _maxRetries; }
+            set { _maxRetries = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the delay after a retry attempt in milliseconds.
+        /// </summary>
+        public int RetryDelay
+        {
+            get { return _retryDelay; }
+            set { _retryDelay = value; }
+        }
 
 		#endregion
 
