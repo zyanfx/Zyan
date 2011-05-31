@@ -114,7 +114,9 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
             if (!IPAddress.TryParse(name, out ipAddress))
             {
-                foreach (var ip in Dns.GetHostEntry(name).AddressList)
+                IPAddress[] resolvedAddresses = Dns.GetHostEntry(name).AddressList;
+                
+                foreach (var ip in resolvedAddresses)
                 {
                     if (ip.AddressFamily == AddressFamily.InterNetwork)
                         return ip;
@@ -176,7 +178,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 			try
 			{
-				StartListening(Connection.CreateConnection(client, channel, channel.TcpKeepAliveEnabled, channel.TcpKeepAliveTime, channel.TcpKeepAliveInterval));
+				StartListening(Connection.CreateConnection(client, channel, channel.TcpKeepAliveEnabled, channel.TcpKeepAliveTime, channel.TcpKeepAliveInterval, channel.MaxRetries, channel.RetryDelay));
 			}
 			catch (DuplicateConnectionException)
 			{
@@ -264,6 +266,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		#endregion
 
 		#region ReadMessage
+
 		public static IAsyncResult BeginReadMessage(object guidOrServer, Connection connection, AsyncCallback callback, object asyncState)
 		{
             lock (_listenersLockObject)
@@ -280,8 +283,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 						ar.Complete((Connection)result[0], (Message)result[1]);
 						return ar;
 					}
-				}
-				
+				}				
 				_listeners.Add(guidOrServer, ar);
 				return ar;
 			}
