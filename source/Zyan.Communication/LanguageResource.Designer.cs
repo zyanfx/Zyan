@@ -88,6 +88,15 @@ namespace Zyan.Communication {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Address must not be empty. ähnelt.
+        /// </summary>
+        internal static string ArgumentException_AddressMustNotBeEmpty {
+            get {
+                return ResourceManager.GetString("ArgumentException_AddressMustNotBeEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Component host name missing. ähnelt.
         /// </summary>
         internal static string ArgumentException_ComponentHostNameMissing {
@@ -304,6 +313,15 @@ namespace Zyan.Communication {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Invalid format for &apos;address&apos; parameter: {0} ähnelt.
+        /// </summary>
+        internal static string Format_Exception_InvalidAddressFormat {
+            get {
+                return ResourceManager.GetString("Format_Exception_InvalidAddressFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Invalid user name or password. ähnelt.
         /// </summary>
         internal static string InvalidCredentials {
@@ -327,6 +345,15 @@ namespace Zyan.Communication {
         internal static string RemotingException_ConnectionError {
             get {
                 return ResourceManager.GetString("RemotingException_ConnectionError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die No remote address specified for reconnet. ähnelt.
+        /// </summary>
+        internal static string RemotingException_NoAddressForReconnect {
+            get {
+                return ResourceManager.GetString("RemotingException_NoAddressForReconnect", resourceCulture);
             }
         }
         
