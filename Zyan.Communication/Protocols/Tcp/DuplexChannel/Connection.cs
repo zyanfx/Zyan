@@ -20,8 +20,6 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
 using System.Threading;
 
-//TODO: Localize Exceptions.
-
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
     /// <summary>
@@ -60,7 +58,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
         public static Connection GetConnection(string address, TcpExChannel channel, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval, short maxRetries, int retryDelay)
 		{
 			if (string.IsNullOrEmpty(address))
-                throw new ArgumentException("Address must not be empty.", "address");
+                throw new ArgumentException(LanguageResource.ArgumentException_AddressMustNotBeEmpty, "address");
 
             if (channel == null)
                 throw new ArgumentNullException("channel");
@@ -150,7 +148,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
         protected Connection(string address, TcpExChannel channel, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval, short maxRetries, int retryDelay)
 		{
             if (string.IsNullOrEmpty(address))
-                throw new ArgumentException("Address must not be empty.", "address");
+                throw new ArgumentException(LanguageResource.ArgumentException_AddressMustNotBeEmpty, "address");
 
             if (channel == null)
                 throw new ArgumentNullException("channel");
@@ -163,7 +161,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			Match m = _addressRegEx.Match(address);
 			
             if (!m.Success)
-				throw new FormatException(string.Format("Invalid format for 'address' parameter - {0}", address));
+				throw new FormatException(string.Format(LanguageResource.Format_Exception_InvalidAddressFormat, address));
 
             IPAddress remoteIPAddress = Manager.GetHostByName(m.Groups["address"].Value);
             _socketRemoteAddress = remoteIPAddress.ToString();
@@ -215,7 +213,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
             _socketRemoteAddress = remoteEndPoint.Address.ToString();
             _socketRemotePort = remoteEndPoint.Port;
             
-			ReceiveChannelInfo();
+            ReceiveChannelInfo();            
 			SendChannelInfo();
 
 			if (_connections.ContainsKey(_remoteChannelData.ChannelID.ToString()))
@@ -303,7 +301,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
                 return;
 
             if (!string.IsNullOrEmpty(_socketRemoteAddress))
-                throw new RemotingException("No remote address specified for reconnet.");
+                throw new RemotingException(LanguageResource.RemotingException_NoAddressForReconnect);
 
             short retryCount = 0;
 

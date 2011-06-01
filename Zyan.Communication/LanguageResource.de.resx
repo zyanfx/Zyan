@@ -112,10 +112,10 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ApplicationException_MultipleModuleControlersNotAllowed" xml:space="preserve">
     <value>Mehrere Modulcontroller im selben Modul sind nicht zulässig.</value>
@@ -227,5 +227,14 @@
   </data>
   <data name="SocketException_LostConnectionToServer" xml:space="preserve">
     <value>Verbindung zu Server '{0}' ist abgebrochen.</value>
+  </data>
+  <data name="ArgumentException_AddressMustNotBeEmpty" xml:space="preserve">
+    <value>Adresse darf nicht leer sein.</value>
+  </data>
+  <data name="Format_Exception_InvalidAddressFormat" xml:space="preserve">
+    <value>Ungültiges Format für Parameter 'address': {0}.</value>
+  </data>
+  <data name="RemotingException_NoAddressForReconnect" xml:space="preserve">
+    <value>Keine Adresse zum Wiederverbinden vorhanden.</value>
   </data>
 </root>

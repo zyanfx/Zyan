@@ -17,6 +17,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.IO;
+using System.Runtime.Serialization;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
@@ -157,14 +159,22 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			TcpExChannel channel = (TcpExChannel)state[1];
 			Socket client = listener.EndAccept(ar);
 
-			try
-			{
-				StartListening(Connection.CreateConnection(client, channel, channel.TcpKeepAliveEnabled, channel.TcpKeepAliveTime, channel.TcpKeepAliveInterval, channel.MaxRetries, channel.RetryDelay));
-			}
-			catch (DuplicateConnectionException)
-			{
-			}
-
+            try
+            {
+                StartListening(Connection.CreateConnection(client, channel, channel.TcpKeepAliveEnabled, channel.TcpKeepAliveTime, channel.TcpKeepAliveInterval, channel.MaxRetries, channel.RetryDelay));
+            }
+            catch (DuplicateConnectionException)
+            {
+            }
+            catch (IOException ioEx)
+            {
+                // Client socket is not responding
+            }
+            catch (SerializationException serEx)
+            { 
+                // Client sends bad data
+            }
+            // Wait for next Client request
 			listener.BeginAccept(new AsyncCallback(listener_Accept), new object[] {listener, channel});
 		}
 
