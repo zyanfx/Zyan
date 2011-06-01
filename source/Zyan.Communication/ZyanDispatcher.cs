@@ -13,9 +13,7 @@ using Zyan.Communication.Toolbox;
 namespace Zyan.Communication
 {
 	/// <summary>
-	/// Allgemeiner Wrapper für eine verteilte Komponente.
-	/// Nimmt Remoting-Aufrufe für eine bestimmte Komponente entgegen und
-	/// leitet sie lokal an die Komponente weiter.
+	/// Central dispatch component for RPC requests.
 	/// </summary>
 	public class ZyanDispatcher : MarshalByRefObject, IZyanDispatcher
 	{
@@ -40,7 +38,7 @@ namespace Zyan.Communication
 
 		#region Komponentenaufruf
 
-		// Felder
+		// Component Host this dispatcher is dispatching for
 		private ZyanComponentHost _host = null;
 
 		/// <summary>
@@ -89,44 +87,32 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Entfernt Drähte zwischen Client- und Server-Komponente (wenn im Korrelationssatz angegeben).
+		/// Removes wires between server and client components (as defined in correlation set).
 		/// </summary>
-		/// <param name="type">Implementierungstyp der Server-Komponente</param>
-		/// <param name="instance">Instanz der Serverkomponente</param>
-		/// <param name="delegateCorrelationSet">Korrelationssatz mit Verdrahtungsinformationen</param>
-		/// <param name="wiringList">Auflistung mit gespeicherten Verdrahtungen</param>
+		/// <param name="type">Type of the server component</param>
+		/// <param name="instance">Instance of the server component</param>
+		/// <param name="delegateCorrelationSet">Correlation set with wiring information</param>
+		/// <param name="wiringList">List with known wirings</param>
 		private void RemoveClientServerWires(Type type, object instance, List<DelegateCorrelationInfo> delegateCorrelationSet, Dictionary<Guid, Delegate> wiringList)
-		{
-			// Wenn kein Korrelationssatz angegeben wurde ...
+		{	
 			if (delegateCorrelationSet == null)
-				// Prozedur abbrechen
 				return;
 
-			// Alle Einträge des Korrelationssatzes durchlaufen
 			foreach (DelegateCorrelationInfo correlationInfo in delegateCorrelationSet)
 			{
-				// Wenn es sich um ein Ereignis handelt ...
 				if (correlationInfo.IsEvent)
 				{
-					// Wenn eine Verdrahtung mit dem angegebenen Korrelationsschlüssel gespeichert ist ...
 					if (wiringList.ContainsKey(correlationInfo.CorrelationID))
 					{
-						// Metadaten des Ereignisses abufen                
 						EventInfo eventInfo = type.GetEvent(correlationInfo.DelegateMemberName);
-
-						// Delegat abrufen
 						Delegate dynamicWireDelegate = wiringList[correlationInfo.CorrelationID];
 
-						// Verdrahtung aufheben
 						eventInfo.RemoveEventHandler(instance, dynamicWireDelegate);
 					}
 				}
 				else
 				{
-					// Metadaten des aktuellen Ausgabe-Pins abufen                
 					PropertyInfo delegatePropInfo = type.GetProperty(correlationInfo.DelegateMemberName);
-
-					// Verdrahtung aufheben
 					delegatePropInfo.SetValue(instance, null, null);
 				}
 			}
@@ -235,8 +221,7 @@ namespace Zyan.Communication
 
 			if (!_host.ComponentRegistry.ContainsKey(interfaceName))
 			{
-				//TODO: Localize the exception text.
-				KeyNotFoundException ex = new KeyNotFoundException(string.Format("Cannot find component for interface '{0}'.", interfaceName));
+				KeyNotFoundException ex = new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_CannotFindComponentForInterface, interfaceName));
 				_host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
 				throw ex;
 			}
@@ -269,8 +254,7 @@ namespace Zyan.Communication
 					}
 					else
 					{
-						//TODO: Locaize the exception text.
-						InvalidSessionException ex = new InvalidSessionException(string.Format("Session ID '{0}' is invalid. Please log on first.", sessionID.ToString()));
+						InvalidSessionException ex = new InvalidSessionException(string.Format(LanguageResource.InvalidSessionException_SessionIDInvalid, sessionID.ToString()));
 						_host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
 						throw ex;
 					}

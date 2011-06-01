@@ -169,10 +169,12 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
             catch (IOException ioEx)
             {
                 // Client socket is not responding
+                //TODO: Add Tracing here!
             }
             catch (SerializationException serEx)
             { 
                 // Client sends bad data
+                //TODO: Add Tracing here!
             }
             // Wait for next Client request
 			listener.BeginAccept(new AsyncCallback(listener_Accept), new object[] {listener, channel});
