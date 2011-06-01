@@ -12,7 +12,7 @@
  Copyright © 2003 Richard Mason. All Rights Reserved. 
  --------------------------------------------------------------------------------------------------------------
 */
-using System;
+
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel.Diagnostics
 {

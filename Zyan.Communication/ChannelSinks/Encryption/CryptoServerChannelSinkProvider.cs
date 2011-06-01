@@ -1,7 +1,6 @@
 using System;
-using System.Net;
 using System.Collections;
-using System.Runtime.Remoting;
+using System.Net;
 using System.Runtime.Remoting.Channels;
 
 namespace Zyan.Communication.ChannelSinks.Encryption

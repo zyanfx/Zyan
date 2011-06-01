@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Reflection;
+using System.Text;
 using Zyan.Communication.Scripting;
-using System.IO;
 
 namespace Zyan.Communication
 {
@@ -103,21 +102,17 @@ namespace Zyan.Communication
         /// Creates a dynamic wire for a specified event or delegate property of a component.        
         /// </summary>
         /// <param name="componentType">Component type</param>
-        /// <param name="delegateType">Type of the delegate</param>
-        /// <param name="clientInterceptor">Interceptor object form client</param>
+        /// <param name="delegateType">Type of the delegate</param>        
         /// <returns>Instance of the created dynamic wire type (ready to use)</returns>
-        public object CreateDynamicWire(Type componentType, Type delegateType, DelegateInterceptor clientInterceptor)
+        public object CreateDynamicWire(Type componentType, Type delegateType)
         {
             if (componentType == null)
                 throw new ArgumentNullException("componentType");
 
             if (delegateType == null)
                 throw new ArgumentNullException("delegateType");
-
-            if (clientInterceptor == null)
-                throw new ArgumentNullException("clientInterceptor");
-                        
-            Type wireType = BuildDynamicWireType(componentType, delegateType, clientInterceptor);
+                                             
+            Type wireType = BuildDynamicWireType(componentType, delegateType);
                                     
             object wire = Activator.CreateInstance(wireType);
             return wire;
@@ -187,10 +182,9 @@ namespace Zyan.Communication
         /// Creates a dynamic wire type dynamicly.
         /// </summary>
         /// <param name="componentType">Type of server component</param>
-        /// <param name="delegateType">Delegate type of the wire</param>
-        /// <param name="clientInterceptor">Interceptor object from client</param>
+        /// <param name="delegateType">Delegate type of the wire</param>        
         /// <returns>Type of dynamic wire</returns>
-        private Type BuildDynamicWireType(Type componentType, Type delegateType, DelegateInterceptor clientInterceptor)
+        private Type BuildDynamicWireType(Type componentType, Type delegateType)
         {            
             string[] references = GetComponentReferences(componentType);
             string sourceCode = string.Empty;

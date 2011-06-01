@@ -327,7 +327,7 @@ namespace Zyan.Communication
 					DelegateInterceptor delegateParamInterceptor = delegateParamIndexes[index];
 					ParameterInfo serverMethodParamDef = serverMethodParamDefs[index];
 
-					object dynamicWire = DynamicWireFactory.Instance.CreateDynamicWire(type, serverMethodParamDef.ParameterType, delegateParamInterceptor);
+					object dynamicWire = DynamicWireFactory.Instance.CreateDynamicWire(type, serverMethodParamDef.ParameterType);
 					Type dynamicWireType = dynamicWire.GetType();
 					dynamicWireType.GetProperty("Interceptor").SetValue(dynamicWire, delegateParamInterceptor, null);
 					Delegate dynamicWireDelegate = Delegate.CreateDelegate(serverMethodParamDef.ParameterType, dynamicWire, dynamicWireType.GetMethod("In"));

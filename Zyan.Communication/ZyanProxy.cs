@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using System.Net.Sockets;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using System.Runtime.Remoting.Proxies;
-using System.Reflection;
-using System.Transactions;
 
 namespace Zyan.Communication
 {
@@ -102,6 +100,14 @@ namespace Zyan.Communication
         }
 
         /// <summary>
+        /// Gets the name of the remote Component Host.
+        /// </summary>
+        public string ComponentHostName
+        {
+            get { return _componentHostName; }            
+        }
+
+        /// <summary>
         /// Entfernte Methode aufrufen.
         /// </summary>
         /// <param name="message">Remoting-Nachricht mit Details für den entfernten Methodenaufruf</param>
@@ -176,7 +182,7 @@ namespace Zyan.Communication
                     if (_delegateCorrelationSet.Count > 0)
                     {
                         // Verdrahtungskonfiguration suchen
-                        DelegateCorrelationInfo found = (from correlationInfo in (DelegateCorrelationInfo[])_delegateCorrelationSet.ToArray()
+                        DelegateCorrelationInfo found = (from correlationInfo in _delegateCorrelationSet.ToArray()
                                                          where correlationInfo.DelegateMemberName.Equals(propertyName) && correlationInfo.ClientDelegateInterceptor.ClientDelegate.Equals(inputMessage)
                                                          select correlationInfo).FirstOrDefault();
 

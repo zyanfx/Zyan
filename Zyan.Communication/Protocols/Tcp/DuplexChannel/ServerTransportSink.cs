@@ -2,31 +2,24 @@
  THIS CODE IS BASED ON:
  -------------------------------------------------------------------------------------------------------------- 
  TcpEx Remoting Channel
-
  Version 1.2 - 18 November, 2003
  Richard Mason - r.mason@qut.edu.au
-  
  Originally published at GotDotNet:
  http://www.gotdotnet.com/Community/UserSamples/Details.aspx?SampleGuid=3F46C102-9970-48B1-9225-8758C38905B1
-
  Copyright © 2003 Richard Mason. All Rights Reserved. 
  --------------------------------------------------------------------------------------------------------------
 */
 using System;
-using System.IO;
-using System.Net.Sockets;
 using System.Collections;
+using System.IO;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Messaging;
-using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
 	class ServerTransportSink : IServerChannelSink
 	{
-		private static readonly BinaryFormatter _formatter = new BinaryFormatter();
-
 		private TcpExChannel _channel;
 		private IServerChannelSink _nextSink;
 
