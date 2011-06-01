@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Timers;
 using System.Linq;
-using System.Security;
-using System.Security.Principal;
 using System.Collections.Generic;
 using System.Runtime.Remoting;
-using System.Runtime.Remoting.Services;
 using System.Runtime.Remoting.Channels;
-using System.Runtime.Remoting.Channels.Tcp;
-using System.Runtime.Serialization.Formatters;
 using Zyan.Communication.Security;
 using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp;
@@ -404,7 +398,7 @@ namespace Zyan.Communication
         private void StartListening()
         {
             // TCP-Kommunikationskanal öffnen
-            IChannel channel = (IChannel)_protocolSetup.CreateChannel();
+            IChannel channel = _protocolSetup.CreateChannel();
                         
             // Wenn der Kanal erzeugt wurde ...
             if (channel != null)

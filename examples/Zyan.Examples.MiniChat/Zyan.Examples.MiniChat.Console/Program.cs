@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Zyan.Communication;
 using Zyan.Communication.Protocols.Tcp;
 using Zyan.Examples.MiniChat.Shared;
@@ -47,6 +44,7 @@ namespace Zyan.Examples.MiniChat.Console
 
                 chatProxy.SendMessage(_nickName, text);
             }
+            chatProxy.MessageReceived -= new Action<string, string>(chatProxy_MessageReceived);
 
             connection.Dispose();        
         }

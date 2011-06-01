@@ -85,6 +85,7 @@
             this.Controls.Add(this._sayBox);
             this.Name = "ChatForm";
             this.Text = "Mini Chat";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ChatForm_FormClosed);
             this.ResumeLayout(false);
             this.PerformLayout();
 

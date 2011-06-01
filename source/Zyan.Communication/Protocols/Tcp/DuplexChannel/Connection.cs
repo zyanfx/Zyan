@@ -2,57 +2,28 @@
  THIS CODE IS BASED ON:
  -------------------------------------------------------------------------------------------------------------- 
  TcpEx Remoting Channel
-
  Version 1.2 - 18 November, 2003
  Richard Mason - r.mason@qut.edu.au
-  
  Originally published at GotDotNet:
  http://www.gotdotnet.com/Community/UserSamples/Details.aspx?SampleGuid=3F46C102-9970-48B1-9225-8758C38905B1
-
  Copyright © 2003 Richard Mason. All Rights Reserved. 
  --------------------------------------------------------------------------------------------------------------
 */
 using System;
-using System.Linq;
-using System.IO;
-using System.Net;
-using System.Threading;
-using System.Net.Sockets;
-using System.Collections;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Runtime.Serialization.Formatters.Binary;
-using Zyan.Communication.Protocols.Tcp.DuplexChannel.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Runtime.Remoting;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text.RegularExpressions;
+using System.Threading;
 
 //TODO: Localize Exceptions.
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
-    /// <summary>
-    /// This exception should be thrown, when an attempt to create a duplicate connection is detected.
-    /// </summary>
-	internal class DuplicateConnectionException : Exception
-	{
-        /// <summary>
-        /// Creates a new instance of the DuplicateConnectionException class.
-        /// </summary>
-        /// <param name="channelID">Unique channel identifier</param>
-		public DuplicateConnectionException(Guid channelID)
-		{
-            ChannelID = channelID;
-		}
-
-        /// <summary>
-        /// Gets the unique channel identifier.
-        /// </summary>
-        public Guid ChannelID
-        {
-            get;
-            private set;
-        }
-	}
-
     /// <summary>
     /// Defines connection roles. A connection may act as Server or as Client.
     /// </summary>
@@ -111,7 +82,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
                 }
                 catch (DuplicateConnectionException ex)
                 {
-                    connection = (Connection)_connections[ex.ChannelID.ToString()];
+                    connection = _connections[ex.ChannelID.ToString()];
                     _connections.Add(address, connection);
                 }
                 catch (FormatException formatEx)
@@ -407,18 +378,6 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
                     }
                 }
 			}
-		}
-
-        /// <summary>
-        /// Add connections for loopback to the connection list.
-        /// </summary>
-		private void AddLoopbackConnections()
-		{
-            lock (_connectionsLockObject)
-            {
-                _connections.Add("localhost", this);
-                _connections.Add(IPAddress.Loopback.ToString(), this);
-            }
 		}
 
         /// <summary>

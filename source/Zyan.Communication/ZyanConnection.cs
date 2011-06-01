@@ -1,20 +1,17 @@
 ﻿using System;
-using System.Threading;
-using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Runtime.Remoting;
-using System.Runtime.Remoting.Messaging;
 using System.Runtime.Remoting.Channels;
-using System.Runtime.Remoting.Channels.Tcp;
-using System.Runtime.Serialization.Formatters;
-using Zyan.Communication.Security;
+using System.Runtime.Remoting.Messaging;
+using System.Threading;
+using System.Transactions;
+using Zyan.Communication.Notification;
 using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp;
-using Zyan.Communication.Notification;
-using System.Net.Sockets;
-using System.Net;
-using System.Transactions;
 
 namespace Zyan.Communication
 {
@@ -154,7 +151,7 @@ namespace Zyan.Communication
             _componentHostName = addressParts[addressParts.Length - 1];
 
             // TCP-Kommunikationskanal öffnen
-            IChannel channel = (IChannel)_protocolSetup.CreateChannel();
+            IChannel channel = _protocolSetup.CreateChannel();
 
             // Wenn der Kanal erzeugt wurde ...
             if (channel != null)

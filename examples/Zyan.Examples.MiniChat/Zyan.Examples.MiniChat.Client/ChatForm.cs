@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 using Zyan.Communication;
-using Zyan.Examples.MiniChat.Shared;
-using System.Threading;
 using Zyan.Communication.Protocols.Tcp;
+using Zyan.Examples.MiniChat.Shared;
 
 namespace Zyan.Examples.MiniChat.Client
 {
@@ -57,6 +51,11 @@ namespace Zyan.Examples.MiniChat.Client
         private void _sendButton_Click(object sender, EventArgs e)
         {
             ThreadPool.QueueUserWorkItem(x => _chatProxy.SendMessage(_nickName.Text, _sayBox.Text));
+        }
+
+        private void ChatForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            _chatProxy.MessageReceived -= new Action<string, string>(_chatProxy_MessageReceived);
         }
     }
 }
