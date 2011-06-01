@@ -12,15 +12,14 @@ namespace Zyan.Communication
     /// </summary>
     internal sealed class DynamicWireFactory
     {
+        #region Singleton implementation
+
         // Locking object
         private static object _singltonLockObject = new object();
 
         // Singleton instance
         private static volatile DynamicWireFactory _singleton=null;
-
-        // Cache for created dynamic wire types (creation is very expensive, so the types are cached)
-        private Dictionary<string, Type> _wireTypeCache = null;
-
+        
         /// <summary>
         /// Gets a singleton instance of the DynamicWirefactory class.
         /// </summary>
@@ -40,6 +39,10 @@ namespace Zyan.Communication
             }
         }
 
+        #endregion
+
+        #region Constructor
+
         /// <summary>
         /// Creates a new instance of the DynamicWireFactory class.
         /// </summary>
@@ -48,8 +51,58 @@ namespace Zyan.Communication
             _wireTypeCache = new Dictionary<string, Type>();
         }
 
+        #endregion
+
+        #region Wire Type Cache
+
+        // Cache for created dynamic wire types (creation is very expensive, so the types are cached)
+        private Dictionary<string, Type> _wireTypeCache = null;
+
         // Locking object for thread sync of the wire type cache
         private object _wireTypeCacheLockObject = new object();
+
+        /// <summary>
+        /// Creates a unique wire cache key for a delegate wire type.
+        /// </summary>
+        /// <param name="componentType">Type of server component</param>
+        /// <param name="delegateType">Delegate type of the wire</param>
+        /// <param name="isEvent">Sets if the wire type is for a event (if false, the wire type must be of a delegate property)</param>
+        /// <returns>Unique key</returns>
+        private string GetWireTypeCacheKeyForWire(Type componentType, Type delegateType, bool isEvent)
+        {
+            StringBuilder wireKeyBuilder = new StringBuilder();
+            wireKeyBuilder.Append(isEvent ? "E|" : "D|");
+            wireKeyBuilder.Append(componentType.FullName);
+            wireKeyBuilder.Append("|");
+            wireKeyBuilder.Append(delegateType.FullName);
+
+            return wireKeyBuilder.ToString();
+        }
+
+        #endregion
+
+        #region Wiring
+
+        /// <summary>
+        /// Gets the delegate type of a component´s event or delegate property.
+        /// </summary>
+        /// <param name="componentType">Component type</param>
+        /// <param name="eventMemberName">Event name or name of the delegate property</param>
+        /// <param name="isEvent">Sets if the member is a event (if false, the memeber must be a delegate property)</param>
+        /// <returns>Delegate type</returns>
+        private Type GetDelegateType(Type componentType, string eventMemberName, bool isEvent)
+        {
+            if (isEvent)
+            {
+                EventInfo eventInfo = componentType.GetEvent(eventMemberName);
+                return eventInfo.EventHandlerType;
+            }
+            else
+            {
+                PropertyInfo delegatePropInfo = componentType.GetProperty(eventMemberName);
+                return delegatePropInfo.PropertyType;
+            } 
+        }
 
         /// <summary>
         /// Creates a dynamic wire for a specified event or delegate property of a component.        
@@ -66,34 +119,8 @@ namespace Zyan.Communication
             if (string.IsNullOrEmpty(eventMemberName))
                 throw new ArgumentException(LanguageResource.ArgumentException_OutPutPinNameMissing, "eventMemberName");
 
-            StringBuilder wireKeyBuilder = new StringBuilder();
-            wireKeyBuilder.Append(componentType.FullName);
-            wireKeyBuilder.Append("|");
-            wireKeyBuilder.Append(eventMemberName);
-            string wireKey = wireKeyBuilder.ToString();
+            Type wireType = wireType = BuildDynamicWireType(componentType, eventMemberName, isEvent);
 
-            Type wireType=null;
-
-            bool wireTypeAlreadyCreated=false;
-
-            lock (_wireTypeCacheLockObject)
-            {
-                wireTypeAlreadyCreated=_wireTypeCache.ContainsKey(wireKey);
-            }
-            if (wireTypeAlreadyCreated)
-                wireType = _wireTypeCache[wireKey];
-            else
-            {                
-                wireType = BuildDynamicWireType(componentType, eventMemberName, isEvent);
-
-                lock (_wireTypeCacheLockObject)
-                {
-                    if (_wireTypeCache.ContainsKey(wireKey))
-                        wireType = _wireTypeCache[wireKey];
-                    else
-                        _wireTypeCache.Add(wireKey, wireType);
-                }
-            }
             object wire = Activator.CreateInstance(wireType);
             return wire;
         }
@@ -111,89 +138,50 @@ namespace Zyan.Communication
 
             if (delegateType == null)
                 throw new ArgumentNullException("delegateType");
-                                             
-            Type wireType = BuildDynamicWireType(componentType, delegateType);
+            
+            Type wireType = BuildDynamicWireTypeForDelegate(componentType, delegateType);
                                     
             object wire = Activator.CreateInstance(wireType);
             return wire;
         }
-
-        /// <summary>
-        /// Returns all direct and indirect references of a specified component type. 
-        /// </summary>
-        /// <param name="componentType">Component type</param>
-        /// <returns>Array with full paths to the referenced assemblies</returns>
-        private string[] GetComponentReferences(Type componentType)
-        {
-            if (componentType == null)
-                throw new ArgumentNullException("componentType");
-
-            List<string> componentReferences = new List<string>();
-            FindAssemblyReferences(Assembly.GetExecutingAssembly(), componentReferences);
-            FindAssemblyReferences(componentType.Assembly, componentReferences);
-
-            return componentReferences.ToArray();
-        }
-
-        /// <summary>
-        /// Adds a path to the path list, if the list doesn´t contain the path already. 
-        /// </summary>
-        /// <param name="path">Path to add</param>
-        /// <param name="paths">path list</param>
-        /// <returns>Returns true if added and false, if the list contains this path aleady</returns>
-        private bool AddReferencePathToList(string path, List<string> paths)
-        {
-            int found = (from p in paths
-                         where p.Equals(path, StringComparison.InvariantCultureIgnoreCase)
-                         select p).Count();
-
-            if (found == 0)
-            {
-                paths.Add(path);
-                return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Obtains all direct and indirect references of a specified Assembly.
-        /// </summary>
-        /// <param name="assembly">Assembly to scan for references</param>
-        /// <param name="paths">List of file paths</param>
-        private void FindAssemblyReferences(Assembly assembly, List<string> paths)
-        {
-            if (assembly == null)
-                throw new ArgumentNullException("assembly");
-
-            if (paths == null)
-                throw new ArgumentNullException("paths");
-
-            AddReferencePathToList(assembly.Location, paths);
                         
-            foreach (AssemblyName refName in assembly.GetReferencedAssemblies())
-            {
-                Assembly reference = Assembly.Load(refName);
-                if (AddReferencePathToList(reference.Location, paths))
-                    FindAssemblyReferences(reference, paths);
-            }            
-        }
-
         /// <summary>
         /// Creates a dynamic wire type dynamicly.
         /// </summary>
         /// <param name="componentType">Type of server component</param>
         /// <param name="delegateType">Delegate type of the wire</param>        
         /// <returns>Type of dynamic wire</returns>
-        private Type BuildDynamicWireType(Type componentType, Type delegateType)
-        {            
-            string[] references = GetComponentReferences(componentType);
-            string sourceCode = string.Empty;
-            sourceCode = CreateDynamicWireSourceCodeForDelegate(delegateType);
-            
-            Assembly assembly = ScriptEngine.CompileScriptToAssembly(sourceCode, references);
+        private Type BuildDynamicWireTypeForDelegate(Type componentType, Type delegateType)
+        {
+            string wireKey = GetWireTypeCacheKeyForWire(componentType, delegateType, false);
+            Type wireType = null;
 
-            Type dynamicWireType = assembly.GetType("Zyan.Communication.DynamicWire");
-            return dynamicWireType;
+            bool wireTypeAlreadyCreated = false;
+
+            lock (_wireTypeCacheLockObject)
+            {
+                wireTypeAlreadyCreated = _wireTypeCache.ContainsKey(wireKey);
+            }
+            if (wireTypeAlreadyCreated)
+                wireType = _wireTypeCache[wireKey];
+            else
+            {
+                string[] references = GetComponentReferences(componentType);
+                string sourceCode = string.Empty;
+                sourceCode = CreateDynamicWireSourceCodeForDelegate(delegateType);
+
+                Assembly assembly = ScriptEngine.CompileScriptToAssembly(sourceCode, references);
+                wireType = assembly.GetType("Zyan.Communication.DynamicWire");
+
+                lock (_wireTypeCacheLockObject)
+                {
+                    if (_wireTypeCache.ContainsKey(wireKey))
+                        wireType = _wireTypeCache[wireKey];
+                    else
+                        _wireTypeCache.Add(wireKey, wireType);
+                }
+            }
+            return wireType;
         }
 
         /// <summary>
@@ -205,24 +193,51 @@ namespace Zyan.Communication
         /// <returns>Type of dynamic wire</returns>
         private Type BuildDynamicWireType(Type componentType,string eventMemberName, bool isEvent)
         {
-            string[] references = GetComponentReferences(componentType);
-            string sourceCode = string.Empty;
+            Type delegateType = GetDelegateType(componentType,eventMemberName,isEvent);
+            string wireKey = GetWireTypeCacheKeyForWire(componentType, delegateType, isEvent);
 
-            if (isEvent)
+            Type wireType = null;
+            bool wireTypeAlreadyCreated = false;
+
+            lock (_wireTypeCacheLockObject)
             {
-                EventInfo eventInfo = componentType.GetEvent(eventMemberName);
-                sourceCode = CreateDynamicWireSourceCodeForEvent(eventInfo);
+                wireTypeAlreadyCreated = _wireTypeCache.ContainsKey(wireKey);
             }
+            if (wireTypeAlreadyCreated)
+                wireType = _wireTypeCache[wireKey];
             else
             {
-                PropertyInfo delegatePropInfo = componentType.GetProperty(eventMemberName);
-                sourceCode = CreateDynamicWireSourceCodeForDelegate(delegatePropInfo);
+                string[] references = GetComponentReferences(componentType);
+                string sourceCode = string.Empty;
+
+                if (isEvent)
+                {
+                    EventInfo eventInfo = componentType.GetEvent(eventMemberName);
+                    sourceCode = CreateDynamicWireSourceCodeForEvent(eventInfo);
+                }
+                else
+                {
+                    PropertyInfo delegatePropInfo = componentType.GetProperty(eventMemberName);
+                    sourceCode = CreateDynamicWireSourceCodeForDelegate(delegatePropInfo);
+                }
+                Assembly assembly = ScriptEngine.CompileScriptToAssembly(sourceCode, references);
+
+                wireType = assembly.GetType("Zyan.Communication.DynamicWire");
+
+                lock (_wireTypeCacheLockObject)
+                {
+                    if (_wireTypeCache.ContainsKey(wireKey))
+                        wireType = _wireTypeCache[wireKey];
+                    else
+                        _wireTypeCache.Add(wireKey, wireType);
+                }
             }
-            Assembly assembly = ScriptEngine.CompileScriptToAssembly(sourceCode, references);
-            
-            Type dynamicWireType = assembly.GetType("Zyan.Communication.DynamicWire");
-            return dynamicWireType;
+            return wireType;
         }
+
+        #endregion
+
+        #region Source code generation
 
         /// <summary>
         /// Generates source code for dynamic wiring of a specified server component event.
@@ -372,5 +387,71 @@ namespace Zyan.Communication
 
             return code.ToString();
         }
+
+        #endregion
+
+        #region Assembly references
+
+        /// <summary>
+        /// Returns all direct and indirect references of a specified component type. 
+        /// </summary>
+        /// <param name="componentType">Component type</param>
+        /// <returns>Array with full paths to the referenced assemblies</returns>
+        private string[] GetComponentReferences(Type componentType)
+        {
+            if (componentType == null)
+                throw new ArgumentNullException("componentType");
+
+            List<string> componentReferences = new List<string>();
+            FindAssemblyReferences(Assembly.GetExecutingAssembly(), componentReferences);
+            FindAssemblyReferences(componentType.Assembly, componentReferences);
+
+            return componentReferences.ToArray();
+        }
+
+        /// <summary>
+        /// Adds a path to the path list, if the list doesn´t contain the path already. 
+        /// </summary>
+        /// <param name="path">Path to add</param>
+        /// <param name="paths">path list</param>
+        /// <returns>Returns true if added and false, if the list contains this path aleady</returns>
+        private bool AddReferencePathToList(string path, List<string> paths)
+        {
+            int found = (from p in paths
+                         where p.Equals(path, StringComparison.InvariantCultureIgnoreCase)
+                         select p).Count();
+
+            if (found == 0)
+            {
+                paths.Add(path);
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Obtains all direct and indirect references of a specified Assembly.
+        /// </summary>
+        /// <param name="assembly">Assembly to scan for references</param>
+        /// <param name="paths">List of file paths</param>
+        private void FindAssemblyReferences(Assembly assembly, List<string> paths)
+        {
+            if (assembly == null)
+                throw new ArgumentNullException("assembly");
+
+            if (paths == null)
+                throw new ArgumentNullException("paths");
+
+            AddReferencePathToList(assembly.Location, paths);
+
+            foreach (AssemblyName refName in assembly.GetReferencedAssemblies())
+            {
+                Assembly reference = Assembly.Load(refName);
+                if (AddReferencePathToList(reference.Location, paths))
+                    FindAssemblyReferences(reference, paths);
+            }
+        }
+
+        #endregion
     }
 }

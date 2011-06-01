@@ -58,6 +58,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActivationType.cs" />
     <Compile Include="CallInterceptorCollection.cs" />
     <Compile Include="CallInterceptorHelper.cs" />
     <Compile Include="ComponentCatalog.cs" />

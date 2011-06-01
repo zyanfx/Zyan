@@ -237,4 +237,10 @@
   <data name="RemotingException_NoAddressForReconnect" xml:space="preserve">
     <value>Keine Adresse zum Wiederverbinden vorhanden.</value>
   </data>
+  <data name="KeyNotFoundException_CannotFindComponentForInterface" xml:space="preserve">
+    <value>Kann keine Komponente für Schnittstelle '{0}' finden.</value>
+  </data>
+  <data name="InvalidSessionException_SessionIDInvalid" xml:space="preserve">
+    <value>Sitzungsschlüssel '{0}' ist ungültig. Bitte melden Sie sich neu an.</value>
+  </data>
 </root>
