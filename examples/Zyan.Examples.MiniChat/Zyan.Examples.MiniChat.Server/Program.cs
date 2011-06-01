@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Zyan.Communication;
-using Zyan.Communication.Security;
 using Zyan.Communication.Protocols.Tcp;
+using Zyan.Communication.Security;
 using Zyan.Examples.MiniChat.Shared;
 
 namespace Zyan.Examples.MiniChat.Server

@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Runtime.Remoting;
-using System.Runtime.Remoting.Messaging;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Http;
 using System.Runtime.Serialization.Formatters;
 using Zyan.Communication.ChannelSinks.Encryption;
-using System.Net.Security;
-using System.Security.Principal;
 
 namespace Zyan.Communication.Protocols.Http
 {

@@ -2,26 +2,21 @@
  THIS CODE IS BASED ON:
  -------------------------------------------------------------------------------------------------------------- 
  TcpEx Remoting Channel
-
  Version 1.2 - 18 November, 2003
  Richard Mason - r.mason@qut.edu.au
-  
  Originally published at GotDotNet:
  http://www.gotdotnet.com/Community/UserSamples/Details.aspx?SampleGuid=3F46C102-9970-48B1-9225-8758C38905B1
-
  Copyright © 2003 Richard Mason. All Rights Reserved. 
  --------------------------------------------------------------------------------------------------------------
 */
 using System;
-using System.IO;
-using System.Net;
-using System.Linq;
-using System.Threading;
-using System.Diagnostics;
-using System.Net.Sockets;
 using System.Collections;
+using System.Diagnostics;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text.RegularExpressions;
-using Zyan.Communication.Protocols.Tcp.DuplexChannel.Diagnostics;
+using System.Threading;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
@@ -88,21 +83,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 			return (string[])retVal.ToArray(typeof(string));
 		}
-
-		static readonly Regex regServer = new Regex("(?<address>[^:]+):(?<port>.+)", RegexOptions.Compiled);
-		
-        static string ResolveHostName(string server)
-		{
-			if (server == null)
-				return "";
-
-			Match m = regServer.Match(server);
-			if (!m.Success)
-				return server;
-			else
-				return string.Format("{0}:{1}", GetHostByName(m.Groups["address"].Value), m.Groups["port"]);
-		}
-
+        		        
 		public static string CreateUrl(Guid guid)
 		{
 			return string.Format("tcpex://{0}", guid);
