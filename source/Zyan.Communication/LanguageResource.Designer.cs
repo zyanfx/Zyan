@@ -331,6 +331,24 @@ namespace Zyan.Communication {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Session ID &apos;{0}&apos; is invalid. Please log on first. ähnelt.
+        /// </summary>
+        internal static string InvalidSessionException_SessionIDInvalid {
+            get {
+                return ResourceManager.GetString("InvalidSessionException_SessionIDInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Cannot find component for interface &apos;{0}&apos;. ähnelt.
+        /// </summary>
+        internal static string KeyNotFoundException_CannotFindComponentForInterface {
+            get {
+                return ResourceManager.GetString("KeyNotFoundException_CannotFindComponentForInterface", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die No serialization handler is registered for type &apos;{0}&apos;. ähnelt.
         /// </summary>
         internal static string KeyNotFoundException_SerializationHandlerNotFound {

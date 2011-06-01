@@ -237,4 +237,10 @@
   <data name="RemotingException_NoAddressForReconnect" xml:space="preserve">
     <value>No remote address specified for reconnet.</value>
   </data>
+  <data name="KeyNotFoundException_CannotFindComponentForInterface" xml:space="preserve">
+    <value>Cannot find component for interface '{0}'.</value>
+  </data>
+  <data name="InvalidSessionException_SessionIDInvalid" xml:space="preserve">
+    <value>Session ID '{0}' is invalid. Please log on first.</value>
+  </data>
 </root>
