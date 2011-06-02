@@ -16,7 +16,7 @@
             if (disposing && (components != null))
             {
                 components.Dispose();
-            }
+            }            
             base.Dispose(disposing);
         }
 
@@ -69,6 +69,7 @@
             // 
             this._nickName.Location = new System.Drawing.Point(12, 12);
             this._nickName.Name = "_nickName";
+            this._nickName.ReadOnly = true;
             this._nickName.Size = new System.Drawing.Size(136, 20);
             this._nickName.TabIndex = 3;
             this._nickName.Text = "Rainbird";

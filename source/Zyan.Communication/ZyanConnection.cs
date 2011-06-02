@@ -591,7 +591,7 @@ namespace Zyan.Communication
                     // Zeitgeber entsorgen
                     _keepSessionAliveTimer.Dispose();
                     _keepSessionAliveTimer = null;
-                }
+                }                
                 try
                 {
                     // Vom Server abmelden
@@ -608,14 +608,30 @@ namespace Zyan.Communication
                     // Verbindung aus der Auflistung entfernen
                     _connections.Remove(this);
                 }
-                // Variablen freigeben
-                _registeredComponents = null;
+                // Variablen freigeben                
                 _remoteComponentFactory = null;
                 _serverUrl = string.Empty;
                 _sessionID = Guid.Empty;
-
-                // Nicht auf Finalisierer warten (da keine unverwalteten Ressourcen freigegeben werden müssen)
-                GC.SuppressFinalize(this);
+                _protocolSetup = null;
+                _serializationHandling=null;
+                _componentHostName = string.Empty;
+                
+                if (_registeredComponents != null)
+                {
+                    _registeredComponents.Clear();
+                    _registeredComponents = null;
+                }
+                if (_callInterceptors != null)
+                {
+                    _callInterceptors.Clear();
+                    _callInterceptors = null;
+                }
+                if (_autoLoginCredentials != null)
+                {
+                    _autoLoginCredentials.Clear();
+                    _autoLoginCredentials = null;
+                }
+                GC.WaitForPendingFinalizers();
             }
         }
 
