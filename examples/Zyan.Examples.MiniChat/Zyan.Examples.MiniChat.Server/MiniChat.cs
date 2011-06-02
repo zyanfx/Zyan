@@ -1,5 +1,6 @@
 ﻿using System;
 using Zyan.Examples.MiniChat.Shared;
+using Zyan.Communication;
 
 namespace Zyan.Examples.MiniChat.Server
 {
@@ -9,6 +10,9 @@ namespace Zyan.Examples.MiniChat.Server
 
         public void SendMessage(string nickname, string text)
         {
+            ServerSession session = ServerSession.CurrentSession;
+            Console.WriteLine(string.Format("[{0} IP={1}] {2}:{3}", DateTime.Now.ToString(), session.ClientAddress, session.Identity.Name, text));
+
             if (MessageReceived != null)
             {
                 try

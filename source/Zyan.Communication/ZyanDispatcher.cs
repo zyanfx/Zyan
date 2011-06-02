@@ -10,6 +10,7 @@ using Zyan.Communication.Security;
 using Zyan.Communication.SessionMgmt;
 using Zyan.Communication.Toolbox;
 using System.Security.Principal;
+using System.Net;
 
 namespace Zyan.Communication
 {
@@ -199,7 +200,32 @@ namespace Zyan.Communication
 			}
 		}
 
-		//TODO: This method needs refactoring. It´s too big.
+        /// <summary>
+        /// Gets the IP Address of the calling client from CallContext.
+        /// </summary>
+        /// <returns></returns>
+        private IPAddress GetCallingClientIPAddress()
+        {
+            return CallContext.GetData("Zyan_ClientAddress") as IPAddress; ;
+        }
+
+        /// <summary>
+        /// Puts the IP Address of the calling client to the current Server Session.
+        /// </summary>
+        private void PutClientAddressToCurrentSession()
+        {
+            if (ServerSession.CurrentSession==null)
+                return;
+
+            IPAddress clientAddress = GetCallingClientIPAddress();
+
+            if (clientAddress != null)
+                ServerSession.CurrentSession.ClientAddress = clientAddress.ToString();
+            else
+                ServerSession.CurrentSession.ClientAddress = string.Empty;
+        }
+
+        //TODO: This method needs refactoring. It´s too big.
 		/// <summary>
 		/// Processes remote method invocation.        
 		/// </summary>
@@ -271,6 +297,8 @@ namespace Zyan.Communication
 			}
 			object returnValue = null;
 
+            PutClientAddressToCurrentSession();
+            
 			Type[] types = new Type[paramDefs.Length];
 
 			Dictionary<int, DelegateInterceptor> delegateParamIndexes = new Dictionary<int, DelegateInterceptor>();
@@ -481,7 +509,13 @@ namespace Zyan.Communication
 				_host.SessionManager.StoreSession(session);
 				ServerSession.CurrentSession = session;
 
-                _host.OnClientLoggedOn(new LoginEventArgs(LoginEventType.Logon, session.Identity, session.Timestamp));
+                string clientIP = string.Empty;
+                IPAddress clientAddress = GetCallingClientIPAddress();
+
+                if (clientAddress != null)
+                    clientIP = clientAddress.ToString();
+
+                _host.OnClientLoggedOn(new LoginEventArgs(LoginEventType.Logon, session.Identity, clientIP, session.Timestamp));
 			}
 		}
 
@@ -504,8 +538,14 @@ namespace Zyan.Communication
 			// Sitzung entfernen
 			_host.SessionManager.RemoveSession(sessionID);
 
+            string clientIP=string.Empty;
+            IPAddress clientAddress = GetCallingClientIPAddress();
+            
+            if (clientAddress!=null)
+                clientIP=clientAddress.ToString();
+
             if (identity!=null)
-                _host.OnClientLoggedOff(new LoginEventArgs(LoginEventType.Logoff, identity, timestamp));
+                _host.OnClientLoggedOff(new LoginEventArgs(LoginEventType.Logoff, identity, clientIP , timestamp));
 		}
 
 		#endregion

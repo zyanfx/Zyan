@@ -5,6 +5,7 @@ using System.Runtime.Remoting.Channels.Http;
 using System.Runtime.Serialization.Formatters;
 using Zyan.Communication.ChannelSinks.Encryption;
 using Zyan.Communication.Security;
+using Zyan.Communication.ChannelSinks.ClientAddress;
 
 namespace Zyan.Communication.Protocols.Http
 {
@@ -210,6 +211,8 @@ namespace Zyan.Communication.Protocols.Http
                     // Serialisierung von komplexen Objekten aktivieren
                     ((SoapServerFormatterSinkProvider)serverFormatter).TypeFilterLevel = TypeFilterLevel.Full;
                 }
+                serverFormatter.Next = new ClientAddressServerChannelSinkProvider();
+
                 // Wenn die Kommunikation verschlüsselt werden soll ...
                 if (_encryption)
                 {

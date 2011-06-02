@@ -14,6 +14,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Messaging;
+using System.Net;
+using System.Linq;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
@@ -45,6 +47,9 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				requestHeaders["__RequestUri"] = url;
 
             Connection connection = Connection.GetConnection(server, channel, channel.TcpKeepAliveEnabled, channel.TcpKeepAliveTime, channel.TcpKeepAliveInterval, channel.MaxRetries,channel.RetryDelay);
+
+            IPEndPoint localEndPoint = (IPEndPoint)connection.Socket.LocalEndPoint;
+            requestHeaders["__IPAddress"] = localEndPoint.Address;
 
 			System.Diagnostics.Debug.Assert(connection != null, "Manager.GetConnection returned null", "Manager.GetConnection returned null in ClientTransportSink.ProcessMessage for server - " + server);
 			return connection;

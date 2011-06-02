@@ -42,7 +42,7 @@ namespace Zyan.Examples.MiniChat.Client
             credentials.Add("nickname", nickname);
 
             TcpDuplexClientProtocolSetup protocol = new TcpDuplexClientProtocolSetup(true);
-
+            
             try
             {
                 using (_connection = new ZyanConnection(Properties.Settings.Default.ServerUrl, protocol, credentials, false, true))

@@ -6,6 +6,7 @@ using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Serialization.Formatters;
 using System.Security.Principal;
 using Zyan.Communication.Security;
+using Zyan.Communication.ChannelSinks.ClientAddress;
 
 namespace Zyan.Communication.Protocols.Tcp
 {
@@ -130,6 +131,8 @@ namespace Zyan.Communication.Protocols.Tcp
                 BinaryServerFormatterSinkProvider serverFormatter = new BinaryServerFormatterSinkProvider();
                 serverFormatter.TypeFilterLevel = TypeFilterLevel.Full;
                 BinaryClientFormatterSinkProvider clientFormatter = new BinaryClientFormatterSinkProvider();
+
+                serverFormatter.Next = new ClientAddressServerChannelSinkProvider();
 
                 // Neuen TCP-Kanal erzeugen
                 channel = new TcpChannel(channelSettings, clientFormatter, serverFormatter);
