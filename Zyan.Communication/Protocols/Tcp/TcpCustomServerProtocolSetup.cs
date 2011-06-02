@@ -5,6 +5,7 @@ using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Serialization.Formatters;
 using Zyan.Communication.ChannelSinks.Encryption;
 using Zyan.Communication.Security;
+using Zyan.Communication.ChannelSinks.ClientAddress;
 
 namespace Zyan.Communication.Protocols.Tcp
 {
@@ -184,6 +185,8 @@ namespace Zyan.Communication.Protocols.Tcp
 
                 // Binäre Serialisierung von komplexen Objekten aktivieren
                 serverFormatter.TypeFilterLevel = TypeFilterLevel.Full;
+
+                serverFormatter.Next = new ClientAddressServerChannelSinkProvider();
 
                 // Wenn die Kommunikation verschlüsselt werden soll ...
                 if (_encryption)

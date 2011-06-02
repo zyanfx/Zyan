@@ -14,6 +14,7 @@ namespace Zyan.Communication
         private Guid _sessionID;
         private IIdentity _identity;
         private DateTime _timestamp;
+        private string _clientAddress;
 
         // Adapter für den Zugriff auf Sitzungsvariablen
         [NonSerialized]
@@ -73,6 +74,15 @@ namespace Zyan.Communication
         public SessionVariableAdapter SessionVariables
         {
             get { return _sessionVariableAdapter; }
+        }
+
+        /// <summary>
+        /// Gets or sets the IP Address of the calling client.
+        /// </summary>
+        public string ClientAddress
+        {
+            get { return _clientAddress; }
+            set { _clientAddress = value; }
         }
 
         /// <summary>
