@@ -23,7 +23,7 @@ namespace Zyan.Examples.MiniChat.Console
 
             ZyanConnection connection = null;
             TcpDuplexClientProtocolSetup protocol = new TcpDuplexClientProtocolSetup(true);
-
+            
             try
             {
                 connection = new ZyanConnection(Properties.Settings.Default.ServerUrl, protocol, credentials, false, true);

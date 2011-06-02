@@ -19,19 +19,19 @@ namespace Zyan.Examples.MiniChat.Server
             ActiveNicknames = new List<string>();
 
             TcpDuplexServerProtocolSetup protocol = new TcpDuplexServerProtocolSetup(Properties.Settings.Default.TcpPort, new NicknameAuthProvider(), true);
-
+            
             using (ZyanComponentHost host = new ZyanComponentHost("MiniChat",protocol))
             {
                 host.RegisterComponent<IMiniChat, MiniChat>(ActivationType.Singleton);
 
                 host.ClientLoggedOn += new EventHandler<LoginEventArgs>((sender, e) => 
                     {
-                        Console.WriteLine(string.Format("{0}: User '{1}' logged on.", e.Timestamp.ToString(), e.Identity.Name));
+                        Console.WriteLine(string.Format("{0}: User '{1}' with IP {2} logged on.", e.Timestamp.ToString(), e.Identity.Name, e.ClientAddress));
                         ActiveNicknames.Add(e.Identity.Name);
                     });
                 host.ClientLoggedOff += new EventHandler<LoginEventArgs>((sender, e) =>
                     {
-                        Console.WriteLine(string.Format("{0}: User '{1}' logged off.", e.Timestamp.ToString(), e.Identity.Name));
+                        Console.WriteLine(string.Format("{0}: User '{1}' with IP {2} logged off.", e.Timestamp.ToString(), e.Identity.Name, e.ClientAddress));
                         ActiveNicknames.Remove(e.Identity.Name);
                     });
 

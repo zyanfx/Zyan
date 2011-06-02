@@ -61,6 +61,8 @@
     <Compile Include="ActivationType.cs" />
     <Compile Include="CallInterceptorCollection.cs" />
     <Compile Include="CallInterceptorHelper.cs" />
+    <Compile Include="ChannelSinks\ClientAddress\ClientAddressServerChannelSink.cs" />
+    <Compile Include="ChannelSinks\ClientAddress\ClientAddressServerChannelSinkProvider.cs" />
     <Compile Include="ComponentCatalog.cs" />
     <Compile Include="ComponentInfo.cs" />
     <Compile Include="DelegateCorrelationInfo.cs" />
