@@ -9,31 +9,15 @@ namespace Zyan.Examples.MiniChat.Client
 {
     public partial class ChatForm : Form
     {
-        private ZyanConnection _connection;
+        
         private IMiniChat _chatProxy;
 
-        public ChatForm()
+        public ChatForm(string nickname)
         {
             InitializeComponent();
 
-            TcpDuplexClientProtocolSetup protocol = new TcpDuplexClientProtocolSetup(true);
-            ZyanConnection _connection = new ZyanConnection(Properties.Settings.Default.ServerUrl, protocol);
-
-            _connection.CallInterceptors.For<IMiniChat>()
-                .Add<string, string>(
-                    (chat, nickname, text) => chat.SendMessage(nickname, text),
-                    (data, nickname, text) =>
-                    {
-                        if (text.Contains("fuck") || text.Contains("sex"))
-                        {
-                            MessageBox.Show("TEXT CONTAINS FORBIDDEN WORDS!");
-                            data.Intercepted = true;
-                        }
-                    });
-
-            _connection.CallInterceptionEnabled = true;
-            
-            _chatProxy = _connection.CreateProxy<IMiniChat>();
+            _nickName.Text = nickname;
+            _chatProxy = Program.ServerConnection.CreateProxy<IMiniChat>();
             _chatProxy.MessageReceived += new Action<string, string>(_chatProxy_MessageReceived);
         }
 
@@ -55,7 +39,7 @@ namespace Zyan.Examples.MiniChat.Client
 
         private void ChatForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            _chatProxy.MessageReceived -= new Action<string, string>(_chatProxy_MessageReceived);
+            _chatProxy.MessageReceived -= new Action<string, string>(_chatProxy_MessageReceived);         
         }
     }
 }

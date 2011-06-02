@@ -2,6 +2,8 @@
 using Zyan.Communication;
 using Zyan.Communication.Protocols.Tcp;
 using Zyan.Examples.MiniChat.Shared;
+using System.Collections;
+using System.Security;
 
 namespace Zyan.Examples.MiniChat.Console
 {
@@ -16,10 +18,22 @@ namespace Zyan.Examples.MiniChat.Console
 
             System.Console.WriteLine("-----------------------------------------------");
 
+            Hashtable credentials = new Hashtable();
+            credentials.Add("nickname", _nickName);
 
+            ZyanConnection connection = null;
             TcpDuplexClientProtocolSetup protocol = new TcpDuplexClientProtocolSetup(true);
-            ZyanConnection connection = new ZyanConnection(Properties.Settings.Default.ServerUrl,protocol);
 
+            try
+            {
+                connection = new ZyanConnection(Properties.Settings.Default.ServerUrl, protocol, credentials, false, true);
+            }
+            catch (SecurityException ex)
+            {
+                System.Console.WriteLine(ex.Message);
+                System.Console.ReadLine();
+                return;
+            }
             connection.CallInterceptors.For<IMiniChat>().Add(
                 (IMiniChat chat, string nickname, string message) => chat.SendMessage(nickname, message),
                 (data, nickname, message) =>
@@ -41,7 +55,6 @@ namespace Zyan.Examples.MiniChat.Console
             while (text.ToLower() != "quit")
             {
                 text = System.Console.ReadLine();
-
                 chatProxy.SendMessage(_nickName, text);
             }
             chatProxy.MessageReceived -= new Action<string, string>(chatProxy_MessageReceived);

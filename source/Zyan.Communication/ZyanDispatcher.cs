@@ -9,6 +9,7 @@ using Zyan.Communication.Notification;
 using Zyan.Communication.Security;
 using Zyan.Communication.SessionMgmt;
 using Zyan.Communication.Toolbox;
+using System.Security.Principal;
 
 namespace Zyan.Communication
 {
@@ -465,33 +466,22 @@ namespace Zyan.Communication
 		/// <param name="credentials">Anmeldeinformationen</param>
 		public void Logon(Guid sessionID, Hashtable credentials)
 		{
-			// Wenn kein eindeutiger Sitzungsschlüssel angegeben wurde ...
 			if (sessionID == Guid.Empty)
-				// Ausnahme werfen
 				throw new ArgumentException(LanguageResource.ArgumentException_EmptySessionIDIsNotAllowed, "sessionID");
 
-			// Wenn noch keine Sitzung mit dem angegebenen Sitzungsschlüssel existiert ...
 			if (!_host.SessionManager.ExistSession(sessionID))
 			{
-				// Authentifizieren
 				AuthResponseMessage authResponse = _host.Authenticate(new AuthRequestMessage() { Credentials = credentials });
 
-				// Wenn die Authentifizierung fehlgeschlagen ist ...
 				if (!authResponse.Success)
-					// Ausnahme werfen
 					throw new SecurityException(authResponse.ErrorMessage);
 
-				// Sitzungsvariablen-Adapter erzeugen
 				SessionVariableAdapter sessionVariableAdapter = new SessionVariableAdapter(_host.SessionManager, sessionID);
-
-				// Neue Sitzung erstellen
 				ServerSession session = new ServerSession(sessionID, authResponse.AuthenticatedIdentity, sessionVariableAdapter);
-
-				// Sitzung speichern
 				_host.SessionManager.StoreSession(session);
-
-				// Aktuelle Sitzung im Threadspeicher ablegen
 				ServerSession.CurrentSession = session;
+
+                _host.OnClientLoggedOn(new LoginEventArgs(LoginEventType.Logon, session.Identity, session.Timestamp));
 			}
 		}
 
@@ -501,8 +491,21 @@ namespace Zyan.Communication
 		/// <param name="sessionID">Sitzungsschlüssel</param>
 		public void Logoff(Guid sessionID)
 		{
+            IIdentity identity = null;
+            DateTime timestamp = DateTime.MinValue;
+            
+            ServerSession session = _host.SessionManager.GetSessionBySessionID(sessionID);
+
+            if (session != null)
+            {
+                identity = session.Identity;
+                timestamp = session.Timestamp;
+            }
 			// Sitzung entfernen
 			_host.SessionManager.RemoveSession(sessionID);
+
+            if (identity!=null)
+                _host.OnClientLoggedOff(new LoginEventArgs(LoginEventType.Logoff, identity, timestamp));
 		}
 
 		#endregion

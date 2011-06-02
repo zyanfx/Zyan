@@ -12,35 +12,11 @@ using Zyan.Communication.Notification;
 namespace Zyan.Communication
 {    
     /// <summary>
-    /// Laufzeitumgebung für Ereignisbasierte Komponenten (Komponentenhost).
+    /// Host for publishing components with Zyan.
     /// </summary>
     public class ZyanComponentHost : IDisposable
     {
-        #region Deklarationen
-
-        // Felder
-        private ZyanDispatcher _invoker = null;
-
-        // Authentifizierungsanbieter
-        private IAuthenticationProvider _authProvider = null;
-        
-        // Protokoll-Einstellungen
-        private IServerProtocolSetup _protocolSetup = null;
-
-        // Auflistung der bekannten Komponenten Hosts
-        private static List<ZyanComponentHost> _hosts = new List<ZyanComponentHost>();
-
-        /// <summary>
-        /// Gibt eine Auflistung aller bekanten Komponenten Hosts zurück.
-        /// </summary>
-        public static List<ZyanComponentHost> Hosts
-        {
-            get { return _hosts.ToList<ZyanComponentHost>(); }
-        }
-
-        #endregion
-
-        #region Konstruktor
+        #region Constructors
 
         /// <summary>
         /// Konstruktor.
@@ -152,22 +128,23 @@ namespace Zyan.Communication
 
         #endregion
         
-        #region Authentifizierung
+        #region Authentication
+
+        private IAuthenticationProvider _authProvider = null;
 
         /// <summary>
-        /// Ausgangs-Pin: Authentifizierungsanfrage
+        /// Request for authentication.
         /// </summary>
         public Func<AuthRequestMessage, AuthResponseMessage> Authenticate;     
 
         #endregion
 
-        #region Sitzungsverwaltung
+        #region Session Management
 
-        // Sitzungsverwaltung
         private ISessionManager _sessionManager = null;
-
+        
         /// <summary>
-        /// Gibt die Sitzungsverwaltung zurück.
+        /// Returns the session manager used by this host.
         /// </summary>
         public ISessionManager SessionManager
         {
@@ -176,10 +153,19 @@ namespace Zyan.Communication
 
         #endregion
 
-        #region Komponenten-Hosting
+        #region Component Hosting
 
-        // Komponenten-Katalog
         private ComponentCatalog _catalog = null;
+        private ZyanDispatcher _invoker = null;
+        private static List<ZyanComponentHost> _hosts = new List<ZyanComponentHost>();
+
+        /// <summary>
+        /// Gibt eine Auflistung aller bekanten Komponenten Hosts zurück.
+        /// </summary>
+        public static List<ZyanComponentHost> Hosts
+        {
+            get { return _hosts.ToList<ZyanComponentHost>(); }
+        }
 
         /// <summary>
         /// Gibt den zu veröffentlichenden Komponenten-Katalog zurück, oder legt ihn fest.
@@ -376,8 +362,10 @@ namespace Zyan.Communication
 
         #endregion               
 
-        #region Netzwerk-Kommunikation
-        
+        #region Network Communication
+
+        private IServerProtocolSetup _protocolSetup = null;
+
         // Name dieses Komponentenhosts
         private string _name = string.Empty;
 
@@ -444,7 +432,7 @@ namespace Zyan.Communication
 
         #endregion
 
-        #region Aufrufverfolgung
+        #region Policy Injection
 
         /// <summary>
         /// Ereignis: Bevor ein Komponentenaufruf durchgeführt wird.
@@ -526,7 +514,7 @@ namespace Zyan.Communication
 
         #endregion
 
-        #region Benachrichtigungen
+        #region Notifications
 
         // Benachrichtigungsdienst
         private volatile NotificationService _notificationService = null;
@@ -618,7 +606,7 @@ namespace Zyan.Communication
 
         #endregion
 
-        #region Benutzerdefinierte Serialisierung
+        #region User defined Serialization Handling
 
         // Serialisierungshandling.
         private SerializationHandlerRepository _serializationHandling = null;
@@ -633,7 +621,7 @@ namespace Zyan.Communication
 
         #endregion
 
-        #region IDisposable Implementierung
+        #region IDisposable Implementation
 
         // Gibt an, ob Dispose bereits aufgerufen wurde, oder nicht
         private bool _isDisposed = false;
@@ -686,6 +674,33 @@ namespace Zyan.Communication
             }
         }
         
+        #endregion
+
+        #region Login Events
+
+        public event EventHandler<LoginEventArgs> ClientLoggedOn;
+        public event EventHandler<LoginEventArgs> ClientLoggedOff;
+
+        /// <summary>
+        /// Fires "ClientLoggedOn" event.
+        /// </summary>
+        /// <param name="e">Arguments</param>
+        protected internal void OnClientLoggedOn(LoginEventArgs e)
+        {
+            if (ClientLoggedOn!=null)
+                ClientLoggedOn(this,e);
+        }
+
+        /// <summary>
+        /// Fires "ClientLoggedOff" event.
+        /// </summary>
+        /// <param name="e">Arguments</param>
+        protected internal void OnClientLoggedOff(LoginEventArgs e)
+        {
+            if (ClientLoggedOff != null)
+                ClientLoggedOff(this, e);
+        }
+
         #endregion
     }
 }
