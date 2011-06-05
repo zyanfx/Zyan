@@ -39,10 +39,10 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 			request.Headers["__CustomErrorsEnabled"] = RemotingConfiguration.CustomErrorsEnabled(connection.IsLocalHost);
 
-            IMessage responseMsg;
+			IMessage responseMsg;
 			ITransportHeaders responseHeaders;
 			Stream responseStream;
-            
+			
 			var serverProcessing = ProcessMessage(new ServerChannelSinkStack(), null, request.Headers, request.MessageBody, out responseMsg, out responseHeaders, out responseStream);
 			if (serverProcessing != ServerProcessing.OneWay)
 			{
@@ -66,11 +66,11 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			{
 				case ServerProcessing.Async:
 					sinkStack.StoreAndDispatch(this, null);
-                    return serverProcessing;
+					return serverProcessing;
 				case ServerProcessing.OneWay:
-                case ServerProcessing.Complete:
+				case ServerProcessing.Complete:
 					sinkStack.Pop(this);
-                    return serverProcessing;				
+					return serverProcessing;
 				default:
 					return serverProcessing;
 			}
@@ -90,7 +90,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 		#region Implementation of IChannelSinkBase
 		
-        public IDictionary Properties
+		public IDictionary Properties
 		{
 			get { return null; }
 		}

@@ -28,60 +28,60 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		private TcpExChannelData channelData;
 		internal ServerTransportSink messageSink;
 		private IClientChannelSinkProvider clientSinkProvider;
-        private bool _tcpKeepAliveEnabled = true;
-        private ulong _tcpKeepAliveTime = 30000;
-        private ulong _tcpKeepAliveInterval = 1000;
-        private short _maxRetries = 10;
-        private int _retryDelay = 1000;
+		private bool _tcpKeepAliveEnabled = true;
+		private ulong _tcpKeepAliveTime = 30000;
+		private ulong _tcpKeepAliveInterval = 1000;
+		private short _maxRetries = 10;
+		private int _retryDelay = 1000;
 
-        #region TCP KeepAlive
+		#region TCP KeepAlive
 
-        /// <summary>
-        /// Enables or disables TCP KeepAlive.        
-        /// </summary>
-        public bool TcpKeepAliveEnabled
-        {
-            get { return _tcpKeepAliveEnabled; }            
-        }
-
-        /// <summary>
-        /// Gets or sets the TCP KeepAlive time in milliseconds.
-        /// </summary>
-        public ulong TcpKeepAliveTime
-        {
-            get { return _tcpKeepAliveTime; }            
-        }
-
-        /// <summary>
-        /// Gets or sets the TCP KeepAlive interval in milliseconds
-        /// </summary>
-        public ulong TcpKeepAliveInterval
-        {
-            get { return _tcpKeepAliveInterval; }            
-        }
-
-        #endregion
-
-        #region Constructors
-
-        public TcpExChannel()
+		/// <summary>
+		/// Enables or disables TCP KeepAlive.
+		/// </summary>
+		public bool TcpKeepAliveEnabled
 		{
-            Initialise(TypeFilterLevel.Low, null, null, 0, false, true, 30000, 1000, 10, 1000);
+			get { return _tcpKeepAliveEnabled; }
+		}
+
+		/// <summary>
+		/// Gets or sets the TCP KeepAlive time in milliseconds.
+		/// </summary>
+		public ulong TcpKeepAliveTime
+		{
+			get { return _tcpKeepAliveTime; }
+		}
+
+		/// <summary>
+		/// Gets or sets the TCP KeepAlive interval in milliseconds
+		/// </summary>
+		public ulong TcpKeepAliveInterval
+		{
+			get { return _tcpKeepAliveInterval; }
+		}
+
+		#endregion
+
+		#region Constructors
+
+		public TcpExChannel()
+		{
+			Initialise(TypeFilterLevel.Low, null, null, 0, false, true, 30000, 1000, 10, 1000);
 		}
 
 		public TcpExChannel(int port)
 		{
-            Initialise(TypeFilterLevel.Low, null, null, port, true, true, 30000, 1000, 10, 1000);
+			Initialise(TypeFilterLevel.Low, null, null, port, true, true, 30000, 1000, 10, 1000);
 		}
 
 		public TcpExChannel(bool listen)
 		{
-            Initialise(TypeFilterLevel.Low, null, null, 0, listen, true, 30000, 1000, 10, 1000);
+			Initialise(TypeFilterLevel.Low, null, null, 0, listen, true, 30000, 1000, 10, 1000);
 		}
 
 		public TcpExChannel(TypeFilterLevel filterLevel, bool listen)
 		{
-            Initialise(filterLevel, null, null, 0, listen, true, 30000, 1000, 10, 1000);
+			Initialise(filterLevel, null, null, 0, listen, true, 30000, 1000, 10, 1000);
 		}
 
 		public TcpExChannel(TypeFilterLevel filterLevel, int port)
@@ -92,11 +92,11 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		public TcpExChannel(IDictionary properties, IClientChannelSinkProvider clientSinkProvider, IServerChannelSinkProvider serverSinkProvider)
 		{
 			int port = 0;
-            bool tcpKeepAliveEnabled = true;
-            ulong tcpKeepAliveTime = 30000;
-            ulong tcpKeepAliveInterval = 1000;
-            short maxRetries = 10;
-            int retryDelay = 1000;
+			bool tcpKeepAliveEnabled = true;
+			ulong tcpKeepAliveTime = 30000;
+			ulong tcpKeepAliveInterval = 1000;
+			short maxRetries = 10;
+			int retryDelay = 1000;
 			bool listen = false;
 			TypeFilterLevel typeFilterLevel = TypeFilterLevel.Low;
 
@@ -113,35 +113,35 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				listen = Convert.ToBoolean(properties["listen"]);
 			if (properties.Contains("bufferSize"))
 				Connection.BufferSize = Convert.ToInt32(properties["bufferSize"]);
-            if (properties.Contains("keepAlive"))
-                tcpKeepAliveEnabled = Convert.ToBoolean(properties["keepAlive"]);
-            if (properties.Contains("keepAliveEnabled"))
-                tcpKeepAliveEnabled = Convert.ToBoolean(properties["keepAliveEnabled"]);
-            if (properties.Contains("keepAliveTime"))
-                tcpKeepAliveTime = Convert.ToUInt64(properties["keepAliveTime"]);
-            if (properties.Contains("keepAliveInterval"))
-                tcpKeepAliveInterval = Convert.ToUInt64(properties["keepAliveInterval"]);
-            if (properties.Contains("maxRetries"))
-                maxRetries = Convert.ToInt16(properties["maxRetries"]);
-            if (properties.Contains("retryDelay"))
-                retryDelay = Convert.ToInt32(properties["retryDelay"]);
-            if (properties.Contains("typeFilterLevel"))
-            {
-                if (properties["typeFilterLevel"] is string)
-                    typeFilterLevel = (TypeFilterLevel)Enum.Parse(typeof(TypeFilterLevel), (string)properties["typeFilterLevel"]);
-                else
-                    typeFilterLevel = (TypeFilterLevel)properties["typeFilterLevel"];
-            }
+			if (properties.Contains("keepAlive"))
+				tcpKeepAliveEnabled = Convert.ToBoolean(properties["keepAlive"]);
+			if (properties.Contains("keepAliveEnabled"))
+				tcpKeepAliveEnabled = Convert.ToBoolean(properties["keepAliveEnabled"]);
+			if (properties.Contains("keepAliveTime"))
+				tcpKeepAliveTime = Convert.ToUInt64(properties["keepAliveTime"]);
+			if (properties.Contains("keepAliveInterval"))
+				tcpKeepAliveInterval = Convert.ToUInt64(properties["keepAliveInterval"]);
+			if (properties.Contains("maxRetries"))
+				maxRetries = Convert.ToInt16(properties["maxRetries"]);
+			if (properties.Contains("retryDelay"))
+				retryDelay = Convert.ToInt32(properties["retryDelay"]);
+			if (properties.Contains("typeFilterLevel"))
+			{
+				if (properties["typeFilterLevel"] is string)
+					typeFilterLevel = (TypeFilterLevel)Enum.Parse(typeof(TypeFilterLevel), (string)properties["typeFilterLevel"]);
+				else
+					typeFilterLevel = (TypeFilterLevel)properties["typeFilterLevel"];
+			}
 			Initialise(typeFilterLevel, clientSinkProvider, serverSinkProvider, port, listen, tcpKeepAliveEnabled, tcpKeepAliveTime, tcpKeepAliveInterval, maxRetries, retryDelay);
 		}
 
-        private void Initialise(TypeFilterLevel typeFilterLevel, IClientChannelSinkProvider clientSinkProvider, IServerChannelSinkProvider serverSinkProvider, int port, bool listen, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval, short maxRetries, int retryDelay)
+		private void Initialise(TypeFilterLevel typeFilterLevel, IClientChannelSinkProvider clientSinkProvider, IServerChannelSinkProvider serverSinkProvider, int port, bool listen, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval, short maxRetries, int retryDelay)
 		{
-            _tcpKeepAliveEnabled = keepAlive;
-            _tcpKeepAliveTime = keepAliveTime;
-            _tcpKeepAliveInterval = KeepAliveInterval;
-            _maxRetries = maxRetries;
-            _retryDelay = retryDelay;
+			_tcpKeepAliveEnabled = keepAlive;
+			_tcpKeepAliveTime = keepAliveTime;
+			_tcpKeepAliveInterval = KeepAliveInterval;
+			_maxRetries = maxRetries;
+			_retryDelay = retryDelay;
 
 			if (clientSinkProvider == null)
 				clientSinkProvider = new BinaryClientFormatterSinkProvider();
@@ -174,7 +174,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			Manager.BeginReadMessage(_channelID, null, new AsyncCallback(messageSink.ReceiveMessage), _channelID);
 		}
 		
-        #endregion
+		#endregion
 
 		internal string[] GetAddresses()
 		{
@@ -183,7 +183,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 		#region Properties
 		
-        public Guid ChannelID
+		public Guid ChannelID
 		{
 			get { return _channelID; }
 		}
@@ -198,17 +198,17 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			get { return port != 0;	}
 		}
 
-        public short MaxRetries
-        {
-            get { return _maxRetries; }
-        }
+		public short MaxRetries
+		{
+			get { return _maxRetries; }
+		}
 
-        public int RetryDelay
-        {
-            get { return _retryDelay; }
-        }
+		public int RetryDelay
+		{
+			get { return _retryDelay; }
+		}
 
-        #endregion
+		#endregion
 
 		#region Implementation of IChannel
 
@@ -265,16 +265,16 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				this.port = Manager.StartListening((int)data, this);
 				channelData = new TcpExChannelData(this);
 
-                foreach (string url in Manager.GetAddresses(this.port, Guid.Empty))
-                {
-                    Manager.BeginReadMessage(url, null, new AsyncCallback(messageSink.ReceiveMessage), url);
-                }
+				foreach (string url in Manager.GetAddresses(this.port, Guid.Empty))
+				{
+					Manager.BeginReadMessage(url, null, new AsyncCallback(messageSink.ReceiveMessage), url);
+				}
 			}
 		}
 
 		public void StopListening(object data)
 		{
-            Manager.StopListening(this);
+			Manager.StopListening(this);
 		}
 
 		public string[] GetUrlsForUri(string objectURI)

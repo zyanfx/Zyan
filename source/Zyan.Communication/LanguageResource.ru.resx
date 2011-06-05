@@ -228,4 +228,19 @@
   <data name="SocketException_LostConnectionToServer" xml:space="preserve">
     <value>Потеряно соединение с сервером '{0}'.</value>
   </data>
+  <data name="ArgumentException_AddressMustNotBeEmpty" xml:space="preserve">
+    <value>Адрес не должен быть пустым.</value>
+  </data>
+  <data name="Format_Exception_InvalidAddressFormat" xml:space="preserve">
+    <value>Недопустимый формат для параметра 'address': {0}</value>
+  </data>
+  <data name="RemotingException_NoAddressForReconnect" xml:space="preserve">
+    <value>Адрес для повторной установки соединения не указан.</value>
+  </data>
+  <data name="KeyNotFoundException_CannotFindComponentForInterface" xml:space="preserve">
+    <value>Не найден компонент для интерфейса '{0}'.</value>
+  </data>
+  <data name="InvalidSessionException_SessionIDInvalid" xml:space="preserve">
+    <value>Идентификатор сессии '{0}' не найден. Вам необходимо войти в систему.</value>
+  </data>
 </root>

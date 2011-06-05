@@ -235,7 +235,7 @@
     <value>Invalid format for 'address' parameter: {0}</value>
   </data>
   <data name="RemotingException_NoAddressForReconnect" xml:space="preserve">
-    <value>No remote address specified for reconnet.</value>
+    <value>No remote address specified for reconnect.</value>
   </data>
   <data name="KeyNotFoundException_CannotFindComponentForInterface" xml:space="preserve">
     <value>Cannot find component for interface '{0}'.</value>
