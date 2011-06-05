@@ -34,19 +34,19 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		private Stream messageBody;
 		private byte[] messageBodyBytes;
 
-        /// <summary>
-        /// Creates a new instance of the Message class.
-        /// </summary>
+		/// <summary>
+		/// Creates a new instance of the Message class.
+		/// </summary>
 		protected Message()
 		{
 		}
 
-        /// <summary>
-        /// Creates a new instance of the Message class.
-        /// </summary>
-        /// <param name="guid">Unique identifier of the message</param>
-        /// <param name="headers">Remoting transport headers</param>
-        /// <param name="message">Stream for message raw data</param>
+		/// <summary>
+		/// Creates a new instance of the Message class.
+		/// </summary>
+		/// <param name="guid">Unique identifier of the message</param>
+		/// <param name="headers">Remoting transport headers</param>
+		/// <param name="message">Stream for message raw data</param>
 		public Message(Guid guid, ITransportHeaders headers, Stream message)
 		{
 			this.Guid = guid;
@@ -54,9 +54,9 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			messageBody = message;
 		}
 
-        /// <summary>
-        /// Gets a stream for accessing the message´s body raw data.
-        /// </summary>
+		/// <summary>
+		/// Gets a stream for accessing the message´s body raw data.
+		/// </summary>
 		public Stream MessageBody
 		{
 			get
@@ -67,10 +67,10 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			}
 		}
 
-        /// <summary>
-        /// Sends the message over a specified connection.
-        /// </summary>
-        /// <param name="connection">Duplex Channel Connection</param>
+		/// <summary>
+		/// Sends the message over a specified connection.
+		/// </summary>
+		/// <param name="connection">Duplex Channel Connection</param>
 		public void Send(Connection connection)
 		{
 			try
@@ -87,7 +87,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				writer.Write((int)MessageBody.Length);
 				MemoryStream ms = MessageBody as MemoryStream;
 				
-                if (ms == null)
+				if (ms == null)
 				{
 					byte[] msgBuffer = new byte[MessageBody.Length];
 					MessageBody.Read(msgBuffer, 0, (int)MessageBody.Length);
@@ -96,7 +96,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				else
 					writer.Write(ms.GetBuffer(), 0, (int)MessageBody.Length);
 				
-                writer.Flush();
+				writer.Flush();
 			}
 			finally
 			{
@@ -104,59 +104,59 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			}
 		}
 
-        /// <summary>
-        /// Sends a specified message over a specified connection.
-        /// </summary>
-        /// <param name="connection">Duplex Channel Connection</param>
-        /// <param name="guid">Unique identifier of the Message</param>
-        /// <param name="headers">Remoting transport headers</param>
-        /// <param name="message">Stream with raw data of the message</param>
+		/// <summary>
+		/// Sends a specified message over a specified connection.
+		/// </summary>
+		/// <param name="connection">Duplex Channel Connection</param>
+		/// <param name="guid">Unique identifier of the Message</param>
+		/// <param name="headers">Remoting transport headers</param>
+		/// <param name="message">Stream with raw data of the message</param>
 		public static void Send(Connection connection, Guid guid, ITransportHeaders headers, Stream message)
 		{
-            try
-            {
-                connection.LockWrite();
-                BinaryWriter writer = connection.Writer;
-                writer.Write(guid.ToByteArray());
+			try
+			{
+				connection.LockWrite();
+				BinaryWriter writer = connection.Writer;
+				writer.Write(guid.ToByteArray());
 
-                MemoryStream headerStream = new MemoryStream();
-                formatter.Serialize(headerStream, headers);
-                writer.Write((int)headerStream.Length);
-                writer.Write(headerStream.GetBuffer(), 0, (int)headerStream.Length);
+				MemoryStream headerStream = new MemoryStream();
+				formatter.Serialize(headerStream, headers);
+				writer.Write((int)headerStream.Length);
+				writer.Write(headerStream.GetBuffer(), 0, (int)headerStream.Length);
 
-                writer.Write((int)message.Length);
-                MemoryStream ms = message as MemoryStream;
-                if (ms == null)
-                {
-                    byte[] msgBuffer = new byte[message.Length];
-                    message.Read(msgBuffer, 0, (int)message.Length);
-                    writer.Write(msgBuffer, 0, (int)message.Length);
-                }
-                else
-                    writer.Write(ms.GetBuffer(), 0, (int)message.Length);
-                writer.Flush();
-            }
-            catch (ObjectDisposedException)
-            { 
-                // Socket may be closed meanwhile. Connection isn´t working anymore, so close it.
-                connection.ReleaseWrite();
-                connection.Close();
-                connection = null;
-            }
+				writer.Write((int)message.Length);
+				MemoryStream ms = message as MemoryStream;
+				if (ms == null)
+				{
+					byte[] msgBuffer = new byte[message.Length];
+					message.Read(msgBuffer, 0, (int)message.Length);
+					writer.Write(msgBuffer, 0, (int)message.Length);
+				}
+				else
+					writer.Write(ms.GetBuffer(), 0, (int)message.Length);
+				writer.Flush();
+			}
+			catch (ObjectDisposedException)
+			{ 
+				// Socket may be closed meanwhile. Connection isn´t working anymore, so close it.
+				connection.ReleaseWrite();
+				connection.Close();
+				connection = null;
+			}
 			finally
 			{
-                if (connection!=null)
-				    connection.ReleaseWrite();
+				if (connection!=null)
+					connection.ReleaseWrite();
 			}
 		}
 
-        /// <summary>
-        /// Begins receiving message data asynchronously.
-        /// </summary>
-        /// <param name="connection">Duplex Channel Connection</param>
-        /// <param name="callback">Delegate to invoke, when asynchronous operation is completed</param>
-        /// <param name="asyncState">Pass through state object</param>
-        /// <returns>Result</returns>
+		/// <summary>
+		/// Begins receiving message data asynchronously.
+		/// </summary>
+		/// <param name="connection">Duplex Channel Connection</param>
+		/// <param name="callback">Delegate to invoke, when asynchronous operation is completed</param>
+		/// <param name="asyncState">Pass through state object</param>
+		/// <returns>Result</returns>
 		public static IAsyncResult BeginReceive(Connection connection, AsyncCallback callback, object asyncState)
 		{
 			byte[] buffer = new Byte[SizeOfGuid];
@@ -165,12 +165,12 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			return myAr;
 		}
 
-        /// <summary>
-        /// Receives a message over a specified Duplex Channel Connection.
-        /// </summary>
-        /// <param name="connection">Duplex Channel Connection</param>
-        /// <param name="ar">Result (for Async pattern)</param>
-        /// <returns>Received message</returns>
+		/// <summary>
+		/// Receives a message over a specified Duplex Channel Connection.
+		/// </summary>
+		/// <param name="connection">Duplex Channel Connection</param>
+		/// <param name="ar">Result (for Async pattern)</param>
+		/// <returns>Received message</returns>
 		public static Message EndReceive(out Connection connection, IAsyncResult ar)
 		{
 			AsyncResult myAr = (AsyncResult)ar;
@@ -193,18 +193,18 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 					int bodyLength = reader.ReadInt32();
 
-                    if (bodyLength > 0)
-                    {
+					if (bodyLength > 0)
+					{
 
-                        retVal.messageBodyBytes = reader.ReadBytes(bodyLength);
-                        if (retVal.messageBodyBytes.Length != bodyLength)
-                            throw new Exception("Not enough body read...");
-                        
-                        System.Diagnostics.Debug.Assert(retVal.MessageBody.CanRead);
-                    }
-                    
-                    Message.BeginReceive(connection, myAr.Callback, myAr.AsyncState);
-                    
+						retVal.messageBodyBytes = reader.ReadBytes(bodyLength);
+						if (retVal.messageBodyBytes.Length != bodyLength)
+							throw new Exception("Not enough body read...");
+						
+						System.Diagnostics.Debug.Assert(retVal.MessageBody.CanRead);
+					}
+					
+					Message.BeginReceive(connection, myAr.Callback, myAr.AsyncState);
+					
 					return retVal;
 				}
 				else if (bytesRead == 0)
@@ -224,10 +224,10 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			}
 		}
 
-        /// <summary>
-        /// Gets a string representation of this object.
-        /// </summary>
-        /// <returns>Unique message identifier</returns>
+		/// <summary>
+		/// Gets a string representation of this object.
+		/// </summary>
+		/// <returns>Unique message identifier</returns>
 		public override string ToString()
 		{
 			return Guid.ToString();
@@ -235,9 +235,9 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 		#region AsyncResult
 
-        /// <summary>
-        /// State object needed to perform asynchronous receive operations.
-        /// </summary>
+		/// <summary>
+		/// State object needed to perform asynchronous receive operations.
+		/// </summary>
 		private class AsyncResult : IAsyncResult
 		{
 			byte[] buffer;
@@ -247,16 +247,16 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			AsyncCallback callback;
 			IAsyncResult internalAsyncResult;
 			System.Threading.ManualResetEvent waitHandle;
-            private object _lockObject = new object();
-            private object _internalAsyncResultLockObject = new object();
+			private object _lockObject = new object();
+			private object _internalAsyncResultLockObject = new object();
 
-            /// <summary>
-            /// Creates a new instance of the AsyncResult class.
-            /// </summary>
-            /// <param name="connection">Duplex Channel Connection</param>
-            /// <param name="buffer">Buffer</param>
-            /// <param name="callback">Delegate to invoke, when asynchronous operation is completed</param>
-            /// <param name="asyncState">Pass trough state object</param>
+			/// <summary>
+			/// Creates a new instance of the AsyncResult class.
+			/// </summary>
+			/// <param name="connection">Duplex Channel Connection</param>
+			/// <param name="buffer">Buffer</param>
+			/// <param name="callback">Delegate to invoke, when asynchronous operation is completed</param>
+			/// <param name="asyncState">Pass trough state object</param>
 			public AsyncResult(Connection connection, byte[] buffer, AsyncCallback callback, object asyncState)
 			{
 				this.buffer = buffer;
@@ -265,13 +265,13 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				this.connection = connection;
 			}
 
-            /// <summary>
-            /// Marks the asynchronous receive operation as completed.
-            /// </summary>
-            /// <param name="ar">Result (for Async pattern)</param>
+			/// <summary>
+			/// Marks the asynchronous receive operation as completed.
+			/// </summary>
+			/// <param name="ar">Result (for Async pattern)</param>
 			public void Complete(IAsyncResult ar)
 			{
-                lock (_lockObject)
+				lock (_lockObject)
 				{
 					internalAsyncResult = ar;
 					isCompleted = true;
@@ -282,39 +282,39 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				}
 			}
 
-            /// <summary>
-            /// Gets the callback delegate.
-            /// </summary>
+			/// <summary>
+			/// Gets the callback delegate.
+			/// </summary>
 			public AsyncCallback Callback
 			{
 				get { return callback; }
 			}
 
-            /// <summary>
-            /// Gets the receive buffer.
-            /// </summary>
+			/// <summary>
+			/// Gets the receive buffer.
+			/// </summary>
 			public byte[] Buffer
 			{
 				get { return buffer; }
 			}
 
-            /// <summary>
-            /// Get the affected Duplex Channel Connection.
-            /// </summary>
+			/// <summary>
+			/// Get the affected Duplex Channel Connection.
+			/// </summary>
 			public Connection Connection
 			{
 				get { return connection; }
 			}
 
-            /// <summary>
-            /// Gets the internal async. result.
-            /// </summary>
+			/// <summary>
+			/// Gets the internal async. result.
+			/// </summary>
 			public IAsyncResult InternalAsyncResult
 			{
 				get { return internalAsyncResult; }
 				set 
-                {   
-                    lock (_internalAsyncResultLockObject) 
+				{   
+					lock (_internalAsyncResultLockObject) 
 					{
 						internalAsyncResult = value;
 					}
@@ -323,30 +323,30 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		
 			#region Implementation of IAsyncResult
 			
-            /// <summary>
-            /// Gets the pass through state object.
-            /// </summary>
-            public object AsyncState
+			/// <summary>
+			/// Gets the pass through state object.
+			/// </summary>
+			public object AsyncState
 			{
 				get { return asyncState; }
 			}
 
-            /// <summary>
-            /// Gets if the operation is completed synchronously or not.
-            /// </summary>
+			/// <summary>
+			/// Gets if the operation is completed synchronously or not.
+			/// </summary>
 			public bool CompletedSynchronously
 			{
 				get { return internalAsyncResult.CompletedSynchronously; }
 			}
 
-            /// <summary>
-            /// Gets a wait handle for the asynchronous operation.
-            /// </summary>
+			/// <summary>
+			/// Gets a wait handle for the asynchronous operation.
+			/// </summary>
 			public WaitHandle AsyncWaitHandle
 			{
 				get
 				{
-                    lock (_internalAsyncResultLockObject)
+					lock (_internalAsyncResultLockObject)
 					{
 						if (waitHandle == null)
 							waitHandle = new System.Threading.ManualResetEvent(isCompleted);
@@ -355,9 +355,9 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				}
 			}
 
-            /// <summary>
-            /// Gets if the asynchronous operation is completed or not.
-            /// </summary>
+			/// <summary>
+			/// Gets if the asynchronous operation is completed or not.
+			/// </summary>
 			public bool IsCompleted
 			{
 				get { return isCompleted; }

@@ -85,7 +85,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 			return (string[])retVal.ToArray(typeof(string));
 		}
-        		        
+
 		public static string CreateUrl(Guid guid)
 		{
 			return string.Format("tcpex://{0}", guid);
@@ -93,35 +93,35 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 		public static IPAddress GetHostByName(string name)
 		{
-            IPAddress ipAddress=null;
+			IPAddress ipAddress=null;
 
-            if (!IPAddress.TryParse(name, out ipAddress))
-            {
-                IPAddress[] resolvedAddresses = Dns.GetHostEntry(name).AddressList;
-                
-                foreach (var ip in resolvedAddresses)
-                {
-                    if (ip.AddressFamily == AddressFamily.InterNetwork)
-                        return ip;
-                }
-                throw new ArgumentOutOfRangeException("IPv4 address not found for host " + name);
-            }
-            return ipAddress;
+			if (!IPAddress.TryParse(name, out ipAddress))
+			{
+				IPAddress[] resolvedAddresses = Dns.GetHostEntry(name).AddressList;
+				
+				foreach (var ip in resolvedAddresses)
+				{
+					if (ip.AddressFamily == AddressFamily.InterNetwork)
+						return ip;
+				}
+				throw new ArgumentOutOfRangeException("IPv4 address not found for host " + name);
+			}
+			return ipAddress;
 		}
 		
-        #endregion
+		#endregion
 
 		#region Listening
 		
-        // Hashtable<Guid|string, AsyncResult>
+		// Hashtable<Guid|string, AsyncResult>
 		private static readonly Hashtable _listeners = new Hashtable();
-        private static object _listenersLockObject=new object();
+		private static object _listenersLockObject=new object();
 
 		public static void StartListening(Connection connection)
 		{
 			Message.BeginReceive(connection, new AsyncCallback(ReceiveMessage), null);
 		}
-        
+		
 		public static int StartListening(int port, TcpExChannel channel)
 		{
 			Socket listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -132,25 +132,25 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			return ((IPEndPoint)listener.LocalEndPoint).Port;
 		}
 
-        /// <summary>
-        /// Stops listening of a specified channel. 
-        /// </summary>
-        /// <param name="channel">TcpEx Channel</param>
-        public static void StopListening(TcpExChannel channel)
-        {
-            if (channel == null)
-                throw new ArgumentNullException("channel");
+		/// <summary>
+		/// Stops listening of a specified channel. 
+		/// </summary>
+		/// <param name="channel">TcpEx Channel</param>
+		public static void StopListening(TcpExChannel channel)
+		{
+			if (channel == null)
+				throw new ArgumentNullException("channel");
 
-            var runningConnections = Connection.GetRunningConnectionsOfChannel(channel);
+			var runningConnections = Connection.GetRunningConnectionsOfChannel(channel);
 
-            if (runningConnections != null)
-            {
-                while(runningConnections.Count()>0)                
-                {
-                    runningConnections.First().Close();
-                }
-            }
-        }
+			if (runningConnections != null)
+			{
+				while(runningConnections.Count()>0)
+				{
+					runningConnections.First().Close();
+				}
+			}
+		}
 
 		static void listener_Accept(IAsyncResult ar)
 		{
@@ -159,24 +159,24 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			TcpExChannel channel = (TcpExChannel)state[1];
 			Socket client = listener.EndAccept(ar);
 
-            try
-            {
-                StartListening(Connection.CreateConnection(client, channel, channel.TcpKeepAliveEnabled, channel.TcpKeepAliveTime, channel.TcpKeepAliveInterval, channel.MaxRetries, channel.RetryDelay));
-            }
-            catch (DuplicateConnectionException)
-            {
-            }
-            catch (IOException ioEx)
-            {
-                // Client socket is not responding
-                //TODO: Add Tracing here!
-            }
-            catch (SerializationException serEx)
-            { 
-                // Client sends bad data
-                //TODO: Add Tracing here!
-            }
-            // Wait for next Client request
+			try
+			{
+				StartListening(Connection.CreateConnection(client, channel, channel.TcpKeepAliveEnabled, channel.TcpKeepAliveTime, channel.TcpKeepAliveInterval, channel.MaxRetries, channel.RetryDelay));
+			}
+			catch (DuplicateConnectionException)
+			{
+			}
+			catch (IOException ioEx)
+			{
+				// Client socket is not responding
+				//TODO: Add Tracing here!
+			}
+			catch (SerializationException serEx)
+			{ 
+				// Client sends bad data
+				//TODO: Add Tracing here!
+			}
+			// Wait for next Client request
 			listener.BeginAccept(new AsyncCallback(listener_Accept), new object[] {listener, channel});
 		}
 
@@ -198,7 +198,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				return;
 			}
 
-            lock (_listenersLockObject)
+			lock (_listenersLockObject)
 			{
 				if (!_listeners.Contains(m.Guid))
 				{
@@ -238,7 +238,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 		static void TriggerException(MessageException e)
 		{
-            lock (_listenersLockObject)
+			lock (_listenersLockObject)
 			{
 				ArrayList toBeDeleted = new ArrayList();
 
@@ -262,7 +262,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 		public static IAsyncResult BeginReadMessage(object guidOrServer, Connection connection, AsyncCallback callback, object asyncState)
 		{
-            lock (_listenersLockObject)
+			lock (_listenersLockObject)
 			{
 				Debug.Assert(!_listeners.Contains(guidOrServer), "Handler for this guid already registered.");
 
@@ -276,7 +276,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 						ar.Complete((Connection)result[0], (Message)result[1]);
 						return ar;
 					}
-				}				
+				}
 				_listeners.Add(guidOrServer, ar);
 				return ar;
 			}
