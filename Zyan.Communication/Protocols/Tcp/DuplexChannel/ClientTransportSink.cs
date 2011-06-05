@@ -46,10 +46,10 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			else
 				requestHeaders["__RequestUri"] = url;
 
-            Connection connection = Connection.GetConnection(server, channel, channel.TcpKeepAliveEnabled, channel.TcpKeepAliveTime, channel.TcpKeepAliveInterval, channel.MaxRetries,channel.RetryDelay);
+			Connection connection = Connection.GetConnection(server, channel, channel.TcpKeepAliveEnabled, channel.TcpKeepAliveTime, channel.TcpKeepAliveInterval, channel.MaxRetries,channel.RetryDelay);
 
-            IPEndPoint localEndPoint = (IPEndPoint)connection.Socket.LocalEndPoint;
-            requestHeaders["__IPAddress"] = localEndPoint.Address;
+			IPEndPoint localEndPoint = (IPEndPoint)connection.Socket.LocalEndPoint;
+			requestHeaders["__IPAddress"] = localEndPoint.Address;
 
 			System.Diagnostics.Debug.Assert(connection != null, "Manager.GetConnection returned null", "Manager.GetConnection returned null in ClientTransportSink.ProcessMessage for server - " + server);
 			return connection;
@@ -89,9 +89,9 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 			Guid msgGuid = Guid.NewGuid();
 			IAsyncResult ar = Manager.BeginReadMessage(msgGuid, connection, null, null);
-            Message.Send(connection, msgGuid, requestHeaders, requestStream); 
+			Message.Send(connection, msgGuid, requestHeaders, requestStream); 
 
-          	ar.AsyncWaitHandle.WaitOne();
+			ar.AsyncWaitHandle.WaitOne();
 			Connection replyConnection;
 			Message reply = Manager.EndReadMessage(out replyConnection, ar);
 			Debug.Assert(connection == replyConnection);
