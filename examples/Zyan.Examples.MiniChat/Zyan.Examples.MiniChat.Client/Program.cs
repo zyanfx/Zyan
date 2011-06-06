@@ -25,15 +25,19 @@ namespace Zyan.Examples.MiniChat.Client
             Application.SetCompatibleTextRenderingDefault(false);
 
             string nickname = string.Empty;
+            string serverUrl = string.Empty;
 
             LoginForm loginForm = new LoginForm();
 
-            while (string.IsNullOrEmpty(nickname))
+            while (string.IsNullOrEmpty(nickname) || string.IsNullOrEmpty(serverUrl))
             {
                 if (loginForm.ShowDialog() != DialogResult.OK)
                     break;
                 else
+                {
                     nickname = loginForm.Nickname;
+                    serverUrl = loginForm.ServerUrl;
+                }
             }
             if (string.IsNullOrEmpty(nickname))
                 return;
@@ -45,7 +49,7 @@ namespace Zyan.Examples.MiniChat.Client
             
             try
             {
-                using (_connection = new ZyanConnection(Properties.Settings.Default.ServerUrl, protocol, credentials, false, true))
+                using (_connection = new ZyanConnection(serverUrl, protocol, credentials, false, true))
                 {
                     _connection.CallInterceptors.For<IMiniChat>()
                         .Add<string, string>(

@@ -32,12 +32,14 @@
             this._textNickname = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
+            this.label2 = new System.Windows.Forms.Label();
+            this._comboServerUrl = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(76, 25);
+            this.label1.Location = new System.Drawing.Point(20, 44);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(55, 13);
             this.label1.TabIndex = 0;
@@ -45,14 +47,15 @@
             // 
             // _textNickname
             // 
-            this._textNickname.Location = new System.Drawing.Point(79, 41);
+            this._textNickname.Location = new System.Drawing.Point(81, 41);
             this._textNickname.Name = "_textNickname";
-            this._textNickname.Size = new System.Drawing.Size(122, 20);
+            this._textNickname.Size = new System.Drawing.Size(212, 20);
             this._textNickname.TabIndex = 1;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(152, 110);
+            this.button1.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.button1.Location = new System.Drawing.Point(223, 147);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 2;
@@ -62,12 +65,32 @@
             // button2
             // 
             this.button2.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.button2.Location = new System.Drawing.Point(56, 110);
+            this.button2.Location = new System.Drawing.Point(142, 147);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(75, 23);
             this.button2.TabIndex = 3;
             this.button2.Text = "OK";
             this.button2.UseVisualStyleBackColor = true;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(12, 70);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(63, 13);
+            this.label2.TabIndex = 4;
+            this.label2.Text = "Server-URL";
+            // 
+            // _comboServerUrl
+            // 
+            this._comboServerUrl.FormattingEnabled = true;
+            this._comboServerUrl.Items.AddRange(new object[] {
+            "tcpex://ZyanMiniChat.cloudapp.net:9010/MiniChat",
+            "tcpex://localhost:9010/MiniChat"});
+            this._comboServerUrl.Location = new System.Drawing.Point(81, 67);
+            this._comboServerUrl.Name = "_comboServerUrl";
+            this._comboServerUrl.Size = new System.Drawing.Size(349, 21);
+            this._comboServerUrl.TabIndex = 5;
             // 
             // LoginForm
             // 
@@ -75,7 +98,9 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.button1;
-            this.ClientSize = new System.Drawing.Size(278, 145);
+            this.ClientSize = new System.Drawing.Size(442, 204);
+            this.Controls.Add(this._comboServerUrl);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this._textNickname);
@@ -96,5 +121,7 @@
         private System.Windows.Forms.TextBox _textNickname;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.ComboBox _comboServerUrl;
     }
 }
