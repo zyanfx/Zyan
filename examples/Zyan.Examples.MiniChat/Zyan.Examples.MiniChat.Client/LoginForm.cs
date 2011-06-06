@@ -15,9 +15,16 @@ namespace Zyan.Examples.MiniChat.Client
         {
             InitializeComponent();
             _textNickname.DataBindings.Add("Text", this, "Nickname");
+            _comboServerUrl.DataBindings.Add("Text", this, "ServerUrl");
         }
 
         public string Nickname
+        {
+            get;
+            set;
+        }
+
+        public string ServerUrl
         {
             get;
             set;

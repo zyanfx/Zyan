@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ServiceDefinition name="Zyan.Examples.AzureHosting" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceDefinition">
+  <WorkerRole name="Zyan.Examples.MiniChat.AzureWorkerRole">
+    <Imports>
+      <Import moduleName="Diagnostics" />
+    </Imports>
+    <Endpoints>
+      <InputEndpoint name="MiniChat" protocol="tcp" port="9010" />
+    </Endpoints>
+  </WorkerRole>
+</ServiceDefinition>
