@@ -26,39 +26,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterLinq.EntityFramework4", "InterLinq.EntityFramework4\InterLinq.EntityFramework4.csproj", "{5C5566A3-1070-4FF7-AE5E-8BF13F37520E}"
 EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 10
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs02
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = InterLinq\\InterLinq.csproj
-		SccProjectName1 = InterLinq
-		SccLocalPath1 = InterLinq
-		SccProjectUniqueName2 = InterLinq.NHibernate\\InterLinq.NHibernate.csproj
-		SccProjectName2 = InterLinq.NHibernate
-		SccLocalPath2 = InterLinq.NHibernate
-		SccProjectUniqueName3 = InterLinq.UnitTests.Server\\InterLinq.UnitTests.Server.csproj
-		SccProjectName3 = InterLinq.UnitTests.Server
-		SccLocalPath3 = InterLinq.UnitTests.Server
-		SccProjectUniqueName4 = InterLinq.UnitTests.Artefacts\\InterLinq.UnitTests.Artefacts.csproj
-		SccProjectName4 = InterLinq.UnitTests.Artefacts
-		SccLocalPath4 = InterLinq.UnitTests.Artefacts
-		SccProjectUniqueName5 = InterLinq.Sql\\InterLinq.Sql.csproj
-		SccProjectName5 = InterLinq.Sql
-		SccLocalPath5 = InterLinq.Sql
-		SccProjectUniqueName6 = InterLinq.Objects\\InterLinq.Objects.csproj
-		SccProjectName6 = InterLinq.Objects
-		SccLocalPath6 = InterLinq.Objects
-		SccProjectUniqueName7 = InterLinq.EntityFramework\\InterLinq.EntityFramework.csproj
-		SccProjectName7 = InterLinq.EntityFramework
-		SccLocalPath7 = InterLinq.EntityFramework
-		SccProjectUniqueName8 = InterLinq.EntityFramework4\\InterLinq.EntityFramework4.csproj
-		SccProjectName8 = InterLinq.EntityFramework4
-		SccLocalPath8 = InterLinq.EntityFramework4
-		SccProjectUniqueName9 = InterLinq.UnitTests\\InterLinq.UnitTests.csproj
-		SccProjectName9 = InterLinq.UnitTests
-		SccLocalPath9 = InterLinq.UnitTests
-	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = InterLinq.vsmdi
 	EndGlobalSection
