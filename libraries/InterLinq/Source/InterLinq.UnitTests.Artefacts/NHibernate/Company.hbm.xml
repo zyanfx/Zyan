@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping auto-import="false" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="InterLinq.UnitTests.Artefacts.NHibernate.Employee, InterLinq.UnitTests.Artefacts"
+		   table="`EMPLOYEE`"
+		   lazy="false">
+		<id name="Id" column="ID" type="integer">
+			<generator class="identity"/>
+		</id>
+		<property name="Name" column="NAME" length="255" type="String" not-null="false"/>
+		<property name="IsMale" column="ISMALE" type="Boolean" not-null="false"/>
+		<property name="Salary" column="SALARY" type="Double" not-null="false"/>
+		<property name="Grade" column="GRADE" type="Int32" not-null="false"/>
+		<many-to-one name="Department"
+					 column="DEPARTMENT_FK"
+					 class="InterLinq.UnitTests.Artefacts.NHibernate.Department, InterLinq.UnitTests.Artefacts"
+					 not-null="false"/>
+	</class>
+	<class name="InterLinq.UnitTests.Artefacts.NHibernate.Department, InterLinq.UnitTests.Artefacts"
+		   table="`DEPARTMENT`"
+		   lazy="false">
+		<id name="Id" column="ID" type="integer">
+			<generator class="identity"/>
+		</id>
+		<property name="Name" column="NAME" length="255" type="String" not-null="false"/>
+		<property name="Foundation" column="FOUNDATION" type="DateTime" not-null="false"/>
+		<property name="QualityLevel" column="QUALITYLEVEL" type="Int32" not-null="false"/>
+		<many-to-one name="Manager"
+					 column="MANAGER_FK"
+					 class="InterLinq.UnitTests.Artefacts.NHibernate.Employee, InterLinq.UnitTests.Artefacts"
+					 not-null="false"/>
+		<many-to-one name="Company"
+					 column="COMPANY_FK"
+					 class="InterLinq.UnitTests.Artefacts.NHibernate.Company, InterLinq.UnitTests.Artefacts"
+					 not-null="false"/>
+		<bag name="Employees" lazy="false" inverse="true">
+			<key column="DEPARTMENT_FK"/>
+			<one-to-many class="InterLinq.UnitTests.Artefacts.NHibernate.Employee, InterLinq.UnitTests.Artefacts"/>
+		</bag>
+	</class>
+	<class name="InterLinq.UnitTests.Artefacts.NHibernate.Company, InterLinq.UnitTests.Artefacts"
+		   table="`COMPANY`"
+		   lazy="false">
+		<id name="Id" column="ID" type="integer">
+			<generator class="identity"/>
+		</id>
+		<property name="Foundation" column="FOUNDATION" type="DateTime" not-null="false"/>
+		<property name="Name" column="NAME" length="255" type="String" not-null="false"/>
+		<many-to-one name="ChiefExecutiveOfficer"
+					 column="CHIEFEXECUTIVEOFFICER_FK"
+					 class="InterLinq.UnitTests.Artefacts.NHibernate.Employee, InterLinq.UnitTests.Artefacts"
+					 not-null="false"/>
+		<bag name="Departments" lazy="false" inverse="true">
+			<key column="COMPANY_FK"/>
+			<one-to-many class="InterLinq.UnitTests.Artefacts.NHibernate.Department, InterLinq.UnitTests.Artefacts"/>
+		</bag>
+	</class>
+</hibernate-mapping>

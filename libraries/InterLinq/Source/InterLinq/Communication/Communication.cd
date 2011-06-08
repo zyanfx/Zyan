@@ -1,0 +1,119 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="InterLinq.Communication.ServerQueryHandler">
+    <Position X="7.75" Y="4.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAACAAAAEAAAAACAAAAAAACAAAAAAAAAAIAAA=</HashCode>
+      <FileName>Communication\ServerQueryHandler.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="InterLinq.Communication.ClientQueryProvider">
+    <Position X="4.25" Y="4" Width="2.25" />
+    <InheritanceLine Type="InterLinq.InterLinqQueryProvider" FixedToPoint="true">
+      <Path>
+        <Point X="5.125" Y="1.645" />
+        <Point X="5.125" Y="4" />
+      </Path>
+    </InheritanceLine>
+    <AssociationLine Name="Handler" Type="InterLinq.IQueryRemoteHandler" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="6.5" Y="4.688" />
+        <Point X="6.875" Y="4.688" />
+        <Point X="6.875" Y="0.991" />
+        <Point X="7.5" Y="0.991" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.06" Y="0.073" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Communication\ClientQueryProvider.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Handler" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="InterLinq.Communication.ClientQueryHandler">
+    <Position X="1.5" Y="4" Width="2.5" />
+    <InheritanceLine Type="InterLinq.InterLinqQueryHandler" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="2.25" Y="2.356" />
+        <Point X="2.25" Y="4" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAAAAAAACAAAAAIAAAAAAAAAAAAAAAAAAEAA=</HashCode>
+      <FileName>Communication\ClientQueryHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InterLinq.Communication.Remoting.ServerQueryRemotingHandler">
+    <Position X="7.5" Y="2.25" Width="2.25" />
+    <Members>
+      <Method Name="InitializeLifetimeService" Hidden="true" />
+    </Members>
+    <AssociationLine Name="InnerHandler" Type="InterLinq.IQueryRemoteHandler" FixedFromPoint="true">
+      <Path>
+        <Point X="8.375" Y="2.25" />
+        <Point X="8.375" Y="1.481" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-1.034" Y="0.085" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAACAEAAAAAAAIAAAIAACAAAAAAAAAAAAAACA=</HashCode>
+      <FileName>Communication\Remoting\ServerQueryRemotingHandler.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="InnerHandler" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="InterLinq.Communication.Remoting.ClientQueryRemotingHandler">
+    <Position X="0.5" Y="6.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAIAAAAAIAgAAAAAAAAAAAAA=</HashCode>
+      <FileName>Communication\Remoting\ClientQueryRemotingHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InterLinq.Communication.Wcf.ClientQueryWcfHandler">
+    <Position X="3" Y="6.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Communication\Wcf\ClientQueryWcfHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InterLinq.Communication.Wcf.ServerQueryWcfHandler">
+    <Position X="7.75" Y="7" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAEAAAAAAAAAAAAAAAAAIAgAAAAAAAA=</HashCode>
+      <FileName>Communication\Wcf\ServerQueryWcfHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InterLinq.InterLinqQueryHandler">
+    <Position X="0.5" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAABCAAIAAAAAAAAAAAAAAAAAACAAAAA=</HashCode>
+      <FileName>InterLinqQueryHandler.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="InterLinq.InterLinqQueryProvider">
+    <Position X="3.75" Y="0.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAACAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>InterLinqQueryProvider.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Interface Name="InterLinq.IQueryRemoteHandler">
+    <Position X="7.5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IQueryRemoteHandler.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Tahoma" Size="8.25" />
+</ClassDiagram>

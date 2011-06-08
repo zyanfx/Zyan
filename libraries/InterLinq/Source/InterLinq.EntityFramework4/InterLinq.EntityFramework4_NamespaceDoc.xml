@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+  <assembly>
+    <name>InterLinq.EntityFramework4</name>
+  </assembly>
+  <members>
+    <member name="N:InterLinq.EntityFramework4">
+      <summary>
+        <p>
+          This namespace contains the ADO.NET Entity Framework (.NET 4.0) specific implementations.
+        </p>
+      </summary>
+    </member>
+  </members>
+</doc>

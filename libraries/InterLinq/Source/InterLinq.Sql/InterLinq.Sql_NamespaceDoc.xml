@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+	<assembly>
+		<name>InterLinq.Sql</name>
+	</assembly>
+	<members>
+		<member name="N:InterLinq.Sql">
+			<summary>
+				<p>
+					This namespace contains the LINQ to Sql specific implementations.
+				</p>
+				<p>
+					<img src="../images/InterLinq_Sql.png"/>
+				</p>
+			</summary>
+		</member>
+	</members>
+</doc>

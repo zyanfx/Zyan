@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="InterLinq.UnitTests.Artefacts.NHibernate.Company">
+    <Position X="0.5" Y="0.5" Width="1.75" />
+    <Members>
+      <Field Name="m_chiefExecutiveOfficer" Hidden="true" />
+      <Field Name="m_departments" Hidden="true" />
+      <Field Name="m_foundation" Hidden="true" />
+      <Field Name="m_id" Hidden="true" />
+      <Field Name="m_name" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>EAACAAAAAACAAAAAAKAAAAQCAAAAAAQEAAAAAgAAAAA=</HashCode>
+      <FileName>NHibernate\Company.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="ChiefExecutiveOfficer" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="Departments" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="InterLinq.UnitTests.Artefacts.NHibernate.Department">
+    <Position X="3.5" Y="1" Width="1.75" />
+    <Members>
+      <Field Name="m_company" Hidden="true" />
+      <Field Name="m_employees" Hidden="true" />
+      <Field Name="m_foundation" Hidden="true" />
+      <Field Name="m_id" Hidden="true" />
+      <Field Name="m_manager" Hidden="true" />
+      <Field Name="m_name" Hidden="true" />
+      <Field Name="m_qualityLevel" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>EAACAAAAAAAAAAAAAIAAIIQACAAAhAQEAAAADAAAACA=</HashCode>
+      <FileName>NHibernate\Department.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Company" />
+      <Property Name="Manager" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="Employees" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="InterLinq.UnitTests.Artefacts.NHibernate.Employee">
+    <Position X="7.25" Y="0.5" Width="1.75" />
+    <Members>
+      <Field Name="m_department" Hidden="true" />
+      <Field Name="m_grade" Hidden="true" />
+      <Field Name="m_id" Hidden="true" />
+      <Field Name="m_isMale" Hidden="true" />
+      <Field Name="m_name" Hidden="true" />
+      <Field Name="m_salary" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>EAACACAAAgAAAAAAAABABEQAEAAAgAQAAAAAAAEAAAA=</HashCode>
+      <FileName>NHibernate\Employee.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Department" />
+    </ShowAsAssociation>
+  </Class>
+  <Font Name="Tahoma" Size="8.25" />
+</ClassDiagram>
