@@ -66,8 +66,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IObjectSource.cs" />
-    <Compile Include="ObjectQueryHandler.cs" />
+    <Compile Include="Objects\IObjectSource.cs" />
+    <Compile Include="Objects\ObjectQueryHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
