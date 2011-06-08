@@ -1,0 +1,110 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7E8E5561-48E1-4672-8BA9-BA5CA91D178C}"
+	ProjectSection(SolutionItems) = preProject
+		InterLinq.testrunconfig = InterLinq.testrunconfig
+		InterLinq.vsmdi = InterLinq.vsmdi
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterLinq", "InterLinq\InterLinq.csproj", "{675F3E10-B4EA-4254-A068-107AAF02D093}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterLinq.NHibernate", "InterLinq.NHibernate\InterLinq.NHibernate.csproj", "{B134658A-9FBF-4497-874E-61A2EAA3CF9C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterLinq.UnitTests.Server", "InterLinq.UnitTests.Server\InterLinq.UnitTests.Server.csproj", "{F2C28EEA-A38F-4BDB-A599-29B38D5FFF66}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterLinq.UnitTests", "InterLinq.UnitTests\InterLinq.UnitTests.csproj", "{52816D09-D5F2-470F-AB4E-DA2F9EA300FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterLinq.UnitTests.Artefacts", "InterLinq.UnitTests.Artefacts\InterLinq.UnitTests.Artefacts.csproj", "{DF5A0083-AB07-4E04-BA02-8D21ED866337}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterLinq.Sql", "InterLinq.Sql\InterLinq.Sql.csproj", "{0A5F7199-3928-4E95-813D-21F0038AB7B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterLinq.Objects", "InterLinq.Objects\InterLinq.Objects.csproj", "{EFBC924D-DD86-4CB1-86F9-FA65817B8CB0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterLinq.EntityFramework", "InterLinq.EntityFramework\InterLinq.EntityFramework.csproj", "{367F0339-C4B3-462E-AC59-81A10681992D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterLinq.EntityFramework4", "InterLinq.EntityFramework4\InterLinq.EntityFramework4.csproj", "{5C5566A3-1070-4FF7-AE5E-8BF13F37520E}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 10
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs02
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = InterLinq\\InterLinq.csproj
+		SccProjectName1 = InterLinq
+		SccLocalPath1 = InterLinq
+		SccProjectUniqueName2 = InterLinq.NHibernate\\InterLinq.NHibernate.csproj
+		SccProjectName2 = InterLinq.NHibernate
+		SccLocalPath2 = InterLinq.NHibernate
+		SccProjectUniqueName3 = InterLinq.UnitTests.Server\\InterLinq.UnitTests.Server.csproj
+		SccProjectName3 = InterLinq.UnitTests.Server
+		SccLocalPath3 = InterLinq.UnitTests.Server
+		SccProjectUniqueName4 = InterLinq.UnitTests.Artefacts\\InterLinq.UnitTests.Artefacts.csproj
+		SccProjectName4 = InterLinq.UnitTests.Artefacts
+		SccLocalPath4 = InterLinq.UnitTests.Artefacts
+		SccProjectUniqueName5 = InterLinq.Sql\\InterLinq.Sql.csproj
+		SccProjectName5 = InterLinq.Sql
+		SccLocalPath5 = InterLinq.Sql
+		SccProjectUniqueName6 = InterLinq.Objects\\InterLinq.Objects.csproj
+		SccProjectName6 = InterLinq.Objects
+		SccLocalPath6 = InterLinq.Objects
+		SccProjectUniqueName7 = InterLinq.EntityFramework\\InterLinq.EntityFramework.csproj
+		SccProjectName7 = InterLinq.EntityFramework
+		SccLocalPath7 = InterLinq.EntityFramework
+		SccProjectUniqueName8 = InterLinq.EntityFramework4\\InterLinq.EntityFramework4.csproj
+		SccProjectName8 = InterLinq.EntityFramework4
+		SccLocalPath8 = InterLinq.EntityFramework4
+		SccProjectUniqueName9 = InterLinq.UnitTests\\InterLinq.UnitTests.csproj
+		SccProjectName9 = InterLinq.UnitTests
+		SccLocalPath9 = InterLinq.UnitTests
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = InterLinq.vsmdi
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{675F3E10-B4EA-4254-A068-107AAF02D093}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{675F3E10-B4EA-4254-A068-107AAF02D093}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{675F3E10-B4EA-4254-A068-107AAF02D093}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{675F3E10-B4EA-4254-A068-107AAF02D093}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B134658A-9FBF-4497-874E-61A2EAA3CF9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B134658A-9FBF-4497-874E-61A2EAA3CF9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B134658A-9FBF-4497-874E-61A2EAA3CF9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B134658A-9FBF-4497-874E-61A2EAA3CF9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2C28EEA-A38F-4BDB-A599-29B38D5FFF66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2C28EEA-A38F-4BDB-A599-29B38D5FFF66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2C28EEA-A38F-4BDB-A599-29B38D5FFF66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2C28EEA-A38F-4BDB-A599-29B38D5FFF66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52816D09-D5F2-470F-AB4E-DA2F9EA300FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52816D09-D5F2-470F-AB4E-DA2F9EA300FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52816D09-D5F2-470F-AB4E-DA2F9EA300FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52816D09-D5F2-470F-AB4E-DA2F9EA300FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF5A0083-AB07-4E04-BA02-8D21ED866337}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF5A0083-AB07-4E04-BA02-8D21ED866337}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF5A0083-AB07-4E04-BA02-8D21ED866337}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF5A0083-AB07-4E04-BA02-8D21ED866337}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A5F7199-3928-4E95-813D-21F0038AB7B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A5F7199-3928-4E95-813D-21F0038AB7B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A5F7199-3928-4E95-813D-21F0038AB7B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A5F7199-3928-4E95-813D-21F0038AB7B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFBC924D-DD86-4CB1-86F9-FA65817B8CB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFBC924D-DD86-4CB1-86F9-FA65817B8CB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFBC924D-DD86-4CB1-86F9-FA65817B8CB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFBC924D-DD86-4CB1-86F9-FA65817B8CB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{367F0339-C4B3-462E-AC59-81A10681992D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{367F0339-C4B3-462E-AC59-81A10681992D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{367F0339-C4B3-462E-AC59-81A10681992D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{367F0339-C4B3-462E-AC59-81A10681992D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C5566A3-1070-4FF7-AE5E-8BF13F37520E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C5566A3-1070-4FF7-AE5E-8BF13F37520E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C5566A3-1070-4FF7-AE5E-8BF13F37520E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C5566A3-1070-4FF7-AE5E-8BF13F37520E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

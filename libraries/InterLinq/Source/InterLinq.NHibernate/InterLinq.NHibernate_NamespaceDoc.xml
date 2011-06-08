@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+	<assembly>
+		<name>InterLinq.NHibernate</name>
+	</assembly>
+	<members>
+		<member name="N:InterLinq.NHibernate">
+			<summary>
+				<p>
+					This namespace contains the NHibernate specific implementations.
+				</p>
+				<p>
+					<img src="../images/InterLinq_NHibernate.png"/>
+				</p>
+			</summary>
+		</member>
+	</members>
+</doc>
