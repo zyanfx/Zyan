@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Zyan</id>
+    <version>2.0</version>
+    <title>Zyan</title>
+    <authors>Rainbird</authors>
+    <owners>Hagen Siegel</owners>
+    <licenseUrl>http://zyan.codeplex.com/license</licenseUrl>
+    <projectUrl>http://zyan.codeplex.com</projectUrl>
+    <iconUrl>http://download.codeplex.com/Project/Download/FileDownload.aspx?ProjectName=zyan&amp;DownloadId=248892</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Zyan is a framework that simplifies development of distributed applications.
+With Zyan you can publish every .NET class for remote access over the network.
+Zyan is highly customizable and provides you with tools to build modular and plugable distributed applications.</description>
+    <summary />
+    <language>en-US</language>
+    <tags>Sockets TCP Remoting Distributed Cloud WCF EBC event-based-components flowdesign easy</tags>
+  </metadata>
+</package>
