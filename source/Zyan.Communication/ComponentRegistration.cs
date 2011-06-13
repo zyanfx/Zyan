@@ -4,26 +4,360 @@ using System.Collections.Generic;
 namespace Zyan.Communication
 {
     /// <summary>
-    /// Beschreibt eine Komponenten-Registrierung.
+    /// Describes a component registration.
     /// </summary>
     public class ComponentRegistration
     {
-        // Sperrobjekt für Threadsynchronisierung
+        #region Constructors
+
+        /// <summary>
+        /// Creates a new instance of the ComponentRegistration class.
+        /// </summary>
+        public ComponentRegistration()
+        {
+            _eventWirings = new Dictionary<Guid, Delegate>();
+        }
+
+        /// <summary>
+        /// Creates a new instance of the ComponentRegistration class.
+        /// </summary>
+        /// <param name="interfaceType">Interface type of the component</param>
+        /// <param name="implementationType">Implementation type of the component</param>                
+        public ComponentRegistration(Type interfaceType, Type implementationType)
+            : this()
+        {
+            this.InterfaceType = interfaceType;
+            this.ImplementationType = implementationType;
+            this.ActivationType = ActivationType.SingleCall;
+            this.UniqueName = interfaceType.FullName;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the ComponentRegistration class.
+        /// </summary>
+        /// <param name="interfaceType">Interface type of the component</param>
+        /// <param name="implementationType">Implementation type of the component</param>    
+        /// <param name="cleanUpHandler">Delegate of clean up method</param>
+        public ComponentRegistration(Type interfaceType, Type implementationType, Action<object> cleanUpHandler)
+            : this()
+        {
+            this.InterfaceType = interfaceType;
+            this.ImplementationType = implementationType;
+            this.ActivationType = ActivationType.SingleCall;
+            this.UniqueName = interfaceType.FullName;
+            this.CleanUpHandler = cleanUpHandler;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the ComponentRegistration class.
+        /// </summary>
+        /// <param name="interfaceType">Interface type of the component</param>
+        /// <param name="implementationType">Implementation type of the component</param>                                
+        /// <param name="activationType">Activation type (Singleton/SingleCall)</param>
+        public ComponentRegistration(Type interfaceType, Type implementationType, ActivationType activationType)
+            : this()
+        {
+            this.InterfaceType = interfaceType;
+            this.ImplementationType = implementationType;
+            this.ActivationType = activationType;
+            this.UniqueName = interfaceType.FullName;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the ComponentRegistration class.
+        /// </summary>
+        /// <param name="interfaceType">Interface type of the component</param>
+        /// <param name="implementationType">Implementation type of the component</param>                                
+        /// <param name="activationType">Activation type (Singleton/SingleCall)</param>
+        /// <param name="cleanUpHandler">Delegate of clean up method</param>
+        public ComponentRegistration(Type interfaceType, Type implementationType, ActivationType activationType, Action<object> cleanUpHandler)
+            : this()
+        {
+            this.InterfaceType = interfaceType;
+            this.ImplementationType = implementationType;
+            this.ActivationType = activationType;
+            this.UniqueName = interfaceType.FullName;
+            this.CleanUpHandler = cleanUpHandler;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the ComponentRegistration class.
+        /// </summary>
+        /// <param name="interfaceType">Interface type of the component</param>
+        /// <param name="intializationHandler">Delegate of initialization method</param>        
+        public ComponentRegistration(Type interfaceType, Func<object> intializationHandler)
+            : this()
+        {
+            this.InterfaceType = interfaceType;
+            this.InitializationHandler = intializationHandler;
+            this.ActivationType = ActivationType.SingleCall;
+            this.UniqueName = interfaceType.FullName;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the ComponentRegistration class.
+        /// </summary>
+        /// <param name="interfaceType">Interface type of the component</param>
+        /// <param name="intializationHandler">Delegate of initialization method</param>   
+        /// <param name="cleanUpHandler">Delegate of clean up method</param>
+        public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, Action<object> cleanUpHandler)
+            : this()
+        {
+            this.InterfaceType = interfaceType;
+            this.InitializationHandler = intializationHandler;
+            this.ActivationType = ActivationType.SingleCall;
+            this.UniqueName = interfaceType.FullName;
+            this.CleanUpHandler = cleanUpHandler;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the ComponentRegistration class.
+        /// </summary>
+        /// <param name="interfaceType">Interface type of the component</param>
+        /// <param name="intializationHandler">Delegate of initialization method</param>        
+        /// <param name="activationType">Activation type (Singleton/SingleCall)</param>
+        public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, ActivationType activationType)
+            : this()
+        {
+            this.InterfaceType = interfaceType;
+            this.InitializationHandler = intializationHandler;
+            this.ActivationType = activationType;
+            this.UniqueName = interfaceType.FullName;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the ComponentRegistration class.
+        /// </summary>
+        /// <param name="interfaceType">Interface type of the component</param>
+        /// <param name="intializationHandler">Delegate of initialization method</param>        
+        /// <param name="activationType">Activation type (Singleton/SingleCall)</param>
+        /// <param name="cleanUpHandler">Delegate of clean up method</param>
+        public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, ActivationType activationType, Action<object> cleanUpHandler)
+            : this()
+        {
+            this.InterfaceType = interfaceType;
+            this.InitializationHandler = intializationHandler;
+            this.ActivationType = activationType;
+            this.UniqueName = interfaceType.FullName;
+            this.CleanUpHandler = cleanUpHandler;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the ComponentRegistration class.
+        /// </summary>
+        /// <param name="interfaceType">Interface type of the component</param>
+        /// <param name="singletonInstance">Singleton instance of the component</param>
+        public ComponentRegistration(Type interfaceType, object singletonInstance)
+            : this()
+        {
+            this.InterfaceType = interfaceType;
+            this.ImplementationType = singletonInstance.GetType();
+            this.SingletonInstance = singletonInstance;
+            this.ActivationType = ActivationType.Singleton;
+            this.UniqueName = interfaceType.FullName;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the ComponentRegistration class.
+        /// </summary>
+        /// <param name="interfaceType">Interface type of the component</param>
+        /// <param name="singletonInstance">Singleton instance of the component</param>
+        /// <param name="cleanUpHandler">Delegate of clean up method</param>
+        public ComponentRegistration(Type interfaceType, object singletonInstance, Action<object> cleanUpHandler)
+            : this()
+        {
+            this.InterfaceType = interfaceType;
+            this.ImplementationType = singletonInstance.GetType();
+            this.SingletonInstance = singletonInstance;
+            this.ActivationType = ActivationType.Singleton;
+            this.UniqueName = interfaceType.FullName;
+            this.CleanUpHandler = cleanUpHandler;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the ComponentRegistration class.
+        /// </summary>
+        /// <param name="interfaceType">Interface type of the component</param>
+        /// <param name="implementationType">Implementation type of the component</param>                        
+        /// <param name="uniqueName">Unique component name</param>
+        public ComponentRegistration(Type interfaceType, Type implementationType, string uniqueName)
+            : this()
+        {
+            this.InterfaceType = interfaceType;
+            this.ImplementationType = implementationType;
+            this.UniqueName = uniqueName;
+            this.ActivationType = ActivationType.SingleCall;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the ComponentRegistration class.
+        /// </summary>
+        /// <param name="interfaceType">Interface type of the component</param>
+        /// <param name="implementationType">Implementation type of the component</param>                        
+        /// <param name="uniqueName">Unique component name</param>
+        /// <param name="cleanUpHandler">Delegate of clean up method</param>
+        public ComponentRegistration(Type interfaceType, Type implementationType, string uniqueName, Action<object> cleanUpHandler)
+            : this()
+        {
+            this.InterfaceType = interfaceType;
+            this.ImplementationType = implementationType;
+            this.UniqueName = uniqueName;
+            this.ActivationType = ActivationType.SingleCall;
+            this.CleanUpHandler = cleanUpHandler;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the ComponentRegistration class.
+        /// </summary>
+        /// <param name="interfaceType">Interface type of the component</param>
+        /// <param name="implementationType">Implementation type of the component</param>                        
+        /// <param name="uniqueName">Unique component name</param>
+        /// <param name="activationType">Activation type (Singleton/SingleCall)</param>
+        public ComponentRegistration(Type interfaceType, Type implementationType, string uniqueName, ActivationType activationType)
+            : this()
+        {
+            this.InterfaceType = interfaceType;
+            this.ImplementationType = implementationType;
+            this.UniqueName = uniqueName;
+            this.ActivationType = activationType;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the ComponentRegistration class.
+        /// </summary>
+        /// <param name="interfaceType">Interface type of the component</param>
+        /// <param name="implementationType">Implementation type of the component</param>                        
+        /// <param name="uniqueName">Unique component name</param>
+        /// <param name="activationType">Activation type (Singleton/SingleCall)</param>
+        /// <param name="cleanUpHandler">Delegate of clean up method</param>
+        public ComponentRegistration(Type interfaceType, Type implementationType, string uniqueName, ActivationType activationType, Action<object> cleanUpHandler)
+            : this()
+        {
+            this.InterfaceType = interfaceType;
+            this.ImplementationType = implementationType;
+            this.UniqueName = uniqueName;
+            this.ActivationType = activationType;
+            this.CleanUpHandler = cleanUpHandler;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the ComponentRegistration class.
+        /// </summary>
+        /// <param name="interfaceType">Interface type of the component</param>
+        /// <param name="intializationHandler">Delegate of initialization method</param>        
+        /// <param name="uniqueName">Unique component name</param>
+        public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, string uniqueName)
+            : this()
+        {
+            this.InterfaceType = interfaceType;
+            this.InitializationHandler = intializationHandler;
+            this.UniqueName = uniqueName;
+            this.ActivationType = ActivationType.SingleCall;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the ComponentRegistration class.
+        /// </summary>
+        /// <param name="interfaceType">Interface type of the component</param>
+        /// <param name="intializationHandler">Delegate of initialization method</param>        
+        /// <param name="uniqueName">Unique component name</param>
+        /// <param name="cleanUpHandler">Delegate of clean up method</param>
+        public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, string uniqueName, Action<object> cleanUpHandler)
+            : this()
+        {
+            this.InterfaceType = interfaceType;
+            this.InitializationHandler = intializationHandler;
+            this.UniqueName = uniqueName;
+            this.ActivationType = ActivationType.SingleCall;
+            this.CleanUpHandler = cleanUpHandler;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the ComponentRegistration class.
+        /// </summary>
+        /// <param name="interfaceType">Interface type of the component</param>
+        /// <param name="intializationHandler">Delegate of initialization method</param>        
+        /// <param name="uniqueName">Unique component name</param>
+        /// <param name="activationType">Activation type (Singleton/SingleCall)</param>
+        public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, string uniqueName, ActivationType activationType)
+            : this()
+        {
+            this.InterfaceType = interfaceType;
+            this.InitializationHandler = intializationHandler;
+            this.UniqueName = uniqueName;
+            this.ActivationType = activationType;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the ComponentRegistration class.
+        /// </summary>
+        /// <param name="interfaceType">Interface type of the component</param>
+        /// <param name="intializationHandler">Delegate of initialization method</param>        
+        /// <param name="uniqueName">Unique component name</param>
+        /// <param name="activationType">Activation type (Singleton/SingleCall)</param>
+        /// <param name="cleanUpHandler">Delegate of clean up method</param>
+        public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, string uniqueName, ActivationType activationType, Action<object> cleanUpHandler)
+            : this()
+        {
+            this.InterfaceType = interfaceType;
+            this.InitializationHandler = intializationHandler;
+            this.UniqueName = uniqueName;
+            this.ActivationType = activationType;
+            this.CleanUpHandler = cleanUpHandler;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the ComponentRegistration class.
+        /// </summary>
+        /// <param name="interfaceType">Interface type of the component</param>
+        /// <param name="singletonInstance">Singleton instance of the component</param>
+        /// <param name="uniqueName">Unique component name</param>
+        public ComponentRegistration(Type interfaceType, object singletonInstance, string uniqueName)
+            : this()
+        {
+            this.InterfaceType = interfaceType;
+            this.ImplementationType = singletonInstance.GetType();
+            this.SingletonInstance = singletonInstance;
+            this.UniqueName = uniqueName;
+            this.ActivationType = ActivationType.Singleton;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the ComponentRegistration class.
+        /// </summary>
+        /// <param name="interfaceType">Interface type of the component</param>
+        /// <param name="singletonInstance">Singleton instance of the component</param>
+        /// <param name="uniqueName">Unique component name</param>
+        /// <param name="cleanUpHandler">Delegate of clean up method</param>
+        public ComponentRegistration(Type interfaceType, object singletonInstance, string uniqueName, Action<object> cleanUpHandler)
+            : this()
+        {
+            this.InterfaceType = interfaceType;
+            this.ImplementationType = singletonInstance.GetType();
+            this.SingletonInstance = singletonInstance;
+            this.UniqueName = uniqueName;
+            this.ActivationType = ActivationType.Singleton;
+            this.CleanUpHandler = cleanUpHandler;
+        }
+
+        #endregion
+
+        #region Properties
+
         private object _syncLock = new object();
 
         /// <summary>
-        /// Gibt das Sperrobjekt für Threadsynchronisierung zurück.
+        /// Returns the lock object for thread synchronization.
         /// </summary>
         public object SyncLock
         {
             get { return _syncLock; }
         }
 
-        // Liste mit Ereignisverdrahtungen
-        private Dictionary<Guid,Delegate> _eventWirings;
+        private Dictionary<Guid, Delegate> _eventWirings;
 
         /// <summary>
-        /// Gibt die Liste der Ereignisverdrahtungen zurück.
+        /// Returns a name-value-list of registered event wirings.
         /// </summary>
         internal Dictionary<Guid, Delegate> EventWirings
         {
@@ -31,177 +365,7 @@ namespace Zyan.Communication
         }
 
         /// <summary>
-        /// Standardkonstruktor.
-        /// </summary>
-        public ComponentRegistration()
-        {
-            // Liste für Ereignisverdrahtungen erzeugen
-            _eventWirings = new Dictionary<Guid, Delegate>();
-        }
-
-        /// <summary>
-        /// Konstruktor.
-        /// </summary>
-        /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
-        /// <param name="implementationType">Implementierungstyp der Komponente</param>                
-        public ComponentRegistration(Type interfaceType, Type implementationType) 
-            : this()
-        {
-            // Werte übernehmen
-            this.InterfaceType = interfaceType;
-            this.ImplementationType = implementationType;
-            this.ActivationType = ActivationType.SingleCall;
-            this.UniqueName = interfaceType.FullName;
-        }
-
-        /// <summary>
-        /// Konstruktor.
-        /// </summary>
-        /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
-        /// <param name="implementationType">Implementierungstyp der Komponente</param>                
-        /// <param name="activationType">Aktivierungsart</param>
-        public ComponentRegistration(Type interfaceType, Type implementationType, ActivationType activationType)
-            : this()
-        {
-            // Werte übernehmen
-            this.InterfaceType = interfaceType;
-            this.ImplementationType = implementationType;
-            this.ActivationType = activationType;
-            this.UniqueName = interfaceType.FullName;
-        }
-
-        /// <summary>
-        /// Konstruktor.
-        /// </summary>
-        /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
-        /// <param name="intializationHandler">Delegat auf Inizialisierungsfunktion</param>        
-        public ComponentRegistration(Type interfaceType, Func<object> intializationHandler)
-            : this()
-        {
-            // Werte übernehmen
-            this.InterfaceType = interfaceType;            
-            this.InitializationHandler = intializationHandler;
-            this.ActivationType = ActivationType.SingleCall;
-            this.UniqueName = interfaceType.FullName;
-        }
-
-        /// <summary>
-        /// Konstruktor.
-        /// </summary>
-        /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
-        /// <param name="intializationHandler">Delegat auf Inizialisierungsfunktion</param>        
-        /// <param name="activationType">Aktivierungsart</param>
-        public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, ActivationType activationType)
-            : this()
-        {
-            // Werte übernehmen
-            this.InterfaceType = interfaceType;
-            this.InitializationHandler = intializationHandler;
-            this.ActivationType = activationType;
-            this.UniqueName = interfaceType.FullName;
-        }
-
-        /// <summary>
-        /// Konstruktor.
-        /// </summary>
-        /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
-        /// <param name="singletonInstance">Singleton-Instanz der Komponente</param>
-        public ComponentRegistration(Type interfaceType, object singletonInstance)
-            : this()
-        {
-            // Werte übernehmen
-            this.InterfaceType = interfaceType;
-            this.ImplementationType = singletonInstance.GetType();
-            this.SingletonInstance = singletonInstance;
-            this.ActivationType = ActivationType.Singleton;
-            this.UniqueName = interfaceType.FullName;
-        }
-                
-        /// <summary>
-        /// Konstruktor.
-        /// </summary>
-        /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
-        /// <param name="implementationType">Implementierungstyp der Komponente</param>        
-        /// <param name="uniqueName">Eindeutiger Name</param>
-        public ComponentRegistration(Type interfaceType, Type implementationType, string uniqueName)
-            : this()
-        {
-            // Werte übernehmen
-            this.InterfaceType = interfaceType;
-            this.ImplementationType = implementationType;
-            this.UniqueName = uniqueName;
-            this.ActivationType = ActivationType.SingleCall;
-        }
-
-        /// <summary>
-        /// Konstruktor.
-        /// </summary>
-        /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
-        /// <param name="implementationType">Implementierungstyp der Komponente</param>        
-        /// <param name="uniqueName">Eindeutiger Name</param>
-        /// <param name="activationType">Aktivierungsart</param>
-        public ComponentRegistration(Type interfaceType, Type implementationType, string uniqueName, ActivationType activationType)
-            : this()
-        {
-            // Werte übernehmen
-            this.InterfaceType = interfaceType;
-            this.ImplementationType = implementationType;
-            this.UniqueName = uniqueName;
-            this.ActivationType = activationType;
-        }
-
-        /// <summary>
-        /// Konstruktor.
-        /// </summary>
-        /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
-        /// <param name="intializationHandler">Delegat auf Inizialisierungsfunktion</param>        
-        /// <param name="uniqueName">Eindeutiger Name</param>
-        public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, string uniqueName)
-            : this()
-        {
-            // Werte übernehmen
-            this.InterfaceType = interfaceType;
-            this.InitializationHandler = intializationHandler;
-            this.UniqueName = uniqueName;
-            this.ActivationType = ActivationType.SingleCall;
-        }
-
-        /// <summary>
-        /// Konstruktor.
-        /// </summary>
-        /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
-        /// <param name="intializationHandler">Delegat auf Inizialisierungsfunktion</param>        
-        /// <param name="uniqueName">Eindeutiger Name</param>
-        /// <param name="activationType">Aktivierungsart</param>
-        public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, string uniqueName, ActivationType activationType)
-            : this()
-        {
-            // Werte übernehmen
-            this.InterfaceType = interfaceType;
-            this.InitializationHandler = intializationHandler;
-            this.UniqueName = uniqueName;
-            this.ActivationType = activationType;
-        }
-
-        /// <summary>
-        /// Konstruktor.
-        /// </summary>
-        /// <param name="interfaceType">Schnittstellentyp der Komponente</param>
-        /// <param name="singletonInstance">Singleton-Instanz der Komponente</param>
-        /// <param name="uniqueName">Eindeutiger Name</param>
-        public ComponentRegistration(Type interfaceType, object singletonInstance, string uniqueName)
-            : this()
-        {
-            // Werte übernehmen
-            this.InterfaceType = interfaceType;
-            this.ImplementationType = singletonInstance.GetType();
-            this.SingletonInstance = singletonInstance;
-            this.UniqueName = uniqueName;
-            this.ActivationType = ActivationType.Singleton;
-        }
-
-        /// <summary>
-        /// Gibt den eindeutigen Namen zurück, oder legt ihn fest.        
+        /// Gets or sets the unqiue name of the component.        
         /// </summary>
         public string UniqueName
         {
@@ -210,7 +374,7 @@ namespace Zyan.Communication
         }
 
         /// <summary>
-        /// Gibt den Typ der öffentlichen Komponenten-Schnittstelle zurück, oder legt ihn fest. 
+        /// Gets or sets the interface type of the component. 
         /// </summary>
         public Type InterfaceType
         {
@@ -219,7 +383,7 @@ namespace Zyan.Communication
         }
 
         /// <summary>
-        /// Gibt den Implementierungstyp der Komponente zurück, oder legt ihn fest.
+        /// Gets or sets the implementation type of the component.
         /// </summary>
         public Type ImplementationType
         {
@@ -228,7 +392,7 @@ namespace Zyan.Communication
         }
 
         /// <summary>
-        /// Gibt einen Delegaten auf eine Methode zurück, die sich um die Erzeugung der Komponente und deren Inizialisierung kümmert,
+        /// Gets or sets the delegate of the initialization method.
         /// </summary>
         public Func<object> InitializationHandler
         {
@@ -237,11 +401,7 @@ namespace Zyan.Communication
         }
 
         /// <summary>
-        /// Gibt die Singleton-Instanz der Komponente zurück, oder legt diese fest.
-        /// <remarks>
-        /// Wenn keine Singleton-Instanz angegeben ist, erzeugt der Komponentenhost für jeden Client-Aufruf 
-        /// automatisch eine Instanz, die nur für einen Methodenaufruf lebt.
-        /// </remarks>
+        /// Gets or sets the current instance (Singleton activation only) of the registered component.
         /// </summary>
         public object SingletonInstance
         {
@@ -250,7 +410,7 @@ namespace Zyan.Communication
         }
 
         /// <summary>
-        /// Gibt die Aktivierungsart der Komponente zurück, oder lget sie fest.
+        /// Gets or sets the activation type (Singleton/SingleCall)
         /// </summary>
         public ActivationType ActivationType
         {
@@ -259,12 +419,31 @@ namespace Zyan.Communication
         }
 
         /// <summary>
-        /// Gibt die Objektdaten als Zeichenkette zurück.
+        /// Gets or sets, if the components should be disposed together with its owning component catalog.
         /// </summary>
-        /// <returns>Als Zeichenkette ausgedrückte Objektdaten</returns>
+        public bool DisposeWithCatalog
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a delegate of a method for handling resource clean up explicitly.
+        /// </summary>
+        public Action<object> CleanUpHandler
+        {
+            get;
+            set;
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Returns a string representation of the object.
+        /// </summary>
+        /// <returns>Unique name of the component</returns>
         public override string ToString()
         {
-            // Eindeutigen Namen zurückgeben
             return this.UniqueName;
         }
     }

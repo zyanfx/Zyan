@@ -116,16 +116,7 @@ namespace Zyan.Communication
             // Beginnen auf Client-Anfragen zu horchen
             StartListening();
         }
-
-        /// <summary>
-        /// Destruktor.
-        /// </summary>
-        ~ZyanComponentHost()
-        {
-            // Ressourcen freigeben
-            Dispose();
-        }
-
+        
         #endregion
         
         #region Authentication
@@ -621,59 +612,66 @@ namespace Zyan.Communication
 
         #endregion
 
-        #region IDisposable Implementation
+        #region IDisposable implementation
 
-        // Gibt an, ob Dispose bereits aufgerufen wurde, oder nicht
         private bool _isDisposed = false;
 
         /// <summary>
-        /// Verwaltete Ressourcen freigeben.
-        /// </summary>
+        /// Releases all managed resources.
+        /// </summary>        
         public void Dispose()
         {
-            // Wenn Dispose noch nicht aufgerufen wurde ...
+            Dispose(false);
+        }
+
+        /// <summary>
+        /// Releases all managed resources.
+        /// </summary>   
+        /// <param name="calledFromFinalizer">Specifies if this method is called from finalizer or not</param>
+        private void Dispose(bool calledFromFinalizer)
+        {
             if (!_isDisposed)
             {
-                // Schalter setzen
                 _isDisposed = true;
 
-                // Host aus der Auflistung entfernen
                 _hosts.Remove(this);
 
-                // Horchen auf Client-Anfragen beenden
                 StopListening();
-                
-                // Wenn der Komponentenaufrufer existiert ...
+
                 if (_invoker != null)
-                    // Komponnetenaufrufer entsorgen
                     _invoker = null;
-                
-                // Wenn die Sitzungsverwaltung existiert ...
+
                 if (_sessionManager != null)
                 {
-                    // Sitzungsverwaltung entsorgen
                     _sessionManager.Dispose();
                     _sessionManager = null;
                 }
-                // Wenn die Authentifizierung verdrahtet ist ...
                 if (this.Authenticate != null)
-                    // Verdrahtung aufheben
                     this.Authenticate = null;
 
-                // Wenn der Authentifizierungsanbieter existiert ...
                 if (_authProvider != null)
-                    // Authentifizierungsanbieter entsorgen
                     _authProvider = null;
 
-                // Wenn der Komponentenkatalog existiert ...
                 if (_catalog != null)
                 {
-                    // Komponentenkatalog entsorgen                    
+                    if (_catalog.DisposeWithHost)
+                        _catalog.Dispose();
+
                     _catalog = null;
                 }
-            }
+                if (!calledFromFinalizer)
+                    GC.SuppressFinalize(this);
+            }            
         }
-        
+
+        /// <summary>
+        /// Is called from runtime when this object is finalized.
+        /// </summary>
+        ~ZyanComponentHost()
+        {
+            Dispose(true);
+        }
+                
         #endregion
 
         #region Login Events
