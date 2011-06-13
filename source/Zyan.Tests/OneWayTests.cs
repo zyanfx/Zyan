@@ -18,7 +18,7 @@ namespace Zyan.Tests
 		/// </summary>
 		public interface ISampleServer
 		{
- 			void OneWayVoidMethod(Action beforeSleep, Action afterSleep);
+			void OneWayVoidMethod(Action beforeSleep, Action afterSleep);
 
 			string NonOneWayMethod(Action callback);
 
@@ -51,7 +51,7 @@ namespace Zyan.Tests
 			public void NonOneWayMethod(ref int value, Action callback)
 			{
 				callback();
- 			}
+			}
 
 			[OneWay]
 			public void OneWayMethodWithException(Action callback)
