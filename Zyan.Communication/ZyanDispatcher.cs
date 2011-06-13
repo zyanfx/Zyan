@@ -283,7 +283,14 @@ namespace Zyan.Communication
 					{
 						InvalidSessionException ex = new InvalidSessionException(string.Format(LanguageResource.InvalidSessionException_SessionIDInvalid, sessionID.ToString()));
 						_host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
-						throw ex;
+
+                        if (registration.ActivationType == ActivationType.SingleCall)
+                        {
+                            RemoveClientServerWires(type, instance, delegateCorrelationSet, wiringList);
+                            _host.ComponentCatalog.CleanUpComponentInstance(registration, instance);
+                        }
+
+                        throw ex;
 					}
 				}
 				if (data.Store.ContainsKey("transaction"))
@@ -293,7 +300,14 @@ namespace Zyan.Communication
 			{
 				SecurityException ex = new SecurityException(LanguageResource.SecurityException_ContextInfoMissing);
 				_host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
-				throw ex;
+
+                if (registration.ActivationType == ActivationType.SingleCall)
+                {
+                    RemoveClientServerWires(type, instance, delegateCorrelationSet, wiringList);
+                    _host.ComponentCatalog.CleanUpComponentInstance(registration, instance);
+                }
+                
+                throw ex;
 			}
 			object returnValue = null;
 
@@ -322,7 +336,14 @@ namespace Zyan.Communication
 						{
 							KeyNotFoundException ex = new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_SerializationHandlerNotFound, container.HandledType.FullName));
 							_host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
-							throw ex;
+
+                            if (registration.ActivationType == ActivationType.SingleCall)
+                            {
+                                RemoveClientServerWires(type, instance, delegateCorrelationSet, wiringList);
+                                _host.ComponentCatalog.CleanUpComponentInstance(registration, instance);
+                            }
+                            
+                            throw ex;
 						}
 						args[i] = serializationHandler.Deserialize(container.DataType, container.Data);
 					}
@@ -379,8 +400,11 @@ namespace Zyan.Communication
 
 					scope.Dispose();
 				}
-				if (registration.ActivationType == ActivationType.SingleCall)
-					RemoveClientServerWires(type, instance, delegateCorrelationSet, wiringList);
+                if (registration.ActivationType == ActivationType.SingleCall)
+                {
+                    RemoveClientServerWires(type, instance, delegateCorrelationSet, wiringList);
+                    _host.ComponentCatalog.CleanUpComponentInstance(registration, instance);
+                }
 			}
 			ProcessAfterInvoke(trackingID, ref interfaceName, ref delegateCorrelationSet, ref methodName, ref args, ref returnValue);
 
