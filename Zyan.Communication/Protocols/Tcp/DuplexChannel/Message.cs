@@ -113,36 +113,43 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// <param name="message">Stream with raw data of the message</param>
 		public static void Send(Connection connection, Guid guid, ITransportHeaders headers, Stream message)
 		{
-			try
-			{
-				connection.LockWrite();
-				BinaryWriter writer = connection.Writer;
-				writer.Write(guid.ToByteArray());
+            try
+            {
+                connection.LockWrite();
+                BinaryWriter writer = connection.Writer;
+                writer.Write(guid.ToByteArray());
 
-				MemoryStream headerStream = new MemoryStream();
-				formatter.Serialize(headerStream, headers);
-				writer.Write((int)headerStream.Length);
-				writer.Write(headerStream.GetBuffer(), 0, (int)headerStream.Length);
+                MemoryStream headerStream = new MemoryStream();
+                formatter.Serialize(headerStream, headers);
+                writer.Write((int)headerStream.Length);
+                writer.Write(headerStream.GetBuffer(), 0, (int)headerStream.Length);
 
-				writer.Write((int)message.Length);
-				MemoryStream ms = message as MemoryStream;
-				if (ms == null)
-				{
-					byte[] msgBuffer = new byte[message.Length];
-					message.Read(msgBuffer, 0, (int)message.Length);
-					writer.Write(msgBuffer, 0, (int)message.Length);
-				}
-				else
-					writer.Write(ms.GetBuffer(), 0, (int)message.Length);
-				writer.Flush();
-			}
-			catch (ObjectDisposedException)
-			{ 
-				// Socket may be closed meanwhile. Connection isn´t working anymore, so close it.
-				connection.ReleaseWrite();
-				connection.Close();
-				connection = null;
-			}
+                writer.Write((int)message.Length);
+                MemoryStream ms = message as MemoryStream;
+                if (ms == null)
+                {
+                    byte[] msgBuffer = new byte[message.Length];
+                    message.Read(msgBuffer, 0, (int)message.Length);
+                    writer.Write(msgBuffer, 0, (int)message.Length);
+                }
+                else
+                    writer.Write(ms.GetBuffer(), 0, (int)message.Length);
+                writer.Flush();
+            }
+            catch (ObjectDisposedException)
+            {
+                // Socket may be closed meanwhile. Connection isn´t working anymore, so close it.
+                connection.ReleaseWrite();
+                connection.Close();
+                connection = null;
+            }
+            catch (IOException)
+            {
+                // Unexpected connection loss. Connection isn´t working anymore, so close it.
+                connection.ReleaseWrite();
+                connection.Close();
+                connection = null;
+            }
 			finally
 			{
 				if (connection!=null)
