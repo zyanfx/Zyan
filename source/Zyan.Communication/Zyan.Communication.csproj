@@ -47,6 +47,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Remoting" />
@@ -65,12 +66,16 @@
     <Compile Include="ChannelSinks\ClientAddress\ClientAddressServerChannelSinkProvider.cs" />
     <Compile Include="ComponentCatalog.cs" />
     <Compile Include="ComponentInfo.cs" />
+    <Compile Include="Composition\DefinitionExtensions.cs" />
+    <Compile Include="Composition\IComponentCatalogMefExtensions.cs" />
+    <Compile Include="Composition\NonSharedPartsCatalog.cs" />
+    <Compile Include="Composition\ZyanComponentAttribute.cs" />
     <Compile Include="DelegateCorrelationInfo.cs" />
     <Compile Include="DynamicWireFactory.cs" />
     <Compile Include="CallInterceptionData.cs" />
     <Compile Include="CallInterceptor.cs" />
     <Compile Include="IComponentCatalog.cs" />
-    <Compile Include="IComponentCatalogExtensions.cs" >
+    <Compile Include="IComponentCatalogExtensions.cs">
       <DependentUpon>IComponentCatalog.cs</DependentUpon>
     </Compile>
     <Compile Include="InvalidSessionException.cs" />
