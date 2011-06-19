@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Zyan.Communication
 {
 	/// <summary>
-	/// Component catalog overloaded methods for backward compatibiliry with C# 3.0.
+	/// Component catalog shorter method overloads.
 	/// </summary>
 	public static class IComponentCatalogExtensions
 	{

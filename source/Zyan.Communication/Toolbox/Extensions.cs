@@ -94,5 +94,13 @@ namespace Zyan.Communication.Toolbox
 
 			return mi.Invoke(instance, args);
 		}
+
+		/// <summary>
+		/// Creates invokation delegate for the method represented by given MethodInfo
+		/// </summary>
+		public static T CreateDelegate<T>(this MethodInfo method) where T : class
+		{
+			return Delegate.CreateDelegate(typeof(T), method) as T;
+		}
 	}
 }
