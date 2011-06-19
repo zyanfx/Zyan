@@ -53,7 +53,7 @@ namespace Zyan.Communication
 		private void CreateClientServerWires(Type type, object instance, List<DelegateCorrelationInfo> delegateCorrelationSet, Dictionary<Guid, Delegate> wiringList)
 		{			
 			if (delegateCorrelationSet == null)
-		    	return;
+				return;
 			
 			foreach (DelegateCorrelationInfo correlationInfo in delegateCorrelationSet)
 			{				
@@ -75,7 +75,7 @@ namespace Zyan.Communication
 
 					eventInfo.AddEventHandler(instance, dynamicWireDelegate);
 					
-                    wiringList.Add(correlationInfo.CorrelationID, dynamicWireDelegate);
+					wiringList.Add(correlationInfo.CorrelationID, dynamicWireDelegate);
 				}
 				else
 				{
@@ -200,32 +200,32 @@ namespace Zyan.Communication
 			}
 		}
 
-        /// <summary>
-        /// Gets the IP Address of the calling client from CallContext.
-        /// </summary>
-        /// <returns></returns>
-        private IPAddress GetCallingClientIPAddress()
-        {
-            return CallContext.GetData("Zyan_ClientAddress") as IPAddress; ;
-        }
+		/// <summary>
+		/// Gets the IP Address of the calling client from CallContext.
+		/// </summary>
+		/// <returns></returns>
+		private IPAddress GetCallingClientIPAddress()
+		{
+			return CallContext.GetData("Zyan_ClientAddress") as IPAddress; ;
+		}
 
-        /// <summary>
-        /// Puts the IP Address of the calling client to the current Server Session.
-        /// </summary>
-        private void PutClientAddressToCurrentSession()
-        {
-            if (ServerSession.CurrentSession==null)
-                return;
+		/// <summary>
+		/// Puts the IP Address of the calling client to the current Server Session.
+		/// </summary>
+		private void PutClientAddressToCurrentSession()
+		{
+			if (ServerSession.CurrentSession==null)
+				return;
 
-            IPAddress clientAddress = GetCallingClientIPAddress();
+			IPAddress clientAddress = GetCallingClientIPAddress();
 
-            if (clientAddress != null)
-                ServerSession.CurrentSession.ClientAddress = clientAddress.ToString();
-            else
-                ServerSession.CurrentSession.ClientAddress = string.Empty;
-        }
+			if (clientAddress != null)
+				ServerSession.CurrentSession.ClientAddress = clientAddress.ToString();
+			else
+				ServerSession.CurrentSession.ClientAddress = string.Empty;
+		}
 
-        //TODO: This method needs refactoring. It´s too big.
+		//TODO: This method needs refactoring. It´s too big.
 		/// <summary>
 		/// Processes remote method invocation.        
 		/// </summary>
@@ -284,13 +284,13 @@ namespace Zyan.Communication
 						InvalidSessionException ex = new InvalidSessionException(string.Format(LanguageResource.InvalidSessionException_SessionIDInvalid, sessionID.ToString()));
 						_host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
 
-                        if (registration.ActivationType == ActivationType.SingleCall)
-                        {
-                            RemoveClientServerWires(type, instance, delegateCorrelationSet, wiringList);
-                            _host.ComponentCatalog.CleanUpComponentInstance(registration, instance);
-                        }
+						if (registration.ActivationType == ActivationType.SingleCall)
+						{
+							RemoveClientServerWires(type, instance, delegateCorrelationSet, wiringList);
+							_host.ComponentCatalog.CleanUpComponentInstance(registration, instance);
+						}
 
-                        throw ex;
+						throw ex;
 					}
 				}
 				if (data.Store.ContainsKey("transaction"))
@@ -301,18 +301,18 @@ namespace Zyan.Communication
 				SecurityException ex = new SecurityException(LanguageResource.SecurityException_ContextInfoMissing);
 				_host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
 
-                if (registration.ActivationType == ActivationType.SingleCall)
-                {
-                    RemoveClientServerWires(type, instance, delegateCorrelationSet, wiringList);
-                    _host.ComponentCatalog.CleanUpComponentInstance(registration, instance);
-                }
-                
-                throw ex;
+				if (registration.ActivationType == ActivationType.SingleCall)
+				{
+					RemoveClientServerWires(type, instance, delegateCorrelationSet, wiringList);
+					_host.ComponentCatalog.CleanUpComponentInstance(registration, instance);
+				}
+				
+				throw ex;
 			}
 			object returnValue = null;
 
-            PutClientAddressToCurrentSession();
-            
+			PutClientAddressToCurrentSession();
+			
 			Type[] types = new Type[paramDefs.Length];
 
 			Dictionary<int, DelegateInterceptor> delegateParamIndexes = new Dictionary<int, DelegateInterceptor>();
@@ -337,13 +337,13 @@ namespace Zyan.Communication
 							KeyNotFoundException ex = new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_SerializationHandlerNotFound, container.HandledType.FullName));
 							_host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
 
-                            if (registration.ActivationType == ActivationType.SingleCall)
-                            {
-                                RemoveClientServerWires(type, instance, delegateCorrelationSet, wiringList);
-                                _host.ComponentCatalog.CleanUpComponentInstance(registration, instance);
-                            }
-                            
-                            throw ex;
+							if (registration.ActivationType == ActivationType.SingleCall)
+							{
+								RemoveClientServerWires(type, instance, delegateCorrelationSet, wiringList);
+								_host.ComponentCatalog.CleanUpComponentInstance(registration, instance);
+							}
+							
+							throw ex;
 						}
 						args[i] = serializationHandler.Deserialize(container.DataType, container.Data);
 					}
@@ -400,11 +400,11 @@ namespace Zyan.Communication
 
 					scope.Dispose();
 				}
-                if (registration.ActivationType == ActivationType.SingleCall)
-                {
-                    RemoveClientServerWires(type, instance, delegateCorrelationSet, wiringList);
-                    _host.ComponentCatalog.CleanUpComponentInstance(registration, instance);
-                }
+				if (registration.ActivationType == ActivationType.SingleCall)
+				{
+					RemoveClientServerWires(type, instance, delegateCorrelationSet, wiringList);
+					_host.ComponentCatalog.CleanUpComponentInstance(registration, instance);
+				}
 			}
 			ProcessAfterInvoke(trackingID, ref interfaceName, ref delegateCorrelationSet, ref methodName, ref args, ref returnValue);
 
@@ -533,13 +533,13 @@ namespace Zyan.Communication
 				_host.SessionManager.StoreSession(session);
 				ServerSession.CurrentSession = session;
 
-                string clientIP = string.Empty;
-                IPAddress clientAddress = GetCallingClientIPAddress();
+				string clientIP = string.Empty;
+				IPAddress clientAddress = GetCallingClientIPAddress();
 
-                if (clientAddress != null)
-                    clientIP = clientAddress.ToString();
+				if (clientAddress != null)
+					clientIP = clientAddress.ToString();
 
-                _host.OnClientLoggedOn(new LoginEventArgs(LoginEventType.Logon, session.Identity, clientIP, session.Timestamp));
+				_host.OnClientLoggedOn(new LoginEventArgs(LoginEventType.Logon, session.Identity, clientIP, session.Timestamp));
 			}
 		}
 
@@ -549,27 +549,27 @@ namespace Zyan.Communication
 		/// <param name="sessionID">Sitzungsschlüssel</param>
 		public void Logoff(Guid sessionID)
 		{
-            IIdentity identity = null;
-            DateTime timestamp = DateTime.MinValue;
-            
-            ServerSession session = _host.SessionManager.GetSessionBySessionID(sessionID);
+			IIdentity identity = null;
+			DateTime timestamp = DateTime.MinValue;
+			
+			ServerSession session = _host.SessionManager.GetSessionBySessionID(sessionID);
 
-            if (session != null)
-            {
-                identity = session.Identity;
-                timestamp = session.Timestamp;
-            }
+			if (session != null)
+			{
+				identity = session.Identity;
+				timestamp = session.Timestamp;
+			}
 			// Sitzung entfernen
 			_host.SessionManager.RemoveSession(sessionID);
 
-            string clientIP=string.Empty;
-            IPAddress clientAddress = GetCallingClientIPAddress();
-            
-            if (clientAddress!=null)
-                clientIP=clientAddress.ToString();
+			string clientIP=string.Empty;
+			IPAddress clientAddress = GetCallingClientIPAddress();
+			
+			if (clientAddress!=null)
+				clientIP=clientAddress.ToString();
 
-            if (identity!=null)
-                _host.OnClientLoggedOff(new LoginEventArgs(LoginEventType.Logoff, identity, clientIP , timestamp));
+			if (identity!=null)
+				_host.OnClientLoggedOff(new LoginEventArgs(LoginEventType.Logoff, identity, clientIP , timestamp));
 		}
 
 		#endregion

@@ -6,7 +6,7 @@ namespace Zyan.Communication
 	/// <summary>
 	/// Implements a component catalog.
 	/// </summary>
-	public class ComponentCatalog : IDisposable
+	public class ComponentCatalog : IComponentCatalog, IDisposable
 	{
 		#region Constructors
 
@@ -29,85 +29,6 @@ namespace Zyan.Communication
 		#endregion
 
 		#region Register components
-
-		/// <summary>
-		/// Registers a component in the component catalog.
-		/// </summary>
-		/// <typeparam name="I">Interface type of the component</typeparam>
-		/// <typeparam name="T">Implementation type of the component</typeparam>
-		public void RegisterComponent<I, T>()
-		{
-			RegisterComponent<I, T>(string.Empty, ActivationType.SingleCall, null);
-		}
-
-		/// <summary>
-		/// Registers a component in the component catalog.
-		/// </summary>
-		/// <typeparam name="I">Interface type of the component</typeparam>
-		/// <typeparam name="T">Implementation type of the component</typeparam>
-		/// <param name="cleanUpHandler">Delegate for external clean up method</param>
-		public void RegisterComponent<I, T>(Action<object> cleanUpHandler)
-		{
-			RegisterComponent<I, T>(string.Empty, ActivationType.SingleCall, cleanUpHandler);
-		}
-
-		/// <summary>
-		/// Registers a component in the component catalog.
-		/// </summary>
-		/// <typeparam name="I">Interface type of the component</typeparam>
-		/// <typeparam name="T">Implementation type of the component</typeparam>
-		/// <param name="uniqueName">Unique component name</param>
-		public void RegisterComponent<I, T>(string uniqueName)
-		{
-			RegisterComponent<I, T>(uniqueName, ActivationType.SingleCall, null);
-		}
-
-		/// <summary>
-		/// Registers a component in the component catalog.
-		/// </summary>
-		/// <typeparam name="I">Interface type of the component</typeparam>
-		/// <typeparam name="T">Implementation type of the component</typeparam>
-		/// <param name="uniqueName">Unique component name</param>
-		/// <param name="cleanUpHandler">Delegate for external clean up method</param>
-		public void RegisterComponent<I, T>(string uniqueName, Action<object> cleanUpHandler)
-		{
-			RegisterComponent<I, T>(uniqueName, ActivationType.SingleCall, cleanUpHandler);
-		}
-
-		/// <summary>
-		/// Registers a component in the component catalog.
-		/// </summary>
-		/// <typeparam name="I">Interface type of the component</typeparam>
-		/// <typeparam name="T">Implementation type of the component</typeparam>
-		/// <param name="activationType">Activation type (SingleCall/Singleton)</param>
-		public void RegisterComponent<I, T>(ActivationType activationType)
-		{
-			RegisterComponent<I, T>(string.Empty, activationType, null);
-		}
-
-		/// <summary>
-		/// Registers a component in the component catalog.
-		/// </summary>
-		/// <typeparam name="I">Interface type of the component</typeparam>
-		/// <typeparam name="T">Implementation type of the component</typeparam>
-		/// <param name="activationType">Activation type (SingleCall/Singleton)</param>
-		/// <param name="cleanUpHandler">Delegate for external clean up method</param>
-		public void RegisterComponent<I, T>(ActivationType activationType, Action<object> cleanUpHandler)
-		{
-			RegisterComponent<I, T>(string.Empty, activationType, cleanUpHandler);
-		}
-
-		/// <summary>
-		/// Registers a component in the component catalog.
-		/// </summary>
-		/// <typeparam name="I">Interface type of the component</typeparam>
-		/// <typeparam name="T">Implementation type of the component</typeparam>
-		/// <param name="uniqueName">Unique component name</param>
-		/// <param name="activationType">Activation type (SingleCall/Singleton)</param>
-		public void RegisterComponent<I, T>(string uniqueName, ActivationType activationType)
-		{
-			RegisterComponent<I, T>(uniqueName, activationType, null);
-		}
 
 		/// <summary>
 		/// Registers a component in the component catalog.
@@ -138,85 +59,6 @@ namespace Zyan.Communication
 				ComponentRegistry.Add(uniqueName, registration);
 			}
 		}
-		
-		/// <summary>
-		/// Registers a component in the component catalog.
-		/// </summary>
-		/// <typeparam name="I">Interface type of the component</typeparam>
-		/// <param name="factoryMethod">Delegate of factory method for external instance creation</param>
-		public void RegisterComponent<I>(Func<object> factoryMethod)
-		{
-			RegisterComponent<I>(string.Empty, factoryMethod, ActivationType.SingleCall, null);
-		}
-
-		/// <summary>
-		/// Registers a component in the component catalog.
-		/// </summary>
-		/// <typeparam name="I">Interface type of the component</typeparam>
-		/// <param name="factoryMethod">Delegate of factory method for external instance creation</param>
-		/// <param name="cleanUpHandler">Delegate for external clean up method</param>
-		public void RegisterComponent<I>(Func<object> factoryMethod, Action<object> cleanUpHandler)
-		{
-			RegisterComponent<I>(string.Empty, factoryMethod, ActivationType.SingleCall, cleanUpHandler);
-		}
-
-		/// <summary>
-		/// Registers a component in the component catalog.
-		/// </summary>
-		/// <typeparam name="I">Interface type of the component</typeparam>
-		/// <param name="uniqueName">Unique component name</param>
-		/// <param name="factoryMethod">Delegate of factory method for external instance creation</param>
-		public void RegisterComponent<I>(string uniqueName, Func<object> factoryMethod)
-		{
-			RegisterComponent<I>(uniqueName, factoryMethod, ActivationType.SingleCall, null);
-		}
-
-		/// <summary>
-		/// Registers a component in the component catalog.
-		/// </summary>
-		/// <typeparam name="I">Interface type of the component</typeparam>
-		/// <param name="uniqueName">Unique component name</param>
-		/// <param name="factoryMethod">Delegate of factory method for external instance creation</param>
-		/// <param name="cleanUpHandler">Delegate for external clean up method</param>
-		public void RegisterComponent<I>(string uniqueName, Func<object> factoryMethod, Action<object> cleanUpHandler)
-		{
-			RegisterComponent<I>(uniqueName, factoryMethod, ActivationType.SingleCall, cleanUpHandler);
-		}
-
-		/// <summary>
-		/// Registers a component in the component catalog.
-		/// </summary>
-		/// <typeparam name="I">Interface type of the component</typeparam>
-		/// <param name="factoryMethod">Delegate of factory method for external instance creation</param>
-		/// <param name="activationType">Activation type (SingleCall/Singleton)</param>
-		public void RegisterComponent<I>(Func<object> factoryMethod, ActivationType activationType)
-		{
-			RegisterComponent<I>(string.Empty, factoryMethod, activationType, null);
-		}
-
-		/// <summary>
-		/// Registers a component in the component catalog.
-		/// </summary>
-		/// <typeparam name="I">Interface type of the component</typeparam>
-		/// <param name="factoryMethod">Delegate of factory method for external instance creation</param>
-		/// <param name="activationType">Activation type (SingleCall/Singleton)</param>
-		/// <param name="cleanUpHandler">Delegate for external clean up method</param>
-		public void RegisterComponent<I>(Func<object> factoryMethod, ActivationType activationType, Action<object> cleanUpHandler)
-		{
-			RegisterComponent<I>(string.Empty, factoryMethod, activationType, cleanUpHandler);
-		}
-
-		/// <summary>
-		/// Registers a component in the component catalog.
-		/// </summary>
-		/// <typeparam name="I">Interface type of the component</typeparam>
-		/// <param name="uniqueName">Unique component name</param>
-		/// <param name="factoryMethod">Delegate of factory method for external instance creation</param>
-		/// <param name="activationType">Activation type (SingleCall/Singleton)</param>
-		public void RegisterComponent<I>(string uniqueName, Func<object> factoryMethod, ActivationType activationType)
-		{
-			RegisterComponent<I>(uniqueName, factoryMethod, activationType, null);
-		}
 
 		/// <summary>
 		/// Registers a component in the component catalog.
@@ -245,41 +87,6 @@ namespace Zyan.Communication
 				registration.DisposeWithCatalog = true;
 				ComponentRegistry.Add(uniqueName, registration);
 			}
-		}
-
-		/// <summary>
-		/// Registeres a component instance in the component catalog.
-		/// </summary>
-		/// <typeparam name="I">Interface type of the component</typeparam>
-		/// <typeparam name="T">Implementation type of the component</typeparam>
-		/// <param name="instance">Component instance</param>
-		public void RegisterComponent<I, T>(T instance)
-		{
-			RegisterComponent<I, T>(string.Empty, instance, null);
-		}
-
-		/// <summary>
-		/// Registeres a component instance in the component catalog.
-		/// </summary>
-		/// <typeparam name="I">Interface type of the component</typeparam>
-		/// <typeparam name="T">Implementation type of the component</typeparam>
-		/// <param name="instance">Component instance</param>
-		/// <param name="cleanUpHandler">Delegate for external clean up method</param>
-		public void RegisterComponent<I, T>(T instance, Action<object> cleanUpHandler)
-		{
-			RegisterComponent<I, T>(string.Empty, instance, cleanUpHandler);
-		}
-
-		/// <summary>
-		/// Registeres a component instance in the component catalog.
-		/// </summary>
-		/// <typeparam name="I">Interface type of the component</typeparam>
-		/// <typeparam name="T">Implementation type of the component</typeparam>
-		/// <param name="uniqueName">Unique component name</param>
-		/// <param name="instance">Component instance</param>
-		public void RegisterComponent<I, T>(string uniqueName, T instance)
-		{
-			RegisterComponent<I, T>(uniqueName, instance, null);
 		}
 
 		/// <summary>
@@ -322,18 +129,6 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Deletes a component registration.
 		/// </summary>
-		/// <typeparam name="I">Interface type of the component to unregister</typeparam>
-		public void UnregisterComponent<I>()
-		{
-			Type interfaceType = typeof(I);
-
-			if (ComponentRegistry.ContainsKey(interfaceType.FullName))
-				ComponentRegistry.Remove(interfaceType.FullName);
-		}
-
-		/// <summary>
-		/// Deletes a component registration.
-		/// </summary>
 		/// <param name="uniqueName">Unique component name</param>
 		public void UnregisterComponent(string uniqueName)
 		{
@@ -346,19 +141,6 @@ namespace Zyan.Communication
 		#region Managing component registrations
 
 		private Dictionary<string, ComponentRegistration> _componentRegistry = null;
-
-		/// <summary>
-		/// Gets registration data for a specified component by its interface type.
-		/// </summary>
-		/// <param name="interfaceType">Interface type of the component</param>
-		/// <returns>Component registration</returns>
-		public ComponentRegistration GetRegistration(Type interfaceType)
-		{
-			if (interfaceType.Equals(null))
-				throw new ArgumentNullException("interfaceType");
-
-			return GetRegistration(interfaceType.FullName);
-		}
 
 		/// <summary>
 		/// Gets registration data for a specified component by its interface name.
