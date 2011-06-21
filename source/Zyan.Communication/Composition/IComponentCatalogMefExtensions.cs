@@ -74,10 +74,12 @@ namespace Zyan.Communication.Composition
 		{
 			// component -> owning container
 			var containers = new ConcurrentDictionary<object, CompositionContainer>();
+			var uniqueName = contractName ?? typeof(T).FullName;
 
 			// component instance is created inside child container
 			host.RegisterComponent<T>
 			(
+				uniqueName,
 				delegate // factory method
 				{
 					// create child container for early component disposal
