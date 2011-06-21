@@ -85,6 +85,38 @@ namespace Zyan.Tests
 		{
 		}
 
+		/// <summary>
+		/// Sample InheritedExport interface
+		/// </summary>
+		[InheritedExport("InheritedExportUniqueName")]
+		[ExportMetadata("ComponentInterface", typeof(IMefSample4))]
+		public interface IMefSample4
+		{
+		}
+
+		/// <summary>
+		/// Zyan-agnostic component registration: standard InheritedExport and ExportMetadata attributes.
+		/// This component is published even if no attributes are attached to it.
+		/// </summary>
+		[PartCreationPolicy(CreationPolicy.NonShared)]
+		public class MefSample4 : IMefSample4, IDisposable
+		{
+			static int instanceCount = 0;
+
+			public static int InstanceCount { get { return instanceCount; } }
+
+			public MefSample4()
+			{
+				Interlocked.Increment(ref instanceCount);
+			}
+
+			public void Dispose()
+			{
+				GC.SuppressFinalize(this);
+				Interlocked.Decrement(ref instanceCount);
+			}
+		}
+
 		#endregion
 
 		public TestContext TestContext { get; set; }
@@ -207,12 +239,54 @@ namespace Zyan.Tests
 			cat.RegisterComponents(MefContainer);
 
 			// component is available in MefContainer
-			var obj = MefContainer.GetExport<IMefSample>("PrivateServiceUniqueName");
+			var obj = MefContainer.GetExport<IMefSample>("PrivateServiceUniqueName").Value;
 			Assert.IsNotNull(obj);
 			Assert.IsInstanceOfType(obj, typeof(MefSample3));
 
 			// component is not registered in Zyan ComponentCatalog
 			var reg = cat.GetRegistration("PrivateServiceUniqueName");
+		}
+
+		[TestMethod]
+		public void InheritedExportFromMefCatalog_IsRegistered()
+		{
+			var cat = new ComponentCatalog();
+			cat.RegisterComponents(MefCatalog);
+
+			// get component registration
+			var reg = cat.GetRegistration("InheritedExportUniqueName");
+			Assert.IsNotNull(reg);
+
+			// get component instance
+			var obj = cat.GetComponent("InheritedExportUniqueName") as IMefSample4;
+			Assert.IsNotNull(obj);
+			Assert.IsInstanceOfType(obj, typeof(MefSample4));
+			Assert.AreEqual(1, MefSample4.InstanceCount);
+
+			// clean up component instance
+			cat.CleanUpComponentInstance(reg, obj);
+			Assert.AreEqual(0, MefSample4.InstanceCount);
+		}
+
+		[TestMethod]
+		public void InheritedExportFromFromMefContainer_IsRegistered()
+		{
+			var cat = new ComponentCatalog();
+			cat.RegisterComponents(MefContainer);
+
+			// get component registration
+			var reg = cat.GetRegistration("SomeUniqueContractName");
+			Assert.IsNotNull(reg);
+
+			// get component instance
+			var obj = cat.GetComponent("SomeUniqueContractName") as IMefSample;
+			Assert.IsNotNull(obj);
+			Assert.IsInstanceOfType(obj, typeof(MefSample2));
+			Assert.AreEqual(1, MefSample2.InstanceCount);
+
+			// clean up component instance
+			cat.CleanUpComponentInstance(reg, obj);
+			Assert.AreEqual(0, MefSample2.InstanceCount);
 		}
 	}
 }
