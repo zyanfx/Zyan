@@ -70,6 +70,7 @@
     <Compile Include="Composition\IComponentCatalogMefExtensions.cs" />
     <Compile Include="Composition\NonSharedPartsCatalog.cs" />
     <Compile Include="Composition\ZyanComponentAttribute.cs" />
+    <Compile Include="Composition\ZyanInterfaceAttribute.cs" />
     <Compile Include="DelegateCorrelationInfo.cs" />
     <Compile Include="DynamicWireFactory.cs" />
     <Compile Include="CallInterceptionData.cs" />

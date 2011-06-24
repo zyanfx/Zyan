@@ -1,30 +1,33 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.ComponentModel.Composition;
 
 namespace Zyan.Communication.Composition
 {
 	/// <summary>
-	/// Specifies that a type is a component that can be published by Zyan
+	/// Specifies that all classes implementing the interface are Zyan components
 	/// </summary>
-	[MetadataAttribute, AttributeUsage(AttributeTargets.Class, Inherited = false)]
-	public class ZyanComponentAttribute : ExportAttribute
+	[MetadataAttribute, AttributeUsage(AttributeTargets.Interface, Inherited = true)]
+	public class ZyanInterfaceAttribute : InheritedExportAttribute
 	{
 		/// <summary>
-		/// Initializes ZyanComponentAttribute instance.
+		/// Initializes ZyanInterfaceAttribute instance.
 		/// </summary>
 		/// <param name="componentInterface">Interface type attached to ZyanComponent</param>
-		public ZyanComponentAttribute(Type componentInterface)
+		public ZyanInterfaceAttribute(Type componentInterface)
 			: base(componentInterface)
 		{
 			Initialize(componentInterface);
 		}
 
 		/// <summary>
-		/// Initializes ZyanComponentAttribute instance.
+		/// Initializes ZyanInterfaceAttribute instance.
 		/// </summary>
 		/// <param name="uniqueName">Unique name of the ZyanComponent</param>
 		/// <param name="componentInterface">Interface type attached to ZyanComponent</param>
-		public ZyanComponentAttribute(string uniqueName, Type componentInterface)
+		public ZyanInterfaceAttribute(string uniqueName, Type componentInterface)
 			: base(uniqueName, componentInterface)
 		{
 			Initialize(componentInterface);
@@ -41,24 +44,8 @@ namespace Zyan.Communication.Composition
 			IsPublished = true;
 		}
 
-		/// <summary>
-		/// Gets interface attached to this ZyanComponent instance.
-		/// </summary>
 		public Type ComponentInterface { get; private set; }
 
-		/// <summary>
-		/// Gets or sets value indicating whether the component should be registered in ZyanComponentHost.
-		/// </summary>
 		public bool IsPublished { get; set; }
-
-		/// <summary>
-		/// MEF metadata key for component interface.
-		/// </summary>
-		public const string ComponentInterfaceKeyName = "ComponentInterface";
-
-		/// <summary>
-		/// MEF metadata key for IsPublished flag.
-		/// </summary>
-		public const string IsPublishedKeyName = "IsPublished";
 	}
 }
