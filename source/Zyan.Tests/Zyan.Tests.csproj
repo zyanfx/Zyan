@@ -67,6 +67,7 @@
   <ItemGroup>
     <Compile Include="CleanupTests.cs" />
     <Compile Include="DataWrapper.cs" />
+    <Compile Include="DuckTypingTests.cs" />
     <Compile Include="Entities.cs" />
     <Compile Include="LinqTests.cs" />
     <Compile Include="MefTests.cs" />

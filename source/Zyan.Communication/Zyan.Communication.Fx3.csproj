@@ -70,7 +70,7 @@
     <Compile Include="CallInterceptionData.cs" />
     <Compile Include="CallInterceptor.cs" />
     <Compile Include="IComponentCatalog.cs" />
-    <Compile Include="IComponentCatalogExtensions.cs" >
+    <Compile Include="IComponentCatalogExtensions.cs">
       <DependentUpon>IComponentCatalog.cs</DependentUpon>
     </Compile>
     <Compile Include="InvalidSessionException.cs" />
@@ -130,6 +130,9 @@
     <Compile Include="SessionMgmt\SessionVariableAdapter.cs" />
     <Compile Include="SessionMgmt\SqlSessionManager.cs" />
     <Compile Include="Toolbox\Extensions.cs" />
+    <Compile Include="Toolbox\ExtensionsFx3.cs" />
+    <Compile Include="Toolbox\MessageHelpers.cs" />
+    <Compile Include="Toolbox\TypeComparer.cs" />
     <Compile Include="Version.cs" />
     <Compile Include="ZyanComponentHost.cs" />
     <Compile Include="ZyanConnection.cs" />
