@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication
 {
@@ -48,6 +49,8 @@ namespace Zyan.Communication
 
 			if (!implementationType.IsClass)
 				throw new ArgumentException(LanguageResource.ArgumentException_TypeIsNotAClass, "interfaceType");
+
+			new TypeComparer<I, T>().Validate();
 
 			if (string.IsNullOrEmpty(uniqueName))
 				uniqueName = interfaceType.FullName;
@@ -107,6 +110,8 @@ namespace Zyan.Communication
 
 			if (!implementationType.IsClass)
 				throw new ArgumentException(LanguageResource.ArgumentException_TypeIsNotAClass, "interfaceType");
+
+			new TypeComparer<I, T>().Validate();
 
 			if (string.IsNullOrEmpty(uniqueName))
 				uniqueName = interfaceType.FullName;

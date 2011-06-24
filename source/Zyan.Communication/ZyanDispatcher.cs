@@ -353,7 +353,14 @@ namespace Zyan.Communication
 
 			try
 			{
-				MethodInfo methodInfo = type.GetMethod(methodName, types);
+				var methodInfo = type.GetMethod(methodName, types);
+				if (methodInfo == null)
+				{
+					var methodSignature = MessageHelpers.GetMethodSignature(type, methodName, types);
+					var exceptionMessage = String.Format(LanguageResource.MissingMethodException_MethodNotFound, methodSignature);
+					throw new MissingMethodException(exceptionMessage);
+				}
+
 				ParameterInfo[] serverMethodParamDefs = methodInfo.GetParameters();
 
 				foreach (int index in delegateParamIndexes.Keys)

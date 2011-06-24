@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // Allgemeine Informationen über eine Assembly werden über die folgenden 
@@ -20,4 +21,4 @@ using System.Runtime.InteropServices;
 
 // Die folgende GUID bestimmt die Kennung der Typbibliothek, wenn dieses Projekt für COM verfügbar gemacht wird
 [assembly: Guid("ab560415-a517-4c22-b197-2397910b170b")]
-
+[assembly: InternalsVisibleTo("Zyan.Tests")]

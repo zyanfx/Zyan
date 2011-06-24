@@ -243,4 +243,7 @@
   <data name="InvalidSessionException_SessionIDInvalid" xml:space="preserve">
     <value>Session ID '{0}' is invalid. Please log on first.</value>
   </data>
+  <data name="MissingMethodException_MethodNotFound" xml:space="preserve">
+    <value>Method not found: '{0}'.</value>
+  </data>
 </root>
