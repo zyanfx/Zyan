@@ -24,7 +24,7 @@ namespace Zyan.Communication.Composition
 
 			// Condition:
 			// 1) md[ComponentInterface] is defined
-			// 2) md[IsPublished] is true of not defined
+			// 2) md[IsPublished] is true or is not defined
 			return md.ContainsKey(key) && md[key] is Type && (!md.ContainsKey(flag) ||
 				(md.ContainsKey(flag) && md[flag] is bool && Convert.ToBoolean(md[flag])));
 		}
