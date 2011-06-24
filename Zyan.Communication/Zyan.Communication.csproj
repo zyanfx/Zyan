@@ -136,6 +136,8 @@
     <Compile Include="SessionMgmt\SessionVariableAdapter.cs" />
     <Compile Include="SessionMgmt\SqlSessionManager.cs" />
     <Compile Include="Toolbox\Extensions.cs" />
+    <Compile Include="Toolbox\MessageHelpers.cs" />
+    <Compile Include="Toolbox\TypeComparer.cs" />
     <Compile Include="Version.cs" />
     <Compile Include="ZyanComponentHost.cs" />
     <Compile Include="ZyanConnection.cs" />

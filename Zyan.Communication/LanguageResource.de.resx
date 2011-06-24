@@ -243,4 +243,7 @@
   <data name="InvalidSessionException_SessionIDInvalid" xml:space="preserve">
     <value>Sitzungsschlüssel '{0}' ist ungültig. Bitte melden Sie sich neu an.</value>
   </data>
+  <data name="MissingMethodException_MethodNotFound" xml:space="preserve">
+    <value>Methode nicht gefunden: '{0}'.</value>
+  </data>
 </root>

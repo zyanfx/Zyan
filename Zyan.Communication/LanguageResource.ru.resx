@@ -243,4 +243,7 @@
   <data name="InvalidSessionException_SessionIDInvalid" xml:space="preserve">
     <value>Идентификатор сессии '{0}' не найден. Вам необходимо войти в систему.</value>
   </data>
+  <data name="MissingMethodException_MethodNotFound" xml:space="preserve">
+    <value>Метод не найден: '{0}'.</value>
+  </data>
 </root>

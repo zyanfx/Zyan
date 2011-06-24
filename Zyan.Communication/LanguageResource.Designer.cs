@@ -358,6 +358,15 @@ namespace Zyan.Communication {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Method not found: &apos;{0}&apos;..
+        /// </summary>
+        internal static string MissingMethodException_MethodNotFound {
+            get {
+                return ResourceManager.GetString("MissingMethodException_MethodNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error connecting remote host: {0}..
         /// </summary>
         internal static string RemotingException_ConnectionError {

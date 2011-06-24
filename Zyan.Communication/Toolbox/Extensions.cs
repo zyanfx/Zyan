@@ -96,7 +96,7 @@ namespace Zyan.Communication.Toolbox
 		}
 
 		/// <summary>
-		/// Creates invokation delegate for the method represented by given MethodInfo
+		/// Creates invocation delegate for the method represented by given MethodInfo
 		/// </summary>
 		public static T CreateDelegate<T>(this MethodInfo method) where T : class
 		{
