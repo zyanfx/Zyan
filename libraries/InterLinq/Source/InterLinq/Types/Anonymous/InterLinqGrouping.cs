@@ -5,119 +5,114 @@ using System.Runtime.Serialization;
 
 namespace InterLinq.Types.Anonymous
 {
+	/// <summary>
+	/// Serializable abstraction of LINQ's <see cref="IGrouping{TKey, TElement}"/>.
+	/// </summary>
+	/// <seealso cref="IGrouping{TKey, TElement}"/>
+	[Serializable]
+	[DataContract]
+	public abstract class InterLinqGroupingBase
+	{
+		/// <summary>
+		/// Sets the grouping <paramref name="key"/>.
+		/// </summary>
+		/// <param name="key">Key to set.</param>
+		public abstract void SetKey(object key);
 
-    /// <summary>
-    /// Serializable abstraction of LINQ's <see cref="IGrouping{TKey, TElement}"/>.
-    /// </summary>
-    /// <seealso cref="IGrouping{TKey, TElement}"/>
-    [Serializable]
-    [DataContract]
-    public abstract class InterLinqGroupingBase
-    {
+		/// <summary>
+		/// Sets the grouping <paramref name="elements"/>.
+		/// </summary>
+		/// <param name="elements">Elements to set.</param>
+		public abstract void SetElements(object elements);
+	}
 
-        /// <summary>
-        /// Sets the grouping <paramref name="key"/>.
-        /// </summary>
-        /// <param name="key">Key to set.</param>
-        public abstract void SetKey(object key);
-        /// <summary>
-        /// Sets the grouping <paramref name="elements"/>.
-        /// </summary>
-        /// <param name="elements">Elements to set.</param>
-        public abstract void SetElements(object elements);
+	/// <summary>
+	/// Serializable abstraction of LINQ's <see cref="IGrouping{TKey, TElement}"/>.
+	/// </summary>
+	/// <seealso cref="InterLinqGroupingBase"/>
+	/// <seealso cref="IGrouping{TKey, TElement}"/>
+	[Serializable]
+	[DataContract]
+	public class InterLinqGrouping<TKey, TElement> : InterLinqGroupingBase, IGrouping<TKey, TElement>
+	{
+		#region Properties
 
-    }
+		/// <summary>
+		/// Gets or sets the elements.
+		/// </summary>
+		[DataMember]
+		public IEnumerable<TElement> Elements { get; set; }
 
-    /// <summary>
-    /// Serializable abstraction of LINQ's <see cref="IGrouping{TKey, TElement}"/>.
-    /// </summary>
-    /// <seealso cref="InterLinqGroupingBase"/>
-    /// <seealso cref="IGrouping{TKey, TElement}"/>
-    [Serializable]
-    [DataContract]
-    public class InterLinqGrouping<TKey, TElement> : InterLinqGroupingBase, IGrouping<TKey, TElement>
-    {
+		#endregion
 
-        #region Properties
+		#region Overridden Methods
 
-        /// <summary>
-        /// Gets or sets the elements.
-        /// </summary>
-        [DataMember]
-        public IEnumerable<TElement> Elements { get; set; }
+		/// <summary>
+		/// Sets the grouping <paramref name="elements"/>.
+		/// </summary>
+		/// <param name="elements">Elements to set.</param>
+		public override void SetElements(object elements)
+		{
+			Elements = (IEnumerable<TElement>)elements;
+		}
 
-        #endregion
+		/// <summary>
+		/// Sets the grouping <paramref name="key"/>.
+		/// </summary>
+		/// <param name="key">Key to set.</param>
+		public override void SetKey(object key)
+		{
+			Key = (TKey)key;
+		}
 
-        #region Overridden Methods
+		#endregion
 
-        /// <summary>
-        /// Sets the grouping <paramref name="elements"/>.
-        /// </summary>
-        /// <param name="elements">Elements to set.</param>
-        public override void SetElements(object elements)
-        {
-            Elements = (IEnumerable<TElement>)elements;
-        }
+		#region IGrouping<TKey,TElement> Members
 
-        /// <summary>
-        /// Sets the grouping <paramref name="key"/>.
-        /// </summary>
-        /// <param name="key">Key to set.</param>
-        public override void SetKey(object key)
-        {
-            Key = (TKey)key;
-        }
+		/// <summary>
+		/// Initializes this class.
+		/// </summary>
+		public InterLinqGrouping()
+		{
+			Elements = new List<TElement>();
+		}
 
-        #endregion
+		/// <summary>
+		/// Gets or sets the key.
+		/// </summary>
+		[DataMember]
+		public TKey Key { get; set; }
 
-        #region IGrouping<TKey,TElement> Members
+		#endregion
 
-        /// <summary>
-        /// Initializes this class.
-        /// </summary>
-        public InterLinqGrouping()
-        {
-            Elements = new List<TElement>();
-        }
+		#region IEnumerable<TElement> Members
 
-        /// <summary>
-        /// Gets or sets the key.
-        /// </summary>
-        [DataMember]
-        public TKey Key { get; set; }
+		/// <summary>
+		/// Returns an <see cref="IEnumerator{T}"/> that iterates through the collection.
+		/// </summary>
+		/// <returns>
+		/// Returns an <see cref="IEnumerator{T}"/> that iterates through the collection.
+		/// </returns>
+		public IEnumerator<TElement> GetEnumerator()
+		{
+			return Elements.GetEnumerator();
+		}
 
-        #endregion
+		#endregion
 
-        #region IEnumerable<TElement> Members
+		#region IEnumerable Members
 
-        /// <summary>
-        /// Returns an <see cref="IEnumerator{T}"/> that iterates through the collection.
-        /// </summary>
-        /// <returns>
-        /// Returns an <see cref="IEnumerator{T}"/> that iterates through the collection.
-        /// </returns>
-        public IEnumerator<TElement> GetEnumerator()
-        {
-            return Elements.GetEnumerator();
-        }
+		/// <summary>
+		/// Returns an <see cref="System.Collections.IEnumerator"/> that iterates through the collection.
+		/// </summary>
+		/// <returns>
+		/// Returns an <see cref="System.Collections.IEnumerator"/> that iterates through the collection.
+		/// </returns>
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
 
-        #endregion
-
-        #region IEnumerable Members
-
-        /// <summary>
-        /// Returns an <see cref="System.Collections.IEnumerator"/> that iterates through the collection.
-        /// </summary>
-        /// <returns>
-        /// Returns an <see cref="System.Collections.IEnumerator"/> that iterates through the collection.
-        /// </returns>
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        #endregion
-
-    }
-
+		#endregion
+	}
 }

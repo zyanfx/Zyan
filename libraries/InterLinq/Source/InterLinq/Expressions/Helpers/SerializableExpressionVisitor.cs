@@ -7,7 +7,6 @@ using InterLinq.Expressions.SerializableTypes;
 
 namespace InterLinq.Expressions.Helpers
 {
-
 	/// <summary>
 	/// This is a basic visitor for serializable expressions.
 	/// </summary>
