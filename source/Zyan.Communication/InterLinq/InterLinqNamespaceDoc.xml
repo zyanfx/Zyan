@@ -1,0 +1,245 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+	<assembly>
+		<name>InterLinq</name>
+	</assembly>
+	<members>
+		<member name="R:Project">
+			<summary>
+				<h1>InterLINQ</h1>
+				<p>
+					Normally, multi-tier functionality is not provided by LINQ technologies like LINQ to NHibernate, LINQ to SQL, etc..<br/>
+					InterLINQ makes local LINQ technologies multi-tier compatible.
+				</p>
+				<p>
+					<img src="../images/BirdsEyeView.png" alt="Bird's eye view of InterLINQ" />
+				</p>
+				<p>
+					As you can see in the figure abouve, InterLINQ is based on the serialization of a query.
+				</p>
+				<h2>Anonymous types</h2>
+				<p>
+					A mayor problem are anonymous types. InterLINQ solves that problem by creating them at runtime on the server.<br/>
+					For further informations: <see cref="N:InterLinq.Types.Anonymous"/>
+				</p>
+			</summary>
+			<seealso cref="N:InterLinq"/>
+			<seealso cref="N:InterLinq.Types.Anonymous"/>
+		</member>
+		<member name="N:InterLinq">
+			<summary>
+				<p>
+					The root namespace contains the main classes used in InterLINQ.
+				</p>
+				<p>
+					<img src="../images/InterLinq_Namespace.png"/>
+				</p>
+			</summary>
+		</member>
+		<member name="N:InterLinq.Communication">
+			<summary>
+				<p>
+					This namespace contains server classes to simplify the server and client architecture.
+				</p>
+				<p>
+					<img src="../images/InterLinq_Communication.png"/>
+				</p>
+			</summary>
+		</member>
+		<member name="N:InterLinq.Communication.Remoting">
+			<summary>
+				<p>
+					This namespace contains the classes required for the communication over .NET Remoting.
+				</p>
+			</summary>
+			<seealso cref="N:InterLinq.Communication"/>
+		</member>
+		<member name="N:InterLinq.Communication.Wcf">
+			<summary>
+				<p>
+					This namespace contains the classes required for the communication over WCF.
+				</p>
+			</summary>
+			<seealso cref="N:InterLinq.Communication"/>
+		</member>
+		<member name="N:InterLinq.Communication.Wcf.NetDataContractSerializer">
+			<summary>
+				<p>
+					This namespace contains the classes required to use the <see cref="T:System.Runtime.Serialization.NetDataContractSerializer"/>.
+				</p>
+			</summary>
+			<seealso cref="N:InterLinq.Communication"/>
+		</member>
+		<member name="N:InterLinq.Expressions">
+			<summary>
+				<p>
+					This namespace contains a serializable expression structure like the one in <see cref="N:System.Linq.Expressions"/>.<br/>
+					Further there are some helper classes in <see cref="N:InterLinq.Expressions.Helpers"/>.<br/>
+					Most classes in this namespace extend <see cref="T:InterLinq.Expressions.SerializableExpression"/>.
+				</p>
+				<p>
+					<img src="../images/InterLinq_Expressions.png"/>
+				</p>
+			</summary>
+			<seealso cref="N:InterLinq.Expressions.SerializableTypes"/>
+		</member>
+		<member name="N:InterLinq.Expressions.Helpers">
+			<summary>
+				<p>
+					This namespace contains helper classes for several conversions and traversings:<br/>
+					<ul>
+						<li>
+							Visitors:
+							<ul>
+								<li>
+									<see cref="T:InterLinq.Expressions.Helpers.ExpressionVisitor"/>
+								</li>
+								<li>
+									<see cref="T:InterLinq.Expressions.Helpers.RewriteExpressionVisitor"/>
+								</li>
+								<li>
+									<see cref="T:InterLinq.Expressions.Helpers.SerializableExpressionVisitor"/>
+								</li>
+							</ul>
+						</li>
+						<li>
+							Converters:<br/>
+							<ul>
+								<li>
+									<see cref="T:InterLinq.Expressions.Helpers.ExpressionConverter"/>
+								</li>
+								<li>
+									<see cref="T:InterLinq.Expressions.Helpers.SerializableExpressionConverter"/>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</p>
+				<p>
+					<img src="../images/InterLinq_Expressions_Helpers.png"/>
+				</p>
+			</summary>
+		</member>
+		<member name="N:InterLinq.Expressions.SerializableTypes">
+			<summary>
+				<p>
+					This namespace contains a few serializable classes used by serializable expressions.<br/>
+					The main difference between this classes and these in <see cref="N:InterLinq.Expressions"/> is that this classes do not extend <see cref="T:InterLinq.Expressions.SerializableExpression"/>.
+				</p>
+			</summary>
+		</member>
+		<member name="N:InterLinq.Types">
+			<summary>
+				<p>
+					Because of the anonymous type problem, normal types can not be transmitted. InterLINQ abstracts the .NET type system in a descriptive way.
+				</p>
+				<p>
+					Here the mappings between CLR types and the InterLINQ equivalent.
+					<table border="1">
+						<tr bgcolor="Black">
+							<td>
+								<b color="White">InterLINQ type</b>
+							</td>
+							<td>
+								<b color="White">CLR type</b>
+							</td>
+							<td>
+								<b color="White">Description</b>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<see cref="T:InterLinq.Types.InterLinqMemberInfo"/>
+							</td>
+							<td>
+								<see cref="T:System.Reflection.MemberInfo"/>
+							</td>
+							<td>Base of all type information.</td>
+						</tr>
+						<tr>
+							<td>
+								<see cref="T:InterLinq.Types.InterLinqType"/>
+							</td>
+							<td>
+								<see cref="T:System.Type"/>
+							</td>
+							<td>Abstraction of type.</td>
+						</tr>
+						<tr>
+							<td>
+								<see cref="T:InterLinq.Types.InterLinqPropertyInfo"/>
+							</td>
+							<td>
+								<see cref="T:System.Reflection.PropertyInfo"/>
+							</td>
+							<td>Description of a property.</td>
+						</tr>
+						<tr>
+							<td>
+								<see cref="T:InterLinq.Types.InterLinqMethodBase"/>
+							</td>
+							<td>
+								<see cref="T:System.Reflection.MethodBase"/>
+							</td>
+							<td>Description of a method base.</td>
+						</tr>
+						<tr>
+							<td>
+								<see cref="T:InterLinq.Types.InterLinqConstructorInfo"/>
+							</td>
+							<td>
+								<see cref="T:System.Reflection.ConstructorInfo"/>
+							</td>
+							<td>Description of a constructor.</td>
+						</tr>
+						<tr>
+							<td>
+								<see cref="T:InterLinq.Types.InterLinqMethodInfo"/>
+							</td>
+							<td>
+								<see cref="T:System.Reflection.MethodInfo"/>
+							</td>
+							<td>Description of a method.</td>
+						</tr>
+						<tr>
+							<td>
+								<see cref="T:InterLinq.Types.InterLinqFieldInfo"/>
+							</td>
+							<td>
+								<see cref="T:System.Reflection.FieldInfo"/>
+							</td>
+							<td>Description of a field.</td>
+						</tr>
+
+					</table>
+				</p>
+				<p>
+					<img src="../images/InterLinq_Types.png"/>
+				</p>
+			</summary>
+		</member>
+		<member name="N:InterLinq.Types.Anonymous">
+			<summary>
+				<h1>Handling of anonymous types</h1>
+				<p>
+					Anonymous types can not be serialized. To serialize them anyway, InterLINQ transmits them in a descriptive way called <see cref="T:InterLinq.Types.Anonymous.AnonymousObject"/>.<br/>
+					As anonymous types are internal types stored in the client assembly, the server does not now them. InterLINQ sends a description (<see cref="T:InterLinq.Types.Anonymous.AnonymousMetaType"/>) of the anonymous types to
+					server who is now able to recreate the anonymous type.
+				</p>
+				<p>
+					The figure below shows the main conept of handling anonymous types.
+				</p>
+				<p>
+					<img src="../images/AnonymousTypes.png" alt="Handling of anonymous types"/>
+				</p>
+				<p>
+					Further, the class diagram:
+				</p>
+				<p>
+					<img src="../images/InterLinq_Types_Anonymous.png"/>
+				</p>
+			</summary>
+			<seealso cref="N:InterLinq.Types"/>
+		</member>
+	</members>
+</doc>

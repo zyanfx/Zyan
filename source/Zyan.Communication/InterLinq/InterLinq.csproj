@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{675F3E10-B4EA-4254-A068-107AAF02D093}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>InterLinq</RootNamespace>
+    <AssemblyName>InterLinq</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\InterLinq.xml</DocumentationFile>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Runtime.Remoting" />
+    <Reference Include="System.Runtime.Serialization">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.ServiceModel">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Communication\Remoting\ClientQueryRemotingHandler.cs" />
+    <Compile Include="Communication\Remoting\RemotingConstants.cs" />
+    <Compile Include="Communication\Wcf\ServiceHelper.cs" />
+    <Compile Include="Expressions\Helpers\SerializableExpressionVisitor.cs" />
+    <Compile Include="InterLinqContext.cs" />
+    <Compile Include="Types\Anonymous\AnonymousMetaType.cs" />
+    <Compile Include="Types\Anonymous\AnonymousTypeHelper.cs" />
+    <Compile Include="Types\Anonymous\AnonymousMetaProperty.cs" />
+    <Compile Include="Types\Anonymous\DynamicAssemblyHolder.cs" />
+    <Compile Include="Types\Anonymous\InterLinqGrouping.cs" />
+    <Compile Include="Types\InterLinqConstructorInfo.cs" />
+    <Compile Include="Types\InterLinqFieldInfo.cs" />
+    <Compile Include="Types\InterLinqMemberInfo.cs" />
+    <Compile Include="Types\InterLinqMethodBase.cs" />
+    <Compile Include="Types\InterLinqMethodInfo.cs" />
+    <Compile Include="Types\InterLinqPropertyInfo.cs" />
+    <Compile Include="Types\InterLinqType.cs" />
+    <Compile Include="Types\InterLinqTypeSystem.cs" />
+    <Compile Include="Communication\ClientQueryHandler.cs" />
+    <Compile Include="Communication\Remoting\ServerQueryRemotingHandler.cs" />
+    <Compile Include="Communication\ServerQueryHandler.cs" />
+    <Compile Include="Communication\Wcf\ServiceConstants.cs" />
+    <Compile Include="Communication\Wcf\ClientQueryWcfHandler.cs" />
+    <Compile Include="Communication\Wcf\ServerQueryWcfHandler.cs" />
+    <Compile Include="Communication\Wcf\NetDataContractSerializer\NetDataContractFormat.cs" />
+    <Compile Include="Communication\Wcf\NetDataContractSerializer\NetDataContractSerializerOperationBehavior.cs" />
+    <Compile Include="Communication\ClientQueryProvider.cs" />
+    <Compile Include="Types\Anonymous\AnonymousObject.cs" />
+    <Compile Include="Types\Anonymous\AnonymousProperty.cs" />
+    <Compile Include="Types\TypeConverter.cs" />
+    <Compile Include="Expressions\ExpressionConversionHelper.cs" />
+    <Compile Include="Expressions\Helpers\ExpressionConverter.cs" />
+    <Compile Include="Expressions\Helpers\ExpressionVisitor.cs" />
+    <Compile Include="Expressions\Helpers\RewriteExpressionVisitor.cs" />
+    <Compile Include="Expressions\SerializableBinaryExpression.cs" />
+    <Compile Include="Expressions\SerializableConditionalExpression.cs" />
+    <Compile Include="Expressions\SerializableConstantExpression.cs" />
+    <Compile Include="Expressions\SerializableExpression.cs" />
+    <Compile Include="Expressions\Helpers\SerializableExpressionConverter.cs" />
+    <Compile Include="Expressions\SerializableExpressionTyped.cs" />
+    <Compile Include="Expressions\SerializableInvocationExpression.cs" />
+    <Compile Include="Expressions\SerializableLambdaExpression.cs" />
+    <Compile Include="Expressions\SerializableListInitExpression.cs" />
+    <Compile Include="Expressions\SerializableMemberExpression.cs" />
+    <Compile Include="Expressions\SerializableMemberInitExpression.cs" />
+    <Compile Include="Expressions\SerializableMethodCallExpression.cs" />
+    <Compile Include="Expressions\SerializableNewArrayExpression.cs" />
+    <Compile Include="Expressions\SerializableNewExpression.cs" />
+    <Compile Include="Expressions\SerializableParameterExpression.cs" />
+    <Compile Include="Expressions\SerializableTypeBinaryExpression.cs" />
+    <Compile Include="Expressions\SerializableTypes\SerializableElementInit.cs" />
+    <Compile Include="Expressions\SerializableTypes\SerializableMemberAssignment.cs" />
+    <Compile Include="Expressions\SerializableTypes\SerializableMemberBinding.cs" />
+    <Compile Include="Expressions\SerializableTypes\SerializableMemberListBinding.cs" />
+    <Compile Include="Expressions\SerializableTypes\SerializableMemberMemberBinding.cs" />
+    <Compile Include="Expressions\SerializableUnaryExpression.cs" />
+    <Compile Include="InterLinqQueryHandler.cs" />
+    <Compile Include="IQueryHandler.cs" />
+    <Compile Include="IQueryRemoteHandler.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="InterLinqQuery.cs" />
+    <Compile Include="InterLinqQueryProvider.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Communication\Communication.cd" />
+    <None Include="Expressions\Helpers\Visitor.cd" />
+    <None Include="Expressions\SerializableExpressions.cd" />
+    <None Include="Types\Anonymous\AnonymousTypes.cd" />
+    <None Include="Types\InterLinqTypeSystem.cd" />
+    <None Include="InterLinq.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="InterLinqNamespaceDoc.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
