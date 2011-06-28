@@ -4,85 +4,83 @@ using System.Reflection.Emit;
 
 namespace InterLinq.Types.Anonymous
 {
-    /// <summary>
-    /// A class that holds a <see cref="AssemblyBuilder">dynamic assembly</see>.
-    /// </summary>
-    internal class DynamicAssemblyHolder
-    {
+	/// <summary>
+	/// A class that holds a <see cref="AssemblyBuilder">dynamic assembly</see>.
+	/// </summary>
+	internal class DynamicAssemblyHolder
+	{
+		#region Singleton (double locked)
 
-        #region Singleton (double locked)
+		private static DynamicAssemblyHolder instance;
 
-        private static DynamicAssemblyHolder instance;
+		/// <summary>
+		/// Singleton instance of the <see cref="DynamicAssemblyHolder"/>.
+		/// </summary>
+		public static DynamicAssemblyHolder Instance
+		{
+			get
+			{
+				if (instance == null)
+				{
+					lock (typeof(DynamicAssemblyHolder))
+					{
+						if (instance == null)
+						{
+							instance = new DynamicAssemblyHolder();
+							instance.Initialize();
+						}
+					}
+				}
+				return instance;
+			}
+		}
 
-        /// <summary>
-        /// Singleton instance of the <see cref="DynamicAssemblyHolder"/>.
-        /// </summary>
-        public static DynamicAssemblyHolder Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    lock (typeof(DynamicAssemblyHolder))
-                    {
-                        if (instance == null)
-                        {
-                            instance = new DynamicAssemblyHolder();
-                            instance.Initialize();
-                        }
-                    }
-                }
-                return instance;
-            }
-        }
+		#endregion
 
-        #endregion
+		#region Fields
 
-        #region Fields
+		private AssemblyBuilder assembly;
 
-        private AssemblyBuilder assembly;
+		#endregion
 
-        #endregion
+		#region Properties
 
-        #region Properties
+		/// <summary>
+		/// Gets a <see cref="ModuleBuilder"/> to create types in it. 
+		/// </summary>
+		public ModuleBuilder ModuleBuilder { get; private set; }
 
-        /// <summary>
-        /// Gets a <see cref="ModuleBuilder"/> to create types in it. 
-        /// </summary>
-        public ModuleBuilder ModuleBuilder { get; private set; }
+		#endregion
 
-        #endregion
+		#region Constuctors / Initialization
 
-        #region Constuctors / Initialization
+		/// <summary>
+		/// Private constructor to avoid external instantiation.
+		/// </summary>
+		private DynamicAssemblyHolder() { }
+		/// <summary>
+		/// Initializes the <see cref="DynamicAssemblyHolder"/>.
+		/// </summary>
+		private void Initialize()
+		{
+			// get the current appdomain
+			AppDomain ad = AppDomain.CurrentDomain;
 
-        /// <summary>
-        /// Private constructor to avoid external instantiation.
-        /// </summary>
-        private DynamicAssemblyHolder() { }
-        /// <summary>
-        /// Initializes the <see cref="DynamicAssemblyHolder"/>.
-        /// </summary>
-        private void Initialize()
-        {
-            // get the current appdomain
-            AppDomain ad = AppDomain.CurrentDomain;
+			// create a new dynamic assembly
+			AssemblyName an = new AssemblyName
+								  {
+									  Name = "InterLinq.Types.Anonymous.Assembly",
+									  Version = new Version("1.0.0.0")
+								  };
 
-            // create a new dynamic assembly
-            AssemblyName an = new AssemblyName
-                                  {
-                                      Name = "InterLinq.Types.Anonymous.Assembly",
-                                      Version = new Version("1.0.0.0")
-                                  };
+			assembly = ad.DefineDynamicAssembly(
+			 an, AssemblyBuilderAccess.Run);
 
-            assembly = ad.DefineDynamicAssembly(
-             an, AssemblyBuilderAccess.Run);
+			// create a new module to hold code in the assembly
+			ModuleBuilder = assembly.GetDynamicModule("InterLinq.Types.Anonymous.Module") ??
+							assembly.DefineDynamicModule("InterLinq.Types.Anonymous.Module");
+		}
 
-            // create a new module to hold code in the assembly
-            ModuleBuilder = assembly.GetDynamicModule("InterLinq.Types.Anonymous.Module") ??
-                            assembly.DefineDynamicModule("InterLinq.Types.Anonymous.Module");
-        }
-
-        #endregion
-
-    }
+		#endregion
+	}
 }

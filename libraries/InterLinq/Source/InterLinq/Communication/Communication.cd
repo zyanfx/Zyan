@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="InterLinq.Communication.ServerQueryHandler">
-    <Position X="7.75" Y="4.5" Width="2" />
+    <Position X="7.75" Y="5" Width="2" />
     <TypeIdentifier>
       <HashCode>AIAAAAAAACAAAAEAAAAACAAAAAAACAAAAAAAAAAIAAA=</HashCode>
       <FileName>Communication\ServerQueryHandler.cs</FileName>
@@ -9,18 +9,12 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="InterLinq.Communication.ClientQueryProvider">
-    <Position X="4.25" Y="4" Width="2.25" />
-    <InheritanceLine Type="InterLinq.InterLinqQueryProvider" FixedToPoint="true">
-      <Path>
-        <Point X="5.125" Y="1.645" />
-        <Point X="5.125" Y="4" />
-      </Path>
-    </InheritanceLine>
+    <Position X="4" Y="4" Width="2.25" />
     <AssociationLine Name="Handler" Type="InterLinq.IQueryRemoteHandler" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="6.5" Y="4.688" />
-        <Point X="6.875" Y="4.688" />
-        <Point X="6.875" Y="0.991" />
+        <Point X="6.25" Y="4.688" />
+        <Point X="7.125" Y="4.688" />
+        <Point X="7.125" Y="0.991" />
         <Point X="7.5" Y="0.991" />
       </Path>
       <MemberNameLabel ManuallyPlaced="true">
@@ -36,13 +30,7 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="InterLinq.Communication.ClientQueryHandler">
-    <Position X="1.5" Y="4" Width="2.5" />
-    <InheritanceLine Type="InterLinq.InterLinqQueryHandler" FixedFromPoint="true" FixedToPoint="true">
-      <Path>
-        <Point X="2.25" Y="2.356" />
-        <Point X="2.25" Y="4" />
-      </Path>
-    </InheritanceLine>
+    <Position X="1" Y="3.25" Width="2.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAQAAAAAAACAAAAAIAAAAAAAAAAAAAAAAAAEAA=</HashCode>
       <FileName>Communication\ClientQueryHandler.cs</FileName>
@@ -86,7 +74,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="InterLinq.Communication.Wcf.ServerQueryWcfHandler">
-    <Position X="7.75" Y="7" Width="2" />
+    <Position X="7.75" Y="7.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAACAAAAEAAAAAAAAAAAAAAAAAIAgAAAAAAAA=</HashCode>
       <FileName>Communication\Wcf\ServerQueryWcfHandler.cs</FileName>

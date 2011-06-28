@@ -7,78 +7,75 @@ using InterLinq.Expressions.Helpers;
 
 namespace InterLinq.Expressions
 {
+	/// <summary>
+	/// A serializable version of <see cref="InvocationExpression"/>.
+	/// </summary>
+	[Serializable]
+	[DataContract]
+	public class SerializableInvocationExpression : SerializableExpression
+	{
+		#region Constructors
 
-    /// <summary>
-    /// A serializable version of <see cref="InvocationExpression"/>.
-    /// </summary>
-    [Serializable]
-    [DataContract]
-    public class SerializableInvocationExpression : SerializableExpression
-    {
+		/// <summary>
+		/// Default constructor for serialization.
+		/// </summary>
+		public SerializableInvocationExpression() { }
 
-        #region Constructors
+		/// <summary>
+		/// Constructor with an <see cref="InvocationExpression"/> and an <see cref="ExpressionConverter"/>.
+		/// </summary>
+		/// <param name="expression">The original, not serializable <see cref="Expression"/>.</param>
+		/// <param name="expConverter">The <see cref="ExpressionConverter"/> to convert contained <see cref="Expression">Expressions</see>.</param>
+		public SerializableInvocationExpression(InvocationExpression expression, ExpressionConverter expConverter)
+			: base(expression, expConverter)
+		{
+			Expression = expression.Expression.MakeSerializable(expConverter);
+			Arguments = expression.Arguments.MakeSerializableCollection<SerializableExpression>(expConverter);
+		}
 
-        /// <summary>
-        /// Default constructor for serialization.
-        /// </summary>
-        public SerializableInvocationExpression() { }
+		#endregion
 
-        /// <summary>
-        /// Constructor with an <see cref="InvocationExpression"/> and an <see cref="ExpressionConverter"/>.
-        /// </summary>
-        /// <param name="expression">The original, not serializable <see cref="Expression"/>.</param>
-        /// <param name="expConverter">The <see cref="ExpressionConverter"/> to convert contained <see cref="Expression">Expressions</see>.</param>
-        public SerializableInvocationExpression(InvocationExpression expression, ExpressionConverter expConverter)
-            : base(expression, expConverter)
-        {
-            Expression = expression.Expression.MakeSerializable(expConverter);
-            Arguments = expression.Arguments.MakeSerializableCollection<SerializableExpression>(expConverter);
-        }
+		#region Properties
 
-        #endregion
+		/// <summary>
+		/// See <see cref="InvocationExpression.Expression"/>
+		/// </summary>
+		[DataMember]
+		public SerializableExpression Expression { get; set; }
 
-        #region Properties
+		/// <summary>
+		/// See <see cref="InvocationExpression.Arguments"/>
+		/// </summary>
+		[DataMember]
+		public ReadOnlyCollection<SerializableExpression> Arguments { get; set; }
 
-        /// <summary>
-        /// See <see cref="InvocationExpression.Expression"/>
-        /// </summary>
-        [DataMember]
-        public SerializableExpression Expression { get; set; }
+		#endregion
 
-        /// <summary>
-        /// See <see cref="InvocationExpression.Arguments"/>
-        /// </summary>
-        [DataMember]
-        public ReadOnlyCollection<SerializableExpression> Arguments { get; set; }
+		#region ToString() Methods
 
-        #endregion
+		/// <summary>
+		/// Builds a <see langword="string"/> representing the <see cref="Expression"/>.
+		/// </summary>
+		/// <param name="builder">A <see cref="System.Text.StringBuilder"/> to add the created <see langword="string"/>.</param>
+		internal override void BuildString(StringBuilder builder)
+		{
+			if (builder == null)
+			{
+				throw new ArgumentNullException("builder");
+			}
+			builder.Append("Invoke(");
+			Expression.BuildString(builder);
+			int num = 0;
+			int count = Arguments.Count;
+			while (num < count)
+			{
+				builder.Append(",");
+				Arguments[num].BuildString(builder);
+				num++;
+			}
+			builder.Append(")");
+		}
 
-        #region ToString() Methods
-
-        /// <summary>
-        /// Builds a <see langword="string"/> representing the <see cref="Expression"/>.
-        /// </summary>
-        /// <param name="builder">A <see cref="System.Text.StringBuilder"/> to add the created <see langword="string"/>.</param>
-        internal override void BuildString(StringBuilder builder)
-        {
-            if (builder == null)
-            {
-                throw new ArgumentNullException("builder");
-            }
-            builder.Append("Invoke(");
-            Expression.BuildString(builder);
-            int num = 0;
-            int count = Arguments.Count;
-            while (num < count)
-            {
-                builder.Append(",");
-                Arguments[num].BuildString(builder);
-                num++;
-            }
-            builder.Append(")");
-        }
-
-        #endregion
-
-    }
+		#endregion
+	}
 }

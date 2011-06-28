@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
   <Class Name="InterLinq.Types.InterLinqType">
-    <Position X="0.5" Y="3.5" Width="3.5" />
+    <Position X="0.5" Y="4.5" Width="3.5" />
     <TypeIdentifier>
       <HashCode>AAIAAgACAAAAAQAAgAAAAAAAAQAAAIAgAABAAAAAAAA=</HashCode>
       <FileName>Types\InterLinqType.cs</FileName>
@@ -18,49 +18,49 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="InterLinq.Types.InterLinqPropertyInfo">
-    <Position X="4.25" Y="3.5" Width="3" />
+    <Position X="4.25" Y="4.5" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAgAAAAAAAQAAgAAAAAAAAAAAAIAAAABCAAAAAAA=</HashCode>
       <FileName>Types\InterLinqPropertyInfo.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="InterLinq.Types.InterLinqConstructorInfo">
-    <Position X="5.5" Y="6.5" Width="3.5" />
+    <Position X="5.25" Y="8.25" Width="3.5" />
     <TypeIdentifier>
       <HashCode>AAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
       <FileName>Types\InterLinqConstructorInfo.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="InterLinq.Types.InterLinqFieldInfo">
-    <Position X="11" Y="3.5" Width="2.75" />
+    <Position X="11" Y="4.5" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAgBAAAAAAQAAgAAAAAAAAAAAAIAAAABAAAAAAAA=</HashCode>
       <FileName>Types\InterLinqFieldInfo.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="InterLinq.Types.InterLinqMemberInfo">
-    <Position X="5.75" Y="0.5" Width="3" />
+    <Position X="7.75" Y="0.5" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAgAAAAAAAQAAgAAAAAQAAAAAAIAAAABAAAgAAAA=</HashCode>
       <FileName>Types\InterLinqMemberInfo.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="InterLinq.Types.InterLinqMethodBase">
-    <Position X="7.5" Y="3.5" Width="3.25" />
+    <Position X="7.5" Y="4.5" Width="3.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAQAAgAAAAAAAAAAAAIAAAAAAAAAAAgA=</HashCode>
       <FileName>Types\InterLinqMethodBase.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="InterLinq.Types.InterLinqMethodInfo">
-    <Position X="9.5" Y="6.5" Width="3.5" />
+    <Position X="9.25" Y="8.25" Width="3.5" />
     <TypeIdentifier>
       <HashCode>AAAAAgAAAAAAAQAAgAAAAAAAAQAAAIAgAABAAAAEAAA=</HashCode>
       <FileName>Types\InterLinqMethodInfo.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="InterLinq.Types.Anonymous.AnonymousMetaType">
-    <Position X="0.5" Y="6.5" Width="3.75" />
+    <Position X="0.5" Y="8.25" Width="3.75" />
     <Members>
       <Method Name="AddDebuggerHiddenAttribute" Hidden="true" />
       <Method Name="GenerateAnonymousType" Hidden="true" />
@@ -72,6 +72,14 @@
       <Method Name="GenerateProperty" Hidden="true" />
       <Method Name="GenerateToStringMethod" Hidden="true" />
     </Members>
+    <InheritanceLine Type="InterLinq.Types.InterLinqType" ManuallyRouted="true" FixedToPoint="true">
+      <Path>
+        <Point X="2.25" Y="7.844" />
+        <Point X="2.25" Y="8.171" />
+        <Point X="2.25" Y="8.171" />
+        <Point X="2.25" Y="8.25" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAgwAAgAQAgAAAAQEABJQgKAAQAAAAAAA=</HashCode>
       <FileName>Types\Anonymous\AnonymousMetaType.cs</FileName>
