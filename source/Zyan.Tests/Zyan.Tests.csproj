@@ -38,9 +38,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="InterLinq">
-      <HintPath>..\..\libraries\InterLinq\InterLinq.dll</HintPath>
-    </Reference>
     <Reference Include="MemoDb">
       <HintPath>..\..\libraries\MemoDb\MemoDb.dll</HintPath>
     </Reference>
@@ -79,10 +76,6 @@
     <ProjectReference Include="..\Zyan.Communication\Zyan.Communication.csproj">
       <Project>{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}</Project>
       <Name>Zyan.Communication</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Zyan.InterLinq\Zyan.InterLinq.csproj">
-      <Project>{8F294CBF-AC94-4F77-8263-7E5693798B16}</Project>
-      <Name>Zyan.InterLinq</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
