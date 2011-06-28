@@ -2,9 +2,9 @@
 using System.Collections;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
-using InterLinq.Expressions;
+using Zyan.InterLinq.Expressions;
 
-namespace InterLinq.Communication.Remoting
+namespace Zyan.InterLinq.Communication.Remoting
 {
 	/// <summary>
 	/// Server handler class to retrieve information via .NET Remoting.

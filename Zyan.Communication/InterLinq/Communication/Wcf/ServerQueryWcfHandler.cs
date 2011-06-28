@@ -2,7 +2,7 @@
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 
-namespace InterLinq.Communication.Wcf
+namespace Zyan.InterLinq.Communication.Wcf
 {
 	/// <summary>
 	/// Server class to retrieve information via WCF.

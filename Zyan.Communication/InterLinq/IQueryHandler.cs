@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace InterLinq
+namespace Zyan.InterLinq
 {
 	/// <summary>
 	/// Interface providing methods to get <see cref="IQueryable{T}"/>.

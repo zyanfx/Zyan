@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
-using InterLinq.Types.Anonymous;
+using Zyan.InterLinq.Types.Anonymous;
 
-namespace InterLinq.Types
+namespace Zyan.InterLinq.Types
 {
 	/// <summary>
 	/// The <see cref="TypeConverter"/> is a helper class providing

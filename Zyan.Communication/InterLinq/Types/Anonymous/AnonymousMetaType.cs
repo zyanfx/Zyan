@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Diagnostics;
 
-namespace InterLinq.Types.Anonymous
+namespace Zyan.InterLinq.Types.Anonymous
 {
 	/// <summary>
 	/// A class representing an anonymous type.

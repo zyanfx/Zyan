@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 using System.ServiceModel.Description;
 using System.Xml;
 
-namespace InterLinq.Communication.Wcf.NetDataContractSerializer
+namespace Zyan.InterLinq.Communication.Wcf.NetDataContractSerializer
 {
 	/// <summary>
 	/// Represents the run-time behavior of the <see cref="DataContractSerializer"/>.

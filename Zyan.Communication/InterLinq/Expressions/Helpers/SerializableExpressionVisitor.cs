@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
-using InterLinq.Expressions.SerializableTypes;
+using Zyan.InterLinq.Expressions.SerializableTypes;
 
-namespace InterLinq.Expressions.Helpers
+namespace Zyan.InterLinq.Expressions.Helpers
 {
 	/// <summary>
 	/// This is a basic visitor for serializable expressions.

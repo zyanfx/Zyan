@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.ObjectModel;
 using System.Linq.Expressions;
-using InterLinq.Expressions.Helpers;
-using InterLinq.Communication;
+using Zyan.InterLinq.Expressions.Helpers;
+using Zyan.InterLinq.Communication;
 
-namespace InterLinq.Expressions
+namespace Zyan.InterLinq.Expressions
 {
 	/// <summary>
 	/// Static helper class providing several C# 3.0 Extension Methods.

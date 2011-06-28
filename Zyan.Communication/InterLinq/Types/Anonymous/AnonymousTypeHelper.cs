@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 
-namespace InterLinq.Types.Anonymous
+namespace Zyan.InterLinq.Types.Anonymous
 {
 	/// <summary>
 	/// A static class that contains static methods to recognize some special types like anonymous types and

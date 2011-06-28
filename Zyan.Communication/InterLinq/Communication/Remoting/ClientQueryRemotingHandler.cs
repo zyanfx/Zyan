@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Runtime.Remoting.Channels;
 
-namespace InterLinq.Communication.Remoting
+namespace Zyan.InterLinq.Communication.Remoting
 {
 	/// <summary>
 	/// Client handler class managing the connection 

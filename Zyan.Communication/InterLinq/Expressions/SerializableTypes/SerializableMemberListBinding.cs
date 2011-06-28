@@ -3,9 +3,9 @@ using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
 using System.Text;
-using InterLinq.Expressions.Helpers;
+using Zyan.InterLinq.Expressions.Helpers;
 
-namespace InterLinq.Expressions.SerializableTypes
+namespace Zyan.InterLinq.Expressions.SerializableTypes
 {
 	/// <summary>
 	/// A serializable version of <see cref="MemberListBinding"/>.

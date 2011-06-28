@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace InterLinq.Expressions.Helpers
+namespace Zyan.InterLinq.Expressions.Helpers
 {
 	/// <summary>
 	/// This is a visitor that rewrites an expression tree during visiting.

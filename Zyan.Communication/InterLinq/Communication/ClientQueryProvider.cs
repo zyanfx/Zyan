@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
-using InterLinq.Expressions;
-using InterLinq.Types;
+using Zyan.InterLinq.Expressions;
+using Zyan.InterLinq.Types;
 
-namespace InterLinq.Communication
+namespace Zyan.InterLinq.Communication
 {
 	/// <summary>
 	/// Client implementation of the <see cref="InterLinqQueryProvider"/>.

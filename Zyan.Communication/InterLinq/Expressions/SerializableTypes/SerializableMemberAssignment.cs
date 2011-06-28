@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
-using InterLinq.Expressions.Helpers;
+using Zyan.InterLinq.Expressions.Helpers;
 using System.Text;
 
-namespace InterLinq.Expressions.SerializableTypes
+namespace Zyan.InterLinq.Expressions.SerializableTypes
 {
 	/// <summary>
 	/// A serializable version of <see cref="MemberAssignment"/>.

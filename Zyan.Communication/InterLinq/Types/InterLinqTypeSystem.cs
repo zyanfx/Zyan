@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection;
-using InterLinq.Types.Anonymous;
+using Zyan.InterLinq.Types.Anonymous;
 
-namespace InterLinq.Types
+namespace Zyan.InterLinq.Types
 {
 	/// <summary>
 	/// Singleton class for the <see cref="InterLinqTypeSystem"/>.
