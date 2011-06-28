@@ -80,6 +80,7 @@
     <Compile Include="NHibernate\CompanyExampleTest.cs" />
     <Compile Include="Objects\CompanyExampleTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SerializationTest.cs" />
     <Compile Include="Sql\CompanyExampleTest.cs" />
   </ItemGroup>
   <ItemGroup>
