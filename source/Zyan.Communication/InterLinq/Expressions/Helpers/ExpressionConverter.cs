@@ -2,10 +2,10 @@
 using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 using System.Reflection;
-using InterLinq.Expressions.SerializableTypes;
-using InterLinq.Types.Anonymous;
+using Zyan.InterLinq.Expressions.SerializableTypes;
+using Zyan.InterLinq.Types.Anonymous;
 
-namespace InterLinq.Expressions.Helpers
+namespace Zyan.InterLinq.Expressions.Helpers
 {
 	/// <summary>
 	/// This class is an <see cref="ExpressionVisitor"/> implementation

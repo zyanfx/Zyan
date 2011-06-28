@@ -5,9 +5,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Security;
-using InterLinq.Expressions.SerializableTypes;
+using Zyan.InterLinq.Expressions.SerializableTypes;
 
-namespace InterLinq.Expressions.Helpers
+namespace Zyan.InterLinq.Expressions.Helpers
 {
 	/// <summary>
 	/// Converter class to convert <see cref="SerializableExpression">SerializableExpression's</see>

@@ -2,11 +2,11 @@
 using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
-using InterLinq.Expressions.Helpers;
-using InterLinq.Expressions.SerializableTypes;
+using Zyan.InterLinq.Expressions.Helpers;
+using Zyan.InterLinq.Expressions.SerializableTypes;
 using System.Text;
 
-namespace InterLinq.Expressions
+namespace Zyan.InterLinq.Expressions
 {
 	/// <summary>
 	/// A serializable version of <see cref="ListInitExpression"/>.

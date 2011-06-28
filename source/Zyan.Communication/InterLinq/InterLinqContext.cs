@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace InterLinq
+namespace Zyan.InterLinq
 {
 	/// <summary>
 	/// Abstract base class holding an <see cref="IQueryHandler"/>.

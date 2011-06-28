@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
 
-namespace InterLinq.Types.Anonymous
+namespace Zyan.InterLinq.Types.Anonymous
 {
 	/// <summary>
 	/// Class that represents a property of an anonymous type.

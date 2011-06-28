@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace InterLinq.Expressions.Helpers
+namespace Zyan.InterLinq.Expressions.Helpers
 {
 	/// <summary>
 	/// A visitor for <see cref="Expression">Expressions</see>.

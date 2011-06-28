@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
-using InterLinq;
+using Zyan.InterLinq;
 using Zyan.Communication;
 
 namespace Zyan.InterLinq

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace InterLinq.Types.Anonymous
+namespace Zyan.InterLinq.Types.Anonymous
 {
 	/// <summary>
 	/// Represents an instance of an <see cref="AnonymousMetaProperty"/>.

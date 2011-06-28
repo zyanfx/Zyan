@@ -2,7 +2,7 @@
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 
-namespace InterLinq.Communication.Remoting
+namespace Zyan.InterLinq.Communication.Remoting
 {
 	/// <summary>
 	/// Constants for the default remoting configuration.
