@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace InterLinq.Communication
+namespace Zyan.InterLinq.Communication
 {
 	/// <summary>
 	/// Client implementation of the <see cref="InterLinqQueryHandler"/>.

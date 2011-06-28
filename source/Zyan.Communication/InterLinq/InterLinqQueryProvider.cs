@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using InterLinq.Types;
+using Zyan.InterLinq.Types;
 
-namespace InterLinq
+namespace Zyan.InterLinq
 {
 	/// <summary>
 	/// Abstract implementation of an <see cref="System.Linq.IQueryProvider"/>.

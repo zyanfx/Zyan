@@ -2,10 +2,10 @@
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
 using System.Text;
-using InterLinq.Expressions.Helpers;
-using InterLinq.Types;
+using Zyan.InterLinq.Expressions.Helpers;
+using Zyan.InterLinq.Types;
 
-namespace InterLinq.Expressions
+namespace Zyan.InterLinq.Expressions
 {
 	/// <summary>
 	/// A serializable version of <see cref="MemberExpression"/>.

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
 
-namespace InterLinq.Types
+namespace Zyan.InterLinq.Types
 {
 	/// <summary>
 	/// InterLINQ representation of <see cref="MemberInfo"/>.

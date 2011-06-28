@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reflection;
 
-namespace InterLinq
+namespace Zyan.InterLinq
 {
 	/// <summary>
 	/// Abstract implementation of an <see cref="IQueryHandler"/>.

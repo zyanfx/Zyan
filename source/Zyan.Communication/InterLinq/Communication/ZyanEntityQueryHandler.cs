@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Linq;
 using System.Reflection;
-using InterLinq;
+using Zyan.InterLinq;
 
 namespace Zyan.InterLinq
 {

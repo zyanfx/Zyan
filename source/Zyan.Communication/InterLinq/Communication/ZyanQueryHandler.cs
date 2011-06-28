@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using InterLinq;
+using Zyan.InterLinq;
 
 namespace Zyan.InterLinq
 {

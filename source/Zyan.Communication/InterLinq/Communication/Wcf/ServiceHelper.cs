@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ServiceModel;
 
-namespace InterLinq.Communication.Wcf
+namespace Zyan.InterLinq.Communication.Wcf
 {
 	/// <summary>
 	/// Helper class providing different methods required by 

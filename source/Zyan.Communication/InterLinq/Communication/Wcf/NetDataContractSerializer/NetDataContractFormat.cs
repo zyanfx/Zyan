@@ -3,7 +3,7 @@ using System.ServiceModel.Description;
 using System.ServiceModel.Dispatcher;
 using System.ServiceModel.Channels;
 
-namespace InterLinq.Communication.Wcf.NetDataContractSerializer
+namespace Zyan.InterLinq.Communication.Wcf.NetDataContractSerializer
 {
 	/// <summary>
 	/// Implements methods that can be used to extend run-time behavior for an operation

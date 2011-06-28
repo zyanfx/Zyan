@@ -1,7 +1,7 @@
 ﻿using System.ServiceModel;
 using System.ServiceModel.Channels;
 
-namespace InterLinq.Communication.Wcf
+namespace Zyan.InterLinq.Communication.Wcf
 {
 	/// <summary>
 	/// Client handler class managing the connection 

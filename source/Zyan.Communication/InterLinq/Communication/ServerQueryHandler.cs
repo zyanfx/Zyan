@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using InterLinq.Types;
-using InterLinq.Expressions;
+using Zyan.InterLinq.Types;
+using Zyan.InterLinq.Expressions;
 
-namespace InterLinq.Communication
+namespace Zyan.InterLinq.Communication
 {
 	/// <summary>
 	/// Server implementation of the <see cref="IQueryRemoteHandler"/>.

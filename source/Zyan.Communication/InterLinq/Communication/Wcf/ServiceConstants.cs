@@ -1,5 +1,5 @@
 ﻿
-namespace InterLinq.Communication.Wcf
+namespace Zyan.InterLinq.Communication.Wcf
 {
 	/// <summary>
 	/// Constant class for the WCF implementation.

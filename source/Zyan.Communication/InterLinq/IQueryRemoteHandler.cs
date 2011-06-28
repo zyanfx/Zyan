@@ -1,9 +1,9 @@
 ﻿using System;
 using System.ServiceModel;
-using InterLinq.Expressions;
-using InterLinq.Communication.Wcf.NetDataContractSerializer;
+using Zyan.InterLinq.Expressions;
+using Zyan.InterLinq.Communication.Wcf.NetDataContractSerializer;
 
-namespace InterLinq
+namespace Zyan.InterLinq
 {
 	/// <summary>
 	/// Interface providing methods to communicate with

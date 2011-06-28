@@ -1,6 +1,6 @@
 ﻿using System;
-using InterLinq;
-using InterLinq.Communication;
+using Zyan.InterLinq;
+using Zyan.InterLinq.Communication;
 using Zyan.Communication;
 
 namespace Zyan.InterLinq

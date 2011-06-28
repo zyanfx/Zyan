@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace InterLinq.Types.Anonymous
+namespace Zyan.InterLinq.Types.Anonymous
 {
 	/// <summary>
 	/// A class that holds a <see cref="AssemblyBuilder">dynamic assembly</see>.
