@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="InterLinq.Expressions.Helpers.ExpressionVisitor">
+    <Position X="2.25" Y="0.5" Width="2.75" />
+    <Members>
+      <Field Name="m_executedvalue" Hidden="true" />
+      <Field Name="m_expression" Hidden="true" />
+    </Members>
+    <AssociationLine Name="Expression" Type="System.Linq.Expressions.Expression" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="2.25" Y="1.375" />
+        <Point X="1.75" Y="1.375" />
+        <Point X="1.75" Y="2" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAKFAAIgAGwAAYAgBAAgQAAZCAAQAEgAoQAEDAA=</HashCode>
+      <FileName>Expressions\Helpers\ExpressionVisitor.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Expression" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="InterLinq.Expressions.Helpers.ExpressionConverter">
+    <Position X="0.75" Y="7" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAKBAAAiACAAAYAABAAgQAAZCAAQAEgAAAAECAQ=</HashCode>
+      <FileName>Expressions\Helpers\ExpressionConverter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InterLinq.Expressions.Helpers.SerializableExpressionVisitor">
+    <Position X="6.75" Y="0.5" Width="2.75" />
+    <Members>
+      <Field Name="m_convertedObjects" Hidden="true" />
+      <Field Name="m_expressionToConvert" Hidden="true" />
+    </Members>
+    <AssociationLine Name="ExpressionToConvert" Type="InterLinq.Expressions.SerializableExpression" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="9.5" Y="1.125" />
+        <Point X="9.969" Y="1.125" />
+        <Point X="9.969" Y="2" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-1.475" Y="0.082" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AJAAAABEACICSAQMgJAEABACAIAAEECIARAMAAAIQAA=</HashCode>
+      <FileName>Expressions\Helpers\SerializableExpressionVisitor.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="ExpressionToConvert" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="InterLinq.Expressions.SerializableExpression">
+    <Position X="9.75" Y="2" Width="1.75" />
+    <Members>
+      <Method Name="BuildString" Hidden="true" />
+      <Field Name="m_hashCode" Hidden="true" />
+      <Field Name="m_nodeType" Hidden="true" />
+      <Field Name="m_type" Hidden="true" />
+      <Method Name="SerializableExpression" Hidden="true" />
+      <Method Name="ToString" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>gCAAICAIAAAAAAAEAABAAAAAAAAAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>Expressions\SerializableExpression.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="System.Linq.Expressions.Expression">
+    <Position X="0.5" Y="2" Width="1.5" />
+    <Members>
+      <Method Name="Add" Hidden="true" />
+      <Method Name="AddChecked" Hidden="true" />
+      <Method Name="And" Hidden="true" />
+      <Method Name="AndAlso" Hidden="true" />
+      <Method Name="ArrayIndex" Hidden="true" />
+      <Method Name="ArrayLength" Hidden="true" />
+      <Method Name="Bind" Hidden="true" />
+      <Method Name="Call" Hidden="true" />
+      <Method Name="Coalesce" Hidden="true" />
+      <Method Name="Condition" Hidden="true" />
+      <Method Name="Constant" Hidden="true" />
+      <Method Name="Convert" Hidden="true" />
+      <Method Name="ConvertChecked" Hidden="true" />
+      <Method Name="Divide" Hidden="true" />
+      <Method Name="ElementInit" Hidden="true" />
+      <Method Name="Equal" Hidden="true" />
+      <Method Name="ExclusiveOr" Hidden="true" />
+      <Method Name="Expression" Hidden="true" />
+      <Method Name="Field" Hidden="true" />
+      <Method Name="GetActionType" Hidden="true" />
+      <Method Name="GetFuncType" Hidden="true" />
+      <Method Name="GreaterThan" Hidden="true" />
+      <Method Name="GreaterThanOrEqual" Hidden="true" />
+      <Method Name="Invoke" Hidden="true" />
+      <Method Name="Lambda" Hidden="true" />
+      <Method Name="LeftShift" Hidden="true" />
+      <Method Name="LessThan" Hidden="true" />
+      <Method Name="LessThanOrEqual" Hidden="true" />
+      <Method Name="ListBind" Hidden="true" />
+      <Method Name="ListInit" Hidden="true" />
+      <Method Name="MakeBinary" Hidden="true" />
+      <Method Name="MakeGenericMethod" Hidden="true" />
+      <Method Name="MakeMemberAccess" Hidden="true" />
+      <Method Name="MakeUnary" Hidden="true" />
+      <Method Name="MemberBind" Hidden="true" />
+      <Method Name="MemberInit" Hidden="true" />
+      <Method Name="Modulo" Hidden="true" />
+      <Method Name="Multiply" Hidden="true" />
+      <Method Name="MultiplyChecked" Hidden="true" />
+      <Method Name="Negate" Hidden="true" />
+      <Method Name="NegateChecked" Hidden="true" />
+      <Method Name="New" Hidden="true" />
+      <Method Name="NewArrayBounds" Hidden="true" />
+      <Method Name="NewArrayInit" Hidden="true" />
+      <Method Name="Not" Hidden="true" />
+      <Method Name="NotEqual" Hidden="true" />
+      <Method Name="Or" Hidden="true" />
+      <Method Name="OrElse" Hidden="true" />
+      <Method Name="Parameter" Hidden="true" />
+      <Method Name="Power" Hidden="true" />
+      <Method Name="Property" Hidden="true" />
+      <Method Name="PropertyOrField" Hidden="true" />
+      <Method Name="Quote" Hidden="true" />
+      <Method Name="RightShift" Hidden="true" />
+      <Method Name="Subtract" Hidden="true" />
+      <Method Name="SubtractChecked" Hidden="true" />
+      <Method Name="ToString" Hidden="true" />
+      <Method Name="TypeAs" Hidden="true" />
+      <Method Name="TypeIs" Hidden="true" />
+      <Method Name="UnaryPlus" Hidden="true" />
+    </Members>
+    <TypeIdentifier />
+  </Class>
+  <Class Name="InterLinq.Expressions.Helpers.RewriteExpressionVisitor">
+    <Position X="3.75" Y="7" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAKBAAAgACAAAYAABAAgQAAZCAQQAEgAAAAECAA=</HashCode>
+      <FileName>Expressions\Helpers\RewriteExpressionVisitor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InterLinq.Expressions.Helpers.SerializableExpressionConverter">
+    <Position X="6.75" Y="7" Width="2.75" />
+    <Members>
+      <Field Name="m_queryHandler" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AJAAAAAAECICSAAEARAAABACAIAAEECIARAMAAAIQAA=</HashCode>
+      <FileName>Expressions\Helpers\SerializableExpressionConverter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Tahoma" Size="8.25" />
+</ClassDiagram>
