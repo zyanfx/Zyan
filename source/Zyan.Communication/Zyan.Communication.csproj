@@ -51,6 +51,8 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Remoting" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
@@ -79,6 +81,88 @@
     <Compile Include="IComponentCatalogExtensions.cs">
       <DependentUpon>IComponentCatalog.cs</DependentUpon>
     </Compile>
+    <Compile Include="InterLinq\Communication\ClientQueryHandler.cs" />
+    <Compile Include="InterLinq\Communication\ClientQueryProvider.cs" />
+    <Compile Include="InterLinq\Communication\Remoting\ClientQueryRemotingHandler.cs" />
+    <Compile Include="InterLinq\Communication\Remoting\RemotingConstants.cs" />
+    <Compile Include="InterLinq\Communication\Remoting\ServerQueryRemotingHandler.cs" />
+    <Compile Include="InterLinq\Communication\ServerQueryHandler.cs" />
+    <Compile Include="InterLinq\Communication\Wcf\ClientQueryWcfHandler.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="InterLinq\Communication\Wcf\NetDataContractSerializer\NetDataContractFormat.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="InterLinq\Communication\Wcf\NetDataContractSerializer\NetDataContractSerializerOperationBehavior.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="InterLinq\Communication\Wcf\ServerQueryWcfHandler.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="InterLinq\Communication\Wcf\ServiceConstants.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="InterLinq\Communication\Wcf\ServiceHelper.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="InterLinq\Communication\ZyanClientQueryHandler.cs" />
+    <Compile Include="InterLinq\Communication\ZyanEntityQueryHandler.cs" />
+    <Compile Include="InterLinq\Communication\ZyanExtensions.cs" />
+    <Compile Include="InterLinq\Communication\ZyanObjectQueryHandler.cs" />
+    <Compile Include="InterLinq\Communication\ZyanQueryHandler.cs" />
+    <Compile Include="InterLinq\Communication\ZyanServerQueryHandler.cs" />
+    <Compile Include="InterLinq\Expressions\ExpressionConversionHelper.cs" />
+    <Compile Include="InterLinq\Expressions\Helpers\ExpressionConverter.cs" />
+    <Compile Include="InterLinq\Expressions\Helpers\ExpressionVisitor.cs" />
+    <Compile Include="InterLinq\Expressions\Helpers\RewriteExpressionVisitor.cs" />
+    <Compile Include="InterLinq\Expressions\Helpers\SerializableExpressionConverter.cs" />
+    <Compile Include="InterLinq\Expressions\Helpers\SerializableExpressionVisitor.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableBinaryExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableConditionalExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableConstantExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableExpressionTyped.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableInvocationExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableLambdaExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableListInitExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableMemberExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableMemberInitExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableMethodCallExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableNewArrayExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableNewExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableParameterExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableTypeBinaryExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableTypes\SerializableElementInit.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableTypes\SerializableMemberAssignment.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableTypes\SerializableMemberBinding.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableTypes\SerializableMemberListBinding.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableTypes\SerializableMemberMemberBinding.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableUnaryExpression.cs" />
+    <Compile Include="InterLinq\IBaseSource.cs" />
+    <Compile Include="InterLinq\IEntitySource.cs" />
+    <Compile Include="InterLinq\InterLinqContext.cs" />
+    <Compile Include="InterLinq\InterLinqQuery.cs" />
+    <Compile Include="InterLinq\InterLinqQueryHandler.cs" />
+    <Compile Include="InterLinq\InterLinqQueryProvider.cs" />
+    <Compile Include="InterLinq\IObjectSource.cs" />
+    <Compile Include="InterLinq\IQueryHandler.cs" />
+    <Compile Include="InterLinq\IQueryRemoteHandler.cs" />
+    <Compile Include="InterLinq\Types\Anonymous\AnonymousMetaProperty.cs" />
+    <Compile Include="InterLinq\Types\Anonymous\AnonymousMetaType.cs" />
+    <Compile Include="InterLinq\Types\Anonymous\AnonymousObject.cs" />
+    <Compile Include="InterLinq\Types\Anonymous\AnonymousProperty.cs" />
+    <Compile Include="InterLinq\Types\Anonymous\AnonymousTypeHelper.cs" />
+    <Compile Include="InterLinq\Types\Anonymous\DynamicAssemblyHolder.cs" />
+    <Compile Include="InterLinq\Types\Anonymous\InterLinqGrouping.cs" />
+    <Compile Include="InterLinq\Types\InterLinqConstructorInfo.cs" />
+    <Compile Include="InterLinq\Types\InterLinqFieldInfo.cs" />
+    <Compile Include="InterLinq\Types\InterLinqMemberInfo.cs" />
+    <Compile Include="InterLinq\Types\InterLinqMethodBase.cs" />
+    <Compile Include="InterLinq\Types\InterLinqMethodInfo.cs" />
+    <Compile Include="InterLinq\Types\InterLinqPropertyInfo.cs" />
+    <Compile Include="InterLinq\Types\InterLinqType.cs" />
+    <Compile Include="InterLinq\Types\InterLinqTypeSystem.cs" />
+    <Compile Include="InterLinq\Types\TypeConverter.cs" />
     <Compile Include="InvalidSessionException.cs" />
     <Compile Include="InvokeCanceledEventArgs.cs" />
     <Compile Include="InvokeCanceledException.cs" />
@@ -169,7 +253,16 @@
     <EmbeddedResource Include="LanguageResource.ru.resx" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="InterLinq\Communication\Communication.cd" />
+    <None Include="InterLinq\Expressions\Helpers\Visitor.cd" />
+    <None Include="InterLinq\Expressions\SerializableExpressions.cd" />
+    <None Include="InterLinq\InterLinq.cd" />
+    <None Include="InterLinq\Types\Anonymous\AnonymousTypes.cd" />
+    <None Include="InterLinq\Types\InterLinqTypeSystem.cd" />
     <None Include="Protocols\Tcp\DuplexChannel\DuplexChannel.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="InterLinq\InterLinqNamespaceDoc.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
