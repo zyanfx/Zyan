@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="InterLinq.Communication.ServerQueryHandler">
+  <Class Name="Zyan.InterLinq.Communication.ServerQueryHandler">
     <Position X="7.75" Y="5" Width="2" />
     <TypeIdentifier>
       <HashCode>AIAAAAAAACAAAAEAAAAACAAAAAAACAAAAAAAAAAIAAA=</HashCode>
@@ -8,7 +8,7 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="InterLinq.Communication.ClientQueryProvider">
+  <Class Name="Zyan.InterLinq.Communication.ClientQueryProvider">
     <Position X="4" Y="4" Width="2.25" />
     <AssociationLine Name="Handler" Type="InterLinq.IQueryRemoteHandler" FixedFromPoint="true" FixedToPoint="true">
       <Path>
@@ -29,14 +29,14 @@
       <Property Name="Handler" />
     </ShowAsAssociation>
   </Class>
-  <Class Name="InterLinq.Communication.ClientQueryHandler">
+  <Class Name="Zyan.InterLinq.Communication.ClientQueryHandler">
     <Position X="1" Y="3.25" Width="2.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAQAAAAAAACAAAAAIAAAAAAAAAAAAAAAAAAEAA=</HashCode>
       <FileName>Communication\ClientQueryHandler.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Communication.Remoting.ServerQueryRemotingHandler">
+  <Class Name="Zyan.InterLinq.Communication.Remoting.ServerQueryRemotingHandler">
     <Position X="7.5" Y="2.25" Width="2.25" />
     <Members>
       <Method Name="InitializeLifetimeService" Hidden="true" />
@@ -59,28 +59,28 @@
     </ShowAsAssociation>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="InterLinq.Communication.Remoting.ClientQueryRemotingHandler">
+  <Class Name="Zyan.InterLinq.Communication.Remoting.ClientQueryRemotingHandler">
     <Position X="0.5" Y="6.5" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAIAAAAAIAgAAAAAAAAAAAAA=</HashCode>
       <FileName>Communication\Remoting\ClientQueryRemotingHandler.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Communication.Wcf.ClientQueryWcfHandler">
+  <Class Name="Zyan.InterLinq.Communication.Wcf.ClientQueryWcfHandler">
     <Position X="3" Y="6.5" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Communication\Wcf\ClientQueryWcfHandler.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Communication.Wcf.ServerQueryWcfHandler">
+  <Class Name="Zyan.InterLinq.Communication.Wcf.ServerQueryWcfHandler">
     <Position X="7.75" Y="7.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAACAAAAEAAAAAAAAAAAAAAAAAIAgAAAAAAAA=</HashCode>
       <FileName>Communication\Wcf\ServerQueryWcfHandler.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.InterLinqQueryHandler">
+  <Class Name="Zyan.InterLinq.InterLinqQueryHandler">
     <Position X="0.5" Y="0.5" Width="2.5" />
     <TypeIdentifier>
       <HashCode>AEAAAAAAAAAAAABCAAIAAAAAAAAAAAAAAAAAACAAAAA=</HashCode>
@@ -88,7 +88,7 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="InterLinq.InterLinqQueryProvider">
+  <Class Name="Zyan.InterLinq.InterLinqQueryProvider">
     <Position X="3.75" Y="0.5" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAQAAAAAAACAAAAAAAAAAAAAAAAAAAA=</HashCode>
@@ -96,7 +96,7 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Interface Name="InterLinq.IQueryRemoteHandler">
+  <Interface Name="Zyan.InterLinq.IQueryRemoteHandler">
     <Position X="7.5" Y="0.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>

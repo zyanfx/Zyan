@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="InterLinq.Expressions.Helpers.ExpressionVisitor">
+  <Class Name="Zyan.InterLinq.Expressions.Helpers.ExpressionVisitor">
     <Position X="2.25" Y="0.5" Width="2.75" />
     <Members>
       <Field Name="m_executedvalue" Hidden="true" />
@@ -21,14 +21,14 @@
       <Property Name="Expression" />
     </ShowAsAssociation>
   </Class>
-  <Class Name="InterLinq.Expressions.Helpers.ExpressionConverter">
+  <Class Name="Zyan.InterLinq.Expressions.Helpers.ExpressionConverter">
     <Position X="0.75" Y="7" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAKBAAAiACAAAYAABAAgQAAZCAAQAEgAAAAECAQ=</HashCode>
       <FileName>Expressions\Helpers\ExpressionConverter.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Expressions.Helpers.SerializableExpressionVisitor">
+  <Class Name="Zyan.InterLinq.Expressions.Helpers.SerializableExpressionVisitor">
     <Position X="6.75" Y="0.5" Width="2.75" />
     <Members>
       <Field Name="m_convertedObjects" Hidden="true" />
@@ -52,7 +52,7 @@
       <Property Name="ExpressionToConvert" />
     </ShowAsAssociation>
   </Class>
-  <Class Name="InterLinq.Expressions.SerializableExpression">
+  <Class Name="Zyan.InterLinq.Expressions.SerializableExpression">
     <Position X="9.75" Y="2" Width="1.75" />
     <Members>
       <Method Name="BuildString" Hidden="true" />
@@ -133,14 +133,14 @@
     </Members>
     <TypeIdentifier />
   </Class>
-  <Class Name="InterLinq.Expressions.Helpers.RewriteExpressionVisitor">
+  <Class Name="Zyan.InterLinq.Expressions.Helpers.RewriteExpressionVisitor">
     <Position X="3.75" Y="7" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAKBAAAgACAAAYAABAAgQAAZCAQQAEgAAAAECAA=</HashCode>
       <FileName>Expressions\Helpers\RewriteExpressionVisitor.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Expressions.Helpers.SerializableExpressionConverter">
+  <Class Name="Zyan.InterLinq.Expressions.Helpers.SerializableExpressionConverter">
     <Position X="6.75" Y="7" Width="2.75" />
     <Members>
       <Field Name="m_queryHandler" Hidden="true" />

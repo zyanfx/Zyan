@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="InterLinq.InterLinqQueryBase">
+  <Class Name="Zyan.InterLinq.InterLinqQueryBase">
     <Position X="0.5" Y="3.75" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAEABAAAAAQAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
@@ -10,7 +10,7 @@
       <Property Name="ElementInterLinqType" />
     </ShowAsAssociation>
   </Class>
-  <Class Name="InterLinq.InterLinqQuery&lt;T&gt;">
+  <Class Name="Zyan.InterLinq.InterLinqQuery&lt;T&gt;">
     <Position X="0.5" Y="6" Width="2.25" />
     <InheritanceLine Type="InterLinq.InterLinqQueryBase" FixedToPoint="true">
       <Path>
@@ -28,7 +28,7 @@
     </ShowAsAssociation>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="InterLinq.InterLinqQueryHandler" BaseTypeListCollapsed="true">
+  <Class Name="Zyan.InterLinq.InterLinqQueryHandler" BaseTypeListCollapsed="true">
     <Position X="7" Y="3" Width="2" />
     <TypeIdentifier>
       <HashCode>AEAAAAAAAAAAAABCAAIAAAAAAAAAAAAAAAAAACAAAAA=</HashCode>
@@ -36,7 +36,7 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="InterLinq.InterLinqQueryProvider" BaseTypeListCollapsed="true">
+  <Class Name="Zyan.InterLinq.InterLinqQueryProvider" BaseTypeListCollapsed="true">
     <Position X="3.25" Y="3" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAQAAAAAAACAAAAAAAAAAAAAAAAAAAA=</HashCode>
@@ -44,7 +44,7 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="InterLinq.Communication.ClientQueryHandler">
+  <Class Name="Zyan.InterLinq.Communication.ClientQueryHandler">
     <Position X="9.75" Y="4" Width="2.5" />
     <AssociationLine Name="QueryRemoteHandler" Type="InterLinq.IQueryRemoteHandler" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
       <Path>
@@ -66,7 +66,7 @@
       <Property Name="QueryRemoteHandler" />
     </ShowAsAssociation>
   </Class>
-  <Class Name="InterLinq.Communication.ServerQueryHandler">
+  <Class Name="Zyan.InterLinq.Communication.ServerQueryHandler">
     <Position X="9.75" Y="0.75" Width="2" />
     <AssociationLine Name="QueryHandler" Type="InterLinq.IQueryHandler" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
       <Path>
@@ -83,7 +83,7 @@
     </ShowAsAssociation>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="InterLinq.Communication.ClientQueryProvider">
+  <Class Name="Zyan.InterLinq.Communication.ClientQueryProvider">
     <Position X="3.5" Y="6" Width="2.25" />
     <AssociationLine Name="Handler" Type="InterLinq.IQueryRemoteHandler" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
       <Path>
@@ -132,21 +132,21 @@
     <TypeIdentifier />
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
-  <Class Name="InterLinq.Types.InterLinqType" Collapsed="true">
+  <Class Name="Zyan.InterLinq.Types.InterLinqType" Collapsed="true">
     <Position X="1.25" Y="2.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAIAAgACAAAAAQAAgAAAAAAAAQAAAIAgAABAAAAAAAA=</HashCode>
       <FileName>Types\InterLinqType.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Interface Name="InterLinq.IQueryRemoteHandler">
+  <Interface Name="Zyan.InterLinq.IQueryRemoteHandler">
     <Position X="0.5" Y="0.5" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>IQueryRemoteHandler.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="InterLinq.IQueryHandler">
+  <Interface Name="Zyan.InterLinq.IQueryHandler">
     <Position X="3.25" Y="0.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AEAAAAAAAAAAAABAAAIAAAAAAAAAAAAAAAAAACAAAAA=</HashCode>

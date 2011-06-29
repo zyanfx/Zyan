@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Zyan.Communication;
 using Zyan.Communication.Protocols.Ipc;
 using Zyan.InterLinq;
+using System.Linq.Expressions;
 
 namespace Zyan.Tests
 {
@@ -14,6 +15,31 @@ namespace Zyan.Tests
 	[TestClass]
 	public class LinqTests
 	{
+		#region Interfaces and components
+
+		interface ISampleService
+		{
+			string CompileAndExecuteExpression(Expression<Func<string, string>> ex, string data);
+
+			Expression ProcessExpression(Expression<Action<string>> ex, string data);
+		}
+
+		class SampleService : ISampleService
+		{
+			public string CompileAndExecuteExpression(Expression<Func<string, string>> ex, string data)
+			{
+				var func = ex.Compile();
+				return func(data);
+			}
+
+			public Expression ProcessExpression(Expression<Action<string>> ex, string data)
+			{
+				return Expression.Invoke(ex, Expression.Constant(data));
+			}
+		}
+
+		#endregion
+
 		public TestContext TestContext { get; set; }
 
 		static ZyanComponentHost ZyanHost { get; set; }
@@ -35,6 +61,7 @@ namespace Zyan.Tests
 			ZyanHost.RegisterQueryableComponent<SampleObjectSource>("Sample6");
 			ZyanHost.RegisterQueryableComponent<SampleObjectSource>("Sample7", ActivationType.SingleCall);
 			ZyanHost.RegisterQueryableComponent("DbSample", new DataWrapper());
+			ZyanHost.RegisterComponent<ISampleService, SampleService>();
 
 			var clientSetup = new IpcBinaryClientProtocolSetup();
 			ZyanConnection = new ZyanConnection("ipc://LinqTest/SampleQueryableServer", clientSetup);
@@ -179,6 +206,30 @@ namespace Zyan.Tests
 			Assert.AreEqual(
 				"Leó, Lev, Hans, Igor, Glenn, James, Klaus, Leona, Niels, Pyotr, Ralph, Albert, Arthur, Edward, Emilio, " +
 				"Enrico, Ernest, George, Harold, Robert, Robert, Richard, William, Alexander, Stanislaw, Chien-Shiung", result);
+		}
+
+		[TestMethod]
+		public void TestExpressionParameter()
+		{
+			var proxy = ZyanConnection.CreateProxy<ISampleService>();
+			Expression<Func<string, string>> ex =
+				s => s.ToLower() + "-" + s.ToUpper();
+
+			var result = proxy.CompileAndExecuteExpression(ex, "Ru");
+			Assert.AreEqual("ru-RU", result);
+		}
+
+		[TestMethod]
+		public void TestExpressionReturnValue()
+		{
+			const string message = "Hello, World!";
+
+			var proxy = ZyanConnection.CreateProxy<ISampleService>();
+			Expression<Action<string>> ex = s => Console.WriteLine(s);
+			Expression expression = Expression.Invoke(ex, Expression.Constant(message));
+
+			var result = proxy.ProcessExpression(ex, message);
+			Assert.AreEqual(expression.ToString(), result.ToString());
 		}
 	}
 }

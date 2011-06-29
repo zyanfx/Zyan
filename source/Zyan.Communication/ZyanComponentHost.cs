@@ -8,6 +8,8 @@ using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp;
 using Zyan.Communication.SessionMgmt;
 using Zyan.Communication.Notification;
+using System.Linq.Expressions;
+using Zyan.InterLinq.Expressions;
 
 namespace Zyan.Communication
 {
@@ -114,10 +116,13 @@ namespace Zyan.Communication
 			// Komponenten Host der Host-Auflistung zufügen
 			_hosts.Add(this);
 
+			// Register standard serialization handlers
+			RegisterStandardSerializationHandlers();
+
 			// Beginnen auf Client-Anfragen zu horchen
 			StartListening();
 		}
-		
+
 		#endregion
 		
 		#region Authentication
@@ -522,6 +527,13 @@ namespace Zyan.Communication
 		public SerializationHandlerRepository SerializationHandling
 		{
 			get { return _serializationHandling; }
+		}
+
+		private void RegisterStandardSerializationHandlers()
+		{
+			// TODO: use MEF to discover and register standard serialization handlers:
+			// [Export(ISerializationHandler), ExportMetadata("SerializedType", typeof(Expression))]
+			SerializationHandling.RegisterSerializationHandler(typeof(Expression), new ExpressionSerializationHandler());
 		}
 
 		#endregion

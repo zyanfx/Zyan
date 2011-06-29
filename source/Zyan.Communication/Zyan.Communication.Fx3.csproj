@@ -94,6 +94,7 @@
     <Compile Include="InterLinq\Communication\ZyanQueryHandler.cs" />
     <Compile Include="InterLinq\Communication\ZyanServerQueryHandler.cs" />
     <Compile Include="InterLinq\Expressions\ExpressionConversionHelper.cs" />
+    <Compile Include="InterLinq\Expressions\ExpressionSerializationHandler.cs" />
     <Compile Include="InterLinq\Expressions\Helpers\ExpressionConverter.cs" />
     <Compile Include="InterLinq\Expressions\Helpers\ExpressionVisitor.cs" />
     <Compile Include="InterLinq\Expressions\Helpers\RewriteExpressionVisitor.cs" />
