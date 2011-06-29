@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
-  <Class Name="InterLinq.Types.InterLinqType">
+  <Class Name="Zyan.InterLinq.Types.InterLinqType">
     <Position X="0.5" Y="4.5" Width="3.5" />
     <TypeIdentifier>
       <HashCode>AAIAAgACAAAAAQAAgAAAAAAAAQAAAIAgAABAAAAAAAA=</HashCode>
       <FileName>Types\InterLinqType.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Types.InterLinqTypeSystem">
+  <Class Name="Zyan.InterLinq.Types.InterLinqTypeSystem">
     <Position X="0.5" Y="0.5" Width="5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAACAAAAIAAABAAAAERABQAIAQAQQ=</HashCode>
@@ -17,49 +17,49 @@
       <Property Name="Instance" />
     </ShowAsAssociation>
   </Class>
-  <Class Name="InterLinq.Types.InterLinqPropertyInfo">
+  <Class Name="Zyan.InterLinq.Types.InterLinqPropertyInfo">
     <Position X="4.25" Y="4.5" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAgAAAAAAAQAAgAAAAAAAAAAAAIAAAABCAAAAAAA=</HashCode>
       <FileName>Types\InterLinqPropertyInfo.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Types.InterLinqConstructorInfo">
+  <Class Name="Zyan.InterLinq.Types.InterLinqConstructorInfo">
     <Position X="5.25" Y="8.25" Width="3.5" />
     <TypeIdentifier>
       <HashCode>AAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
       <FileName>Types\InterLinqConstructorInfo.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Types.InterLinqFieldInfo">
+  <Class Name="Zyan.InterLinq.Types.InterLinqFieldInfo">
     <Position X="11" Y="4.5" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAgBAAAAAAQAAgAAAAAAAAAAAAIAAAABAAAAAAAA=</HashCode>
       <FileName>Types\InterLinqFieldInfo.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Types.InterLinqMemberInfo">
+  <Class Name="Zyan.InterLinq.Types.InterLinqMemberInfo">
     <Position X="7.75" Y="0.5" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAgAAAAAAAQAAgAAAAAQAAAAAAIAAAABAAAgAAAA=</HashCode>
       <FileName>Types\InterLinqMemberInfo.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Types.InterLinqMethodBase">
+  <Class Name="Zyan.InterLinq.Types.InterLinqMethodBase">
     <Position X="7.5" Y="4.5" Width="3.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAQAAgAAAAAAAAAAAAIAAAAAAAAAAAgA=</HashCode>
       <FileName>Types\InterLinqMethodBase.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Types.InterLinqMethodInfo">
+  <Class Name="Zyan.InterLinq.Types.InterLinqMethodInfo">
     <Position X="9.25" Y="8.25" Width="3.5" />
     <TypeIdentifier>
       <HashCode>AAAAAgAAAAAAAQAAgAAAAAAAAQAAAIAgAABAAAAEAAA=</HashCode>
       <FileName>Types\InterLinqMethodInfo.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Types.Anonymous.AnonymousMetaType">
+  <Class Name="Zyan.InterLinq.Types.Anonymous.AnonymousMetaType">
     <Position X="0.5" Y="8.25" Width="3.75" />
     <Members>
       <Method Name="AddDebuggerHiddenAttribute" Hidden="true" />

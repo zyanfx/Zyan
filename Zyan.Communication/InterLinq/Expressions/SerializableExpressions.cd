@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
-  <Class Name="InterLinq.Expressions.SerializableBinaryExpression" Collapsed="true">
+  <Class Name="Zyan.InterLinq.Expressions.SerializableBinaryExpression" Collapsed="true">
     <Position X="0.5" Y="2.75" Width="2.75" />
     <InheritanceLine Type="InterLinq.Expressions.SerializableExpression" FixedToPoint="true">
       <Path>
@@ -14,28 +14,28 @@
       <FileName>Expressions\SerializableBinaryExpression.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Expressions.SerializableUnaryExpression" Collapsed="true">
+  <Class Name="Zyan.InterLinq.Expressions.SerializableUnaryExpression" Collapsed="true">
     <Position X="3.5" Y="8" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAEAAAA=</HashCode>
       <FileName>Expressions\SerializableUnaryExpression.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Expressions.SerializableConditionalExpression" Collapsed="true">
+  <Class Name="Zyan.InterLinq.Expressions.SerializableConditionalExpression" Collapsed="true">
     <Position X="0.5" Y="3.5" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAACAAAGAA=</HashCode>
       <FileName>Expressions\SerializableConditionalExpression.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Expressions.SerializableConstantExpression" Collapsed="true">
+  <Class Name="Zyan.InterLinq.Expressions.SerializableConstantExpression" Collapsed="true">
     <Position X="0.5" Y="4.25" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
       <FileName>Expressions\SerializableConstantExpression.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Expressions.SerializableExpression">
+  <Class Name="Zyan.InterLinq.Expressions.SerializableExpression">
     <Position X="0.5" Y="0.5" Width="5.75" />
     <Members>
       <Method Name="BuildString" Hidden="true" />
@@ -49,35 +49,35 @@
       <Property Name="NodeType" />
     </ShowAsAssociation>
   </Class>
-  <Class Name="InterLinq.Expressions.SerializableExpressionTyped" Collapsed="true">
+  <Class Name="Zyan.InterLinq.Expressions.SerializableExpressionTyped" Collapsed="true">
     <Position X="0.5" Y="7.25" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Expressions\SerializableExpressionTyped.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Expressions.SerializableInvocationExpression" Collapsed="true">
+  <Class Name="Zyan.InterLinq.Expressions.SerializableInvocationExpression" Collapsed="true">
     <Position X="0.5" Y="5" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAABAAAAAAAAAAAAQIAAAAAAAAAA=</HashCode>
       <FileName>Expressions\SerializableInvocationExpression.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Expressions.SerializableLambdaExpression" Collapsed="true">
+  <Class Name="Zyan.InterLinq.Expressions.SerializableLambdaExpression" Collapsed="true">
     <Position X="0.5" Y="5.75" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAABBAAAAAAAAAAAAAIAAAAAAAAA=</HashCode>
       <FileName>Expressions\SerializableLambdaExpression.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Expressions.SerializableListInitExpression" Collapsed="true">
+  <Class Name="Zyan.InterLinq.Expressions.SerializableListInitExpression" Collapsed="true">
     <Position X="0.5" Y="8" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAACAAABAA=</HashCode>
       <FileName>Expressions\SerializableListInitExpression.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Expressions.SerializableMemberExpression" Collapsed="true">
+  <Class Name="Zyan.InterLinq.Expressions.SerializableMemberExpression" Collapsed="true">
     <Position X="3.5" Y="2.75" Width="2.75" />
     <InheritanceLine Type="InterLinq.Expressions.SerializableExpression" FixedToPoint="true">
       <Path>
@@ -91,35 +91,35 @@
       <FileName>Expressions\SerializableMemberExpression.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Expressions.SerializableMemberInitExpression" Collapsed="true">
+  <Class Name="Zyan.InterLinq.Expressions.SerializableMemberInitExpression" Collapsed="true">
     <Position X="3.5" Y="3.5" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAEAACAAAAAA=</HashCode>
       <FileName>Expressions\SerializableMemberInitExpression.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Expressions.SerializableMethodCallExpression" Collapsed="true">
+  <Class Name="Zyan.InterLinq.Expressions.SerializableMethodCallExpression" Collapsed="true">
     <Position X="3.5" Y="4.25" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAgAABgAAAAAAAAAAAAIAAAAAAAAAA=</HashCode>
       <FileName>Expressions\SerializableMethodCallExpression.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Expressions.SerializableNewArrayExpression" Collapsed="true">
+  <Class Name="Zyan.InterLinq.Expressions.SerializableNewArrayExpression" Collapsed="true">
     <Position X="3.5" Y="5" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAgAAAAA=</HashCode>
       <FileName>Expressions\SerializableNewArrayExpression.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Expressions.SerializableNewExpression" Collapsed="true">
+  <Class Name="Zyan.InterLinq.Expressions.SerializableNewExpression" Collapsed="true">
     <Position X="3.5" Y="5.75" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAEAAAAAAAAAAAABQAAAAAAAAAAAAIAAEAAAAAAA=</HashCode>
       <FileName>Expressions\SerializableNewExpression.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Expressions.SerializableParameterExpression" Collapsed="true">
+  <Class Name="Zyan.InterLinq.Expressions.SerializableParameterExpression" Collapsed="true">
     <Position X="3.5" Y="6.5" Width="2.75" />
     <InheritanceLine Type="InterLinq.Expressions.SerializableExpression" FixedToPoint="true">
       <Path>
@@ -133,42 +133,42 @@
       <FileName>Expressions\SerializableParameterExpression.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Expressions.SerializableTypeBinaryExpression" Collapsed="true">
+  <Class Name="Zyan.InterLinq.Expressions.SerializableTypeBinaryExpression" Collapsed="true">
     <Position X="3.5" Y="7.25" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAABAAAAAAAAAAAAQAAAAAAABAAA=</HashCode>
       <FileName>Expressions\SerializableTypeBinaryExpression.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Expressions.SerializableTypes.SerializableElementInit" Collapsed="true">
+  <Class Name="Zyan.InterLinq.Expressions.SerializableTypes.SerializableElementInit" Collapsed="true">
     <Position X="6.5" Y="10" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAFAABAAAAAAAAAAAAAIAAAAAAAAAA=</HashCode>
       <FileName>Expressions\SerializableTypes\SerializableElementInit.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Expressions.SerializableTypes.SerializableMemberMemberBinding" Collapsed="true">
+  <Class Name="Zyan.InterLinq.Expressions.SerializableTypes.SerializableMemberMemberBinding" Collapsed="true">
     <Position X="0.5" Y="10" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAEAAAAAAAAA=</HashCode>
       <FileName>Expressions\SerializableTypes\SerializableMemberMemberBinding.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Expressions.SerializableTypes.SerializableMemberAssignment" Collapsed="true">
+  <Class Name="Zyan.InterLinq.Expressions.SerializableTypes.SerializableMemberAssignment" Collapsed="true">
     <Position X="3.5" Y="10" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAABAAAAAAAAAAAAQAAAAAAAAAAA=</HashCode>
       <FileName>Expressions\SerializableTypes\SerializableMemberAssignment.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Expressions.SerializableTypes.SerializableMemberBinding" Collapsed="true">
+  <Class Name="Zyan.InterLinq.Expressions.SerializableTypes.SerializableMemberBinding" Collapsed="true">
     <Position X="2" Y="9" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAEAAAAEAABAAAAAAAAIAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Expressions\SerializableTypes\SerializableMemberBinding.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Expressions.SerializableTypes.SerializableMemberListBinding" Collapsed="true">
+  <Class Name="Zyan.InterLinq.Expressions.SerializableTypes.SerializableMemberListBinding" Collapsed="true">
     <Position X="2" Y="10.75" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAABAA=</HashCode>

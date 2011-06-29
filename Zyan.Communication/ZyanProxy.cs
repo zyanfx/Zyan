@@ -8,447 +8,447 @@ using System.Runtime.Remoting.Proxies;
 
 namespace Zyan.Communication
 {
-    /// <summary>
-    /// Delegat für den Aufruf von InvokeRemoteMethod.
-    /// </summary>
-    /// <param name="methodCallMessage">Remoting-Nachricht</param>
-    /// <param name="allowCallInterception">Gibt an, ob das Abfangen von Aufrufen zugelassen wird, oder nicht</param>
-    /// <returns>Antwortnachricht</returns>
-    public delegate IMessage InvokeRemoteMethodDelegate(IMethodCallMessage methodCallMessage,bool allowCallInterception);
+	/// <summary>
+	/// Delegat für den Aufruf von InvokeRemoteMethod.
+	/// </summary>
+	/// <param name="methodCallMessage">Remoting-Nachricht</param>
+	/// <param name="allowCallInterception">Gibt an, ob das Abfangen von Aufrufen zugelassen wird, oder nicht</param>
+	/// <returns>Antwortnachricht</returns>
+	public delegate IMessage InvokeRemoteMethodDelegate(IMethodCallMessage methodCallMessage, bool allowCallInterception);
 
-    /// <summary>
-    /// Stellvertreterobjekt für den Zugriff auf eine entfernte Komponente.
-    /// </summary>
-    public class ZyanProxy : RealProxy
-    {
-        // Felder
-        private Type _interfaceType = null;
-        private IZyanDispatcher _remoteInvoker = null;
-        private List<DelegateCorrelationInfo> _delegateCorrelationSet = null;
-        private bool _implicitTransactionTransfer = false;
-        private Guid _sessionID;
-        private string _componentHostName = string.Empty;
-        private bool _autoLoginOnExpiredSession = false;
-        private Hashtable _autoLoginCredentials = null;
-        private ZyanConnection _connection = null;
-        private ActivationType _activationType = ActivationType.SingleCall;
-        private string _uniqueName = string.Empty;
+	/// <summary>
+	/// Stellvertreterobjekt für den Zugriff auf eine entfernte Komponente.
+	/// </summary>
+	public class ZyanProxy : RealProxy
+	{
+		// Felder
+		private Type _interfaceType = null;
+		private IZyanDispatcher _remoteInvoker = null;
+		private List<DelegateCorrelationInfo> _delegateCorrelationSet = null;
+		private bool _implicitTransactionTransfer = false;
+		private Guid _sessionID;
+		private string _componentHostName = string.Empty;
+		private bool _autoLoginOnExpiredSession = false;
+		private Hashtable _autoLoginCredentials = null;
+		private ZyanConnection _connection = null;
+		private ActivationType _activationType = ActivationType.SingleCall;
+		private string _uniqueName = string.Empty;
 
-        /// <summary>
-        /// Konstruktor.
-        /// </summary>
-        /// <param name="uniqueName">Eindeutiger Komponentenname</param>
-        /// <param name="type">Schnittstelle der entfernten Komponente</param>
-        /// <param name="connection">Verbindungsobjekt</param>
-        /// <param name="implicitTransactionTransfer">Implizite Transaktionsübertragung</param>
-        /// <param name="sessionID">Sitzungsschlüssel</param>
-        /// <param name="componentHostName">Name des entfernten Komponentenhosts</param>
-        /// <param name="autoLoginOnExpiredSession">Gibt an, ob sich der Proxy automatisch neu anmelden soll, wenn die Sitzung abgelaufen ist</param>
-        /// <param name="autoLogoninCredentials">Optional! Anmeldeinformationen, die nur benötigt werden, wenn autoLoginOnExpiredSession auf Wahr eingestellt ist</param>              
-        /// <param name="activationType">Aktivierungsart</param>
-        public ZyanProxy(string uniqueName, Type type, ZyanConnection connection, bool implicitTransactionTransfer, Guid sessionID, string componentHostName, bool autoLoginOnExpiredSession, Hashtable autoLogoninCredentials, ActivationType activationType)
-            : base(type)
-        {
-            // Wenn kein Typ angegeben wurde ...
-            if (type.Equals(null))
-                // Ausnahme werfen
-                throw new ArgumentNullException("type");
+		/// <summary>
+		/// Konstruktor.
+		/// </summary>
+		/// <param name="uniqueName">Eindeutiger Komponentenname</param>
+		/// <param name="type">Schnittstelle der entfernten Komponente</param>
+		/// <param name="connection">Verbindungsobjekt</param>
+		/// <param name="implicitTransactionTransfer">Implizite Transaktionsübertragung</param>
+		/// <param name="sessionID">Sitzungsschlüssel</param>
+		/// <param name="componentHostName">Name des entfernten Komponentenhosts</param>
+		/// <param name="autoLoginOnExpiredSession">Gibt an, ob sich der Proxy automatisch neu anmelden soll, wenn die Sitzung abgelaufen ist</param>
+		/// <param name="autoLogoninCredentials">Optional! Anmeldeinformationen, die nur benötigt werden, wenn autoLoginOnExpiredSession auf Wahr eingestellt ist</param>              
+		/// <param name="activationType">Aktivierungsart</param>
+		public ZyanProxy(string uniqueName, Type type, ZyanConnection connection, bool implicitTransactionTransfer, Guid sessionID, string componentHostName, bool autoLoginOnExpiredSession, Hashtable autoLogoninCredentials, ActivationType activationType)
+			: base(type)
+		{
+			// Wenn kein Typ angegeben wurde ...
+			if (type.Equals(null))
+				// Ausnahme werfen
+				throw new ArgumentNullException("type");
 
-            // Wenn kein Verbindungsobjekt angegeben wurde ...
-            if (connection == null)
-                // Ausnahme werfen
-                throw new ArgumentNullException("connection");
+			// Wenn kein Verbindungsobjekt angegeben wurde ...
+			if (connection == null)
+				// Ausnahme werfen
+				throw new ArgumentNullException("connection");
 
-            // Wenn kein eindeutiger Name angegeben wurde ...
-            if (string.IsNullOrEmpty(uniqueName))
-                // Name der Schnittstelle verwenden
-                _uniqueName = type.FullName;
-            else
-                _uniqueName = uniqueName;
-            
-            // Sitzungsschlüssel übernehmen
-            _sessionID = sessionID;
+			// Wenn kein eindeutiger Name angegeben wurde ...
+			if (string.IsNullOrEmpty(uniqueName))
+				// Name der Schnittstelle verwenden
+				_uniqueName = type.FullName;
+			else
+				_uniqueName = uniqueName;
 
-            // Verbindungsobjekt übernehmen
-            _connection = connection;
+			// Sitzungsschlüssel übernehmen
+			_sessionID = sessionID;
 
-            // Name des Komponentenhosts übernehmen
-            _componentHostName = componentHostName;
+			// Verbindungsobjekt übernehmen
+			_connection = connection;
 
-            // Schnittstellentyp übernehmen
-            _interfaceType = type;
+			// Name des Komponentenhosts übernehmen
+			_componentHostName = componentHostName;
 
-            // Aktivierungsart übernehmen
-            _activationType = activationType;
+			// Schnittstellentyp übernehmen
+			_interfaceType = type;
 
-            // Aufrufer von Verbindung übernehmen
-            _remoteInvoker = _connection.RemoteComponentFactory;
+			// Aktivierungsart übernehmen
+			_activationType = activationType;
 
-            // Schalter für implizite Transaktionsübertragung übernehmen
-            _implicitTransactionTransfer = implicitTransactionTransfer;
+			// Aufrufer von Verbindung übernehmen
+			_remoteInvoker = _connection.RemoteComponentFactory;
 
-            // Schalter für automatische Anmeldung bei abgelaufender Sitzung übernehmen
-            _autoLoginOnExpiredSession = autoLoginOnExpiredSession;
+			// Schalter für implizite Transaktionsübertragung übernehmen
+			_implicitTransactionTransfer = implicitTransactionTransfer;
 
-            // Wenn automatische Anmeldung aktiv ist ...
-            if (_autoLoginOnExpiredSession)
-                // Anmeldeinformationen speichern
-                _autoLoginCredentials = autoLogoninCredentials;
+			// Schalter für automatische Anmeldung bei abgelaufender Sitzung übernehmen
+			_autoLoginOnExpiredSession = autoLoginOnExpiredSession;
 
-            // Sammlung für Korrelationssatz erzeugen
-            _delegateCorrelationSet = new List<DelegateCorrelationInfo>();
-        }
+			// Wenn automatische Anmeldung aktiv ist ...
+			if (_autoLoginOnExpiredSession)
+				// Anmeldeinformationen speichern
+				_autoLoginCredentials = autoLogoninCredentials;
 
-        /// <summary>
-        /// Gets the name of the remote Component Host.
-        /// </summary>
-        public string ComponentHostName
-        {
-            get { return _componentHostName; }            
-        }
+			// Sammlung für Korrelationssatz erzeugen
+			_delegateCorrelationSet = new List<DelegateCorrelationInfo>();
+		}
 
-        /// <summary>
-        /// Entfernte Methode aufrufen.
-        /// </summary>
-        /// <param name="message">Remoting-Nachricht mit Details für den entfernten Methodenaufruf</param>
-        /// <returns>Remoting Antwortnachricht</returns>
-        public override IMessage Invoke(IMessage message)
-        {
-            // Wenn keine Nachricht angegeben wurde ...
-            if (message == null)
-                // Ausnahme werfen
-                throw new ArgumentNullException("message");
+		/// <summary>
+		/// Gets the name of the remote Component Host.
+		/// </summary>
+		public string ComponentHostName
+		{
+			get { return _componentHostName; }
+		}
 
-            // Nachricht in benötigte Schnittstelle casten
-            IMethodCallMessage methodCallMessage = (IMethodCallMessage)message;
+		/// <summary>
+		/// Entfernte Methode aufrufen.
+		/// </summary>
+		/// <param name="message">Remoting-Nachricht mit Details für den entfernten Methodenaufruf</param>
+		/// <returns>Remoting Antwortnachricht</returns>
+		public override IMessage Invoke(IMessage message)
+		{
+			// Wenn keine Nachricht angegeben wurde ...
+			if (message == null)
+				// Ausnahme werfen
+				throw new ArgumentNullException("message");
 
-            // Methoden-Metadaten abrufen
-            MethodInfo methodInfo = (MethodInfo)methodCallMessage.MethodBase;
-            methodInfo.GetParameters();
+			// Nachricht in benötigte Schnittstelle casten
+			IMethodCallMessage methodCallMessage = (IMethodCallMessage)message;
 
-            try
-            {
-                // Wenn die Methode ein Delegat ist ...
-                if (methodInfo.ReturnType.Equals(typeof(void)) &&
-                    methodCallMessage.InArgCount == 1 &&
-                    methodCallMessage.ArgCount == 1 &&
-                    methodCallMessage.Args[0] != null &&
-                    typeof(Delegate).IsAssignableFrom(methodCallMessage.Args[0].GetType()) &&
-                    (methodCallMessage.MethodName.StartsWith("set_") || methodCallMessage.MethodName.StartsWith("add_")))
-                {
-                    // Delegat auf zu verdrahtende Client-Methode abrufen
-                    object receiveMethodDelegate = methodCallMessage.GetArg(0);
+			// Methoden-Metadaten abrufen
+			MethodInfo methodInfo = (MethodInfo)methodCallMessage.MethodBase;
+			methodInfo.GetParameters();
 
-                    // "set_" wegschneiden
-                    string propertyName = methodCallMessage.MethodName.Substring(4);
+			try
+			{
+				// Wenn die Methode ein Delegat ist ...
+				if (methodInfo.ReturnType.Equals(typeof(void)) &&
+					methodCallMessage.InArgCount == 1 &&
+					methodCallMessage.ArgCount == 1 &&
+					methodCallMessage.Args[0] != null &&
+					typeof(Delegate).IsAssignableFrom(methodCallMessage.Args[0].GetType()) &&
+					(methodCallMessage.MethodName.StartsWith("set_") || methodCallMessage.MethodName.StartsWith("add_")))
+				{
+					// Delegat auf zu verdrahtende Client-Methode abrufen
+					object receiveMethodDelegate = methodCallMessage.GetArg(0);
 
-                    // Verdrahtungskonfiguration festschreiben
-                    DelegateInterceptor wiring = new DelegateInterceptor()
-                    {
-                        ClientDelegate = receiveMethodDelegate
-                    };
-                    // Korrelationsinformation zusammenstellen
-                    DelegateCorrelationInfo correlationInfo = new DelegateCorrelationInfo()
-                    {
-                        IsEvent = methodCallMessage.MethodName.StartsWith("add_"),
-                        DelegateMemberName = propertyName,
-                        ClientDelegateInterceptor = wiring
-                    };
-                    // Wenn die Serverkomponente Singletonaktiviert ist ...
-                    if (_activationType == ActivationType.Singleton)
-                        // Ereignis der Serverkomponente abonnieren
-                        _connection.RemoteComponentFactory.AddEventHandler(_interfaceType.FullName, correlationInfo);
+					// "set_" wegschneiden
+					string propertyName = methodCallMessage.MethodName.Substring(4);
 
-                    // Verdrahtung in der Sammlung ablegen
-                    _delegateCorrelationSet.Add(correlationInfo);
+					// Verdrahtungskonfiguration festschreiben
+					DelegateInterceptor wiring = new DelegateInterceptor()
+					{
+						ClientDelegate = receiveMethodDelegate
+					};
+					// Korrelationsinformation zusammenstellen
+					DelegateCorrelationInfo correlationInfo = new DelegateCorrelationInfo()
+					{
+						IsEvent = methodCallMessage.MethodName.StartsWith("add_"),
+						DelegateMemberName = propertyName,
+						ClientDelegateInterceptor = wiring
+					};
+					// Wenn die Serverkomponente Singletonaktiviert ist ...
+					if (_activationType == ActivationType.Singleton)
+						// Ereignis der Serverkomponente abonnieren
+						_connection.RemoteComponentFactory.AddEventHandler(_interfaceType.FullName, correlationInfo);
 
-                    // Leere Remoting-Antwortnachricht erstellen und zurückgeben
-                    return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
-                }
-                else if (methodInfo.ReturnType.Equals(typeof(void)) &&
-                    methodCallMessage.InArgCount == 1 &&
-                    methodCallMessage.ArgCount == 1 &&
-                    methodCallMessage.Args[0] != null &&
-                    typeof(Delegate).IsAssignableFrom(methodCallMessage.Args[0].GetType()) &&
-                    (methodCallMessage.MethodName.StartsWith("remove_")))
-                {
-                    // EBC-Eingangsnachricht abrufen
-                    object inputMessage = methodCallMessage.GetArg(0);
+					// Verdrahtung in der Sammlung ablegen
+					_delegateCorrelationSet.Add(correlationInfo);
 
-                    // "remove_" wegschneiden
-                    string propertyName = methodCallMessage.MethodName.Substring(7);
+					// Leere Remoting-Antwortnachricht erstellen und zurückgeben
+					return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
+				}
+				else if (methodInfo.ReturnType.Equals(typeof(void)) &&
+					methodCallMessage.InArgCount == 1 &&
+					methodCallMessage.ArgCount == 1 &&
+					methodCallMessage.Args[0] != null &&
+					typeof(Delegate).IsAssignableFrom(methodCallMessage.Args[0].GetType()) &&
+					(methodCallMessage.MethodName.StartsWith("remove_")))
+				{
+					// EBC-Eingangsnachricht abrufen
+					object inputMessage = methodCallMessage.GetArg(0);
 
-                    // Wenn Verdrahtungen gespeichert sind ...
-                    if (_delegateCorrelationSet.Count > 0)
-                    {
-                        // Verdrahtungskonfiguration suchen
-                        DelegateCorrelationInfo found = (from correlationInfo in _delegateCorrelationSet.ToArray()
-                                                         where correlationInfo.DelegateMemberName.Equals(propertyName) && correlationInfo.ClientDelegateInterceptor.ClientDelegate.Equals(inputMessage)
-                                                         select correlationInfo).FirstOrDefault();
+					// "remove_" wegschneiden
+					string propertyName = methodCallMessage.MethodName.Substring(7);
 
-                        // Wenn eine passende Verdrahtungskonfiguration gefunden wurde ...
-                        if (found != null)
-                        {
-                            // Wenn die Serverkomponente SingleCallaktiviert ist ...
-                            if (_activationType == ActivationType.SingleCall)
-                            {
-                                // Verdrahtungskonfiguration entfernen
-                                _delegateCorrelationSet.Remove(found);
-                            }
-                            else
-                            {
-                                // Ereignisabo entfernen
-                                _connection.RemoteComponentFactory.RemoveEventHandler(_interfaceType.FullName, found);
-                            }
-                        }
-                    }
-                    // Leere Remoting-Antwortnachricht erstellen und zurückgeben
-                    return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
-                }
-                else
-                {
-                    // Aufrufkontext vorbereiten
-                    _connection.PrepareCallContext(_implicitTransactionTransfer);
+					// Wenn Verdrahtungen gespeichert sind ...
+					if (_delegateCorrelationSet.Count > 0)
+					{
+						// Verdrahtungskonfiguration suchen
+						DelegateCorrelationInfo found = (from correlationInfo in _delegateCorrelationSet.ToArray()
+														 where correlationInfo.DelegateMemberName.Equals(propertyName) && correlationInfo.ClientDelegateInterceptor.ClientDelegate.Equals(inputMessage)
+														 select correlationInfo).FirstOrDefault();
 
-                    // Entfernten Methodenaufruf durchführen und jede Antwortnachricht sofort über einen Rückkanal empfangen
-                    return InvokeRemoteMethod(methodCallMessage, true);
-                }
-            }
-            catch (Exception ex)
-            {
-                if (_connection.ErrorHandlingEnabled)
-                {
-                    ZyanErrorEventArgs e = new ZyanErrorEventArgs() 
-                    {
-                        Exception = ex,
-                        RemotingMessage = methodCallMessage,
-                        ServerComponentType = _interfaceType,
-                        RemoteMemberName = methodCallMessage.MethodName
-                    };
+						// Wenn eine passende Verdrahtungskonfiguration gefunden wurde ...
+						if (found != null)
+						{
+							// Wenn die Serverkomponente SingleCallaktiviert ist ...
+							if (_activationType == ActivationType.SingleCall)
+							{
+								// Verdrahtungskonfiguration entfernen
+								_delegateCorrelationSet.Remove(found);
+							}
+							else
+							{
+								// Ereignisabo entfernen
+								_connection.RemoteComponentFactory.RemoveEventHandler(_interfaceType.FullName, found);
+							}
+						}
+					}
+					// Leere Remoting-Antwortnachricht erstellen und zurückgeben
+					return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
+				}
+				else
+				{
+					// Aufrufkontext vorbereiten
+					_connection.PrepareCallContext(_implicitTransactionTransfer);
 
-                    _connection.OnError(e);
+					// Entfernten Methodenaufruf durchführen und jede Antwortnachricht sofort über einen Rückkanal empfangen
+					return InvokeRemoteMethod(methodCallMessage, true);
+				}
+			}
+			catch (Exception ex)
+			{
+				if (_connection.ErrorHandlingEnabled)
+				{
+					ZyanErrorEventArgs e = new ZyanErrorEventArgs()
+					{
+						Exception = ex,
+						RemotingMessage = methodCallMessage,
+						ServerComponentType = _interfaceType,
+						RemoteMemberName = methodCallMessage.MethodName
+					};
 
-                    switch (e.Action)
-                    { 
-                        case ZyanErrorAction.ThrowException:
-                            throw ex;
-                        case ZyanErrorAction.Retry:
-                            return Invoke(message);
-                        case ZyanErrorAction.Ignore:
-                            return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
-                    }
-                }
+					_connection.OnError(e);
 
-                throw ex;
-            }
-        }
+					switch (e.Action)
+					{
+						case ZyanErrorAction.ThrowException:
+							throw ex;
+						case ZyanErrorAction.Retry:
+							return Invoke(message);
+						case ZyanErrorAction.Ignore:
+							return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
+					}
+				}
 
-        /// <summary>
-        /// Führt einen entfernten Methodenaufruf aus.
-        /// </summary>
-        /// <param name="methodCallMessage">Remoting-Nachricht mit Details für den entfernten Methodenaufruf</param>
-        /// <param name="allowCallInterception">Gibt an, ob das Abfangen von Aufrufen zugelassen wird, oder nicht</param>
-        /// <returns>Remoting Antwortnachricht</returns>
-        internal IMessage InvokeRemoteMethod(IMethodCallMessage methodCallMessage,bool allowCallInterception)
-        {
-            // Aufrufschlüssel vergeben
-            Guid trackingID = Guid.NewGuid();
+				throw ex;
+			}
+		}
 
-            try
-            {
-                // Variable für Rückgabewert
-                object returnValue = null;
+		/// <summary>
+		/// Führt einen entfernten Methodenaufruf aus.
+		/// </summary>
+		/// <param name="methodCallMessage">Remoting-Nachricht mit Details für den entfernten Methodenaufruf</param>
+		/// <param name="allowCallInterception">Gibt an, ob das Abfangen von Aufrufen zugelassen wird, oder nicht</param>
+		/// <returns>Remoting Antwortnachricht</returns>
+		internal IMessage InvokeRemoteMethod(IMethodCallMessage methodCallMessage, bool allowCallInterception)
+		{
+			// Aufrufschlüssel vergeben
+			Guid trackingID = Guid.NewGuid();
 
-                // Variable für Verdrahtungskorrelationssatz
-                List<DelegateCorrelationInfo> correlationSet = null;
+			try
+			{
+				// Variable für Rückgabewert
+				object returnValue = null;
 
-                // Wenn die Komponente SingleCallaktiviert ist ...
-                if (_activationType == ActivationType.SingleCall)
-                    // Korrelationssatz übernehmen (wird mit übertragen)
-                    correlationSet = _delegateCorrelationSet;
+				// Variable für Verdrahtungskorrelationssatz
+				List<DelegateCorrelationInfo> correlationSet = null;
 
-                // Ereignisargumente für BeforeInvoke erstellen
-                BeforeInvokeEventArgs cancelArgs = new BeforeInvokeEventArgs()
-                {
-                    TrackingID = trackingID,
-                    InterfaceName = _interfaceType.FullName,
-                    DelegateCorrelationSet = correlationSet,
-                    MethodName = methodCallMessage.MethodName,
-                    Arguments = methodCallMessage.Args,
-                    Cancel = false
-                };
-                // BeforeInvoke-Ereignis feuern
-                _connection.OnBeforeInvoke(cancelArgs);
+				// Wenn die Komponente SingleCallaktiviert ist ...
+				if (_activationType == ActivationType.SingleCall)
+					// Korrelationssatz übernehmen (wird mit übertragen)
+					correlationSet = _delegateCorrelationSet;
 
-                // Wenn der Aufruf abgebrochen werden soll ...
-                if (cancelArgs.Cancel)
-                {
-                    // Wenn keine Abbruchausnahme definiert ist ...
-                    if (cancelArgs.CancelException == null)
-                        // Standard-Abbruchausnahme erstellen
-                        cancelArgs.CancelException = new InvokeCanceledException();
+				// Ereignisargumente für BeforeInvoke erstellen
+				BeforeInvokeEventArgs cancelArgs = new BeforeInvokeEventArgs()
+				{
+					TrackingID = trackingID,
+					InterfaceName = _interfaceType.FullName,
+					DelegateCorrelationSet = correlationSet,
+					MethodName = methodCallMessage.MethodName,
+					Arguments = methodCallMessage.Args,
+					Cancel = false
+				};
+				// BeforeInvoke-Ereignis feuern
+				_connection.OnBeforeInvoke(cancelArgs);
 
-                    // InvokeCanceled-Ereignis feuern
-                    _connection.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = cancelArgs.CancelException });
+				// Wenn der Aufruf abgebrochen werden soll ...
+				if (cancelArgs.Cancel)
+				{
+					// Wenn keine Abbruchausnahme definiert ist ...
+					if (cancelArgs.CancelException == null)
+						// Standard-Abbruchausnahme erstellen
+						cancelArgs.CancelException = new InvokeCanceledException();
 
-                    // Abbruchausnahme werfen
-                    throw cancelArgs.CancelException;
-                }
-                // Parametertypen ermitteln
-                ParameterInfo[] paramDefs = methodCallMessage.MethodBase.GetParameters();
-                                                    
-                // Abfragen, ob Abfangvorrichtungen verarbeitet werden sollen
-                bool callInterception = _connection.CallInterceptionEnabled && allowCallInterception;
+					// InvokeCanceled-Ereignis feuern
+					_connection.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = cancelArgs.CancelException });
 
-                // Wenn Aufrufabfangvorrichtungen verarbeitet werden sollen ...
-                if (callInterception)
-                {
-                    // Passende Aufrufabfangvorrichtung suchen
-                    CallInterceptor interceptor = _connection.CallInterceptors.FindMatchingInterceptor(_interfaceType, methodCallMessage);
+					// Abbruchausnahme werfen
+					throw cancelArgs.CancelException;
+				}
+				// Parametertypen ermitteln
+				ParameterInfo[] paramDefs = methodCallMessage.MethodBase.GetParameters();
 
-                    // Wenn eine passende Aufrufabfangvorrichtung gefunden wurde ...
-                    if (interceptor != null)
-                    { 
-                        // Aufrufdaten zusammenstellen
-                        CallInterceptionData interceptionData = new CallInterceptionData(methodCallMessage.Args,new InvokeRemoteMethodDelegate(this.InvokeRemoteMethod),methodCallMessage);
+				// Abfragen, ob Abfangvorrichtungen verarbeitet werden sollen
+				bool callInterception = _connection.CallInterceptionEnabled && allowCallInterception;
 
-                        // Wenn ein Delegat für die Behandlung der Abfangaktion hinterlegt ist ...
-                        if (interceptor.OnInterception != null)                             
-                            // Aufruf abfangen
-                            interceptor.OnInterception(interceptionData);
-                            
-                        // Wenn der Aufruf abgefangen wurde ...
-                        if (interceptionData.Intercepted)
-                            // Rückgabewert übernehmen
-                            returnValue = interceptionData.ReturnValue;
-                        else
-                            // Schalter für Aufrufabfangverarbeitung zurücksetzen
-                            callInterception = false;
-                    }
-                }                    
-                // Wenn der Aufruf nicht abgefangen wurde ...
-                if (!callInterception)
-                {
-                    try
-                    {
-                        // Ggf. Delegaten-Parameter abfangen
-                        object[] checkedArgs = InterceptDelegateParameters(methodCallMessage);
+				// Wenn Aufrufabfangvorrichtungen verarbeitet werden sollen ...
+				if (callInterception)
+				{
+					// Passende Aufrufabfangvorrichtung suchen
+					CallInterceptor interceptor = _connection.CallInterceptors.FindMatchingInterceptor(_interfaceType, methodCallMessage);
 
-                        // Entfernten Methodenaufruf durchführen
-                        returnValue = _remoteInvoker.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, paramDefs, checkedArgs);
+					// Wenn eine passende Aufrufabfangvorrichtung gefunden wurde ...
+					if (interceptor != null)
+					{
+						// Aufrufdaten zusammenstellen
+						CallInterceptionData interceptionData = new CallInterceptionData(methodCallMessage.Args, new InvokeRemoteMethodDelegate(this.InvokeRemoteMethod), methodCallMessage);
 
-                        // Ereignisargumente für AfterInvoke erstellen
-                        AfterInvokeEventArgs afterInvokeArgs = new AfterInvokeEventArgs()
-                        {
-                            TrackingID = trackingID,
-                            InterfaceName = _interfaceType.FullName,
-                            DelegateCorrelationSet = correlationSet,
-                            MethodName = methodCallMessage.MethodName,
-                            Arguments = methodCallMessage.Args,
-                            ReturnValue = returnValue
-                        };
-                        // AfterInvoke-Ereignis feuern
-                        _connection.OnAfterInvoke(afterInvokeArgs);
-                    }                 
-                    catch (InvalidSessionException)
-                    {
-                        // Wenn automatisches Anmelden bei abgelaufener Sitzung aktiviert ist ...
-                        if (_autoLoginOnExpiredSession)
-                        {
-                            // Neu anmelden
-                            _remoteInvoker.Logon(_sessionID, _autoLoginCredentials);
+						// Wenn ein Delegat für die Behandlung der Abfangaktion hinterlegt ist ...
+						if (interceptor.OnInterception != null)
+							// Aufruf abfangen
+							interceptor.OnInterception(interceptionData);
 
-                            // Entfernten Methodenaufruf erneut versuchen                        
-                            returnValue = _remoteInvoker.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, paramDefs, methodCallMessage.Args);
-                        }                    
-                    }                    
-                }                
-                // Versuchen den Rückgabewert in einen Serialisierungscontainer zu casten
-                CustomSerializationContainer container = returnValue as CustomSerializationContainer;
+						// Wenn der Aufruf abgefangen wurde ...
+						if (interceptionData.Intercepted)
+							// Rückgabewert übernehmen
+							returnValue = interceptionData.ReturnValue;
+						else
+							// Schalter für Aufrufabfangverarbeitung zurücksetzen
+							callInterception = false;
+					}
+				}
+				// Wenn der Aufruf nicht abgefangen wurde ...
+				if (!callInterception)
+				{
+					try
+					{
+						// Ggf. Delegaten-Parameter abfangen
+						object[] checkedArgs = InterceptDelegateParameters(methodCallMessage);
 
-                // Wenn der aktuelle Parameter ein Serialisierungscontainer ist ...
-                if (container != null)
-                {
-                    // Passenden Serialisierungshandler suchen                        
-                    ISerializationHandler serializationHandler = _connection.SerializationHandling[container.HandledType];
+						// Entfernten Methodenaufruf durchführen
+						returnValue = _remoteInvoker.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, paramDefs, checkedArgs);
 
-                    // Wenn kein passender Serialisierungshandler registriert ist ...
-                    if (serializationHandler == null)
-                        // Ausnahme werfen
-                        throw new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_SerializationHandlerNotFound, container.HandledType.FullName));
+						// Ereignisargumente für AfterInvoke erstellen
+						AfterInvokeEventArgs afterInvokeArgs = new AfterInvokeEventArgs()
+						{
+							TrackingID = trackingID,
+							InterfaceName = _interfaceType.FullName,
+							DelegateCorrelationSet = correlationSet,
+							MethodName = methodCallMessage.MethodName,
+							Arguments = methodCallMessage.Args,
+							ReturnValue = returnValue
+						};
+						// AfterInvoke-Ereignis feuern
+						_connection.OnAfterInvoke(afterInvokeArgs);
+					}
+					catch (InvalidSessionException)
+					{
+						// Wenn automatisches Anmelden bei abgelaufener Sitzung aktiviert ist ...
+						if (_autoLoginOnExpiredSession)
+						{
+							// Neu anmelden
+							_remoteInvoker.Logon(_sessionID, _autoLoginCredentials);
 
-                    // Deserialisierung durchführen
-                    returnValue = serializationHandler.Deserialize(container.DataType, container.Data);
-                }
-                // Remoting-Antwortnachricht erstellen und zurückgeben
-                return new ReturnMessage(returnValue, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
-            }
-            catch (Exception ex)
-            {
-                if (_connection.ErrorHandlingEnabled)
-                    throw ex;
-                else
-                    return new ReturnMessage(ex, methodCallMessage);
-            }            
-        }
+							// Entfernten Methodenaufruf erneut versuchen                        
+							returnValue = _remoteInvoker.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, paramDefs, methodCallMessage.Args);
+						}
+					}
+				}
+				// Versuchen den Rückgabewert in einen Serialisierungscontainer zu casten
+				CustomSerializationContainer container = returnValue as CustomSerializationContainer;
 
-        /// <summary>
-        /// Ersetzt Delegaten-Parameter einer Remoting-Nachricht durch eine entsprechende Delegaten-Abfangvorrichtung.
-        /// </summary>
-        /// <param name="message">Remoting-Nachricht</param>
-        /// <returns>argumentliste</returns>
-        private object[] InterceptDelegateParameters(IMethodCallMessage message)
-        { 
-            // Argument-Array erzeugen
-            object[] result = new object[message.ArgCount];
+				// Wenn der aktuelle Parameter ein Serialisierungscontainer ist ...
+				if (container != null)
+				{
+					// Passenden Serialisierungshandler suchen                        
+					ISerializationHandler serializationHandler = _connection.SerializationHandling[container.HandledType];
 
-            // Parametertypen ermitteln
-            ParameterInfo[] paramDefs = message.MethodBase.GetParameters();
+					// Wenn kein passender Serialisierungshandler registriert ist ...
+					if (serializationHandler == null)
+						// Ausnahme werfen
+						throw new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_SerializationHandlerNotFound, container.HandledType.FullName));
 
-            // Alle Parameter durchlaufen
-            for (int i = 0; i < message.ArgCount; i++)
-            { 
-                // Parameter abrufen
-                object arg = message.Args[i];
+					// Deserialisierung durchführen
+					returnValue = serializationHandler.Deserialize(container.DataType, container.Data);
+				}
+				// Remoting-Antwortnachricht erstellen und zurückgeben
+				return new ReturnMessage(returnValue, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
+			}
+			catch (Exception ex)
+			{
+				if (_connection.ErrorHandlingEnabled)
+					throw ex;
+				else
+					return new ReturnMessage(ex, methodCallMessage);
+			}
+		}
 
-                // Wenn der aktuelle Parameter ein Delegat ist ...
-                if (arg != null && typeof(Delegate).IsAssignableFrom(arg.GetType()))
-                {
-                    // Abfangvorrichtung erzeugen
-                    DelegateInterceptor interceptor = new DelegateInterceptor()
-                    {
-                        ClientDelegate = arg
-                    };
-                    // Original-Parameter durch Abfangvorrichting in der Remoting-Nachricht ersetzen
-                    result[i] = interceptor;
-                }
-                else
-                {
-                    // Typ des Parameters abfragen
-                    Type argType = paramDefs[i].ParameterType;
+		/// <summary>
+		/// Ersetzt Delegaten-Parameter einer Remoting-Nachricht durch eine entsprechende Delegaten-Abfangvorrichtung.
+		/// </summary>
+		/// <param name="message">Remoting-Nachricht</param>
+		/// <returns>argumentliste</returns>
+		private object[] InterceptDelegateParameters(IMethodCallMessage message)
+		{
+			// Argument-Array erzeugen
+			object[] result = new object[message.ArgCount];
 
-                    // Passenden Serialisierungshandler suchen
-                    Type handledType;
-                    ISerializationHandler handler;
-                    _connection.SerializationHandling.FindMatchingSerializationHandler(argType,out handledType,out handler);
+			// Parametertypen ermitteln
+			ParameterInfo[] paramDefs = message.MethodBase.GetParameters();
 
-                    // Wenn für diesen Typ ein passender Serialisierungshandler registriert ist ...
-                    if (handler != null)
-                    {   
-                        // Serialisierung durchführen
-                        byte[] raw = handler.Serialize(arg);
+			// Alle Parameter durchlaufen
+			for (int i = 0; i < message.ArgCount; i++)
+			{
+				// Parameter abrufen
+				object arg = message.Args[i];
 
-                        // Parameter durch Serialisierungscontainer ersetzen
-                        result[i] = new CustomSerializationContainer(handledType, argType, raw);
-                    }
-                    else
-                        // 1:1
-                        result[i] = arg;
-                }
-            }
-            // Arument-Array zurückgeben
-            return result;
-        }
-    }
+				// Wenn der aktuelle Parameter ein Delegat ist ...
+				if (arg != null && typeof(Delegate).IsAssignableFrom(arg.GetType()))
+				{
+					// Abfangvorrichtung erzeugen
+					DelegateInterceptor interceptor = new DelegateInterceptor()
+					{
+						ClientDelegate = arg
+					};
+					// Original-Parameter durch Abfangvorrichting in der Remoting-Nachricht ersetzen
+					result[i] = interceptor;
+				}
+				else
+				{
+					// Typ des Parameters abfragen
+					Type argType = paramDefs[i].ParameterType;
+
+					// Passenden Serialisierungshandler suchen
+					Type handledType;
+					ISerializationHandler handler;
+					_connection.SerializationHandling.FindMatchingSerializationHandler(argType, out handledType, out handler);
+
+					// Wenn für diesen Typ ein passender Serialisierungshandler registriert ist ...
+					if (handler != null)
+					{
+						// Serialisierung durchführen
+						byte[] raw = handler.Serialize(arg);
+
+						// Parameter durch Serialisierungscontainer ersetzen
+						result[i] = new CustomSerializationContainer(handledType, argType, raw);
+					}
+					else
+						// 1:1
+						result[i] = arg;
+				}
+			}
+			// Arument-Array zurückgeben
+			return result;
+		}
+	}
 }
 

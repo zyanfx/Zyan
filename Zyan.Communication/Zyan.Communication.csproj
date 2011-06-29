@@ -112,6 +112,7 @@
     <Compile Include="InterLinq\Communication\ZyanQueryHandler.cs" />
     <Compile Include="InterLinq\Communication\ZyanServerQueryHandler.cs" />
     <Compile Include="InterLinq\Expressions\ExpressionConversionHelper.cs" />
+    <Compile Include="InterLinq\Expressions\ExpressionSerializationHandler.cs" />
     <Compile Include="InterLinq\Expressions\Helpers\ExpressionConverter.cs" />
     <Compile Include="InterLinq\Expressions\Helpers\ExpressionVisitor.cs" />
     <Compile Include="InterLinq\Expressions\Helpers\RewriteExpressionVisitor.cs" />
@@ -244,7 +245,9 @@
     <Compile Include="Toolbox\TransactionStarter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="LanguageResource.de.resx" />
+    <EmbeddedResource Include="LanguageResource.de.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="LanguageResource.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>LanguageResource.Designer.cs</LastGenOutput>
