@@ -52,16 +52,6 @@ namespace Zyan.InterLinq
 			return (IQueryable)genericGetTableMethod.Invoke(this, new object[0]);
 		}
 
-		public IQueryable GetTable(Type type)
-		{
-			return Get(type);
-		}
-
-		public IQueryable<T> GetTable<T>() where T : class
-		{
-			return Get<T>();
-		}
-
 		public bool CloseSession()
 		{
 			return true;

@@ -38,7 +38,19 @@ namespace Zyan.Communication.Composition
 			var key = CompositionConstants.PartCreationPolicyMetadataName;
 
 			// Condition: CreationPolicy == NonShared
-			return md.ContainsKey(key) && ((CreationPolicy)md[key]) == CreationPolicy.NonShared;
+			return md.ContainsKey(key) && (CreationPolicy)md[key] == CreationPolicy.NonShared;
+		}
+
+		/// <summary>
+		/// Returns true if part definition uses NonShared or Any creation policy
+		/// </summary>
+		public static bool IsNonSharedOrAny(this ComposablePartDefinition def)
+		{
+			var md = def.Metadata;
+			var key = CompositionConstants.PartCreationPolicyMetadataName;
+
+			// Condition: CreationPolicy is not specified or is either Any or NonShared
+			return !md.ContainsKey(key) || (CreationPolicy)md[key] == CreationPolicy.Any || def.IsNonShared();
 		}
 	}
 }

@@ -20,7 +20,7 @@ namespace Zyan.Communication.Composition
 		{
 			ParentCatalog = parent;
 			ParentNotificationSource = parent as INotifyComposablePartCatalogChanged;
-			PartsQuery = ParentCatalog.Parts.Where(def => def.IsNonShared());
+			PartsQuery = ParentCatalog.Parts.Where(def => def.IsNonSharedOrAny());
 		}
 
 		public override IQueryable<ComposablePartDefinition> Parts
