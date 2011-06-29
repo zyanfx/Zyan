@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
-  <Class Name="InterLinq.Types.Anonymous.AnonymousMetaType">
+  <Class Name="Zyan.InterLinq.Types.Anonymous.AnonymousMetaType">
     <Position X="0.5" Y="0.5" Width="4.25" />
     <Members>
       <Method Name="AddDebuggerHiddenAttribute" Hidden="true" />
@@ -32,14 +32,14 @@
       <Property Name="MetaProperties" />
     </ShowAsCollectionAssociation>
   </Class>
-  <Class Name="InterLinq.Types.Anonymous.AnonymousMetaProperty">
+  <Class Name="Zyan.InterLinq.Types.Anonymous.AnonymousMetaProperty">
     <Position X="1.25" Y="3.5" Width="3.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAgAAAAAQAAAAAAIAAAAACAAAAAAA=</HashCode>
       <FileName>Types\Anonymous\AnonymousMetaProperty.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="InterLinq.Types.Anonymous.AnonymousObject">
+  <Class Name="Zyan.InterLinq.Types.Anonymous.AnonymousObject">
     <Position X="5.25" Y="0.5" Width="4" />
     <AssociationLine Name="Properties" Type="InterLinq.Types.Anonymous.AnonymousProperty" FixedToPoint="true">
       <Path>
@@ -58,7 +58,7 @@
       <Property Name="Properties" />
     </ShowAsCollectionAssociation>
   </Class>
-  <Class Name="InterLinq.Types.Anonymous.AnonymousProperty">
+  <Class Name="Zyan.InterLinq.Types.Anonymous.AnonymousProperty">
     <Position X="6.25" Y="3" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAEAAAAAAQAAAAAAAAAAAAgAAAAAAA=</HashCode>

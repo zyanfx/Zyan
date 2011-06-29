@@ -55,7 +55,7 @@ namespace Zyan.Communication
 			Parse(expression, out memberType, out memberName);
 
 			Interceptors.Add(new CallInterceptor(typeof(T),
-				memberType, memberName, new Type[0], 
+				memberType, memberName, new Type[0],
 				data =>
 				{
 					data.ReturnValue = handler(data);
