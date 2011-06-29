@@ -25,28 +25,6 @@ namespace Zyan.InterLinq
 		/// <summary>
 		/// Returns an <see cref="IQueryable{T}"/>.
 		/// </summary>
-		/// <typeparam name="T">Type of the returned <see cref="IQueryable{T}"/>.</typeparam>
-		/// <returns>Returns an <see cref="IQueryable{T}"/>.</returns>
-		/// <seealso cref="IQueryHandler.Get{T}"/>
-		public virtual IQueryable<T> GetTable<T>() where T : class
-		{
-			return Get<T>();
-		}
-
-		/// <summary>
-		/// Returns an <see cref="IQueryable"/>.
-		/// </summary>
-		/// <param name="type">Type contained in the returned <see cref="IQueryable"/>.</param>
-		/// <returns>Returns an <see cref="IQueryable"/>.</returns>
-		/// <seealso cref="IQueryHandler.Get"/>
-		public virtual IQueryable GetTable(Type type)
-		{
-			return Get(type);
-		}
-
-		/// <summary>
-		/// Returns an <see cref="IQueryable{T}"/>.
-		/// </summary>
 		/// <param name="type">Type of the returned <see cref="IQueryable{T}"/>.</param>
 		/// <returns>Returns an <see cref="IQueryable{T}"/>.</returns>
 		public IQueryable Get(Type type)

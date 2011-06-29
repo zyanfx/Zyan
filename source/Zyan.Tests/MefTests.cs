@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Zyan.Communication;
 using Zyan.Communication.Composition;
 using System.Collections.Generic;
+using Zyan.InterLinq;
 
 namespace Zyan.Tests
 {
@@ -17,7 +18,7 @@ namespace Zyan.Tests
 	[TestClass]
 	public class MefTests
 	{
-		#region Interfaces and classes
+		#region Interfaces and components
 
 		/// <summary>
 		/// Sample interface
@@ -27,10 +28,9 @@ namespace Zyan.Tests
 		}
 
 		/// <summary>
-		/// Recommended component registration: ZyanComponent attribute, NonShared creation policy.
+		/// Recommended component registration: ZyanComponent attribute, creation policy not specified (Zyan implies non-shared creation policy).
 		/// </summary>
 		[ZyanComponent(typeof(IMefSample))]
-		[PartCreationPolicy(CreationPolicy.NonShared)]
 		public class MefSample1 : IMefSample, IDisposable
 		{
 			static int instanceCount = 0;
@@ -50,10 +50,9 @@ namespace Zyan.Tests
 		}
 
 		/// <summary>
-		/// Recommended component registration: named ZyanComponent attribute, NonShared creation policy.
+		/// Recommended component registration: named ZyanComponent attribute, creation policy not specified.
 		/// </summary>
 		[ZyanComponent("UniqueName_MefSample2", typeof(IMefSample))]
-		[PartCreationPolicy(CreationPolicy.NonShared)]
 		public class MefSample2 : IMefSample, IDisposable
 		{
 			static int instanceCount = 0;
@@ -77,7 +76,6 @@ namespace Zyan.Tests
 		/// </summary>
 		[Export("UniqueName_MefSample3", typeof(IMefSample))]
 		[ExportMetadata("ComponentInterface", typeof(IMefSample))]
-		[PartCreationPolicy(CreationPolicy.NonShared)]
 		public class MefSample3 : IMefSample, IDisposable
 		{
 			static int instanceCount = 0;
@@ -103,7 +101,6 @@ namespace Zyan.Tests
 		[Export("UniqueName_MefSample4", typeof(IMefSample))]
 		[ExportMetadata("ComponentInterface", typeof(IMefSample))]
 		[ExportMetadata("IsPublished", false)]
-		[PartCreationPolicy(CreationPolicy.NonShared)]
 		public class MefSample4 : IMefSample
 		{
 		}
@@ -119,9 +116,8 @@ namespace Zyan.Tests
 
 		/// <summary>
 		/// Zyan-agnostic component registration: standard InheritedExport and ExportMetadata attributes.
-		/// This component is published even if no attributes are attached to it.
+		/// This component is published even though no attributes are attached to it.
 		/// </summary>
-		[PartCreationPolicy(CreationPolicy.NonShared)]
 		public class MefSample5 : IMefSample5, IDisposable
 		{
 			static int instanceCount = 0;
@@ -169,9 +165,8 @@ namespace Zyan.Tests
 
 		/// <summary>
 		/// Alternative registration: class implements interface decorated with ZyanInterface attribute.
-		/// This component is published even if no attributes are attached to it.
+		/// This component is published even though no attributes are attached to it.
 		/// </summary>
-		[PartCreationPolicy(CreationPolicy.NonShared)]
 		public class MefSample7 : IMefSample7, IDisposable
 		{
 			static int instanceCount = 0;
@@ -201,9 +196,8 @@ namespace Zyan.Tests
 
 		/// <summary>
 		/// Alternative registration: class implements interface decorated with named ZyanInterface attribute.
-		/// This component is published even if no attributes are attached to it.
+		/// This component is published even though no attributes are attached to it.
 		/// </summary>
-		[PartCreationPolicy(CreationPolicy.NonShared)]
 		public class MefSample8 : IMefSample8, IDisposable
 		{
 			static int instanceCount = 0;
@@ -211,6 +205,84 @@ namespace Zyan.Tests
 			public static int InstanceCount { get { return instanceCount; } }
 
 			public MefSample8()
+			{
+				Interlocked.Increment(ref instanceCount);
+			}
+
+			public void Dispose()
+			{
+				GC.SuppressFinalize(this);
+				Interlocked.Decrement(ref instanceCount);
+			}
+		}
+
+		/// <summary>
+		/// Component uses Shared creation policy and acts as a singleton.
+		/// It is disposed together with root CompositionContainer.
+		/// </summary>
+		[ZyanComponent("UniqueName_MefSample9", typeof(IMefSample))]
+		[PartCreationPolicy(CreationPolicy.Shared)]
+		public class MefSample9 : IMefSample, IDisposable
+		{
+			static int instanceCount = 0;
+
+			public static int InstanceCount { get { return instanceCount; } }
+
+			public MefSample9()
+			{
+				Interlocked.Increment(ref instanceCount);
+			}
+
+			public void Dispose()
+			{
+				GC.SuppressFinalize(this);
+				Interlocked.Decrement(ref instanceCount);
+			}
+		}
+
+		/// <summary>
+		/// Queryable component is registered as IQueryRemoteHandler.
+		/// </summary>
+		[ZyanComponent("UniqueName_MefSample10", typeof(IEntitySource))]
+		public class MefSample10 : IEntitySource, IDisposable
+		{
+			public IQueryable<T> Get<T>() where T : class
+			{
+				throw new NotImplementedException();
+			}
+
+			static int instanceCount = 0;
+
+			public static int InstanceCount { get { return instanceCount; } }
+
+			public MefSample10()
+			{
+				Interlocked.Increment(ref instanceCount);
+			}
+
+			public void Dispose()
+			{
+				GC.SuppressFinalize(this);
+				Interlocked.Decrement(ref instanceCount);
+			}
+		}
+
+		/// <summary>
+		/// Queryable component is registered as IQueryRemoteHandler.
+		/// </summary>
+		[ZyanComponent("UniqueName_MefSample11", typeof(IObjectSource))]
+		public class MefSample11 : IObjectSource, IDisposable
+		{
+			public IEnumerable<T> Get<T>() where T : class
+			{
+				throw new NotImplementedException();
+			}
+
+			static int instanceCount = 0;
+
+			public static int InstanceCount { get { return instanceCount; } }
+
+			public MefSample11()
 			{
 				Interlocked.Increment(ref instanceCount);
 			}
@@ -549,6 +621,90 @@ namespace Zyan.Tests
 			// clean up component instance
 			cat.CleanUpComponentInstance(reg, obj);
 			Assert.AreEqual(0, MefSample8.InstanceCount);
+		}
+
+		[TestMethod]
+		public void SharedZyanComponentFromMefCatalog_IsRegistered()
+		{
+			var cat = new ComponentCatalog();
+			cat.RegisterComponents(MefCatalog);
+
+			// get component registration
+			var reg = cat.GetRegistration("UniqueName_MefSample9");
+			Assert.IsNotNull(reg);
+
+			// get component instance
+			var obj = cat.GetComponent("UniqueName_MefSample9") as IMefSample;
+			Assert.IsNotNull(obj);
+			Assert.IsInstanceOfType(obj, typeof(MefSample9));
+			Assert.AreNotEqual(0, MefSample9.InstanceCount);
+
+			// clean up component instance
+			cat.CleanUpComponentInstance(reg, obj);
+			Assert.AreNotEqual(0, MefSample9.InstanceCount);
+		}
+
+		[TestMethod]
+		public void SharedZyanComponentFromMefContainer_IsRegistered()
+		{
+			var cat = new ComponentCatalog();
+			cat.RegisterComponents(MefContainer);
+
+			// get component registration
+			var reg = cat.GetRegistration("UniqueName_MefSample9");
+			Assert.IsNotNull(reg);
+
+			// get component instance
+			var obj = cat.GetComponent("UniqueName_MefSample9") as IMefSample;
+			Assert.IsNotNull(obj);
+			Assert.IsInstanceOfType(obj, typeof(MefSample9));
+			Assert.AreNotEqual(0, MefSample9.InstanceCount);
+
+			// clean up component instance
+			cat.CleanUpComponentInstance(reg, obj);
+			Assert.AreNotEqual(0, MefSample9.InstanceCount);
+		}
+
+		[TestMethod]
+		public void IEntitySourceFromMefContainer_IsRegisteredAsQueryRemoteHandler()
+		{
+			var cat = new ComponentCatalog();
+			cat.RegisterComponents(MefContainer);
+
+			// get component registration
+			var reg = cat.GetRegistration("UniqueName_MefSample10");
+			Assert.IsNotNull(reg);
+
+			// get component instance
+			var obj = cat.GetComponent("UniqueName_MefSample10") as IQueryRemoteHandler;
+			Assert.IsNotNull(obj);
+			Assert.IsInstanceOfType(obj, typeof(ZyanServerQueryHandler));
+			Assert.AreEqual(1, MefSample10.InstanceCount);
+
+			// clean up component instance
+			cat.CleanUpComponentInstance(reg, obj);
+			Assert.AreEqual(0, MefSample10.InstanceCount);
+		}
+
+		[TestMethod]
+		public void IObjectSourceFromMefContainer_IsRegisteredAsQueryRemoteHandler()
+		{
+			var cat = new ComponentCatalog();
+			cat.RegisterComponents(MefContainer);
+
+			// get component registration
+			var reg = cat.GetRegistration("UniqueName_MefSample11");
+			Assert.IsNotNull(reg);
+
+			// get component instance
+			var obj = cat.GetComponent("UniqueName_MefSample11") as IQueryRemoteHandler;
+			Assert.IsNotNull(obj);
+			Assert.IsInstanceOfType(obj, typeof(ZyanServerQueryHandler));
+			Assert.AreEqual(1, MefSample11.InstanceCount);
+
+			// clean up component instance
+			cat.CleanUpComponentInstance(reg, obj);
+			Assert.AreEqual(0, MefSample11.InstanceCount);
 		}
 	}
 }

@@ -10,21 +10,21 @@ namespace Zyan.InterLinq
 	/// <example>
 	/// The following code illustrates a possible implementation of <see cref="InterLinqContext"/>.
 	/// <code>
-	///     public class CompanyContext : InterLinqContext {
-	///        public CompanyContext( IQueryHandler queryHandler ) : base( queryHandler ) { }
-	///       
-	///         public IQueryable&lt;Company&gt; Companies {
-	///             get { return QueryHander.GetTable&lt;Company&gt;(); }
-	///         }
-	///     
-	///         public IQueryable&lt;Company&gt; Departments {
-	///             get { return QueryHander.GetTable&lt;Departments&gt;(); }
-	///         }
-	///     
-	///         public IQueryable&lt;Company&gt; Employees {
-	///             get { return QueryHander.GetTable&lt;Employee&gt;(); }
-	///         }
-	///     }
+	///	public class CompanyContext : InterLinqContext {
+	///		public CompanyContext(IQueryHandler queryHandler) : base(queryHandler) { }
+	///
+	///		public IQueryable&lt;Company&gt; Companies {
+	///			get { return QueryHander.Get&lt;Company&gt;(); }
+	///		}
+	///
+	///		public IQueryable&lt;Company&gt; Departments {
+	///			get { return QueryHander.Get&lt;Departments&gt;(); }
+	///		}
+	///
+	///		public IQueryable&lt;Company&gt; Employees {
+	///			get { return QueryHander.Get&lt;Employee&gt;(); }
+	///		}
+	///	}
 	/// </code>
 	/// </example>
 	public abstract class InterLinqContext
