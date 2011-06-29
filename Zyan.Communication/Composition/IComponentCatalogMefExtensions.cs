@@ -115,7 +115,13 @@ namespace Zyan.Communication.Composition
 		{
 			// zyanServerQueryHandler -> owning container
 			var containers = new ConcurrentDictionary<object, CompositionContainer>();
-			var uniqueName = contractName ?? typeof(I).FullName;
+			var uniqueName = contractName ?? typeof(IQueryRemoteHandler).FullName;
+
+			// MEF's default contract name is set to the type full name, which is not convenient for the queryable components
+			if (uniqueName == typeof(IObjectSource).FullName || uniqueName == typeof(IEntitySource).FullName)
+			{
+				uniqueName = typeof(IQueryRemoteHandler).FullName;
+			}
 
 			// ZyanServerQueryHandler factory for the given object or entity source
 			var createZyanServerQueryHandler = GetZyanServerQueryHandlerFactory<I>();
