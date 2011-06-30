@@ -294,6 +294,14 @@ namespace Zyan.Communication
 					// Abbruchausnahme werfen
 					throw cancelArgs.CancelException;
 				}
+
+				// Prepare generic method arguments
+				Type[] genericArgs = null;
+				if (methodCallMessage.MethodBase.IsGenericMethod)
+				{
+					genericArgs = methodCallMessage.MethodBase.GetGenericArguments();
+				}
+
 				// Parametertypen ermitteln
 				ParameterInfo[] paramDefs = methodCallMessage.MethodBase.GetParameters();
 
@@ -335,7 +343,7 @@ namespace Zyan.Communication
 						object[] checkedArgs = InterceptDelegateParameters(methodCallMessage);
 
 						// Entfernten Methodenaufruf durchführen
-						returnValue = _remoteInvoker.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, paramDefs, checkedArgs);
+						returnValue = _remoteInvoker.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, genericArgs, paramDefs, checkedArgs);
 
 						// Ereignisargumente für AfterInvoke erstellen
 						AfterInvokeEventArgs afterInvokeArgs = new AfterInvokeEventArgs()
@@ -358,8 +366,8 @@ namespace Zyan.Communication
 							// Neu anmelden
 							_remoteInvoker.Logon(_sessionID, _autoLoginCredentials);
 
-							// Entfernten Methodenaufruf erneut versuchen                        
-							returnValue = _remoteInvoker.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, paramDefs, methodCallMessage.Args);
+							// Entfernten Methodenaufruf erneut versuchen
+							returnValue = _remoteInvoker.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, genericArgs, paramDefs, methodCallMessage.Args);
 						}
 					}
 				}
@@ -369,7 +377,7 @@ namespace Zyan.Communication
 				// Wenn der aktuelle Parameter ein Serialisierungscontainer ist ...
 				if (container != null)
 				{
-					// Passenden Serialisierungshandler suchen                        
+					// Passenden Serialisierungshandler suchen
 					ISerializationHandler serializationHandler = _connection.SerializationHandling[container.HandledType];
 
 					// Wenn kein passender Serialisierungshandler registriert ist ...
