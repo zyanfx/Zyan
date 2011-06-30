@@ -20,9 +20,9 @@ namespace Zyan.Communication
 		/// <param name="delegateCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Delegaten und Ereignisse mit entfernten Methoden</param>
 		/// <param name="methodName">Methodenname</param>
 		/// <param name="paramDefs">Parameter-Definitionen</param>
-		/// <param name="args">Parameter</param>        
+		/// <param name="args">Parameter</param>
 		/// <returns>Rückgabewert</returns>
-		object Invoke(Guid trackingID, string interfaceName, List<DelegateCorrelationInfo> delegateCorrelationSet, string methodName, ParameterInfo[] paramDefs, params object[] args);
+		object Invoke(Guid trackingID, string interfaceName, List<DelegateCorrelationInfo> delegateCorrelationSet, string methodName, Type[] genericArguments, ParameterInfo[] paramDefs, params object[] args);
 
 		/// <summary>
 		/// Gibt eine Liste mit allen registrierten Komponenten zurück.
