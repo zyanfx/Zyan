@@ -13,6 +13,8 @@ namespace Zyan.Tests
 	[TestClass]
 	public class OneWayTests
 	{
+		#region Interfaces and components
+
 		/// <summary>
 		/// Sample server interface
 		/// </summary>
@@ -71,6 +73,8 @@ namespace Zyan.Tests
 				}
 			}
 		}
+
+		#endregion
 
 		public TestContext TestContext { get; set; }
 

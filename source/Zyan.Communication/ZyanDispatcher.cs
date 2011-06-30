@@ -236,7 +236,7 @@ namespace Zyan.Communication
 		/// <param name="paramDefs">Reflection info of parameter types</param>
 		/// <param name="args">Parameter values</param>        
 		/// <returns>Return value</returns>
-		public object Invoke(Guid trackingID, string interfaceName, List<DelegateCorrelationInfo> delegateCorrelationSet, string methodName, ParameterInfo[] paramDefs, params object[] args)
+		public object Invoke(Guid trackingID, string interfaceName, List<DelegateCorrelationInfo> delegateCorrelationSet, string methodName, Type[] genericArguments, ParameterInfo[] paramDefs, params object[] args)
 		{
 			if (string.IsNullOrEmpty(interfaceName))
 				throw new ArgumentException(LanguageResource.ArgumentException_InterfaceNameMissing, "interfaceName");
@@ -353,7 +353,7 @@ namespace Zyan.Communication
 
 			try
 			{
-				var methodInfo = type.GetMethod(methodName, types);
+				var methodInfo = type.GetMethod(methodName, genericArguments, types);
 				if (methodInfo == null)
 				{
 					var methodSignature = MessageHelpers.GetMethodSignature(type, methodName, types);
