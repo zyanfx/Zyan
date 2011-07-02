@@ -22,3 +22,4 @@ using System.Runtime.InteropServices;
 // Die folgende GUID bestimmt die Kennung der Typbibliothek, wenn dieses Projekt für COM verfügbar gemacht wird
 [assembly: Guid("ab560415-a517-4c22-b197-2397910b170b")]
 [assembly: InternalsVisibleTo("Zyan.Tests")]
+[assembly: InternalsVisibleTo("Zyan.Tests.NUnit")]

@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTest_Distributed
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Communication.Fx3", "Zyan.Communication\Zyan.Communication.Fx3.csproj", "{260A24A8-69CF-4F36-8665-C6376F7BA16E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Tests.NUnit", "Zyan.Tests\Zyan.Tests.NUnit.csproj", "{3E62B4CF-9BB5-48A9-8DEC-63A1DA88D258}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
 		SccNumberOfProjects = 5
@@ -77,6 +79,12 @@ Global
 		{260A24A8-69CF-4F36-8665-C6376F7BA16E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{260A24A8-69CF-4F36-8665-C6376F7BA16E}.Release|x64.ActiveCfg = Release|x64
 		{260A24A8-69CF-4F36-8665-C6376F7BA16E}.Release|x64.Build.0 = Release|x64
+		{3E62B4CF-9BB5-48A9-8DEC-63A1DA88D258}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E62B4CF-9BB5-48A9-8DEC-63A1DA88D258}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E62B4CF-9BB5-48A9-8DEC-63A1DA88D258}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3E62B4CF-9BB5-48A9-8DEC-63A1DA88D258}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E62B4CF-9BB5-48A9-8DEC-63A1DA88D258}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E62B4CF-9BB5-48A9-8DEC-63A1DA88D258}.Release|x64.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -84,5 +92,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{6D0167F8-9611-410F-9212-3D8AE9FF95E4} = {DD15B030-587C-4A27-840B-2D7615608FD9}
 		{09360563-4EBA-460E-A1D4-D54B3B386066} = {DD15B030-587C-4A27-840B-2D7615608FD9}
+		{3E62B4CF-9BB5-48A9-8DEC-63A1DA88D258} = {DD15B030-587C-4A27-840B-2D7615608FD9}
 	EndGlobalSection
 EndGlobal
