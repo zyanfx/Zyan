@@ -4,7 +4,6 @@ using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
 using System.Threading;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Zyan.Communication;
 using Zyan.Communication.Composition;
 using System.Collections.Generic;
@@ -12,6 +11,20 @@ using Zyan.InterLinq;
 
 namespace Zyan.Tests
 {
+	#region Unit testing platform abstraction layer
+#if NUNIT
+	using NUnit.Framework;
+	using TestClass = NUnit.Framework.TestFixtureAttribute;
+	using TestMethod = NUnit.Framework.TestAttribute;
+	using ClassInitializeParameterless = NUnit.Framework.TestFixtureSetUpAttribute;
+	using ClassInitialize = DummyAttribute;
+	using ClassCleanup = NUnit.Framework.TestFixtureTearDownAttribute;
+#else
+	using Microsoft.VisualStudio.TestTools.UnitTesting;
+	using ClassInitializeParameterless = DummyAttribute;
+#endif
+	#endregion
+
 	/// <summary>
 	/// Test class for MEF integration
 	///</summary>
@@ -302,6 +315,12 @@ namespace Zyan.Tests
 
 		static CompositionContainer MefContainer { get; set; }
 
+		[ClassInitializeParameterless]
+		public static void DiscoverComposableParts()
+		{
+			DiscoverComposableParts(null);
+		}
+
 		[ClassInitialize]
 		public static void DiscoverComposableParts(TestContext ctx)
 		{
@@ -322,7 +341,7 @@ namespace Zyan.Tests
 			// get component instance
 			var obj = cat.GetComponent<IMefSample>();
 			Assert.IsNotNull(obj);
-			Assert.IsInstanceOfType(obj, typeof(MefSample1));
+			AssertEx.IsInstanceOf<MefSample1>(obj);
 			Assert.AreEqual(1, MefSample1.InstanceCount);
 
 			// clean up component instance
@@ -343,7 +362,7 @@ namespace Zyan.Tests
 			// get component instance
 			var obj = cat.GetComponent<IMefSample>();
 			Assert.IsNotNull(obj);
-			Assert.IsInstanceOfType(obj, typeof(MefSample1));
+			AssertEx.IsInstanceOf<MefSample1>(obj);
 			Assert.AreEqual(1, MefSample1.InstanceCount);
 
 			// clean up component instance
@@ -364,7 +383,7 @@ namespace Zyan.Tests
 			// get component instance
 			var obj = cat.GetComponent("UniqueName_MefSample2") as IMefSample;
 			Assert.IsNotNull(obj);
-			Assert.IsInstanceOfType(obj, typeof(MefSample2));
+			AssertEx.IsInstanceOf<MefSample2>(obj);
 			Assert.AreEqual(1, MefSample2.InstanceCount);
 
 			// clean up component instance
@@ -385,7 +404,7 @@ namespace Zyan.Tests
 			// get component instance
 			var obj = cat.GetComponent("UniqueName_MefSample2") as IMefSample;
 			Assert.IsNotNull(obj);
-			Assert.IsInstanceOfType(obj, typeof(MefSample2));
+			AssertEx.IsInstanceOf<MefSample2>(obj);
 			Assert.AreEqual(1, MefSample2.InstanceCount);
 
 			// clean up component instance
@@ -406,7 +425,7 @@ namespace Zyan.Tests
 			// get component instance
 			var obj = cat.GetComponent("UniqueName_MefSample3") as IMefSample;
 			Assert.IsNotNull(obj);
-			Assert.IsInstanceOfType(obj, typeof(MefSample3));
+			AssertEx.IsInstanceOf<MefSample3>(obj);
 			Assert.AreEqual(1, MefSample3.InstanceCount);
 
 			// clean up component instance
@@ -427,7 +446,7 @@ namespace Zyan.Tests
 			// get component instance
 			var obj = cat.GetComponent("UniqueName_MefSample3") as IMefSample;
 			Assert.IsNotNull(obj);
-			Assert.IsInstanceOfType(obj, typeof(MefSample3));
+			AssertEx.IsInstanceOf<MefSample3>(obj);
 			Assert.AreEqual(1, MefSample3.InstanceCount);
 
 			// clean up component instance
@@ -460,7 +479,7 @@ namespace Zyan.Tests
 			// component is available in MefContainer
 			var obj = MefContainer.GetExport<IMefSample>("UniqueName_MefSample4").Value;
 			Assert.IsNotNull(obj);
-			Assert.IsInstanceOfType(obj, typeof(MefSample4));
+			AssertEx.IsInstanceOf<MefSample4>(obj);
 
 			// component is not registered in Zyan ComponentCatalog
 			var reg = cat.GetRegistration("UniqueName_MefSample4");
@@ -479,7 +498,7 @@ namespace Zyan.Tests
 			// get component instance
 			var obj = cat.GetComponent("UniqueName_MefSample5") as IMefSample5;
 			Assert.IsNotNull(obj);
-			Assert.IsInstanceOfType(obj, typeof(MefSample5));
+			AssertEx.IsInstanceOf<MefSample5>(obj);
 			Assert.AreEqual(1, MefSample5.InstanceCount);
 
 			// clean up component instance
@@ -500,7 +519,7 @@ namespace Zyan.Tests
 			// get component instance
 			var obj = cat.GetComponent("UniqueName_MefSample5") as IMefSample5;
 			Assert.IsNotNull(obj);
-			Assert.IsInstanceOfType(obj, typeof(MefSample5));
+			AssertEx.IsInstanceOf<MefSample5>(obj);
 			Assert.AreEqual(1, MefSample5.InstanceCount);
 
 			// clean up component instance
@@ -533,7 +552,7 @@ namespace Zyan.Tests
 			// component is available in MefContainer
 			var obj = MefContainer.GetExport<IMefSample6>("UniqueName_MefSample6").Value;
 			Assert.IsNotNull(obj);
-			Assert.IsInstanceOfType(obj, typeof(MefSample6));
+			AssertEx.IsInstanceOf<MefSample6>(obj);
 
 			// component is not registered in Zyan ComponentCatalog
 			var reg = cat.GetRegistration("UniqueName_MefSample6");
@@ -552,7 +571,7 @@ namespace Zyan.Tests
 			// get component instance
 			var obj = cat.GetComponent<IMefSample7>();
 			Assert.IsNotNull(obj);
-			Assert.IsInstanceOfType(obj, typeof(MefSample7));
+			AssertEx.IsInstanceOf<MefSample7>(obj);
 			Assert.AreEqual(1, MefSample7.InstanceCount);
 
 			// clean up component instance
@@ -573,7 +592,7 @@ namespace Zyan.Tests
 			// get component instance
 			var obj = cat.GetComponent<IMefSample7>();
 			Assert.IsNotNull(obj);
-			Assert.IsInstanceOfType(obj, typeof(MefSample7));
+			AssertEx.IsInstanceOf<MefSample7>(obj);
 			Assert.AreEqual(1, MefSample7.InstanceCount);
 
 			// clean up component instance
@@ -594,7 +613,7 @@ namespace Zyan.Tests
 			// get component instance
 			var obj = cat.GetComponent("UniqueName_MefSample8") as IMefSample8;
 			Assert.IsNotNull(obj);
-			Assert.IsInstanceOfType(obj, typeof(MefSample8));
+			AssertEx.IsInstanceOf<MefSample8>(obj);
 			Assert.AreEqual(1, MefSample8.InstanceCount);
 
 			// clean up component instance
@@ -615,7 +634,7 @@ namespace Zyan.Tests
 			// get component instance
 			var obj = cat.GetComponent("UniqueName_MefSample8") as IMefSample8;
 			Assert.IsNotNull(obj);
-			Assert.IsInstanceOfType(obj, typeof(MefSample8));
+			AssertEx.IsInstanceOf<MefSample8>(obj);
 			Assert.AreEqual(1, MefSample8.InstanceCount);
 
 			// clean up component instance
@@ -636,7 +655,7 @@ namespace Zyan.Tests
 			// get component instance
 			var obj = cat.GetComponent("UniqueName_MefSample9") as IMefSample;
 			Assert.IsNotNull(obj);
-			Assert.IsInstanceOfType(obj, typeof(MefSample9));
+			AssertEx.IsInstanceOf<MefSample9>(obj);
 			Assert.AreNotEqual(0, MefSample9.InstanceCount);
 
 			// clean up component instance
@@ -657,7 +676,7 @@ namespace Zyan.Tests
 			// get component instance
 			var obj = cat.GetComponent("UniqueName_MefSample9") as IMefSample;
 			Assert.IsNotNull(obj);
-			Assert.IsInstanceOfType(obj, typeof(MefSample9));
+			AssertEx.IsInstanceOf<MefSample9>(obj);
 			Assert.AreNotEqual(0, MefSample9.InstanceCount);
 
 			// clean up component instance
@@ -678,7 +697,7 @@ namespace Zyan.Tests
 			// get component instance
 			var obj = cat.GetComponent("UniqueName_MefSample10") as IQueryRemoteHandler;
 			Assert.IsNotNull(obj);
-			Assert.IsInstanceOfType(obj, typeof(ZyanServerQueryHandler));
+			AssertEx.IsInstanceOf<ZyanServerQueryHandler>(obj);
 			Assert.AreEqual(1, MefSample10.InstanceCount);
 
 			// clean up component instance
@@ -699,7 +718,7 @@ namespace Zyan.Tests
 			// get component instance
 			var obj = cat.GetComponent("UniqueName_MefSample11") as IQueryRemoteHandler;
 			Assert.IsNotNull(obj);
-			Assert.IsInstanceOfType(obj, typeof(ZyanServerQueryHandler));
+			AssertEx.IsInstanceOf<ZyanServerQueryHandler>(obj);
 			Assert.AreEqual(1, MefSample11.InstanceCount);
 
 			// clean up component instance
