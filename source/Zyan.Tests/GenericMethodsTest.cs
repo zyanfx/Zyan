@@ -2,13 +2,26 @@
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Zyan.Communication;
 using Zyan.Communication.Protocols.Ipc;
 using System.Diagnostics;
 
 namespace Zyan.Tests
 {
+	#region Unit testing platform abstraction layer
+#if NUNIT
+	using NUnit.Framework;
+	using TestClass = NUnit.Framework.TestFixtureAttribute;
+	using TestMethod = NUnit.Framework.TestAttribute;
+	using ClassInitializeParameterless = NUnit.Framework.TestFixtureSetUpAttribute;
+	using ClassInitialize = DummyAttribute;
+	using ClassCleanup = NUnit.Framework.TestFixtureTearDownAttribute;
+#else
+	using Microsoft.VisualStudio.TestTools.UnitTesting;
+	using ClassInitializeParameterless = DummyAttribute;
+#endif
+	#endregion
+
 	/// <summary>
 	/// Tests for generic method invocation
 	/// </summary>
@@ -97,6 +110,12 @@ namespace Zyan.Tests
 		static ZyanComponentHost ZyanHost { get; set; }
 
 		static ZyanConnection ZyanConnection { get; set; }
+
+		[ClassInitializeParameterless]
+		public static void StartServer()
+		{
+			StartServer(null);
+		}
 
 		[ClassInitialize]
 		public static void StartServer(TestContext ctx)

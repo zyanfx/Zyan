@@ -1,13 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Zyan.Communication;
 using Zyan.Communication.Protocols.Ipc;
 using Zyan.Communication.SessionMgmt;
 
 namespace Zyan.Tests
 {
+	#region Unit testing platform abstraction layer
+#if NUNIT
+	using NUnit.Framework;
+	using TestClass = NUnit.Framework.TestFixtureAttribute;
+	using TestMethod = NUnit.Framework.TestAttribute;
+	using ClassInitializeParameterless = NUnit.Framework.TestFixtureSetUpAttribute;
+	using ClassInitialize = DummyAttribute;
+	using ClassCleanup = NUnit.Framework.TestFixtureTearDownAttribute;
+#else
+	using Microsoft.VisualStudio.TestTools.UnitTesting;
+	using ClassInitializeParameterless = DummyAttribute;
+#endif
+	#endregion
+
 	/// <summary>
 	/// Test class for deterministic cleanup
 	/// </summary>
