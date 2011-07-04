@@ -50,7 +50,6 @@
   <ItemGroup>
     <Compile Include="CleanupTests.cs" />
     <Compile Include="DuckTypingTests.cs" />
-    <Compile Include="GenericMethodsTest.cs" />
     <Compile Include="LinqTests.cs" />
     <Compile Include="MefTests.cs">
       <SubType>Code</SubType>
