@@ -89,10 +89,7 @@ namespace Zyan.Tests
 			ZyanHost.RegisterQueryableComponent("Sample5", (Type t) => (new object[] { "stepping", "outside", "she", "is", "free" }).AsQueryable());
 			ZyanHost.RegisterQueryableComponent<SampleObjectSource>("Sample6");
 			ZyanHost.RegisterQueryableComponent<SampleObjectSource>("Sample7", ActivationType.SingleCall);
-#if !NUNIT
-			// MemoDb doesn't support Mono (yet)
 			ZyanHost.RegisterQueryableComponent("DbSample", new DataWrapper());
-#endif
 
 			var clientSetup = new IpcBinaryClientProtocolSetup();
 			ZyanConnection = new ZyanConnection("ipc://LinqTest/SampleQueryableServer", clientSetup);
@@ -211,7 +208,6 @@ namespace Zyan.Tests
 			Assert.AreEqual("brown lazy dog", result);
 		}
 
-#if !NUNIT
 		[TestMethod]
 		public void TestDbSampleComponent1()
 		{
@@ -239,7 +235,6 @@ namespace Zyan.Tests
 				"Leó, Lev, Hans, Igor, Glenn, James, Klaus, Leona, Niels, Pyotr, Ralph, Albert, Arthur, Edward, Emilio, " +
 				"Enrico, Ernest, George, Harold, Robert, Robert, Richard, William, Alexander, Stanislaw, Chien-Shiung", result);
 		}
-#endif
 
 		[TestMethod]
 		public void TestExpressionParameter()
