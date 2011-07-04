@@ -6,11 +6,11 @@ using System.Text;
 using System.Threading;
 using System.Collections.Generic;
 
+// TODO: Localize exceptions and trace messages
 namespace Zyan.Communication.Toolbox
 {
 	/// <summary>
-	/// Various extension methods
-	/// TODO: Localize exceptions and trace messages
+	/// Various extension methods.
 	/// </summary>
 	public static class Extensions
 	{

@@ -13,12 +13,15 @@ namespace Zyan.Tests
 	using NUnit.Framework;
 	using TestClass = NUnit.Framework.TestFixtureAttribute;
 	using TestMethod = NUnit.Framework.TestAttribute;
-	using ClassInitializeParameterless = NUnit.Framework.TestFixtureSetUpAttribute;
+	using ClassInitializeNonStatic = NUnit.Framework.TestFixtureSetUpAttribute;
 	using ClassInitialize = DummyAttribute;
-	using ClassCleanup = NUnit.Framework.TestFixtureTearDownAttribute;
+	using ClassCleanupNonStatic = NUnit.Framework.TestFixtureTearDownAttribute;
+	using ClassCleanup = DummyAttribute;
+	using TestContext = System.Object;
 #else
 	using Microsoft.VisualStudio.TestTools.UnitTesting;
-	using ClassInitializeParameterless = DummyAttribute;
+	using ClassInitializeNonStatic = DummyAttribute;
+	using ClassCleanupNonStatic = DummyAttribute;
 #endif
 	#endregion
 
@@ -111,10 +114,16 @@ namespace Zyan.Tests
 
 		static ZyanConnection ZyanConnection { get; set; }
 
-		[ClassInitializeParameterless]
-		public static void StartServer()
+		[ClassInitializeNonStatic]
+		public void Initialize()
 		{
 			StartServer(null);
+		}
+
+		[ClassCleanupNonStatic]
+		public void Cleanup()
+		{
+			StopServer();
 		}
 
 		[ClassInitialize]
