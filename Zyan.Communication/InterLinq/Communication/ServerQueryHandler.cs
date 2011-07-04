@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using Zyan.InterLinq.Types;
 using Zyan.InterLinq.Expressions;
+using System.Diagnostics;
 
 namespace Zyan.InterLinq.Communication
 {
@@ -81,8 +82,7 @@ namespace Zyan.InterLinq.Communication
 			try
 			{
 #if DEBUG
-				Console.WriteLine(expression);
-				Console.WriteLine();
+				Trace.WriteLine(expression);
 #endif
 
 				MethodInfo mInfo;
@@ -101,17 +101,18 @@ namespace Zyan.InterLinq.Communication
 				}
 
 				object returnValue = mInfo.Invoke(this, new object[] { expression });
-
+ 
 #if DEBUG
-				try
-				{
-					System.IO.MemoryStream ms = new System.IO.MemoryStream();
-					new System.Runtime.Serialization.NetDataContractSerializer().Serialize(ms, returnValue);
-				}
-				catch (Exception)
-				{
-					throw;
-				}
+				// NetDataContractSerializer is not supported by Mono Framework
+				//try
+				//{
+				//	System.IO.MemoryStream ms = new System.IO.MemoryStream();
+				//	new System.Runtime.Serialization.NetDataContractSerializer().Serialize(ms, returnValue);
+				//}
+				//catch (Exception)
+				//{
+				//	throw;
+				//}
 #endif
 
 				return returnValue;

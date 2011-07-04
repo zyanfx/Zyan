@@ -17,7 +17,7 @@ namespace Zyan.InterLinq
 
 		public ZyanConnection Connection { get; private set; }
 
-		private string _unqiueName = string.Empty;
+		private string _uniqueName = string.Empty;
 
 		/// <summary>
 		/// Creates ZyanClientQueryHandler instance.
@@ -40,7 +40,7 @@ namespace Zyan.InterLinq
 		/// <param name="unqiueName">Unique component name</param>
 		public ZyanClientQueryHandler(ZyanConnection connection, string unqiueName) : this(connection)
 		{
-			_unqiueName = unqiueName;
+			_uniqueName = unqiueName;
 		}
 
 		/// <summary>
@@ -66,7 +66,7 @@ namespace Zyan.InterLinq
 		{
 			if (queryRemoteHandler == null)
 			{
-				queryRemoteHandler = Connection.CreateProxy<IQueryRemoteHandler>(_unqiueName,ImplicitTransactionTransfer);
+				queryRemoteHandler = Connection.CreateProxy<IQueryRemoteHandler>(_uniqueName,ImplicitTransactionTransfer);
 
 				if (queryRemoteHandler == null)
 				{
