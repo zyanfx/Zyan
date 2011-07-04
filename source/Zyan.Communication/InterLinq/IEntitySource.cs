@@ -8,6 +8,11 @@ namespace Zyan.InterLinq
 	/// </summary>
 	public interface IEntitySource : IBaseSource
 	{
+		/// <summary>
+		/// Returns an <see cref="IQueryable{T}"/>.
+		/// </summary>
+		/// <typeparam name="T">Generic Argument of the returned <see cref="IQueryable{T}"/>.</typeparam>
+		/// <returns>Returns an <see cref="IQueryable{T}"/>.</returns>
 		IQueryable<T> Get<T>() where T : class;
 	}
 }
