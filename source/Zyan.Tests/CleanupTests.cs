@@ -12,12 +12,15 @@ namespace Zyan.Tests
 	using NUnit.Framework;
 	using TestClass = NUnit.Framework.TestFixtureAttribute;
 	using TestMethod = NUnit.Framework.TestAttribute;
-	using ClassInitializeParameterless = NUnit.Framework.TestFixtureSetUpAttribute;
+	using ClassInitializeNonStatic = NUnit.Framework.TestFixtureSetUpAttribute;
 	using ClassInitialize = DummyAttribute;
-	using ClassCleanup = NUnit.Framework.TestFixtureTearDownAttribute;
+	using ClassCleanupNonStatic = NUnit.Framework.TestFixtureTearDownAttribute;
+	using ClassCleanup = DummyAttribute;
+	using TestContext = System.Object;
 #else
 	using Microsoft.VisualStudio.TestTools.UnitTesting;
-	using ClassInitializeParameterless = DummyAttribute;
+	using ClassInitializeNonStatic = DummyAttribute;
+	using ClassCleanupNonStatic = DummyAttribute;
 #endif
 	#endregion
 
@@ -31,53 +34,38 @@ namespace Zyan.Tests
 
 		public interface ISampleComponent
 		{
+			Action Handler { get; set; }
 		}
 
 		public class DisposableComponent : ISampleComponent, IDisposable
 		{
-			static int instanceCount = 0;
+			public Action Handler { get; set; }
 
 			public DisposableComponent()
 			{
-				Interlocked.Increment(ref instanceCount);
 			}
 
 			public void Dispose()
 			{
-				Interlocked.Decrement(ref instanceCount);
+				GC.SuppressFinalize(this);
+				Assert.IsNotNull(Handler);
+				Handler();
 			}
-
-			public static int InstanceCount { get { return instanceCount; } }
 		}
 
 		public class ReleasableComponent : ISampleComponent
 		{
-			static int instanceCount = 0;
+			public Action Handler { get; set; }
 
 			public ReleasableComponent()
 			{
-				Interlocked.Increment(ref instanceCount);
 			}
 
 			public void Release()
 			{
-				Interlocked.Decrement(ref instanceCount);
+				Assert.IsNotNull(Handler);
+				Handler();
 			}
-
-			public static int InstanceCount { get { return instanceCount; } }
-		}
-
-		public class NonDisposableComponent : ISampleComponent
-		{
-			static List<NonDisposableComponent> instanceList = new List<NonDisposableComponent>();
-
-			public NonDisposableComponent()
-			{
-				// prevent GC from collecting this instance
-				instanceList.Add(this);
-			}
-
-			public static int InstanceCount { get { return instanceList.Count; } }
 		}
 
 		#endregion
@@ -91,82 +79,89 @@ namespace Zyan.Tests
 		[TestMethod]
 		public void SingleCallComponentRegisteredWithFactoryMethod_IsDisposed()
 		{
+			var disposed = false;
 			var cat = new ComponentCatalog();
-			cat.RegisterComponent<ISampleComponent>(() => new DisposableComponent(), ActivationType.SingleCall);
-			Assert.AreEqual(0, DisposableComponent.InstanceCount);
+			cat.RegisterComponent<ISampleComponent>(() => new DisposableComponent { Handler = () => disposed = true }, ActivationType.SingleCall);
+			Assert.IsFalse(disposed);
 
 			var instance = cat.GetComponent<ISampleComponent>();
-			Assert.AreEqual(1, DisposableComponent.InstanceCount);
+			AssertEx.IsInstanceOf<DisposableComponent>(instance);
 
 			var reg = cat.GetRegistration(typeof(ISampleComponent));
 			cat.CleanUpComponentInstance(reg, instance);
-			Assert.AreEqual(0, DisposableComponent.InstanceCount);
+			Assert.IsTrue(disposed);
 		}
 
 		[TestMethod]
 		public void SingleCallComponentRegisteredWithComponentType_IsDisposed()
 		{
+			var disposed = false;
 			var cat = new ComponentCatalog();
 			cat.RegisterComponent<ISampleComponent, DisposableComponent>(ActivationType.SingleCall);
-			Assert.AreEqual(0, DisposableComponent.InstanceCount);
+			Assert.IsFalse(disposed);
 
 			var instance = cat.GetComponent<ISampleComponent>();
-			Assert.AreEqual(1, DisposableComponent.InstanceCount);
+			AssertEx.IsInstanceOf<DisposableComponent>(instance);
+			instance.Handler = () => disposed = true;
 
 			var reg = cat.GetRegistration(typeof(ISampleComponent));
 			cat.CleanUpComponentInstance(reg, instance);
-			Assert.AreEqual(0, DisposableComponent.InstanceCount);
+			Assert.IsTrue(disposed);
 		}
 
 		[TestMethod]
 		public void SingletonComponentRegisteredWithFactoryMethod_IsDisposed()
 		{
+			var disposed = false;
 			var cat = new ComponentCatalog();
-			cat.RegisterComponent<ISampleComponent>(() => new DisposableComponent(), ActivationType.Singleton);
-			Assert.AreEqual(0, DisposableComponent.InstanceCount);
+			cat.RegisterComponent<ISampleComponent>(() => new DisposableComponent { Handler = () => disposed = true }, ActivationType.Singleton);
+			Assert.IsFalse(disposed);
 
 			var instance = cat.GetComponent<ISampleComponent>();
-			Assert.AreEqual(1, DisposableComponent.InstanceCount);
+			AssertEx.IsInstanceOf<DisposableComponent>(instance);
 
 			var reg = cat.GetRegistration(typeof(ISampleComponent));
 			cat.CleanUpComponentInstance(reg, instance);
-			Assert.AreEqual(0, DisposableComponent.InstanceCount);
+			Assert.IsTrue(disposed);
 		}
 
 		[TestMethod]
 		public void SingletonComponentRegisteredWithComponentType_IsDisposed()
 		{
+			var disposed = false;
 			var cat = new ComponentCatalog();
 			cat.RegisterComponent<ISampleComponent, DisposableComponent>(ActivationType.Singleton);
-			Assert.AreEqual(0, DisposableComponent.InstanceCount);
+			Assert.IsFalse(disposed);
 
 			var instance = cat.GetComponent<ISampleComponent>();
-			Assert.AreEqual(1, DisposableComponent.InstanceCount);
+			AssertEx.IsInstanceOf<DisposableComponent>(instance);
+			instance.Handler = () => disposed = true;
 
 			var reg = cat.GetRegistration(typeof(ISampleComponent));
 			cat.CleanUpComponentInstance(reg, instance);
-			Assert.AreEqual(0, DisposableComponent.InstanceCount);
+			Assert.IsTrue(disposed);
 		}
 
 		[TestMethod]
 		public void SingletonComponentRegisteredWithComponentInstance_IsNotDisposed()
 		{
 			// this component instance is externally-owned
-			var immortalServer = new DisposableComponent();
+			var disposed = false;
+			var immortalServer = new DisposableComponent { Handler = () => disposed = true };
 
 			var cat = new ComponentCatalog();
 			cat.RegisterComponent<ISampleComponent, DisposableComponent>(immortalServer);
-			Assert.AreEqual(1, DisposableComponent.InstanceCount);
+			Assert.IsFalse(disposed);
 
 			var instance = cat.GetComponent<ISampleComponent>();
-			Assert.AreEqual(1, DisposableComponent.InstanceCount);
+			AssertEx.IsInstanceOf<DisposableComponent>(instance);
 
 			var reg = cat.GetRegistration(typeof(ISampleComponent));
 			cat.CleanUpComponentInstance(reg, instance);
-			Assert.AreEqual(1, DisposableComponent.InstanceCount);
+			Assert.IsFalse(disposed);
 
 			immortalServer.Dispose();
-			Assert.AreEqual(0, DisposableComponent.InstanceCount);
+			Assert.IsTrue(disposed);
 		}
 
 		//=============================================
@@ -176,61 +171,73 @@ namespace Zyan.Tests
 		[TestMethod]
 		public void SingleCallComponentRegisteredWithFactoryMethod_IsCleanedUp()
 		{
+			var disposed = false;
 			var cat = new ComponentCatalog();
-			cat.RegisterComponent<ISampleComponent>(() => new ReleasableComponent(), ActivationType.SingleCall, v => ((ReleasableComponent)v).Release());
-			Assert.AreEqual(0, ReleasableComponent.InstanceCount);
+			cat.RegisterComponent<ISampleComponent>(
+				() => new ReleasableComponent { Handler = () => disposed = true }, 
+				ActivationType.SingleCall, v => ((ReleasableComponent)v).Release());
+			Assert.IsFalse(disposed);
 
 			var instance = cat.GetComponent<ISampleComponent>();
-			Assert.AreEqual(1, ReleasableComponent.InstanceCount);
+			AssertEx.IsInstanceOf<ReleasableComponent>(instance);
 
 			var reg = cat.GetRegistration(typeof(ISampleComponent));
 			cat.CleanUpComponentInstance(reg, instance);
-			Assert.AreEqual(0, ReleasableComponent.InstanceCount);
+			Assert.IsTrue(disposed);
 		}
 
 		[TestMethod]
 		public void SingleCallComponentRegisteredWithComponentType_IsCleanedUp()
 		{
+			var disposed = false;
 			var cat = new ComponentCatalog();
-			cat.RegisterComponent<ISampleComponent, ReleasableComponent>(ActivationType.SingleCall, v => ((ReleasableComponent)v).Release());
-			Assert.AreEqual(0, ReleasableComponent.InstanceCount);
+			cat.RegisterComponent<ISampleComponent, ReleasableComponent>(
+				ActivationType.SingleCall, v => ((ReleasableComponent)v).Release());
+			Assert.IsFalse(disposed);
 
 			var instance = cat.GetComponent<ISampleComponent>();
-			Assert.AreEqual(1, ReleasableComponent.InstanceCount);
+			AssertEx.IsInstanceOf<ReleasableComponent>(instance);
+			instance.Handler = () => disposed = true;
 
 			var reg = cat.GetRegistration(typeof(ISampleComponent));
 			cat.CleanUpComponentInstance(reg, instance);
-			Assert.AreEqual(0, ReleasableComponent.InstanceCount);
+			Assert.IsTrue(disposed);
 		}
 
 		[TestMethod]
 		public void SingletonComponentRegisteredWithFactoryMethod_IsCleanedUp()
 		{
+			var disposed = false;
 			var cat = new ComponentCatalog();
-			cat.RegisterComponent<ISampleComponent>(() => new ReleasableComponent(), ActivationType.Singleton, v => ((ReleasableComponent)v).Release());
-			Assert.AreEqual(0, ReleasableComponent.InstanceCount);
+			cat.RegisterComponent<ISampleComponent>(
+				() => new ReleasableComponent { Handler = () => disposed = true },
+				ActivationType.Singleton, v => ((ReleasableComponent)v).Release());
+			Assert.IsFalse(disposed);
 
 			var instance = cat.GetComponent<ISampleComponent>();
-			Assert.AreEqual(1, ReleasableComponent.InstanceCount);
+			AssertEx.IsInstanceOf<ReleasableComponent>(instance);
 
 			var reg = cat.GetRegistration(typeof(ISampleComponent));
 			cat.CleanUpComponentInstance(reg, instance);
-			Assert.AreEqual(0, ReleasableComponent.InstanceCount);
+			Assert.IsTrue(disposed);
 		}
 
 		[TestMethod]
 		public void SingletonComponentRegisteredWithComponentType_IsCleanedUp()
 		{
+			var disposed = false;
 			var cat = new ComponentCatalog();
-			cat.RegisterComponent<ISampleComponent, ReleasableComponent>(ActivationType.Singleton, v => ((ReleasableComponent)v).Release());
-			Assert.AreEqual(0, ReleasableComponent.InstanceCount);
+			cat.RegisterComponent<ISampleComponent, ReleasableComponent>(
+				ActivationType.Singleton, v => ((ReleasableComponent)v).Release());
+			Assert.IsFalse(disposed);
 
 			var instance = cat.GetComponent<ISampleComponent>();
-			Assert.AreEqual(1, ReleasableComponent.InstanceCount);
+			AssertEx.IsInstanceOf<ReleasableComponent>(instance);
+			instance.Handler = () => disposed = true;
 
 			var reg = cat.GetRegistration(typeof(ISampleComponent));
 			cat.CleanUpComponentInstance(reg, instance);
-			Assert.AreEqual(0, ReleasableComponent.InstanceCount);
+			Assert.IsTrue(disposed);
 		}
 
 		[TestMethod]
@@ -238,100 +245,19 @@ namespace Zyan.Tests
 		{
 			// this component instance is created outside, but the ownership
 			// is transferred to the ComponentCatalog via cleanup delegate
-			var mortalServer = new ReleasableComponent();
+			var disposed = false;
+			var mortalServer = new ReleasableComponent { Handler = () => disposed = true };
 
 			var cat = new ComponentCatalog();
 			cat.RegisterComponent<ISampleComponent, ReleasableComponent>(mortalServer, v => ((ReleasableComponent)v).Release());
-			Assert.AreEqual(1, ReleasableComponent.InstanceCount);
+			Assert.IsFalse(disposed);
 
 			var instance = cat.GetComponent<ISampleComponent>();
-			Assert.AreEqual(1, ReleasableComponent.InstanceCount);
+			AssertEx.IsInstanceOf<ReleasableComponent>(instance);
 
 			var reg = cat.GetRegistration(typeof(ISampleComponent));
 			cat.CleanUpComponentInstance(reg, instance);
-			Assert.AreEqual(0, ReleasableComponent.InstanceCount);
-		}
-
-		//=============================================
-		// Non-disposable components are not handled
-		//=============================================
-
-		[TestMethod]
-		public void SingleCallNonDisposableComponentRegisteredWithFactoryMethod_IsNotDisposed()
-		{
-			var cat = new ComponentCatalog();
-			var count = NonDisposableComponent.InstanceCount;
-			cat.RegisterComponent<ISampleComponent>(() => new NonDisposableComponent(), ActivationType.SingleCall);
-
-			var instance = cat.GetComponent<ISampleComponent>();
-			Assert.AreEqual(count + 1, NonDisposableComponent.InstanceCount);
-
-			var reg = cat.GetRegistration(typeof(ISampleComponent));
-			cat.CleanUpComponentInstance(reg, instance);
-			Assert.AreEqual(count + 1, NonDisposableComponent.InstanceCount);
-		}
-
-		[TestMethod]
-		public void SingleCallNonDisposableComponentRegisteredWithComponentType_IsNotDisposed()
-		{
-			var cat = new ComponentCatalog();
-			var count = NonDisposableComponent.InstanceCount;
-			cat.RegisterComponent<ISampleComponent, NonDisposableComponent>(ActivationType.SingleCall);
-
-			var instance = cat.GetComponent<ISampleComponent>();
-			Assert.AreEqual(count + 1, NonDisposableComponent.InstanceCount);
-
-			var reg = cat.GetRegistration(typeof(ISampleComponent));
-			cat.CleanUpComponentInstance(reg, instance);
-			Assert.AreEqual(count + 1, NonDisposableComponent.InstanceCount);
-		}
-
-		[TestMethod]
-		public void SingletonNonDisposableComponentRegisteredWithFactoryMethod_IsNotDisposed()
-		{
-			var cat = new ComponentCatalog();
-			var count = NonDisposableComponent.InstanceCount;
-			cat.RegisterComponent<ISampleComponent>(() => new NonDisposableComponent(), ActivationType.Singleton);
-
-			var instance = cat.GetComponent<ISampleComponent>();
-			Assert.AreEqual(count + 1, NonDisposableComponent.InstanceCount);
-
-			var reg = cat.GetRegistration(typeof(ISampleComponent));
-			cat.CleanUpComponentInstance(reg, instance);
-			Assert.AreEqual(count + 1, NonDisposableComponent.InstanceCount);
-		}
-
-		[TestMethod]
-		public void SingletonNonDisposableComponentRegisteredWithComponentType_IsNotDisposed()
-		{
-			var cat = new ComponentCatalog();
-			var count = NonDisposableComponent.InstanceCount;
-			cat.RegisterComponent<ISampleComponent, NonDisposableComponent>(ActivationType.Singleton);
-
-			var instance = cat.GetComponent<ISampleComponent>();
-			Assert.AreEqual(count + 1, NonDisposableComponent.InstanceCount);
-
-			var reg = cat.GetRegistration(typeof(ISampleComponent));
-			cat.CleanUpComponentInstance(reg, instance);
-			Assert.AreEqual(count + 1, NonDisposableComponent.InstanceCount);
-		}
-
-		[TestMethod]
-		public void SingletonNonDisposableComponentRegisteredWithComponentInstance_IsNotDisposed()
-		{
-			// this component instance is externally-owned
-			var immortalServer = new NonDisposableComponent();
-
-			var cat = new ComponentCatalog();
-			var count = NonDisposableComponent.InstanceCount;
-			cat.RegisterComponent<ISampleComponent, NonDisposableComponent>(immortalServer);
-
-			var instance = cat.GetComponent<ISampleComponent>();
-			Assert.AreEqual(count, NonDisposableComponent.InstanceCount);
-
-			var reg = cat.GetRegistration(typeof(ISampleComponent));
-			cat.CleanUpComponentInstance(reg, instance);
-			Assert.AreEqual(count, NonDisposableComponent.InstanceCount);
+			Assert.IsTrue(disposed);
 		}
 
 		//=============================================
@@ -341,36 +267,38 @@ namespace Zyan.Tests
 		[TestMethod]
 		public void OwnedComponentCatalog_IsDisposed()
 		{
-			var mortalServer = new ReleasableComponent();
-			Assert.AreEqual(1, ReleasableComponent.InstanceCount);
+			var disposed = false;
+			var server = new ReleasableComponent { Handler = () => disposed = true };
+			Assert.IsFalse(disposed);
 
 			var serverSetup = new IpcBinaryServerProtocolSetup("CleanupTest1");
 			using (var host = new ZyanComponentHost("SampleServer1", serverSetup))
 			{
 				host.RegisterComponent<ISampleComponent, ReleasableComponent>(
-					mortalServer, s => ((ReleasableComponent)s).Release());
+					server, s => ((ReleasableComponent)s).Release());
 			}
 
-			Assert.AreEqual(0, ReleasableComponent.InstanceCount);
+			Assert.IsTrue(disposed);
 		}
 
 		[TestMethod]
 		public void ExternalComponentCatalog_IsNotDisposed()
 		{
-			var mortalServer = new ReleasableComponent();
-			Assert.AreEqual(1, ReleasableComponent.InstanceCount);
+			var disposed = false;
+			var server = new ReleasableComponent { Handler = () => disposed = true };
+			Assert.IsFalse(disposed);
 
 			var catalog = new ComponentCatalog();
 			var serverSetup = new IpcBinaryServerProtocolSetup("CleanupTest2");
 			using (var host = new ZyanComponentHost("SampleServer2", serverSetup, new InProcSessionManager(), catalog))
 			{
 				host.RegisterComponent<ISampleComponent, ReleasableComponent>(
-					mortalServer, s => ((ReleasableComponent)s).Release());
+					server, s => ((ReleasableComponent)s).Release());
 			}
 
-			Assert.AreEqual(1, ReleasableComponent.InstanceCount);
-			mortalServer.Release();
-			Assert.AreEqual(0, ReleasableComponent.InstanceCount);
+			Assert.IsFalse(disposed);
+			server.Release();
+			Assert.IsTrue(disposed);
 		}
 	}
 }

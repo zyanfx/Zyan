@@ -3,7 +3,7 @@
 namespace Zyan.InterLinq
 {
 	/// <summary>
-	/// Base interface the built-in Linq support
+	/// Base interface required for the built-in Linq support.
 	/// </summary>
 	public interface IBaseSource
 	{
