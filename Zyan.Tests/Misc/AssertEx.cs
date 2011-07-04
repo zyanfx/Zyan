@@ -27,7 +27,7 @@ namespace Zyan.Tests
 		public static void IsInstanceOf<T>(object obj)
 		{
 #if NUNIT
-			Assert.IsInstanceOf<T>(obj);
+			Assert.IsInstanceOfType(typeof(T), obj);
 #else
 			Assert.IsInstanceOfType(obj, typeof(T));
 #endif
@@ -36,7 +36,7 @@ namespace Zyan.Tests
 		public static void IsNotInstanceOf<T>(object obj)
 		{
 #if NUNIT
-			Assert.IsInstanceOf<T>(obj);
+			Assert.IsNotInstanceOfType(typeof(T), obj);
 #else
 			Assert.IsNotInstanceOfType(obj, typeof(T));
 #endif
