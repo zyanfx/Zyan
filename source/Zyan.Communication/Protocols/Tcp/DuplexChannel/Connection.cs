@@ -38,12 +38,12 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 	public class Connection
 	{
 		#region Connection management
-				
+
 		private static readonly Dictionary<string, Connection> _connections=new Dictionary<string, Connection>();
 		private static object _connectionsLockObject = new object();
-		
+
 		private static readonly Regex _addressRegEx=new Regex(@"^(?<address>[^:]+)(:(?<port>\d+))?$", RegexOptions.Compiled);
-					
+
 		/// <summary>
 		/// Gets a specified connection.
 		/// </summary>
@@ -129,7 +129,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				throw new ArgumentNullException("channel");
 
 			return new Connection(socket, channel, keepAlive, keepAliveTime, KeepAliveInterval, maxRetries, retryDelay);            
-		}               
+		}
 
 		#endregion
 
@@ -152,7 +152,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 			if (channel == null)
 				throw new ArgumentNullException("channel");
-						
+
 			_connectionRole = ConnectionRole.ActAsClient;
 			_maxRetries = maxRetries;
 			_retryDelay = retryDelay;
@@ -169,7 +169,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 			_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 			_socket.Connect(new IPEndPoint(remoteIPAddress, _socketRemotePort));
-			
+
 			SendChannelInfo();
 			ReceiveChannelInfo();
 
@@ -206,14 +206,14 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			_connectionRole = ConnectionRole.ActAsServer;
 			_maxRetries = maxRetries;
 			_retryDelay = retryDelay;
-			_channel = channel;            		
+			_channel = channel;
 			_socket = socket;
-			
+
 			IPEndPoint remoteEndPoint = socket.RemoteEndPoint as IPEndPoint;
 			_socketRemoteAddress = remoteEndPoint.Address.ToString();
 			_socketRemotePort = remoteEndPoint.Port;
-			
-			ReceiveChannelInfo();            
+
+			ReceiveChannelInfo();
 			SendChannelInfo();
 
 			if (_connections.ContainsKey(_remoteChannelData.ChannelID.ToString()))
@@ -255,28 +255,28 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// <summary>
 		/// Port of the remote socket endpoint.
 		/// </summary>
-		protected int _socketRemotePort;               
+		protected int _socketRemotePort;
 
 		/// <summary>
 		/// Networkstream for sending and receiving raw data.
 		/// </summary>
 		protected Stream _stream;
-		
+
 		/// <summary>
 		/// Reader for reading binary raw data from network stream.
 		/// </summary>
 		protected BinaryReader _reader;
-		
+
 		/// <summary>
 		/// Writer for writing binary raw data to network stream.
 		/// </summary>
 		protected BinaryWriter _writer;
-		
+
 		/// <summary>
 		/// Parent Remoting channel of this connection.
 		/// </summary>
 		protected TcpExChannel _channel;
-		
+
 		/// <summary>
 		/// Configuration data of the remoting channel.
 		/// </summary>
@@ -326,9 +326,9 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 							break;
 
 						case ConnectionRole.ActAsServer:
-							
+
 							// Wait for connection from client
-				  
+
 							break;
 					}
 					if (_retryDelay > 0)
@@ -365,13 +365,13 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		private void AddToConnectionList()
 		{
 			lock (_connectionsLockObject)
-			{				
+			{
 				_connections.Add(_remoteChannelData.ChannelID.ToString(), this);
 
 				if (_remoteChannelData.Addresses != null)
 				{
 					foreach (string address in _remoteChannelData.Addresses)
-					{                     
+					{
 						_connections.Add(address, this);
 					}
 				}
@@ -456,7 +456,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 					_socket = null;
 				}
 			}
-			if (_channel != null)            
+			if (_channel != null)
 				_channel = null;
 
 			if (_remoteChannelData != null)
@@ -605,7 +605,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		#region Locking
 
 		private object _readLock = new object();
-		private object _writeLock = new object();        
+		private object _writeLock = new object();
 
 		/// <summary>
 		/// Locks the connection for reading through other threads.
@@ -651,7 +651,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		const int BITS_PER_BYTE = 8;
 
 		/// <summary>
-		/// Enables or disables TCP KeepAlive.        
+		/// Enables or disables TCP KeepAlive.
 		/// </summary>
 		public bool TcpKeepAliveEnabled
 		{
@@ -660,7 +660,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			{ 
 				_tcpKeepAliveEnabled = value; 
 				
-				if (_socket!=null)                
+				if (_socket!=null)
 					SetTcpKeepAlive(_socket, _tcpKeepAliveEnabled ? TcpKeepAliveTime : 0, _tcpKeepAliveEnabled ? TcpKeepAliveInterval : 0);                
 			}
 		}
@@ -691,12 +691,12 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// <param name="interval">Interval in milliseconds</param>
 		/// <returns>True if successful, otherwiese false</returns>
 		private bool SetTcpKeepAlive(Socket socket, ulong time, ulong interval)
-		{            
+		{
 			try
-			{                
+			{
 				byte[] sioKeepAliveValues = new byte[3 * BYTES_PER_LONG];
 				ulong[] input = new ulong[3];
-								
+
 				if (time == 0 || interval == 0)
 					input[0] = (0UL); // Off
 				else
@@ -704,16 +704,16 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 				input[1] = time;
 				input[2] = interval;
-								
+
 				for (int i = 0; i < input.Length; i++)
 				{
 					sioKeepAliveValues[i * BYTES_PER_LONG + 3] = (byte)(input[i] >> ((BYTES_PER_LONG - 1) * BITS_PER_BYTE) & 0xff);
 					sioKeepAliveValues[i * BYTES_PER_LONG + 2] = (byte)(input[i] >> ((BYTES_PER_LONG - 2) * BITS_PER_BYTE) & 0xff);
 					sioKeepAliveValues[i * BYTES_PER_LONG + 1] = (byte)(input[i] >> ((BYTES_PER_LONG - 3) * BITS_PER_BYTE) & 0xff);
 					sioKeepAliveValues[i * BYTES_PER_LONG + 0] = (byte)(input[i] >> ((BYTES_PER_LONG - 4) * BITS_PER_BYTE) & 0xff);
-				}                
+				}
 				byte[] result = BitConverter.GetBytes(0);
-								
+
 				socket.IOControl(IOControlCode.KeepAliveValues, sioKeepAliveValues, result);
 			}
 			catch (Exception)
