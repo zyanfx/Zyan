@@ -146,12 +146,12 @@ namespace Zyan.Tests
 			});
 
 			// check if the method is still running
-			Assert.IsTrue(mre.WaitOne(300));
+			Assert.IsTrue(mre.WaitOne(5000));
 			Assert.IsFalse(callbackExecuted);
 
 			// wait for the method to finish
 			mre.Reset();
-			Assert.IsTrue(mre.WaitOne(500));
+			Assert.IsTrue(mre.WaitOne(5000));
 			Assert.IsTrue(callbackExecuted);
 		}
 
@@ -205,7 +205,7 @@ namespace Zyan.Tests
 			});
 
 			// check if exception was caught
-			Assert.IsTrue(mre.WaitOne(100));
+			Assert.IsTrue(mre.WaitOne(5000));
 			Assert.IsTrue(callbackExecuted);
 		}
 	}
