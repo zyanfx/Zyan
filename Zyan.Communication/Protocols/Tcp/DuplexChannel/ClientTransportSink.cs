@@ -20,7 +20,7 @@ using System.Linq;
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
 	class ClientTransportSink : IClientChannelSink
-	{		
+	{
 		string server;
 		TcpExChannel channel;
 

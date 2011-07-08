@@ -134,7 +134,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		#endregion
 
 		#region Constructors
-		
+
 		/// <summary>
 		/// Creates a new instance of the Connection class.
 		/// </summary>
@@ -159,7 +159,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			_channel = channel;
 
 			Match m = _addressRegEx.Match(address);
-			
+
 			if (!m.Success)
 				throw new FormatException(string.Format(LanguageResource.Format_Exception_InvalidAddressFormat, address));
 
@@ -251,7 +251,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// Address of the remote socket endpoint.
 		/// </summary>
 		protected string _socketRemoteAddress;
-		
+
 		/// <summary>
 		/// Port of the remote socket endpoint.
 		/// </summary>
@@ -656,8 +656,8 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		public bool TcpKeepAliveEnabled
 		{
 			get { return _tcpKeepAliveEnabled; }
-			set 
-			{ 
+			set
+			{
 				_tcpKeepAliveEnabled = value; 
 				
 				if (_socket!=null)
@@ -685,7 +685,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 		/// <summary>
 		/// Sets TCP-KeepAlive option for a specified socket.
-		/// </summary>        
+		/// </summary>
 		/// <param name="socket">Socket</param>
 		/// <param name="time">Time in milliseconds</param>
 		/// <param name="interval">Interval in milliseconds</param>
