@@ -177,6 +177,7 @@
     <Compile Include="Protocols\Tcp\DuplexChannel\ServerTransportSink.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\TcpExChannel.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\TcpExChannelData.cs" />
+    <Compile Include="Protocols\Tcp\DuplexChannel\TransportHeaderWrapper.cs" />
     <Compile Include="Protocols\Tcp\TcpCustomClientProtocolSetup.cs" />
     <Compile Include="Protocols\Tcp\TcpCustomServerProtocolSetup.cs" />
     <Compile Include="Protocols\Tcp\TcpBinaryClientProtocolSetup.cs" />
