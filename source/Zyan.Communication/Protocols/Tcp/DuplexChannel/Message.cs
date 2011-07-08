@@ -18,6 +18,7 @@ using System.Net.Sockets;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
+using System.Runtime.Serialization.Formatters;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
@@ -26,11 +27,9 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 	/// </summary>
 	public class Message
 	{
-		private static readonly BinaryFormatter formatter = new BinaryFormatter();
 		internal const int SizeOfGuid = 16;
-
-		public Guid Guid;
-		public ITransportHeaders Headers;
+		internal Guid Guid;
+		internal ITransportHeaders Headers;
 		private Stream messageBody;
 		private byte[] messageBodyBytes;
 
@@ -79,8 +78,8 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 				BinaryWriter writer = connection.Writer;
 				writer.Write(Guid.ToByteArray());
-				MemoryStream headerStream = new MemoryStream();
-				formatter.Serialize(headerStream, Headers);
+
+				var headerStream = TransportHeaderWrapper.Serialize(Headers);
 				writer.Write((int)headerStream.Length);
 				writer.Write(headerStream.GetBuffer(), 0, (int)headerStream.Length);
 				
@@ -113,43 +112,42 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// <param name="message">Stream with raw data of the message</param>
 		public static void Send(Connection connection, Guid guid, ITransportHeaders headers, Stream message)
 		{
-            try
-            {
-                connection.LockWrite();
-                BinaryWriter writer = connection.Writer;
-                writer.Write(guid.ToByteArray());
+			try
+			{
+				connection.LockWrite();
+				BinaryWriter writer = connection.Writer;
+				writer.Write(guid.ToByteArray());
 
-                MemoryStream headerStream = new MemoryStream();
-                formatter.Serialize(headerStream, headers);
-                writer.Write((int)headerStream.Length);
-                writer.Write(headerStream.GetBuffer(), 0, (int)headerStream.Length);
+				var headerStream = TransportHeaderWrapper.Serialize(headers);
+				writer.Write((int)headerStream.Length);
+				writer.Write(headerStream.GetBuffer(), 0, (int)headerStream.Length);
 
-                writer.Write((int)message.Length);
-                MemoryStream ms = message as MemoryStream;
-                if (ms == null)
-                {
-                    byte[] msgBuffer = new byte[message.Length];
-                    message.Read(msgBuffer, 0, (int)message.Length);
-                    writer.Write(msgBuffer, 0, (int)message.Length);
-                }
-                else
-                    writer.Write(ms.GetBuffer(), 0, (int)message.Length);
-                writer.Flush();
-            }
-            catch (ObjectDisposedException)
-            {
-                // Socket may be closed meanwhile. Connection isn´t working anymore, so close it.
-                connection.ReleaseWrite();
-                connection.Close();
-                connection = null;
-            }
-            catch (IOException)
-            {
-                // Unexpected connection loss. Connection isn´t working anymore, so close it.
-                connection.ReleaseWrite();
-                connection.Close();
-                connection = null;
-            }
+				writer.Write((int)message.Length);
+				MemoryStream ms = message as MemoryStream;
+				if (ms == null)
+				{
+					byte[] msgBuffer = new byte[message.Length];
+					message.Read(msgBuffer, 0, (int)message.Length);
+					writer.Write(msgBuffer, 0, (int)message.Length);
+				}
+				else
+					writer.Write(ms.GetBuffer(), 0, (int)message.Length);
+				writer.Flush();
+			}
+			catch (ObjectDisposedException)
+			{
+				// Socket may be closed meanwhile. Connection isn´t working anymore, so close it.
+				connection.ReleaseWrite();
+				connection.Close();
+				connection = null;
+			}
+			catch (IOException)
+			{
+				// Unexpected connection loss. Connection isn´t working anymore, so close it.
+				connection.ReleaseWrite();
+				connection.Close();
+				connection = null;
+			}
 			finally
 			{
 				if (connection!=null)
@@ -196,7 +194,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 					MemoryStream headerStream = new MemoryStream(reader.ReadBytes(headerLength));
 					if (headerStream.Length != headerLength)
 						throw new Exception("Not enough headers read...");
-					retVal.Headers = (ITransportHeaders)formatter.Deserialize(headerStream);
+					retVal.Headers = TransportHeaderWrapper.Deserialize(headerStream);
 
 					int bodyLength = reader.ReadInt32();
 
