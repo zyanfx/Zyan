@@ -44,8 +44,17 @@ namespace Zyan.Communication.Composition
 			IsPublished = true;
 		}
 
+		/// <summary>
+		/// Gets the component interface.
+		/// </summary>
 		public Type ComponentInterface { get; private set; }
 
+		/// <summary>
+		/// Gets or sets a value indicating whether this instance should be published by ZyanComponentHost.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if this instance is published; otherwise, <c>false</c>.
+		/// </value>
 		public bool IsPublished { get; set; }
 	}
 }

@@ -227,14 +227,15 @@ namespace Zyan.Communication
 
 		//TODO: This method needs refactoring. It´s too big.
 		/// <summary>
-		/// Processes remote method invocation.        
+		/// Processes remote method invocation.
 		/// </summary>
 		/// <param name="trackingID">Key for call tracking</param>
 		/// <param name="interfaceName">Name of the component interface</param>
 		/// <param name="delegateCorrelationSet">Correlation set for dynamic event and delegate wiring</param>
 		/// <param name="methodName">Name of the invoked method</param>
+		/// <param name="genericArguments">Generic arguments of the invoked method</param>
 		/// <param name="paramDefs">Reflection info of parameter types</param>
-		/// <param name="args">Parameter values</param>        
+		/// <param name="args">Parameter values</param>
 		/// <returns>Return value</returns>
 		public object Invoke(Guid trackingID, string interfaceName, List<DelegateCorrelationInfo> delegateCorrelationSet, string methodName, Type[] genericArguments, ParameterInfo[] paramDefs, params object[] args)
 		{

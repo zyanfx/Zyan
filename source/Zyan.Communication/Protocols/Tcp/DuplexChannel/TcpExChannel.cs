@@ -18,7 +18,16 @@ using Zyan.Communication.Protocols.Tcp.DuplexChannel.Diagnostics;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
-	/// <include file='TcpExChannel.docs' path='TcpExChannel/summary[@name="TcpExChannel"]'/>
+	/// <summary name="TcpExChannel">
+	/// A replacement for the standard Tcp remoting channel that allows communication in both directions over a single tcp connection.
+	/// <b>Remoting Configuration Parameters</b>
+	/// <list type="bullet">
+	/// <item><term>port</term><description>The tcp port the channel should listen on.  If this is specified, the channel will automatically start listening on that port.</description></item>
+	/// <item><term>listen</term><description>Indicates the channel should start listening.  This is not required if the port parameter is specified.  If no port is specified the channel will choose a random unused port.</description></item>
+	/// <item><term>bufferSize</term><description>The size of the buffer to use when sending data over a connection.</description></item>
+	/// <item><term>priority</term><description>The priority of the channel.</description></item>
+	/// </list>
+	/// </summary>
 	public class TcpExChannel : IChannel, IChannelSender, IChannelReceiver
 	{
 		private int port = 0;
@@ -64,31 +73,58 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 		#region Constructors
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TcpExChannel"/> class with default settings (client mode).
+		/// </summary>
 		public TcpExChannel()
 		{
 			Initialise(TypeFilterLevel.Low, null, null, 0, false, true, 30000, 1000, 10, 1000);
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TcpExChannel"/> class (server mode).
+		/// </summary>
+		/// <param name="port">Tcp port.</param>
 		public TcpExChannel(int port)
 		{
 			Initialise(TypeFilterLevel.Low, null, null, port, true, true, 30000, 1000, 10, 1000);
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TcpExChannel"/> class.
+		/// </summary>
+		/// <param name="listen">if set to <c>true</c>, the channel will listen for incoming connections.</param>
 		public TcpExChannel(bool listen)
 		{
 			Initialise(TypeFilterLevel.Low, null, null, 0, listen, true, 30000, 1000, 10, 1000);
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TcpExChannel"/> class.
+		/// </summary>
+		/// <param name="filterLevel">The type filter level.</param>
+		/// <param name="listen">if set to <c>true</c>, the channel will listen for incoming connections.</param>
 		public TcpExChannel(TypeFilterLevel filterLevel, bool listen)
 		{
 			Initialise(filterLevel, null, null, 0, listen, true, 30000, 1000, 10, 1000);
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TcpExChannel"/> class.
+		/// </summary>
+		/// <param name="filterLevel">The type filter level.</param>
+		/// <param name="port">Tcp port.</param>
 		public TcpExChannel(TypeFilterLevel filterLevel, int port)
 		{
 			Initialise(filterLevel, null, null, port, true, true, 30000, 1000,10,1000);
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TcpExChannel"/> class.
+		/// </summary>
+		/// <param name="properties">Channel initialization properties. <see cref="TcpExChannel"/></param>
+		/// <param name="clientSinkProvider">The client sink provider.</param>
+		/// <param name="serverSinkProvider">The server sink provider.</param>
 		public TcpExChannel(IDictionary properties, IClientChannelSinkProvider clientSinkProvider, IServerChannelSinkProvider serverSinkProvider)
 		{
 			int port = 0;
@@ -182,27 +218,45 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		}
 
 		#region Properties
-		
+
+		/// <summary>
+		/// Gets the unique identifier of the channel.
+		/// </summary>
 		public Guid ChannelID
 		{
 			get { return _channelID; }
 		}
 
+		/// <summary>
+		/// Gets the Tcp port.
+		/// </summary>
 		public int Port
 		{
 			get { return port; }
 		}
 
+		/// <summary>
+		/// Gets a value indicating whether this channel is listening to incoming connections.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if this instance is listening to incoming connections; otherwise, <c>false</c>.
+		/// </value>
 		public bool IsListening
 		{
 			get { return port != 0;	}
 		}
 
+		/// <summary>
+		/// Gets or sets the maximum number of connection retry attempts.
+		/// </summary>
 		public short MaxRetries
 		{
 			get { return _maxRetries; }
 		}
 
+		/// <summary>
+		/// Gets or sets the delay after a retry attempt in milliseconds.
+		/// </summary>
 		public int RetryDelay
 		{
 			get { return _retryDelay; }
@@ -212,16 +266,41 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 		#region Implementation of IChannel
 
+		/// <summary>
+		/// Returns the object URI as an out parameter, and the URI of the current channel as the return value.
+		/// </summary>
+		/// <param name="url">The URL of the object.</param>
+		/// <param name="objectURI">When this method returns, contains a <see cref="T:System.String"/> that holds the object URI. This parameter is passed uninitialized.</param>
+		/// <returns>
+		/// The URI of the current channel, or null if the URI does not belong to this channel.
+		/// </returns>
+		/// <exception cref="T:System.Security.SecurityException">The immediate caller does not have infrastructure permission. </exception>
 		public string Parse(string url, out string objectURI)
 		{
 			return Manager.Parse(url, out objectURI);
 		}
 
+		/// <summary>
+		/// Gets the name of the channel.
+		/// </summary>
+		/// <returns>The name of the channel.</returns>
+		/// <exception cref="T:System.Security.SecurityException">The immediate caller does not have infrastructure permission. </exception>
+		/// <PermissionSet>
+		///  <IPermission class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Flags="Infrastructure"/>
+		/// </PermissionSet>
 		public string ChannelName
 		{
 			get { return name; }
 		}
 
+		/// <summary>
+		/// Gets the priority of the channel.
+		/// </summary>
+		/// <returns>An integer that indicates the priority of the channel.</returns>
+		/// <exception cref="T:System.Security.SecurityException">The immediate caller does not have infrastructure permission. </exception>
+		/// <PermissionSet>
+		///  <IPermission class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Flags="Infrastructure"/>
+		/// </PermissionSet>
 		public int ChannelPriority
 		{
 			get { return priority; }
@@ -231,6 +310,16 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 		#region Implementation of IChannelSender
 
+		/// <summary>
+		/// Returns a channel message sink that delivers messages to the specified URL or channel data object.
+		/// </summary>
+		/// <param name="url">The URL to which the new sink will deliver messages. Can be null.</param>
+		/// <param name="remoteChannelData">The channel data object of the remote host to which the new sink will deliver messages. Can be null.</param>
+		/// <param name="objectURI">When this method returns, contains a URI of the new channel message sink that delivers messages to the specified URL or channel data object. This parameter is passed uninitialized.</param>
+		/// <returns>
+		/// A channel message sink that delivers messages to the specified URL or channel data object, or null if the channel cannot connect to the given endpoint.
+		/// </returns>
+		/// <exception cref="T:System.Security.SecurityException">The immediate caller does not have infrastructure permission. </exception>
 		public IMessageSink CreateMessageSink(string url, object remoteChannelData, out string objectURI)
 		{
 			if (url == null)
@@ -255,6 +344,11 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 		#region Implementation of IChannelReceiver
 
+		/// <summary>
+		/// Instructs the current channel to start listening for requests.
+		/// </summary>
+		/// <param name="data">Optional initialization information.</param>
+		/// <exception cref="T:System.Security.SecurityException">The immediate caller does not have infrastructure permission. </exception>
 		public void StartListening(object data)
 		{
 			if (this.port != 0)
@@ -272,16 +366,37 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			}
 		}
 
+		/// <summary>
+		/// Instructs the current channel to stop listening for requests.
+		/// </summary>
+		/// <param name="data">Optional state information for the channel.</param>
+		/// <exception cref="T:System.Security.SecurityException">The immediate caller does not have infrastructure permission. </exception>
 		public void StopListening(object data)
 		{
 			Manager.StopListening(this);
 		}
 
+		/// <summary>
+		/// Returns an array of all the URLs for a URI.
+		/// </summary>
+		/// <param name="objectURI">The URI for which URLs are required.</param>
+		/// <returns>
+		/// An array of the URLs.
+		/// </returns>
+		/// <exception cref="T:System.Security.SecurityException">The immediate caller does not have infrastructure permission. </exception>
 		public string[] GetUrlsForUri(string objectURI)
 		{
 			return Manager.GetUrlsForUri(objectURI, port, _channelID);
 		}
 
+		/// <summary>
+		/// Gets the channel-specific data.
+		/// </summary>
+		/// <returns>The channel data.</returns>
+		/// <exception cref="T:System.Security.SecurityException">The immediate caller does not have infrastructure permission. </exception>
+		/// <PermissionSet>
+		/// 	<IPermission class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Flags="Infrastructure"/>
+		/// </PermissionSet>
 		public object ChannelData
 		{
 			get { return channelData; }

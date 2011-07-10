@@ -16,7 +16,7 @@
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel.Diagnostics
 {
-	public class Trace
+	internal class Trace
 	{
 		const string TraceCategory = "TcpEx";
 

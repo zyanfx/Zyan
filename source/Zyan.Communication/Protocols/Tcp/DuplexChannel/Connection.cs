@@ -26,8 +26,15 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 	/// Defines connection roles. A connection may act as Server or as Client.
 	/// </summary>
 	public enum ConnectionRole
-	{ 
+	{
+		/// <summary>
+		/// Connection acts as client.
+		/// </summary>
 		ActAsClient = 1,
+
+		/// <summary>
+		/// Connection acts as server.
+		/// </summary>
 		ActAsServer
 	}
 
