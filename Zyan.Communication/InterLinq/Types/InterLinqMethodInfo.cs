@@ -38,7 +38,6 @@ namespace Zyan.InterLinq.Types
 		/// <summary>
 		/// Returns true if the <see cref="InterLinqMethodInfo"/> is generic.
 		/// </summary>
-		/// <seealso cref="MethodInfo.IsGenericMethod"/>
 		public bool IsGeneric
 		{
 			get { return GenericArguments.Count > 0; }
@@ -50,6 +49,12 @@ namespace Zyan.InterLinq.Types
 		/// <seealso cref="MethodInfo.GetGenericArguments"/>
 		[DataMember]
 		public List<InterLinqType> GenericArguments { get; set; }
+
+		/// <summary>
+		/// Returns true if the <see cref="InterLinqMethodInfo"/> is static.
+		/// </summary>
+		[DataMember]
+		public bool IsStatic { get; private set; }
 
 		#endregion
 
@@ -83,6 +88,7 @@ namespace Zyan.InterLinq.Types
 			base.Initialize(memberInfo);
 			MethodInfo methodInfo = memberInfo as MethodInfo;
 			ReturnType = InterLinqTypeSystem.Instance.GetInterLinqVersionOf<InterLinqType>(methodInfo.ReturnType);
+			IsStatic = methodInfo.IsStatic;
 			if (methodInfo.IsGenericMethod)
 			{
 				foreach (Type genericArgument in methodInfo.GetGenericArguments())

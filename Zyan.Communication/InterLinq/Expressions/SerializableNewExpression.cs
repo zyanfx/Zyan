@@ -10,7 +10,7 @@ using Zyan.InterLinq.Types;
 namespace Zyan.InterLinq.Expressions
 {
 	/// <summary>
-	/// A serializable version of <see cref="NewArrayExpression"/>.
+	/// A serializable version of <see cref="NewExpression"/>.
 	/// </summary>
 	[Serializable]
 	[DataContract]
@@ -104,7 +104,8 @@ namespace Zyan.InterLinq.Expressions
 		{
 			if (method != null)
 			{
-#warning Implement
+				//TODO: implement (this method is only used by ToString)
+
 				//InterLinqType declaringType = method.DeclaringType;
 				//BindingFlags bindingAttr = BindingFlags.NonPublic | BindingFlags.Public;
 				//bindingAttr |= method.IsStatic ? BindingFlags.Static : BindingFlags.Instance;
