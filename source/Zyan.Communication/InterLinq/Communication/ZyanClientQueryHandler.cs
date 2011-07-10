@@ -13,8 +13,17 @@ namespace Zyan.InterLinq
 	/// <seealso cref="IQueryHandler"/>
 	public class ZyanClientQueryHandler : ClientQueryHandler
 	{
+		/// <summary>
+		/// Gets or sets a value indicating whether ambient transaction support is enabled.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if ambient transaction support; otherwise, <c>false</c>.
+		/// </value>
 		public bool ImplicitTransactionTransfer { get; set; }
 
+		/// <summary>
+		/// Gets the <see cref="ZyanConnection"/> associated with the client query handler.
+		/// </summary>
 		public ZyanConnection Connection { get; private set; }
 
 		private string _uniqueName = string.Empty;

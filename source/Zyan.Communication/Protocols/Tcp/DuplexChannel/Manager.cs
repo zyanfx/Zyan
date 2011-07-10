@@ -166,12 +166,12 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			catch (DuplicateConnectionException)
 			{
 			}
-			catch (IOException ioEx)
+			catch (IOException)
 			{
 				// Client socket is not responding
 				//TODO: Add Tracing here!
 			}
-			catch (SerializationException serEx)
+			catch (SerializationException)
 			{ 
 				// Client sends bad data
 				//TODO: Add Tracing here!

@@ -18,6 +18,7 @@ namespace Zyan.Communication
 		/// <param name="trackingID">Aufrufschlüssel zur Nachverfolgung</param>
 		/// <param name="interfaceName">Name der Komponentenschnittstelle</param>
 		/// <param name="delegateCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Delegaten und Ereignisse mit entfernten Methoden</param>
+		/// <param name="genericArguments">Generic parameters for the method</param>
 		/// <param name="methodName">Methodenname</param>
 		/// <param name="paramDefs">Parameter-Definitionen</param>
 		/// <param name="args">Parameter</param>
