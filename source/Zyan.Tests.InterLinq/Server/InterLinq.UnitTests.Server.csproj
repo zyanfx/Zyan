@@ -108,9 +108,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Libraries\MySql.Data.dll" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="App.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
