@@ -98,7 +98,7 @@
     </ProjectReference>
     <ProjectReference Include="..\Artefacts\InterLinq.UnitTests.Artefacts.csproj">
       <Project>{DF5A0083-AB07-4E04-BA02-8D21ED866337}</Project>
-      <Name>InterLinq.UnitTest.Artefacts</Name>
+      <Name>InterLinq.UnitTests.Artefacts</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
