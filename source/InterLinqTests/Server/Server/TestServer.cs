@@ -1,34 +1,32 @@
 ﻿
 namespace InterLinq.UnitTests.Server
 {
-    public abstract class TestServer
-    {
+	public abstract class TestServer
+	{
+		#region Fields
 
-        #region Fields
+		protected string connectionString;
 
-        protected string connectionString;
+		#endregion
 
-        #endregion
+		#region Properties
 
-        #region Properties
+		protected string databaseName;
+		public abstract string DatabaseName { get; }
 
-        protected string databaseName;
-        public abstract string DatabaseName { get; }
+		protected string createScriptName;
+		public abstract string CreateScriptName { get; }
 
-        protected string createScriptName;
-        public abstract string CreateScriptName { get; }
+		protected string integrityScriptName;
+		public abstract string IntegrityScriptName { get; }
 
-        protected string integrityScriptName;
-        public abstract string IntegrityScriptName { get; }
+		#endregion
 
-        #endregion
+		#region Methods
 
-        #region Methods
+		public abstract void Start();
+		public abstract void Publish();
 
-        public abstract void Start();
-        public abstract void Publish();
-
-        #endregion
-
-    }
+		#endregion
+	}
 }

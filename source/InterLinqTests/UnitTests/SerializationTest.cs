@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq.Expressions;
-using InterLinq.Expressions;
+using Zyan.InterLinq;
+using Zyan.InterLinq.Expressions;
 
 namespace InterLinq.UnitTests
 {
