@@ -428,7 +428,7 @@ namespace Zyan.Communication
 
 		// Benachrichtigungsdienst
 		private volatile NotificationService _notificationService = null;
-				
+
 		// Sperrobjekt für Instanzerstellung des Benachrichtigungsdienstes 
 		private object _notificationServiceLockObject = new object();
 
@@ -598,12 +598,19 @@ namespace Zyan.Communication
 		{
 			Dispose(true);
 		}
-				
+
 		#endregion
 
 		#region Login Events
 
+		/// <summary>
+		/// Occurs when new client is logged on.
+		/// </summary>
 		public event EventHandler<LoginEventArgs> ClientLoggedOn;
+
+		/// <summary>
+		/// Occurs when the client is logged off.
+		/// </summary>
 		public event EventHandler<LoginEventArgs> ClientLoggedOff;
 
 		/// <summary>

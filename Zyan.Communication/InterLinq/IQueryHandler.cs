@@ -9,10 +9,10 @@ namespace Zyan.InterLinq
 	public interface IQueryHandler
 	{
 		/// <summary>
-		/// Returns an <see cref="IQueryable{T}"/>.
+		/// Returns an <see cref="IQueryable"/>.
 		/// </summary>
-		/// <param name="type">Type of the returned <see cref="IQueryable{T}"/>.</param>
-		/// <returns>Returns an <see cref="IQueryable{T}"/>.</returns>
+		/// <param name="type">Type of the returned <see cref="IQueryable"/>.</param>
+		/// <returns>Returns an <see cref="IQueryable"/>.</returns>
 		IQueryable Get(Type type);
 
 		/// <summary>

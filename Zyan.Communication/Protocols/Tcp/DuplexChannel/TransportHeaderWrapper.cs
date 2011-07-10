@@ -24,7 +24,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			FilterLevel = TypeFilterLevel.Low,
 			TypeFormat = FormatterTypeStyle.TypesWhenNeeded
 		};
-			
+
 		object[] Keys = new object[0];
 
 		object[] Values = new object[0];

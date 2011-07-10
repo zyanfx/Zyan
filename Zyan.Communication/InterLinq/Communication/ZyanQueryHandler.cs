@@ -21,10 +21,10 @@ namespace Zyan.InterLinq
 		}
 
 		/// <summary>
-		/// Returns an <see cref="IQueryable{T}"/>.
+		/// Returns an <see cref="IQueryable"/>.
 		/// </summary>
-		/// <typeparam name="T">Generic Argument of the returned <see cref="IQueryable{T}"/>.</typeparam>
-		/// <returns>Returns an <see cref="IQueryable{T}"/>.</returns>
+		/// <param name="type">Generic Argument of the returned <see cref="IQueryable"/>.</param>
+		/// <returns>Returns an <see cref="IQueryable"/>.</returns>
 		public IQueryable Get(Type type)
 		{
 			var getTableMethod = GetType().GetMethod("Get", new Type[] { });
