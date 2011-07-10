@@ -1,11 +1,11 @@
 ﻿using System;
 using System.ServiceModel;
-using InterLinq.Communication.Wcf;
-using InterLinq.Communication.Remoting;
 using System.Collections;
 using System.Runtime.Remoting.Channels;
 using InterLinq.UnitTests.Artefacts.EntityFramework4;
 using InterLinq.EntityFramework4;
+using Zyan.InterLinq.Communication.Wcf;
+using Zyan.InterLinq.Communication.Remoting;
 
 namespace InterLinq.UnitTests.Server
 {

@@ -40,7 +40,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\..\bin\UnitTests\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -49,26 +49,13 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\..\bin\UnitTests\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MySql.Data, Version=1.0.5.13785, Culture=neutral, PublicKeyToken=c5687fc88969c44d" />
-    <Reference Include="NHibernate, Version=2.1.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\InterLinq.NHibernate\Libraries\NHibernate.dll</HintPath>
-    </Reference>
-    <Reference Include="NHibernate.ByteCode.Castle, Version=2.1.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\InterLinq.NHibernate\Libraries\NHibernate.ByteCode.Castle.dll</HintPath>
-    </Reference>
-    <Reference Include="NHibernate.Linq, Version=1.0.0.4000, Culture=neutral, PublicKeyToken=444cf6a87fdab271, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\InterLinq.NHibernate\Libraries\NHibernate.Linq.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -95,47 +82,23 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Server\ServerQueryRemotingHandlerEntityFramework4.cs" />
-    <Compile Include="Server\TestServerEntityFramework4.cs" />
     <Compile Include="Server\ServerQueryRemotingHandlerObjects.cs" />
     <Compile Include="Server\ServerQueryRemotingHandlerNHibernate.cs" />
     <Compile Include="Server\ServerQueryRemotingHandlerSql.cs" />
     <Compile Include="Server\TestServer.cs" />
     <Compile Include="Server\TestServerObjects.cs" />
-    <Compile Include="Server\TestServerSql.cs" />
-    <Compile Include="Server\DatabaseCreator.cs" />
     <Compile Include="Server\CredentialsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Server\TestServerNHibernate.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\InterLinq.EntityFramework4\InterLinq.EntityFramework4.csproj">
-      <Project>{5C5566A3-1070-4FF7-AE5E-8BF13F37520E}</Project>
-      <Name>InterLinq.EntityFramework4</Name>
+    <ProjectReference Include="..\..\Zyan.Communication\Zyan.Communication.csproj">
+      <Project>{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}</Project>
+      <Name>Zyan.Communication</Name>
     </ProjectReference>
-    <ProjectReference Include="..\InterLinq.EntityFramework\InterLinq.EntityFramework.csproj">
-      <Project>{367F0339-C4B3-462E-AC59-81A10681992D}</Project>
-      <Name>InterLinq.EntityFramework</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\InterLinq.NHibernate\InterLinq.NHibernate.csproj">
-      <Project>{B134658A-9FBF-4497-874E-61A2EAA3CF9C}</Project>
-      <Name>InterLinq.NHibernate</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\InterLinq.Objects\InterLinq.Objects.csproj">
-      <Project>{EFBC924D-DD86-4CB1-86F9-FA65817B8CB0}</Project>
-      <Name>InterLinq.Objects</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\InterLinq.Sql\InterLinq.Sql.csproj">
-      <Project>{0A5F7199-3928-4E95-813D-21F0038AB7B0}</Project>
-      <Name>InterLinq.Sql</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\InterLinq.UnitTests.Artefacts\InterLinq.UnitTests.Artefacts.csproj">
+    <ProjectReference Include="..\Artefacts\InterLinq.UnitTests.Artefacts.csproj">
       <Project>{DF5A0083-AB07-4E04-BA02-8D21ED866337}</Project>
       <Name>InterLinq.UnitTest.Artefacts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\InterLinq\InterLinq.csproj">
-      <Project>{675F3E10-B4EA-4254-A068-107AAF02D093}</Project>
-      <Name>InterLinq</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

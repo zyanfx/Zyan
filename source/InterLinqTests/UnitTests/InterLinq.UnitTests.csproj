@@ -37,17 +37,18 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\..\bin\UnitTests\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\InterLinq.UnitTests.XML</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\..\bin\UnitTests\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -55,10 +56,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="NHibernate, Version=2.1.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\InterLinq.NHibernate\Libraries\NHibernate.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -75,30 +72,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClientEnvironment.cs" />
-    <Compile Include="EntityFramework4\CompanyExampleTest.cs" />
     <Compile Include="FaultShieldQueryHandler.cs" />
-    <Compile Include="NHibernate\CompanyExampleTest.cs" />
     <Compile Include="Objects\CompanyExampleTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerializationTest.cs" />
-    <Compile Include="Sql\CompanyExampleTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\InterLinq.EntityFramework4\InterLinq.EntityFramework4.csproj">
-      <Project>{5C5566A3-1070-4FF7-AE5E-8BF13F37520E}</Project>
-      <Name>InterLinq.EntityFramework4</Name>
+    <ProjectReference Include="..\..\Zyan.Communication\Zyan.Communication.csproj">
+      <Project>{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}</Project>
+      <Name>Zyan.Communication</Name>
     </ProjectReference>
-    <ProjectReference Include="..\InterLinq.EntityFramework\InterLinq.EntityFramework.csproj">
-      <Project>{367F0339-C4B3-462E-AC59-81A10681992D}</Project>
-      <Name>InterLinq.EntityFramework</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\InterLinq.UnitTests.Artefacts\InterLinq.UnitTests.Artefacts.csproj">
+    <ProjectReference Include="..\Artefacts\InterLinq.UnitTests.Artefacts.csproj">
       <Project>{DF5A0083-AB07-4E04-BA02-8D21ED866337}</Project>
       <Name>InterLinq.UnitTests.Artefacts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\InterLinq\InterLinq.csproj">
-      <Project>{675F3E10-B4EA-4254-A068-107AAF02D093}</Project>
-      <Name>InterLinq</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
