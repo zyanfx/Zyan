@@ -297,7 +297,7 @@ namespace Zyan.Communication
 		{
 			// TCP-Kommunikationskanal öffnen
 			IChannel channel = _protocolSetup.CreateChannel();
-						
+
 			// Wenn der Kanal erzeugt wurde ...
 			if (channel != null)
 			{

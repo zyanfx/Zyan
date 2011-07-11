@@ -12,7 +12,7 @@ namespace Zyan.InterLinq.Communication.Remoting
 		/// <summary>
 		/// The default service protocol for the server name
 		/// </summary>
-		public const string DefaultServiceProtcol = "tcp";
+		public const string DefaultServiceProtocol = "tcp";
 
 		/// <summary>
 		/// The default server name.
