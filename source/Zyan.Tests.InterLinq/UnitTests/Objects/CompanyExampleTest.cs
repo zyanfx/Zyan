@@ -1210,4 +1210,24 @@ namespace InterLinq.UnitTests.Objects
 
 		#endregion
 	}
+
+	/// <summary>
+	/// A Zyan version of the unit tests.
+	/// </summary>
+	/// <seealso cref="CompanyExampleTest"/>
+	[TestClass]
+	public class CompanyExampleTestZyan : CompanyExampleTest
+	{
+		#region Constructors
+
+		/// <summary>
+		/// Instance an new instance of the class <see cref="CompanyExampleTest"/>.
+		/// </summary>
+		public CompanyExampleTestZyan()
+		{
+			companyExampleContext = new CompanyContext(ClientEnvironment.GetInstanceZyan(ServiceConstants.ObjectsServiceName).QueryHandler);
+		}
+
+		#endregion
+	}
 }

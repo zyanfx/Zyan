@@ -7,6 +7,7 @@ using Zyan.InterLinq;
 using Zyan.InterLinq.Communication.Remoting;
 using Zyan.InterLinq.Communication.Wcf;
 using Zyan.InterLinq.Communication;
+using Zyan.Communication;
 
 namespace InterLinq.UnitTests
 {
@@ -96,6 +97,24 @@ namespace InterLinq.UnitTests
 			return instancesRemoting[serviceName];
 		}
 
+		private static readonly Dictionary<string, ClientEnvironment> instancesZyan = new Dictionary<string, ClientEnvironment>();
+		/// <summary>
+		/// Returns the Zyan client environment instance for a <paramref name="serviceName">service name</paramref>.
+		/// </summary>
+		/// <param name="serviceName">Name of the service to search.</param>
+		/// <returns>Returns the client environment instance for a <paramref name="serviceName">service name</paramref>.</returns>
+		public static ClientEnvironment GetInstanceZyan(string serviceName)
+		{
+			if (!instancesZyan.ContainsKey(serviceName))
+			{
+				ClientEnvironment environment = new ClientEnvironmentZyan(serviceName);
+				environment.Start();
+				instancesZyan.Add(serviceName, environment);
+			}
+
+			return instancesZyan[serviceName];
+		}
+
 		#endregion
 	}
 
@@ -167,18 +186,57 @@ namespace InterLinq.UnitTests
 
 		/// <summary>
 		/// Starts the client environment instance and 
-		/// etablishes a connection to the WCF Service.
+		/// etablishes a connection to the remoting server.
 		/// </summary>
 		/// <seealso cref="ClientEnvironment.Start"/>
 		public override void Start()
 		{
-			int servicePort = Artefacts.ServiceConstants.GetServicePort(serviceName);
-			string url = string.Format("{0}://{1}:{2}/{3}", RemotingConstants.DefaultServiceProtcol, RemotingConstants.DefaultServerName, servicePort, serviceName);
-			ClientQueryRemotingHandler queryHandler = new ClientQueryRemotingHandler(url);
-			Hashtable properties = new Hashtable();
+			var servicePort = Artefacts.ServiceConstants.GetServicePort(serviceName);
+			var url = string.Format("{0}://{1}:{2}/{3}", RemotingConstants.DefaultServiceProtocol, RemotingConstants.DefaultServerName, servicePort, serviceName);
 
+			var queryHandler = new ClientQueryRemotingHandler(url);
+			var properties = new Hashtable();
 			properties["name"] = serviceName;
+
 			ChannelServices.RegisterChannel(RemotingConstants.GetDefaultChannel(properties), false);
+			queryHandler.Connect();
+			QueryHandler = queryHandler;
+		}
+
+		#endregion
+	}
+
+	/// <summary>
+	/// Zyan client environment. The <see cref="ClientEnvironmentRemoting"/>
+	/// is used for setting up a Zyan client in an easy way.
+	/// </summary>
+	/// <seealso cref="ClientEnvironment"/>
+	public class ClientEnvironmentZyan : ClientEnvironment
+	{
+		#region Constructors
+
+		/// <summary>
+		/// Initializes this class.
+		/// </summary>
+		/// <param name="serviceName">Name of the service to instantiate.</param>
+		public ClientEnvironmentZyan(string serviceName) : base(serviceName) { }
+
+		#endregion
+
+		#region Methods
+
+		/// <summary>
+		/// Starts the client environment instance and 
+		/// etablishes a connection to the Zyan service.
+		/// </summary>
+		/// <seealso cref="ClientEnvironment.Start"/>
+		public override void Start()
+		{
+			var name = Artefacts.ServiceConstants.ZyanServicePrefix + serviceName;
+			var url = String.Format("{0}://{1}:{2}/{3}", ZyanConstants.DefaultServiceProtocol, ZyanConstants.DefaultServerName, ZyanConstants.DefaultServicePort, name);
+
+			var connection = new ZyanConnection(url, ZyanConstants.GetDefaultClientProtocol());
+			var queryHandler = new ZyanClientQueryHandler(connection);
 			queryHandler.Connect();
 
 			QueryHandler = queryHandler;

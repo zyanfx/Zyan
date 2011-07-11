@@ -68,7 +68,7 @@ namespace Zyan.InterLinq.Communication.Remoting
 					properties["name"] = RemotingConstants.DefaultServiceChannelName;
 					ChannelServices.RegisterChannel(RemotingConstants.GetDefaultChannel(properties), false);
 
-					url = string.Format("{0}://{1}:{2}/{3}", RemotingConstants.DefaultServiceProtcol, RemotingConstants.DefaultServerName, RemotingConstants.DefaultServicePort, RemotingConstants.DefaultServerObjectName);
+					url = string.Format("{0}://{1}:{2}/{3}", RemotingConstants.DefaultServiceProtocol, RemotingConstants.DefaultServerName, RemotingConstants.DefaultServicePort, RemotingConstants.DefaultServerObjectName);
 				}
 
 				queryRemoteHandler = (IQueryRemoteHandler)Activator.GetObject(typeof(IQueryRemoteHandler), url);
