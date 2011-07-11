@@ -47,10 +47,10 @@ namespace InterLinq.UnitTests.Server
 			#region Start the WCF server
 
 			var wcfServer = new ServerQueryWcfHandler(queryHandler);
-			var netTcpBinding = ServiceHelper.GetNetTcpBinding();
+			var binding = ServiceHelper.GetDefaultBinding();
 
 			string serviceUri = ServiceHelper.GetServiceUri(null, null, Artefacts.ServiceConstants.ObjectsServiceName);
-			wcfServer.Start(netTcpBinding, serviceUri);
+			wcfServer.Start(binding, serviceUri);
 
 			#endregion
 
