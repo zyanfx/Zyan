@@ -39,10 +39,10 @@ namespace Zyan.InterLinq.Communication.Wcf
 				}
 				else
 				{
-					NetTcpBinding netTcpBinding = ServiceHelper.GetNetTcpBinding();
-					EndpointAddress endpointAddress = ServiceHelper.GetEndpoint();
+					var binding = ServiceHelper.GetDefaultBinding();
+					var endpointAddress = ServiceHelper.GetEndpoint();
 
-					Connect(netTcpBinding, endpointAddress);
+					Connect(binding, endpointAddress);
 				}
 			}
 		}

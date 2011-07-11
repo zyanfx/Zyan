@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ServiceModel;
 using System.Xml;
+using System.ServiceModel.Channels;
 
 namespace Zyan.InterLinq.Communication.Wcf
 {
@@ -91,7 +92,7 @@ namespace Zyan.InterLinq.Communication.Wcf
 		/// </list>
 		/// </remarks>
 		/// <returns>Returns a default <see cref="NetTcpBinding"/>.</returns>
-		public static NetTcpBinding GetNetTcpBinding()
+		public static Binding GetDefaultBinding()
 		{
 			var netTcpBinding = new NetTcpBinding(SecurityMode.None);
 

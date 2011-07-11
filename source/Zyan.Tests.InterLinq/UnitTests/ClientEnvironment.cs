@@ -155,10 +155,10 @@ namespace InterLinq.UnitTests
 		{
 			ClientQueryWcfHandler clientHandler = new ClientQueryWcfHandler();
 
-			NetTcpBinding netTcpBinding = ServiceHelper.GetNetTcpBinding();
-			EndpointAddress endpoint = ServiceHelper.GetEndpoint(null, null, serviceName);
+			var binding = ServiceHelper.GetDefaultBinding();
+			var endpoint = ServiceHelper.GetEndpoint(null, null, serviceName);
 
-			clientHandler.Connect(netTcpBinding, endpoint);
+			clientHandler.Connect(binding, endpoint);
 			return clientHandler.QueryRemoteHandler;
 		}
 
