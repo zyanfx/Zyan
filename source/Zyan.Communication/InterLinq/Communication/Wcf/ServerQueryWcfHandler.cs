@@ -54,10 +54,10 @@ namespace Zyan.InterLinq.Communication.Wcf
 			}
 			else
 			{
-				NetTcpBinding netTcpBinding = ServiceHelper.GetNetTcpBinding();
-				string serviceUri = ServiceHelper.GetServiceUri();
+				var binding = ServiceHelper.GetDefaultBinding();
+				var serviceUri = ServiceHelper.GetServiceUri();
 
-				Start(netTcpBinding, serviceUri);
+				Start(binding, serviceUri);
 			}
 		}
 
