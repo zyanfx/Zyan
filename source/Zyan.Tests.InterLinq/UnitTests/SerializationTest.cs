@@ -2,13 +2,30 @@
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq.Expressions;
 using Zyan.InterLinq;
 using Zyan.InterLinq.Expressions;
 
 namespace InterLinq.UnitTests
 {
+	#region Unit testing platform abstraction layer
+#if NUNIT
+	using NUnit.Framework;
+	using TestClass = NUnit.Framework.TestFixtureAttribute;
+	using TestMethod = NUnit.Framework.TestAttribute;
+	using ClassInitializeNonStatic = NUnit.Framework.TestFixtureSetUpAttribute;
+	using ClassInitialize = DummyAttribute;
+	using ClassCleanupNonStatic = NUnit.Framework.TestFixtureTearDownAttribute;
+	using ClassCleanup = DummyAttribute;
+	using Owner = DummyAttribute;
+	using TestContext = System.Object;
+#else
+	using Microsoft.VisualStudio.TestTools.UnitTesting;
+	using ClassInitializeNonStatic = DummyAttribute;
+	using ClassCleanupNonStatic = DummyAttribute;
+#endif
+	#endregion
+
 	/// <summary>
 	/// Expression serialization tests
 	/// </summary>
