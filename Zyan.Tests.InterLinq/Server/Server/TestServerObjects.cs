@@ -7,6 +7,9 @@ using InterLinq.UnitTests.Artefacts.Objects;
 using Zyan.InterLinq;
 using Zyan.InterLinq.Communication.Remoting;
 using Zyan.InterLinq.Communication.Wcf;
+using InterLinq.UnitTests.Properties;
+using Zyan.Communication;
+using Zyan.InterLinq.Communication;
 
 namespace InterLinq.UnitTests.Server
 {
@@ -43,18 +46,27 @@ namespace InterLinq.UnitTests.Server
 
 			#region Start the WCF server
 
-			ServerQueryWcfHandler wcfServer = new ServerQueryWcfHandler(queryHandler);
+			var wcfServer = new ServerQueryWcfHandler(queryHandler);
+			var netTcpBinding = ServiceHelper.GetNetTcpBinding();
 
-			NetTcpBinding netTcpBinding = ServiceHelper.GetNetTcpBinding();
 			string serviceUri = ServiceHelper.GetServiceUri(null, null, Artefacts.ServiceConstants.ObjectsServiceName);
-
 			wcfServer.Start(netTcpBinding, serviceUri);
+
+			#endregion
+
+			#region Start the Zyan server
+
+			// change service name to avoid conflict with Remoting service
+			var serviceName = Artefacts.ServiceConstants.ZyanServicePrefix + Artefacts.ServiceConstants.ObjectsServiceName;
+			var protocol = ZyanConstants.GetDefaultServerProtocol(ZyanConstants.DefaultServicePort);
+			var host = new ZyanComponentHost(serviceName, protocol);
+			host.RegisterQueryableComponent(queryHandler);
 
 			#endregion
 
 			#region Start the remoting server
 
-			ServerQueryRemotingHandlerObjects remotingServer = new ServerQueryRemotingHandlerObjects(queryHandler);
+			var remotingServer = new ServerQueryRemotingHandlerObjects(queryHandler);
 			// Register default channel for remote access
 			Hashtable properties = new Hashtable();
 			properties["name"] = Artefacts.ServiceConstants.ObjectsServiceName;

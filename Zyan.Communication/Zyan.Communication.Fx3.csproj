@@ -89,6 +89,7 @@
     <Compile Include="InterLinq\Communication\Wcf\ServiceConstants.cs" />
     <Compile Include="InterLinq\Communication\Wcf\ServiceHelper.cs" />
     <Compile Include="InterLinq\Communication\ZyanClientQueryHandler.cs" />
+    <Compile Include="InterLinq\Communication\ZyanConstants.cs" />
     <Compile Include="InterLinq\Communication\ZyanEntityQueryHandler.cs" />
     <Compile Include="InterLinq\Communication\ZyanExtensions.cs" />
     <Compile Include="InterLinq\Communication\ZyanObjectQueryHandler.cs" />

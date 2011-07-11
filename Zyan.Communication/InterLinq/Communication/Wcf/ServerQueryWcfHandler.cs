@@ -47,7 +47,7 @@ namespace Zyan.InterLinq.Communication.Wcf
 		/// <param name="useAppConfig">Uses App.config WCF Service configuration elements if true.</param>
 		public void Start(bool useAppConfig)
 		{
-			if(useAppConfig)
+			if (useAppConfig)
 			{
 				host = new ServiceHost(this);
 				host.Open();
@@ -58,7 +58,7 @@ namespace Zyan.InterLinq.Communication.Wcf
 				string serviceUri = ServiceHelper.GetServiceUri();
 
 				Start(netTcpBinding, serviceUri);
-			}           
+			}
 		}
 
 		/// <summary>

@@ -171,6 +171,27 @@ namespace Zyan.InterLinq
 		}
 
 		/// <summary>
+		/// Registers IQueryHandler as IQueryable component
+		/// </summary>
+		/// <param name="host">Component host</param>
+		/// <param name="queryHandler">Query handler</param>
+		public static void RegisterQueryableComponent(this ZyanComponentHost host, IQueryHandler queryHandler)
+		{
+			host.RegisterComponent<IQueryRemoteHandler, ZyanServerQueryHandler>(new ZyanServerQueryHandler(queryHandler));
+		}
+
+		/// <summary>
+		/// Registers IQueryHandler as IQueryable component
+		/// </summary>
+		/// <param name="host">Component host</param>
+		/// <param name="uniqueName">Unique component name</param>
+		/// <param name="queryHandler">Query handler</param>
+		public static void RegisterQueryableComponent(this ZyanComponentHost host, string uniqueName, IQueryHandler queryHandler)
+		{
+			host.RegisterComponent<IQueryRemoteHandler, ZyanServerQueryHandler>(uniqueName, new ZyanServerQueryHandler(queryHandler));
+		}
+
+		/// <summary>
 		/// Registers IQueryable component factory
 		/// </summary>
 		/// <param name="host">Component host</param>
