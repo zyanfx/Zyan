@@ -3,15 +3,32 @@ using System.Collections.Generic;
 using System.Linq;
 using InterLinq.UnitTests.Artefacts;
 using InterLinq.UnitTests.Artefacts.Objects;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace InterLinq.UnitTests.Objects
 {
+	#region Unit testing platform abstraction layer
+#if NUNIT
+	using NUnit.Framework;
+	using TestClass = NUnit.Framework.TestFixtureAttribute;
+	using TestMethod = NUnit.Framework.TestAttribute;
+	using ClassInitializeNonStatic = NUnit.Framework.TestFixtureSetUpAttribute;
+	using ClassInitialize = DummyAttribute;
+	using ClassCleanupNonStatic = NUnit.Framework.TestFixtureTearDownAttribute;
+	using ClassCleanup = DummyAttribute;
+	using Owner = DummyAttribute;
+	using TestContext = System.Object;
+#else
+	using Microsoft.VisualStudio.TestTools.UnitTesting;
+	using ClassInitializeNonStatic = DummyAttribute;
+	using ClassCleanupNonStatic = DummyAttribute;
+#endif
+	#endregion
+
 	/// <summary>
 	/// Tests with the domain model of a <see cref="Company"/> with <see cref="Department">Departments</see>
 	/// and <see cref="Employee"/>.
 	/// </summary>
-	public class CompanyExampleTest
+	public abstract class CompanyExampleTest
 	{
 		#region Fields
 
