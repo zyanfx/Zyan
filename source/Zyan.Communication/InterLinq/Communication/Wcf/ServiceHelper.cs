@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ServiceModel;
+using System.Xml;
 
 namespace Zyan.InterLinq.Communication.Wcf
 {
@@ -77,27 +78,28 @@ namespace Zyan.InterLinq.Communication.Wcf
 		///     </item>
 		///     <item>
 		///         <term><see cref="System.ServiceModel.Channels.Binding.OpenTimeout">OpenTimeout</see></term>
-		///         <description>new <see cref="TimeSpan"/>( 0, 10, 0 ) = 10 Minutes</description>
+		///         <description>new <see cref="TimeSpan"/>(0, 10, 0) = 10 Minutes</description>
 		///     </item>
 		///     <item>
 		///         <term><see cref="System.ServiceModel.Channels.Binding.CloseTimeout">CloseTimeout</see></term>
-		///         <description>new <see cref="TimeSpan"/>( 0, 10, 0 ) = 10 Minutes</description>
+		///         <description>new <see cref="TimeSpan"/>(0, 10, 0) = 10 Minutes</description>
 		///     </item>
 		///     <item>
 		///         <term><see cref="System.ServiceModel.Channels.Binding.SendTimeout">SendTimeout</see></term>
-		///         <description>new <see cref="TimeSpan"/>( 0, 10, 0 ) = 10 Minutes</description>
+		///         <description>new <see cref="TimeSpan"/>(0, 10, 0) = 10 Minutes</description>
 		///     </item>
 		/// </list>
 		/// </remarks>
 		/// <returns>Returns a default <see cref="NetTcpBinding"/>.</returns>
 		public static NetTcpBinding GetNetTcpBinding()
 		{
-			NetTcpBinding netTcpBinding = new NetTcpBinding();
-
-			netTcpBinding.Security.Mode = SecurityMode.None;
+			var netTcpBinding = new NetTcpBinding(SecurityMode.None);
 
 			netTcpBinding.MaxBufferSize = int.MaxValue;
 			netTcpBinding.MaxReceivedMessageSize = int.MaxValue;
+
+			if (netTcpBinding.ReaderQuotas == null)
+				netTcpBinding.ReaderQuotas = new XmlDictionaryReaderQuotas();
 
 			netTcpBinding.ReaderQuotas.MaxArrayLength = int.MaxValue;
 			netTcpBinding.ReaderQuotas.MaxBytesPerRead = int.MaxValue;
