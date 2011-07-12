@@ -204,7 +204,7 @@ namespace Zyan.Tests
 		public void ZyanComponentHost_ChickenCannotQuack()
 		{
 			var proxy = ZyanConnection.CreateProxy<IDuck>("Chicken");
-			var quack = proxy.Quack(String.Empty, default(int));
+			proxy.Quack(String.Empty, default(int));
 		}
 
 		[TestMethod]

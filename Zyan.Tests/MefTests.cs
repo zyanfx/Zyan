@@ -470,7 +470,7 @@ namespace Zyan.Tests
 			Assert.AreEqual(1, exports.Count());
 
 			// component is not registered in Zyan ComponentCatalog
-			var reg = cat.GetRegistration("UniqueName_MefSample4");
+			cat.GetRegistration("UniqueName_MefSample4");
 		}
 
 		[TestMethod, ExpectedException(typeof(KeyNotFoundException))]
@@ -485,7 +485,7 @@ namespace Zyan.Tests
 			AssertEx.IsInstanceOf<MefSample4>(obj);
 
 			// component is not registered in Zyan ComponentCatalog
-			var reg = cat.GetRegistration("UniqueName_MefSample4");
+			cat.GetRegistration("UniqueName_MefSample4");
 		}
 
 		[TestMethod]
@@ -543,7 +543,7 @@ namespace Zyan.Tests
 			Assert.AreEqual(1, exports.Count());
 
 			// component is not registered in Zyan ComponentCatalog
-			var reg = cat.GetRegistration("UniqueName_MefSample6");
+			cat.GetRegistration("UniqueName_MefSample6");
 		}
 
 		[TestMethod, ExpectedException(typeof(KeyNotFoundException))]
@@ -558,7 +558,7 @@ namespace Zyan.Tests
 			AssertEx.IsInstanceOf<MefSample6>(obj);
 
 			// component is not registered in Zyan ComponentCatalog
-			var reg = cat.GetRegistration("UniqueName_MefSample6");
+			cat.GetRegistration("UniqueName_MefSample6");
 		}
 
 		[TestMethod]

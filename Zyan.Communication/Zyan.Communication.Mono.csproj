@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{F14FF4B4-A9C6-415F-9484-444CBBDBBEA2}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Zyan.Communication</RootNamespace>
+    <AssemblyName>Zyan.Communication</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\bin\DebugMono</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\bin\ReleaseMono</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System">
+    </Reference>
+    <Reference Include="System.Configuration">
+    </Reference>
+    <Reference Include="System.Core">
+    </Reference>
+    <Reference Include="System.Data">
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+    </Reference>
+    <Reference Include="System.Data.Linq">
+    </Reference>
+    <Reference Include="System.Runtime.Remoting">
+    </Reference>
+    <Reference Include="System.Runtime.Serialization">
+    </Reference>
+    <Reference Include="System.ServiceModel">
+    </Reference>
+    <Reference Include="System.Transactions">
+    </Reference>
+    <Reference Include="System.Windows.Forms">
+    </Reference>
+    <Reference Include="System.Xml">
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+    </Reference>
+    <Reference Include="System.ComponentModel.Composition">
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ActivationType.cs" />
+    <Compile Include="AfterInvokeEventArgs.cs" />
+    <Compile Include="BeforeInvokeEventArgs.cs" />
+    <Compile Include="CallContextData.cs" />
+    <Compile Include="CallInterceptionData.cs" />
+    <Compile Include="CallInterceptor.cs" />
+    <Compile Include="CallInterceptorCollection.cs" />
+    <Compile Include="CallInterceptorHelper.cs" />
+    <Compile Include="ComponentCatalog.cs" />
+    <Compile Include="ComponentInfo.cs" />
+    <Compile Include="ComponentRegistration.cs" />
+    <Compile Include="CustomSerializationContainer.cs" />
+    <Compile Include="DelegateCorrelationInfo.cs" />
+    <Compile Include="DelegateInterceptor.cs" />
+    <Compile Include="DynamicWireFactory.cs" />
+    <Compile Include="IComponentCatalog.cs" />
+    <Compile Include="IComponentCatalogExtensions.cs" />
+    <Compile Include="InvalidSessionException.cs" />
+    <Compile Include="InvokeCanceledEventArgs.cs" />
+    <Compile Include="InvokeCanceledException.cs" />
+    <Compile Include="ISerializationHandler.cs" />
+    <Compile Include="IZyanDispatcher.cs" />
+    <Compile Include="LoginEventArgs.cs" />
+    <Compile Include="MonoCheck.cs" />
+    <Compile Include="SerializationHandlerRepository.cs" />
+    <Compile Include="ServerSession.cs" />
+    <Compile Include="ZyanComponentHost.cs" />
+    <Compile Include="ZyanConnection.cs" />
+    <Compile Include="ZyanConnectionSetup.cs" />
+    <Compile Include="ZyanDispatcher.cs" />
+    <Compile Include="ZyanErrorEventArgs.cs" />
+    <Compile Include="ZyanProxy.cs" />
+    <Compile Include="ChannelSinks\ClientAddress\ClientAddressServerChannelSink.cs" />
+    <Compile Include="ChannelSinks\ClientAddress\ClientAddressServerChannelSinkProvider.cs" />
+    <Compile Include="ChannelSinks\Encryption\CryptoClientChannelSink.cs" />
+    <Compile Include="ChannelSinks\Encryption\CryptoClientChannelSinkProvider.cs" />
+    <Compile Include="ChannelSinks\Encryption\CryptoRemotingException.cs" />
+    <Compile Include="ChannelSinks\Encryption\CryptoServerChannelSink.cs" />
+    <Compile Include="ChannelSinks\Encryption\CryptoServerChannelSinkProvider.cs" />
+    <Compile Include="ChannelSinks\Encryption\CryptoTools.cs" />
+    <Compile Include="ChannelSinks\Encryption\MiscStuff.cs" />
+    <Compile Include="Composition\DefinitionExtensions.cs" />
+    <Compile Include="Composition\IComponentCatalogMefExtensions.cs" />
+    <Compile Include="Composition\NonSharedPartsCatalog.cs" />
+    <Compile Include="Composition\ZyanComponentAttribute.cs" />
+    <Compile Include="Composition\ZyanInterfaceAttribute.cs" />
+    <Compile Include="InterLinq\IBaseSource.cs" />
+    <Compile Include="InterLinq\IEntitySource.cs" />
+    <Compile Include="InterLinq\InterLinqContext.cs" />
+    <Compile Include="InterLinq\InterLinqQuery.cs" />
+    <Compile Include="InterLinq\InterLinqQueryHandler.cs" />
+    <Compile Include="InterLinq\InterLinqQueryProvider.cs" />
+    <Compile Include="InterLinq\IObjectSource.cs" />
+    <Compile Include="InterLinq\IQueryHandler.cs" />
+    <Compile Include="InterLinq\IQueryRemoteHandler.cs" />
+    <Compile Include="InterLinq\Communication\ClientQueryHandler.cs" />
+    <Compile Include="InterLinq\Communication\ClientQueryProvider.cs" />
+    <Compile Include="InterLinq\Communication\ServerQueryHandler.cs" />
+    <Compile Include="InterLinq\Communication\ZyanClientQueryHandler.cs" />
+    <Compile Include="InterLinq\Communication\ZyanConstants.cs" />
+    <Compile Include="InterLinq\Communication\ZyanEntityQueryHandler.cs" />
+    <Compile Include="InterLinq\Communication\ZyanExtensions.cs" />
+    <Compile Include="InterLinq\Communication\ZyanObjectQueryHandler.cs" />
+    <Compile Include="InterLinq\Communication\ZyanQueryHandler.cs" />
+    <Compile Include="InterLinq\Communication\ZyanServerQueryHandler.cs" />
+    <Compile Include="InterLinq\Communication\Remoting\ClientQueryRemotingHandler.cs" />
+    <Compile Include="InterLinq\Communication\Remoting\RemotingConstants.cs" />
+    <Compile Include="InterLinq\Communication\Remoting\ServerQueryRemotingHandler.cs" />
+    <Compile Include="InterLinq\Communication\Wcf\ClientQueryWcfHandler.cs" />
+    <Compile Include="InterLinq\Communication\Wcf\ServerQueryWcfHandler.cs" />
+    <Compile Include="InterLinq\Communication\Wcf\ServiceConstants.cs" />
+    <Compile Include="InterLinq\Communication\Wcf\ServiceHelper.cs" />
+    <Compile Include="InterLinq\Communication\Wcf\NetDataContractSerializer\NetDataContractFormat.cs" />
+    <Compile Include="InterLinq\Communication\Wcf\NetDataContractSerializer\NetDataContractSerializerOperationBehavior.cs" />
+    <Compile Include="InterLinq\Expressions\ExpressionConversionHelper.cs" />
+    <Compile Include="InterLinq\Expressions\ExpressionSerializationHandler.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableBinaryExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableConditionalExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableConstantExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableExpressionTyped.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableInvocationExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableLambdaExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableListInitExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableMemberExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableMemberInitExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableMethodCallExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableNewArrayExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableNewExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableParameterExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableTypeBinaryExpression.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableUnaryExpression.cs" />
+    <Compile Include="InterLinq\Expressions\Helpers\ExpressionConverter.cs" />
+    <Compile Include="InterLinq\Expressions\Helpers\ExpressionVisitor.cs" />
+    <Compile Include="InterLinq\Expressions\Helpers\RewriteExpressionVisitor.cs" />
+    <Compile Include="InterLinq\Expressions\Helpers\SerializableExpressionConverter.cs" />
+    <Compile Include="InterLinq\Expressions\Helpers\SerializableExpressionVisitor.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableTypes\SerializableElementInit.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableTypes\SerializableMemberAssignment.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableTypes\SerializableMemberBinding.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableTypes\SerializableMemberListBinding.cs" />
+    <Compile Include="InterLinq\Expressions\SerializableTypes\SerializableMemberMemberBinding.cs" />
+    <Compile Include="InterLinq\Types\InterLinqConstructorInfo.cs" />
+    <Compile Include="InterLinq\Types\InterLinqFieldInfo.cs" />
+    <Compile Include="InterLinq\Types\InterLinqMemberInfo.cs" />
+    <Compile Include="InterLinq\Types\InterLinqMethodBase.cs" />
+    <Compile Include="InterLinq\Types\InterLinqMethodInfo.cs" />
+    <Compile Include="InterLinq\Types\InterLinqPropertyInfo.cs" />
+    <Compile Include="InterLinq\Types\InterLinqType.cs" />
+    <Compile Include="InterLinq\Types\InterLinqTypeSystem.cs" />
+    <Compile Include="InterLinq\Types\TypeConverter.cs" />
+    <Compile Include="InterLinq\Types\Anonymous\AnonymousMetaProperty.cs" />
+    <Compile Include="InterLinq\Types\Anonymous\AnonymousMetaType.cs" />
+    <Compile Include="InterLinq\Types\Anonymous\AnonymousObject.cs" />
+    <Compile Include="InterLinq\Types\Anonymous\AnonymousProperty.cs" />
+    <Compile Include="InterLinq\Types\Anonymous\AnonymousTypeHelper.cs" />
+    <Compile Include="InterLinq\Types\Anonymous\DynamicAssemblyHolder.cs" />
+    <Compile Include="InterLinq\Types\Anonymous\InterLinqGrouping.cs" />
+    <Compile Include="Notification\NotificationEventArgs.cs" />
+    <Compile Include="Notification\NotificationReceiver.cs" />
+    <Compile Include="Notification\NotificationSender.cs" />
+    <Compile Include="Notification\NotificationService.cs" />
+    <Compile Include="Protocols\IClientProtocolSetup.cs" />
+    <Compile Include="Protocols\IServerProtocolSetup.cs" />
+    <Compile Include="Protocols\Http\HttpCustomClientProtocolSetup.cs" />
+    <Compile Include="Protocols\Http\HttpCustomServerProtocolSetup.cs" />
+    <Compile Include="Protocols\Ipc\IpcBinaryClientProtocolSetup.cs" />
+    <Compile Include="Protocols\Ipc\IpcBinaryServerProtocolSetup.cs" />
+    <Compile Include="Protocols\Tcp\TcpBinaryClientProtocolSetup.cs" />
+    <Compile Include="Protocols\Tcp\TcpBinaryServerProtocolSetup.cs" />
+    <Compile Include="Protocols\Tcp\TcpCustomClientProtocolSetup.cs" />
+    <Compile Include="Protocols\Tcp\TcpCustomServerProtocolSetup.cs" />
+    <Compile Include="Protocols\Tcp\TcpDuplexClientProtocolSetup.cs" />
+    <Compile Include="Protocols\Tcp\TcpDuplexServerProtocolSetup.cs" />
+    <Compile Include="Protocols\Tcp\DuplexChannel\ClientTransportSink.cs" />
+    <Compile Include="Protocols\Tcp\DuplexChannel\Connection.cs" />
+    <Compile Include="Protocols\Tcp\DuplexChannel\DuplicateConnectionException.cs" />
+    <Compile Include="Protocols\Tcp\DuplexChannel\Manager.cs" />
+    <Compile Include="Protocols\Tcp\DuplexChannel\Message.cs" />
+    <Compile Include="Protocols\Tcp\DuplexChannel\MessageException.cs" />
+    <Compile Include="Protocols\Tcp\DuplexChannel\ServerTransportSink.cs" />
+    <Compile Include="Protocols\Tcp\DuplexChannel\TcpExChannel.cs" />
+    <Compile Include="Protocols\Tcp\DuplexChannel\TcpExChannelData.cs" />
+    <Compile Include="Protocols\Tcp\DuplexChannel\TransportHeaderWrapper.cs" />
+    <Compile Include="Protocols\Tcp\DuplexChannel\Diagnostics\Trace.cs" />
+    <Compile Include="Scripting\ScriptEngine.cs" />
+    <Compile Include="Security\AuthRequestMessage.cs" />
+    <Compile Include="Security\AuthResponseMessage.cs" />
+    <Compile Include="Security\BasicWindowsAuthProvider.cs" />
+    <Compile Include="Security\IAuthenticationProvider.cs" />
+    <Compile Include="Security\IntegratedWindowsAuthProvider.cs" />
+    <Compile Include="Security\NullAuthenticationProvider.cs" />
+    <Compile Include="Security\WindowsSecurityTools.cs" />
+    <Compile Include="SessionMgmt\InProcSessionManager.cs" />
+    <Compile Include="SessionMgmt\ISessionManager.cs" />
+    <Compile Include="SessionMgmt\SessionVariableAdapter.cs" />
+    <Compile Include="SessionMgmt\SqlSessionManager.cs" />
+    <Compile Include="Toolbox\Asynchronizer.cs" />
+    <Compile Include="Toolbox\Extensions.cs" />
+    <Compile Include="Toolbox\ExtensionsFx3.cs" />
+    <Compile Include="Toolbox\MessageHelpers.cs" />
+    <Compile Include="Toolbox\SyncContextSwitcher.cs" />
+    <Compile Include="Toolbox\TransactionStarter.cs" />
+    <Compile Include="Toolbox\TypeComparer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="LanguageResource.Designer.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <None Include="InterLinq\InterLinq.cd" />
+    <None Include="InterLinq\InterLinqNamespaceDoc.xml" />
+    <None Include="InterLinq\Communication\Communication.cd" />
+    <None Include="InterLinq\Expressions\SerializableExpressions.cd" />
+    <None Include="InterLinq\Expressions\Helpers\Visitor.cd" />
+    <None Include="InterLinq\Types\InterLinqTypeSystem.cd" />
+    <None Include="InterLinq\Types\Anonymous\AnonymousTypes.cd" />
+    <None Include="Protocols\Tcp\DuplexChannel\DuplexChannel.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="LanguageResource.resx" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="LanguageResource.de.resx" />
+    <None Include="LanguageResource.ru.resx" />
+  </ItemGroup>
+</Project>
