@@ -17,10 +17,16 @@ namespace InterLinq.UnitTests.Objects
 	using ClassCleanup = DummyAttribute;
 	using Owner = DummyAttribute;
 	using TestContext = System.Object;
+#if MONO
+	using MonoIgnore = NUnit.Framework.IgnoreAttribute;
+#else
+	using MonoIgnore = DummyAttribute;
+#endif
 #else
 	using Microsoft.VisualStudio.TestTools.UnitTesting;
 	using ClassInitializeNonStatic = DummyAttribute;
 	using ClassCleanupNonStatic = DummyAttribute;
+	using MonoIgnore = DummyAttribute;
 #endif
 	#endregion
 
@@ -1190,9 +1196,10 @@ namespace InterLinq.UnitTests.Objects
 
 	/// <summary>
 	/// A WCF version of the unit tests.
+	/// These test are disabled in Mono/NUnit setup due to incomplete Mono WCF implementation.
 	/// </summary>
 	/// <seealso cref="CompanyExampleTest"/>
-	[TestClass]
+	[TestClass, MonoIgnore("Ignored due to Mono incompatibility")]
 	public class CompanyExampleTestWcf : CompanyExampleTest
 	{
 		#region Constructors

@@ -8,7 +8,7 @@ namespace InterLinq.UnitTests
 	/// <summary>
 	/// Dummy attribute used by unit test platform abstraction layer.
 	/// </summary>
-	[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
 	internal class DummyAttribute : Attribute
 	{
 		public DummyAttribute()
