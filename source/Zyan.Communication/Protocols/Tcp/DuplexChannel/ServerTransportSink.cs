@@ -20,13 +20,11 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
 	class ServerTransportSink : IServerChannelSink
 	{
-		private TcpExChannel _channel;
 		private IServerChannelSink _nextSink;
 
-		public ServerTransportSink(IServerChannelSink nextSink, TcpExChannel channel)
+		public ServerTransportSink(IServerChannelSink nextSink)
 		{
 			this._nextSink = nextSink;
-			this._channel = channel;
 		}
 
 		public void ReceiveMessage(IAsyncResult ar)
