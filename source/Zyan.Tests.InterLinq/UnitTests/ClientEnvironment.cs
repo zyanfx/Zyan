@@ -8,6 +8,7 @@ using Zyan.InterLinq.Communication.Remoting;
 using Zyan.InterLinq.Communication.Wcf;
 using Zyan.InterLinq.Communication;
 using Zyan.Communication;
+using InterLinq.UnitTests.Properties;
 
 namespace InterLinq.UnitTests
 {
@@ -23,6 +24,15 @@ namespace InterLinq.UnitTests
 		/// Name of the running client environment instance.
 		/// </summary>
 		protected string serviceName;
+
+		/// <summary>
+		/// InterLinq unit test server remote address.
+		/// </summary>
+#if REMOTE_SERVER
+		protected string remoteAddress = Settings.Default.RemoteServerAddress; // server is running on the remote machine
+#else
+		protected string remoteAddress = null; // server is running on the local machine (default setup)
+#endif
 
 		#endregion
 
@@ -156,7 +166,7 @@ namespace InterLinq.UnitTests
 			ClientQueryWcfHandler clientHandler = new ClientQueryWcfHandler();
 
 			var binding = ServiceHelper.GetDefaultBinding();
-			var endpoint = ServiceHelper.GetEndpoint(null, null, serviceName);
+			var endpoint = ServiceHelper.GetEndpoint(remoteAddress, null, serviceName);
 
 			clientHandler.Connect(binding, endpoint);
 			return clientHandler.QueryRemoteHandler;
@@ -191,8 +201,9 @@ namespace InterLinq.UnitTests
 		/// <seealso cref="ClientEnvironment.Start"/>
 		public override void Start()
 		{
+			var serverAddress = remoteAddress ?? RemotingConstants.DefaultServerName;
 			var servicePort = Artefacts.ServiceConstants.GetServicePort(serviceName);
-			var url = string.Format("{0}://{1}:{2}/{3}", RemotingConstants.DefaultServiceProtocol, RemotingConstants.DefaultServerName, servicePort, serviceName);
+			var url = string.Format("{0}://{1}:{2}/{3}", RemotingConstants.DefaultServiceProtocol, serverAddress, servicePort, serviceName);
 
 			var queryHandler = new ClientQueryRemotingHandler(url);
 			var properties = new Hashtable();
@@ -232,8 +243,9 @@ namespace InterLinq.UnitTests
 		/// <seealso cref="ClientEnvironment.Start"/>
 		public override void Start()
 		{
+			var serverAddress = remoteAddress ?? ZyanConstants.DefaultServerName;
 			var name = Artefacts.ServiceConstants.ZyanServicePrefix + serviceName;
-			var url = String.Format("{0}://{1}:{2}/{3}", ZyanConstants.DefaultServiceProtocol, ZyanConstants.DefaultServerName, ZyanConstants.DefaultServicePort, name);
+			var url = String.Format("{0}://{1}:{2}/{3}", ZyanConstants.DefaultServiceProtocol, serverAddress, ZyanConstants.DefaultServicePort, name);
 
 			var connection = new ZyanConnection(url, ZyanConstants.GetDefaultClientProtocol());
 			var queryHandler = new ZyanClientQueryHandler(connection);
