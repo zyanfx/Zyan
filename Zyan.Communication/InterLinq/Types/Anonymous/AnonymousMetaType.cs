@@ -340,7 +340,7 @@ namespace Zyan.InterLinq.Types.Anonymous
 		private static void GenerateEqualsMethod(TypeBuilder dynamicType, IEnumerable<FieldBuilder> fields)
 		{
 			MethodBuilder method = dynamicType.DefineMethod("Equals", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Virtual, CallingConventions.Standard, typeof(bool), new[] { typeof(object) });
-			ParameterBuilder parameter = method.DefineParameter(0, ParameterAttributes.None, "value");
+			method.DefineParameter(0, ParameterAttributes.None, "value");
 			ILGenerator ilGen = method.GetILGenerator();
 
 			LocalBuilder localType = ilGen.DeclareLocal(dynamicType);

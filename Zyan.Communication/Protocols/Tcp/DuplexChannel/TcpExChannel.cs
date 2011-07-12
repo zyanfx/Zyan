@@ -195,7 +195,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				clientSinkProvider = clientSinkProvider.Next;
 			clientSinkProvider.Next = new ClientTransportSinkProvider();
 
-			messageSink = new ServerTransportSink(ChannelServices.CreateServerChannelSinkChain(serverSinkProvider, this), this);
+			messageSink = new ServerTransportSink(ChannelServices.CreateServerChannelSinkChain(serverSinkProvider, this));
 			serverSinkProvider.GetChannelData(channelData);
 
 			if (listen)
