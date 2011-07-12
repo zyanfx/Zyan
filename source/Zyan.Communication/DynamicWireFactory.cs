@@ -119,7 +119,7 @@ namespace Zyan.Communication
 			if (string.IsNullOrEmpty(eventMemberName))
 				throw new ArgumentException(LanguageResource.ArgumentException_OutPutPinNameMissing, "eventMemberName");
 
-			Type wireType = wireType = BuildDynamicWireType(componentType, eventMemberName, isEvent);
+			var wireType = BuildDynamicWireType(componentType, eventMemberName, isEvent);
 
 			object wire = Activator.CreateInstance(wireType);
 			return wire;
@@ -139,7 +139,7 @@ namespace Zyan.Communication
 			if (delegateType == null)
 				throw new ArgumentNullException("delegateType");
 
-			Type wireType = BuildDynamicWireTypeForDelegate(componentType, delegateType);
+			var wireType = BuildDynamicWireTypeForDelegate(componentType, delegateType);
 
 			object wire = Activator.CreateInstance(wireType);
 			return wire;
