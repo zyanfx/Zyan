@@ -1,13 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Zyan.Communication;
 using System.IO;
 using System.Reflection;
-using Zyan.Communication.Protocols.Tcp;
-using Zyan.Communication.Security;
-using System.Threading;
 
 namespace IntegrationTest_DistributedEvents
 {
@@ -33,7 +26,7 @@ namespace IntegrationTest_DistributedEvents
 
     class Program
     {
-        private static AppDomain _serverAppDomain;               
+        private static AppDomain _serverAppDomain;
 
         public static int Main(string[] args)
         {
@@ -46,6 +39,8 @@ namespace IntegrationTest_DistributedEvents
             CrossAppDomainDelegate serverWork = new CrossAppDomainDelegate(() =>
             {
                 EventServer server = EventServer.Instance;
+				if (server != null)
+					Console.WriteLine("Event server started.");
             });
             _serverAppDomain.DoCallBack(serverWork);
 
