@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Zyan.InterLinq;
 using InterLinq.UnitTests.Artefacts;
 using InterLinq.UnitTests.Artefacts.Objects;
 
@@ -1189,6 +1190,26 @@ namespace InterLinq.UnitTests.Objects
 			{
 				Assert.IsTrue(names.Contains(employee.Name));
 			}
+		}
+
+		#endregion
+	}
+
+	/// <summary>
+	/// A local version of the unit tests.
+	/// </summary>
+	/// <seealso cref="CompanyExampleTest"/>
+	[TestClass]
+	public class CompanyExampleTestLocal : CompanyExampleTest
+	{
+		#region Constructors
+
+		/// <summary>
+		/// Instance an new instance of the class <see cref="CompanyExampleTest"/>.
+		/// </summary>
+		public CompanyExampleTestLocal()
+		{
+			companyExampleContext = new CompanyContext(new ObjectSource());
 		}
 
 		#endregion
