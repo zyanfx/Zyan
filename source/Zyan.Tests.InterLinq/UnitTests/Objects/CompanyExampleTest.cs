@@ -35,14 +35,15 @@ namespace InterLinq.UnitTests.Objects
 	/// Tests with the domain model of a <see cref="Company"/> with <see cref="Department">Departments</see>
 	/// and <see cref="Employee"/>.
 	/// </summary>
-	public abstract class CompanyExampleTest
+	[TestClass]
+	public class CompanyExampleTest
 	{
 		#region Fields
 
 		/// <summary>
 		/// Context instance providing <see cref="IQueryable">IQueryables</see>.
 		/// </summary>
-		protected CompanyContext companyExampleContext;
+		protected CompanyContext companyExampleContext = new CompanyContext(new ObjectSource());
 
 		#endregion
 
@@ -1190,26 +1191,6 @@ namespace InterLinq.UnitTests.Objects
 			{
 				Assert.IsTrue(names.Contains(employee.Name));
 			}
-		}
-
-		#endregion
-	}
-
-	/// <summary>
-	/// A local version of the unit tests.
-	/// </summary>
-	/// <seealso cref="CompanyExampleTest"/>
-	[TestClass]
-	public class CompanyExampleTestLocal : CompanyExampleTest
-	{
-		#region Constructors
-
-		/// <summary>
-		/// Instance an new instance of the class <see cref="CompanyExampleTest"/>.
-		/// </summary>
-		public CompanyExampleTestLocal()
-		{
-			companyExampleContext = new CompanyContext(new ObjectSource());
 		}
 
 		#endregion
