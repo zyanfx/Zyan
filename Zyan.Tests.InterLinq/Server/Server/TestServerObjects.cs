@@ -43,13 +43,13 @@ namespace InterLinq.UnitTests.Server
 			IQueryHandler queryHandler = new ZyanObjectQueryHandler(ObjectSource);
 
 			#region Start the WCF server
-
+#if !MONO
 			var wcfServer = new ServerQueryWcfHandler(queryHandler);
 			var binding = ServiceHelper.GetDefaultBinding();
 
 			string serviceUri = ServiceHelper.GetServiceUri(null, null, Artefacts.ServiceConstants.ObjectsServiceName);
 			wcfServer.Start(binding, serviceUri);
-
+#endif
 			#endregion
 
 			#region Start the Zyan server

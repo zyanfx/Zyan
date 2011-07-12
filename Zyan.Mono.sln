@@ -74,7 +74,7 @@ Global
 		{37A20035-ABE1-44D1-901E-845157D85010} = {502B0A21-982C-48A4-81D7-6073B99194E0}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Zyan.Tests\Zyan.Tests.Mono.csproj
+		StartupItem = Zyan.Tests.InterLinq\Server\InterLinq.UnitTests.Server.Mono.csproj
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
 		SccNumberOfProjects = 5

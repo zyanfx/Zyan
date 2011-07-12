@@ -1,5 +1,6 @@
 ﻿using System;
 using InterLinq.UnitTests.Server;
+using System.Threading;
 
 namespace InterLinq.UnitTests
 {
@@ -17,9 +18,9 @@ namespace InterLinq.UnitTests
 			//testServerWcfSql.Start();
 			//testServerWcfSql.Publish();
 
-			TestServerObjects testServerWcfObjects = new TestServerObjects();
-			testServerWcfObjects.Start();
-			testServerWcfObjects.Publish();
+			TestServerObjects testServerObjects = new TestServerObjects();
+			testServerObjects.Start();
+			testServerObjects.Publish();
 
 			//TestServerEntityFramework4 testServerEntityFramework4 = new TestServerEntityFramework4();
 			//testServerEntityFramework4.Start();
