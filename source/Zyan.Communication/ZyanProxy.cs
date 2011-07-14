@@ -303,7 +303,8 @@ namespace Zyan.Communication
 				}
 
 				// Parametertypen ermitteln
-				ParameterInfo[] paramDefs = methodCallMessage.MethodBase.GetParameters();
+				var paramDefs = methodCallMessage.MethodBase.GetParameters();
+				var paramTypes = paramDefs.Select(p => p.ParameterType).ToArray();
 
 				// Abfragen, ob Abfangvorrichtungen verarbeitet werden sollen
 				bool callInterception = _connection.CallInterceptionEnabled && allowCallInterception;
@@ -343,7 +344,7 @@ namespace Zyan.Communication
 						object[] checkedArgs = InterceptDelegateParameters(methodCallMessage);
 
 						// Entfernten Methodenaufruf durchführen
-						returnValue = _remoteInvoker.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, genericArgs, paramDefs, checkedArgs);
+						returnValue = _remoteInvoker.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, genericArgs, paramTypes, checkedArgs);
 
 						// Ereignisargumente für AfterInvoke erstellen
 						AfterInvokeEventArgs afterInvokeArgs = new AfterInvokeEventArgs()
@@ -367,7 +368,7 @@ namespace Zyan.Communication
 							_remoteInvoker.Logon(_sessionID, _autoLoginCredentials);
 
 							// Entfernten Methodenaufruf erneut versuchen
-							returnValue = _remoteInvoker.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, genericArgs, paramDefs, methodCallMessage.Args);
+							returnValue = _remoteInvoker.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, genericArgs, paramTypes, methodCallMessage.Args);
 						}
 					}
 				}

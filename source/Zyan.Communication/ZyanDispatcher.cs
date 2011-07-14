@@ -234,10 +234,10 @@ namespace Zyan.Communication
 		/// <param name="delegateCorrelationSet">Correlation set for dynamic event and delegate wiring</param>
 		/// <param name="methodName">Name of the invoked method</param>
 		/// <param name="genericArguments">Generic arguments of the invoked method</param>
-		/// <param name="paramDefs">Reflection info of parameter types</param>
+		/// <param name="paramTypes">Parameter types</param>
 		/// <param name="args">Parameter values</param>
 		/// <returns>Return value</returns>
-		public object Invoke(Guid trackingID, string interfaceName, List<DelegateCorrelationInfo> delegateCorrelationSet, string methodName, Type[] genericArguments, ParameterInfo[] paramDefs, params object[] args)
+		public object Invoke(Guid trackingID, string interfaceName, List<DelegateCorrelationInfo> delegateCorrelationSet, string methodName, Type[] genericArguments, Type[] paramTypes, params object[] args)
 		{
 			if (string.IsNullOrEmpty(interfaceName))
 				throw new ArgumentException(LanguageResource.ArgumentException_InterfaceNameMissing, "interfaceName");
@@ -313,14 +313,11 @@ namespace Zyan.Communication
 			object returnValue = null;
 
 			PutClientAddressToCurrentSession();
-			
-			Type[] types = new Type[paramDefs.Length];
 
 			Dictionary<int, DelegateInterceptor> delegateParamIndexes = new Dictionary<int, DelegateInterceptor>();
 
-			for (int i = 0; i < paramDefs.Length; i++)
+			for (int i = 0; i < paramTypes.Length; i++)
 			{
-				types[i] = paramDefs[i].ParameterType;
 				DelegateInterceptor delegateParamInterceptor = args[i] as DelegateInterceptor;
 
 				if (delegateParamInterceptor != null)
@@ -354,10 +351,10 @@ namespace Zyan.Communication
 
 			try
 			{
-				var methodInfo = type.GetMethod(methodName, genericArguments, types);
+				var methodInfo = type.GetMethod(methodName, genericArguments, paramTypes);
 				if (methodInfo == null)
 				{
-					var methodSignature = MessageHelpers.GetMethodSignature(type, methodName, types);
+					var methodSignature = MessageHelpers.GetMethodSignature(type, methodName, paramTypes);
 					var exceptionMessage = String.Format(LanguageResource.MissingMethodException_MethodNotFound, methodSignature);
 					throw new MissingMethodException(exceptionMessage);
 				}
