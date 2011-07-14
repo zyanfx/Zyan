@@ -58,5 +58,12 @@ namespace Zyan.Communication
 		/// </summary>
 		/// <returns>List with component information</returns>
 		List<ComponentInfo> GetRegisteredComponents();
+
+		/// <summary>
+		/// Returns an instance of a specified registered component.
+		/// </summary>
+		/// <param name="registration">Component registration</param>
+		/// <returns>Component instance</returns>
+		object GetComponentInstance(ComponentRegistration registration);
 	}
 }
