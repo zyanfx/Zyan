@@ -112,6 +112,7 @@
     <Compile Include="InterLinq\Communication\ZyanExtensions.cs" />
     <Compile Include="InterLinq\Communication\ZyanObjectQueryHandler.cs" />
     <Compile Include="InterLinq\Communication\ZyanQueryHandler.cs" />
+    <Compile Include="InterLinq\Communication\ZyanMethodQueryHandler.cs" />
     <Compile Include="InterLinq\Communication\ZyanServerQueryHandler.cs" />
     <Compile Include="InterLinq\Expressions\ExpressionConversionHelper.cs" />
     <Compile Include="InterLinq\Expressions\ExpressionSerializationHandler.cs" />

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using System.Runtime.Remoting.Proxies;
+using Zyan.InterLinq;
 
 namespace Zyan.Communication
 {
@@ -108,27 +109,22 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Entfernte Methode aufrufen.
+		/// Invoke remote method.
 		/// </summary>
-		/// <param name="message">Remoting-Nachricht mit Details für den entfernten Methodenaufruf</param>
-		/// <returns>Remoting Antwortnachricht</returns>
+		/// <param name="message">Remoting method invocation message.</param>
+		/// <returns>Reply message</returns>
 		public override IMessage Invoke(IMessage message)
 		{
-			// Wenn keine Nachricht angegeben wurde ...
 			if (message == null)
-				// Ausnahme werfen
 				throw new ArgumentNullException("message");
 
-			// Nachricht in benötigte Schnittstelle casten
-			IMethodCallMessage methodCallMessage = (IMethodCallMessage)message;
-
-			// Methoden-Metadaten abrufen
-			MethodInfo methodInfo = (MethodInfo)methodCallMessage.MethodBase;
-			methodInfo.GetParameters();
+			// Get method details
+			var methodCallMessage = (IMethodCallMessage)message;
+			var methodInfo = (MethodInfo)methodCallMessage.MethodBase;
 
 			try
 			{
-				// Wenn die Methode ein Delegat ist ...
+				// Check for delegate parameters in properties and events
 				if (methodInfo.ReturnType.Equals(typeof(void)) &&
 					methodCallMessage.InArgCount == 1 &&
 					methodCallMessage.ArgCount == 1 &&
@@ -136,33 +132,33 @@ namespace Zyan.Communication
 					typeof(Delegate).IsAssignableFrom(methodCallMessage.Args[0].GetType()) &&
 					(methodCallMessage.MethodName.StartsWith("set_") || methodCallMessage.MethodName.StartsWith("add_")))
 				{
-					// Delegat auf zu verdrahtende Client-Methode abrufen
+					// Get client delegate
 					object receiveMethodDelegate = methodCallMessage.GetArg(0);
 
-					// "set_" wegschneiden
+					// Trim "set_" or "add_" prefix
 					string propertyName = methodCallMessage.MethodName.Substring(4);
 
-					// Verdrahtungskonfiguration festschreiben
+					// Create delegate correlation info
 					DelegateInterceptor wiring = new DelegateInterceptor()
 					{
 						ClientDelegate = receiveMethodDelegate
 					};
-					// Korrelationsinformation zusammenstellen
+
 					DelegateCorrelationInfo correlationInfo = new DelegateCorrelationInfo()
 					{
 						IsEvent = methodCallMessage.MethodName.StartsWith("add_"),
 						DelegateMemberName = propertyName,
 						ClientDelegateInterceptor = wiring
 					};
-					// Wenn die Serverkomponente Singletonaktiviert ist ...
+
+					// If component is singleton, attach event handler
 					if (_activationType == ActivationType.Singleton)
-						// Ereignis der Serverkomponente abonnieren
 						_connection.RemoteComponentFactory.AddEventHandler(_interfaceType.FullName, correlationInfo);
 
-					// Verdrahtung in der Sammlung ablegen
+					// Save delegate correlation info
 					_delegateCorrelationSet.Add(correlationInfo);
 
-					// Leere Remoting-Antwortnachricht erstellen und zurückgeben
+					// Create empty return message
 					return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
 				}
 				else if (methodInfo.ReturnType.Equals(typeof(void)) &&
@@ -204,6 +200,26 @@ namespace Zyan.Communication
 					}
 					// Leere Remoting-Antwortnachricht erstellen und zurückgeben
 					return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
+				}
+				else if (methodInfo.GetParameters().Length == 0 &&
+					methodInfo.GetGenericArguments().Length == 1 &&
+					typeof(IEnumerable).IsAssignableFrom(methodInfo.ReturnType))
+				{
+					var elementType = methodInfo.GetGenericArguments().First();
+					var serverHandlerName = ZyanMethodQueryHandler.GetMethodQueryHandlerName(_uniqueName, methodInfo);
+					var clientHandler = new ZyanClientQueryHandler(_connection, serverHandlerName);
+					var returnValue = clientHandler.Get(elementType);
+					return new ReturnMessage(returnValue, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
+				}
+				else if (methodInfo.GetParameters().Length == 0 && 
+					methodInfo.GetGenericArguments().Length == 1 &&
+					typeof(IQueryable).IsAssignableFrom(methodInfo.ReturnType))
+				{
+					var elementType = methodInfo.GetGenericArguments().First();
+					var serverHandlerName = ZyanMethodQueryHandler.GetMethodQueryHandlerName(_uniqueName, methodInfo);
+					var clientHandler = new ZyanClientQueryHandler(_connection, serverHandlerName);
+					var returnValue = clientHandler.Get(elementType);
+					return new ReturnMessage(returnValue, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
 				}
 				else
 				{

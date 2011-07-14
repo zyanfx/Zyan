@@ -198,7 +198,7 @@ namespace Zyan.Communication
 		/// </summary>
 		/// <param name="registration">Component registration</param>
 		/// <returns>Component instance</returns>
-		internal object GetComponentInstance(ComponentRegistration registration)
+		public object GetComponentInstance(ComponentRegistration registration)
 		{
 			return _catalog.GetComponentInstance(registration);
 		}
