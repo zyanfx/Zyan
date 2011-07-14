@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Runtime.Remoting.Channels;
-using System.ServiceModel;
 using InterLinq.UnitTests.Artefacts.Objects;
+using Zyan.Communication;
 using Zyan.InterLinq;
+using Zyan.InterLinq.Communication;
 using Zyan.InterLinq.Communication.Remoting;
 using Zyan.InterLinq.Communication.Wcf;
-using InterLinq.UnitTests.Properties;
-using Zyan.Communication;
-using Zyan.InterLinq.Communication;
 
 namespace InterLinq.UnitTests.Server
 {
@@ -58,7 +55,7 @@ namespace InterLinq.UnitTests.Server
 			var serviceName = Artefacts.ServiceConstants.ZyanServicePrefix + Artefacts.ServiceConstants.ObjectsServiceName;
 			var protocol = ZyanConstants.GetDefaultServerProtocol(ZyanConstants.DefaultServicePort);
 			var host = new ZyanComponentHost(serviceName, protocol);
-			host.RegisterQueryableComponent(queryHandler);
+			host.RegisterQueryHandler(queryHandler);
 
 			#endregion
 
