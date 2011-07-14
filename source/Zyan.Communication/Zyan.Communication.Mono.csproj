@@ -167,6 +167,7 @@
     <Compile Include="InterLinq\Types\InterLinqMemberInfo.cs" />
     <Compile Include="InterLinq\Types\InterLinqMethodBase.cs" />
     <Compile Include="InterLinq\Types\InterLinqMethodInfo.cs" />
+    <Compile Include="InterLinq\Types\InterLinqNestedType.cs" />
     <Compile Include="InterLinq\Types\InterLinqPropertyInfo.cs" />
     <Compile Include="InterLinq\Types\InterLinqType.cs" />
     <Compile Include="InterLinq\Types\InterLinqTypeSystem.cs" />

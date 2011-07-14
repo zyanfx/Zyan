@@ -11,11 +11,21 @@ namespace Zyan.InterLinq
 	/// </summary>
 	public static class ZyanExtensions
 	{
+		#region Messages
+
+		private const string ObsoleteMessage = "are not used anymore. Linq queries can be executed against any Zyan components. " +
+			"Implement an interface with methods like IQueryable<T> Query<T>() or IEnumerable<T> Get<T>() in a component to be able to use Linq against it.";
+		private const string CreateQueryableProxyObsoleteMessage = "Queryable proxies " + ObsoleteMessage;
+		private const string RegisterQueryableComponentObsoleteMessage = "Queryable components " + ObsoleteMessage;
+
+		#endregion
+
 		/// <summary>
 		/// Creates IQueryable proxy for Zyan connection
 		/// </summary>
 		/// <param name="connection">ZyanConnection</param>
 		/// <param name="implicitTransactionTransfer">Transfer ambient transactions</param>
+		[Obsolete(CreateQueryableProxyObsoleteMessage, true)]
 		public static ZyanClientQueryHandler CreateQueryableProxy(this ZyanConnection connection, bool implicitTransactionTransfer)
 		{
 			return new ZyanClientQueryHandler(connection) { ImplicitTransactionTransfer = implicitTransactionTransfer };
@@ -25,6 +35,7 @@ namespace Zyan.InterLinq
 		/// Creates IQueryable proxy for Zyan connection
 		/// </summary>
 		/// <param name="connection">ZyanConnection</param>
+		[Obsolete(CreateQueryableProxyObsoleteMessage, true)]
 		public static ZyanClientQueryHandler CreateQueryableProxy(this ZyanConnection connection)
 		{
 			return new ZyanClientQueryHandler(connection);
@@ -36,6 +47,7 @@ namespace Zyan.InterLinq
 		/// <param name="connection">ZyanConnection</param>
 		/// <param name="unqiueName">Unique component name</param>
 		/// <param name="implicitTransactionTransfer">Transfer ambient transactions</param>
+		[Obsolete(CreateQueryableProxyObsoleteMessage, true)]
 		public static ZyanClientQueryHandler CreateQueryableProxy(this ZyanConnection connection, string unqiueName, bool implicitTransactionTransfer)
 		{
 			return new ZyanClientQueryHandler(connection, unqiueName) { ImplicitTransactionTransfer = implicitTransactionTransfer };
@@ -46,6 +58,7 @@ namespace Zyan.InterLinq
 		/// </summary>
 		/// <param name="connection">ZyanConnection</param>
 		/// <param name="unqiueName">Unique component name</param>
+		[Obsolete(CreateQueryableProxyObsoleteMessage, true)]
 		public static ZyanClientQueryHandler CreateQueryableProxy(this ZyanConnection connection, string unqiueName)
 		{
 			return new ZyanClientQueryHandler(connection, unqiueName);
@@ -108,6 +121,7 @@ namespace Zyan.InterLinq
 		/// </summary>
 		/// <typeparam name="T">Component type</typeparam>
 		/// <param name="host">Component host</param>
+		[Obsolete(RegisterQueryableComponentObsoleteMessage, true)]
 		public static void RegisterQueryableComponent<T>(this ZyanComponentHost host) where T : IBaseSource, new()
 		{
 			host.RegisterComponent<IQueryRemoteHandler>(CreateServerHandler<T>());
@@ -119,6 +133,7 @@ namespace Zyan.InterLinq
 		/// <typeparam name="T">Component type</typeparam>
 		/// <param name="host">Component host</param>
 		/// <param name="activationType">Activation type</param>
+		[Obsolete(RegisterQueryableComponentObsoleteMessage, true)]
 		public static void RegisterQueryableComponent<T>(this ZyanComponentHost host, ActivationType activationType) where T : IBaseSource, new()
 		{
 			host.RegisterComponent<IQueryRemoteHandler>(CreateServerHandler<T>(), activationType);
@@ -130,6 +145,7 @@ namespace Zyan.InterLinq
 		/// <typeparam name="T">Component type</typeparam>
 		/// <param name="host">Component host</param>
 		/// <param name="uniqueName">Unique component name</param>
+		[Obsolete(RegisterQueryableComponentObsoleteMessage, true)]
 		public static void RegisterQueryableComponent<T>(this ZyanComponentHost host, string uniqueName) where T : IBaseSource, new()
 		{
 			host.RegisterComponent<IQueryRemoteHandler>(uniqueName, CreateServerHandler<T>());
@@ -141,6 +157,7 @@ namespace Zyan.InterLinq
 		/// <typeparam name="T">Component type</typeparam>
 		/// <param name="host">Component host</param>
 		/// <param name="instance">Component instance</param>
+		[Obsolete(RegisterQueryableComponentObsoleteMessage, true)]
 		public static void RegisterQueryableComponent<T>(this ZyanComponentHost host, T instance) where T : IBaseSource
 		{
 			host.RegisterComponent<IQueryRemoteHandler>(CreateServerHandler<T>(instance));
@@ -153,6 +170,7 @@ namespace Zyan.InterLinq
 		/// <param name="host">Component host</param>
 		/// <param name="uniqueName">Unique component name</param>
 		/// <param name="instance">Component instance</param>
+		[Obsolete(RegisterQueryableComponentObsoleteMessage, true)]
 		public static void RegisterQueryableComponent<T>(this ZyanComponentHost host, string uniqueName, T instance) where T : IBaseSource
 		{
 			host.RegisterComponent<IQueryRemoteHandler>(uniqueName, CreateServerHandler<T>(instance));
@@ -165,6 +183,7 @@ namespace Zyan.InterLinq
 		/// <param name="host">Component host</param>
 		/// <param name="uniqueName">Unique component name</param>
 		/// <param name="activationType">Activation type</param>
+		[Obsolete(RegisterQueryableComponentObsoleteMessage, true)]
 		public static void RegisterQueryableComponent<T>(this ZyanComponentHost host, string uniqueName, ActivationType activationType) where T : IBaseSource, new()
 		{
 			host.RegisterComponent<IQueryRemoteHandler>(uniqueName, CreateServerHandler<T>(), activationType);
@@ -175,7 +194,7 @@ namespace Zyan.InterLinq
 		/// </summary>
 		/// <param name="host">Component host</param>
 		/// <param name="queryHandler">Query handler</param>
-		public static void RegisterQueryableComponent(this ZyanComponentHost host, IQueryHandler queryHandler)
+		public static void RegisterQueryHandler(this ZyanComponentHost host, IQueryHandler queryHandler)
 		{
 			host.RegisterComponent<IQueryRemoteHandler, ZyanServerQueryHandler>(new ZyanServerQueryHandler(queryHandler));
 		}
@@ -186,7 +205,7 @@ namespace Zyan.InterLinq
 		/// <param name="host">Component host</param>
 		/// <param name="uniqueName">Unique component name</param>
 		/// <param name="queryHandler">Query handler</param>
-		public static void RegisterQueryableComponent(this ZyanComponentHost host, string uniqueName, IQueryHandler queryHandler)
+		public static void RegisterQueryHandler(this ZyanComponentHost host, string uniqueName, IQueryHandler queryHandler)
 		{
 			host.RegisterComponent<IQueryRemoteHandler, ZyanServerQueryHandler>(uniqueName, new ZyanServerQueryHandler(queryHandler));
 		}
@@ -196,6 +215,7 @@ namespace Zyan.InterLinq
 		/// </summary>
 		/// <param name="host">Component host</param>
 		/// <param name="getMethod">Method returning IEnumerable instances of the given type</param>
+		[Obsolete(RegisterQueryableComponentObsoleteMessage, true)]
 		public static void RegisterQueryableComponent(this ZyanComponentHost host, Func<Type, IEnumerable> getMethod)
 		{
 			host.RegisterComponent<IQueryRemoteHandler>(() => new ZyanServerQueryHandler(getMethod));
@@ -206,6 +226,7 @@ namespace Zyan.InterLinq
 		/// </summary>
 		/// <param name="host">Component host</param>
 		/// <param name="getMethod">Method returning IQueryable instances of the given type</param>
+		[Obsolete(RegisterQueryableComponentObsoleteMessage, true)]
 		public static void RegisterQueryableComponent(this ZyanComponentHost host, Func<Type, IQueryable> getMethod)
 		{
 			host.RegisterComponent<IQueryRemoteHandler>(() => new ZyanServerQueryHandler(getMethod));
@@ -217,6 +238,7 @@ namespace Zyan.InterLinq
 		/// <param name="host">Component host</param>
 		/// <param name="uniqueName">Unique component name</param>
 		/// <param name="getMethod">Method returning IEnumerable instances of the given type</param>
+		[Obsolete(RegisterQueryableComponentObsoleteMessage, true)]
 		public static void RegisterQueryableComponent(this ZyanComponentHost host, string uniqueName, Func<Type, IEnumerable> getMethod)
 		{
 			host.RegisterComponent<IQueryRemoteHandler>(uniqueName, () => new ZyanServerQueryHandler(getMethod));
@@ -228,6 +250,7 @@ namespace Zyan.InterLinq
 		/// <param name="host">Component host</param>
 		/// <param name="uniqueName">Unique component name</param>
 		/// <param name="getMethod">Method returning IQueryable instances of the given type</param>
+		[Obsolete(RegisterQueryableComponentObsoleteMessage, true)]
 		public static void RegisterQueryableComponent(this ZyanComponentHost host, string uniqueName, Func<Type, IQueryable> getMethod)
 		{
 			host.RegisterComponent<IQueryRemoteHandler>(uniqueName, () => new ZyanServerQueryHandler(getMethod));
@@ -240,6 +263,7 @@ namespace Zyan.InterLinq
 		/// <param name="uniqueName">Unique component name</param>
 		/// <param name="getMethod">Method returning IEnumerable instances of the given type</param>
 		/// <param name="activationType">Activation type</param>
+		[Obsolete(RegisterQueryableComponentObsoleteMessage, true)]
 		public static void RegisterQueryableComponent(this ZyanComponentHost host, string uniqueName, Func<Type, IEnumerable> getMethod, ActivationType activationType)
 		{
 			host.RegisterComponent<IQueryRemoteHandler>(uniqueName, () => new ZyanServerQueryHandler(getMethod), activationType);
@@ -252,6 +276,7 @@ namespace Zyan.InterLinq
 		/// <param name="uniqueName">Unique component name</param>
 		/// <param name="getMethod">Method returning IQueryable instances of the given type</param>
 		/// <param name="activationType">Activation type</param>
+		[Obsolete(RegisterQueryableComponentObsoleteMessage, true)]
 		public static void RegisterQueryableComponent(this ZyanComponentHost host, string uniqueName, Func<Type, IQueryable> getMethod, ActivationType activationType)
 		{
 			host.RegisterComponent<IQueryRemoteHandler>(uniqueName, () => new ZyanServerQueryHandler(getMethod), activationType);
@@ -262,6 +287,7 @@ namespace Zyan.InterLinq
 		/// </summary>
 		/// <param name="host">Component host</param>
 		/// <param name="factoryMethod">Factory method to create component instance</param>
+		[Obsolete(RegisterQueryableComponentObsoleteMessage, true)]
 		public static void RegisterQueryableComponent(this ZyanComponentHost host, Func<IObjectSource> factoryMethod)
 		{
 			host.RegisterComponent<IQueryRemoteHandler>(() => new ZyanServerQueryHandler(factoryMethod()));
@@ -272,6 +298,7 @@ namespace Zyan.InterLinq
 		/// </summary>
 		/// <param name="host">Component host</param>
 		/// <param name="factoryMethod">Factory method to create component instance</param>
+		[Obsolete(RegisterQueryableComponentObsoleteMessage, true)]
 		public static void RegisterQueryableComponent(this ZyanComponentHost host, Func<IEntitySource> factoryMethod)
 		{
 			host.RegisterComponent<IQueryRemoteHandler>(() => new ZyanServerQueryHandler(factoryMethod()));
@@ -283,6 +310,7 @@ namespace Zyan.InterLinq
 		/// <param name="host">Component host</param>
 		/// <param name="uniqueName">Unique component name</param>
 		/// <param name="factoryMethod">Factory method to create component instance</param>
+		[Obsolete(RegisterQueryableComponentObsoleteMessage, true)]
 		public static void RegisterQueryableComponent(this ZyanComponentHost host, string uniqueName, Func<IObjectSource> factoryMethod)
 		{
 			host.RegisterComponent<IQueryRemoteHandler>(uniqueName, () => new ZyanServerQueryHandler(factoryMethod()));
@@ -294,6 +322,7 @@ namespace Zyan.InterLinq
 		/// <param name="host">Component host</param>
 		/// <param name="uniqueName">Unique component name</param>
 		/// <param name="factoryMethod">Factory method to create component instance</param>
+		[Obsolete(RegisterQueryableComponentObsoleteMessage, true)]
 		public static void RegisterQueryableComponent(this ZyanComponentHost host, string uniqueName, Func<IEntitySource> factoryMethod)
 		{
 			host.RegisterComponent<IQueryRemoteHandler>(uniqueName, () => new ZyanServerQueryHandler(factoryMethod()));
@@ -305,6 +334,7 @@ namespace Zyan.InterLinq
 		/// <param name="host">Component host</param>
 		/// <param name="factoryMethod">Factory method to create component instance</param>
 		/// <param name="activationType">Activation type</param>
+		[Obsolete(RegisterQueryableComponentObsoleteMessage, true)]
 		public static void RegisterQueryableComponent(this ZyanComponentHost host, Func<IObjectSource> factoryMethod, ActivationType activationType)
 		{
 			host.RegisterComponent<IQueryRemoteHandler>(() => new ZyanServerQueryHandler(factoryMethod()), activationType);
@@ -316,6 +346,7 @@ namespace Zyan.InterLinq
 		/// <param name="host">Component host</param>
 		/// <param name="factoryMethod">Factory method to create component instance</param>
 		/// <param name="activationType">Activation type</param>
+		[Obsolete(RegisterQueryableComponentObsoleteMessage, true)]
 		public static void RegisterQueryableComponent(this ZyanComponentHost host, Func<IEntitySource> factoryMethod, ActivationType activationType)
 		{
 			host.RegisterComponent<IQueryRemoteHandler>(() => new ZyanServerQueryHandler(factoryMethod()), activationType);
@@ -328,6 +359,7 @@ namespace Zyan.InterLinq
 		/// <param name="uniqueName">Unique component name</param>
 		/// <param name="factoryMethod">Factory method to create component instance</param>
 		/// <param name="activationType">Activation type</param>
+		[Obsolete(RegisterQueryableComponentObsoleteMessage, true)]
 		public static void RegisterQueryableComponent(this ZyanComponentHost host, string uniqueName, Func<IObjectSource> factoryMethod, ActivationType activationType)
 		{
 			host.RegisterComponent<IQueryRemoteHandler>(uniqueName, () => new ZyanServerQueryHandler(factoryMethod()), activationType);
@@ -340,6 +372,7 @@ namespace Zyan.InterLinq
 		/// <param name="uniqueName">Unique component name</param>
 		/// <param name="factoryMethod">Factory method to create component instance</param>
 		/// <param name="activationType">Activation type</param>
+		[Obsolete(RegisterQueryableComponentObsoleteMessage, true)]
 		public static void RegisterQueryableComponent(this ZyanComponentHost host, string uniqueName, Func<IEntitySource> factoryMethod, ActivationType activationType)
 		{
 			host.RegisterComponent<IQueryRemoteHandler>(uniqueName, () => new ZyanServerQueryHandler(factoryMethod()), activationType);
