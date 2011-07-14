@@ -83,6 +83,9 @@ namespace Zyan.InterLinq.Types
 					case MemberTypes.TypeInfo:
 						createdMemberInfo = ((Type)memberInfo).IsAnonymous() ? new AnonymousMetaType() : new InterLinqType();
 						break;
+					case MemberTypes.NestedType:
+						createdMemberInfo = new InterLinqType();
+						break;
 					default:
 						throw new Exception(string.Format("MemberInfo \"{0}\" could not be handled.", memberInfo));
 				}

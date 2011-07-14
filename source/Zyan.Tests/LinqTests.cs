@@ -28,7 +28,7 @@ namespace Zyan.Tests
 	#endregion
 
 	/// <summary>
-	/// Test class for Linq stuff
+	/// Test class for Linq stuff (expression serialization, linq queries).
 	/// </summary>
 	[TestClass]
 	public class LinqTests
@@ -40,6 +40,10 @@ namespace Zyan.Tests
 			string CompileAndExecuteExpression(Expression<Func<string, string>> ex, string data);
 
 			Expression ProcessExpression(Expression<Action<string>> ex, string data);
+
+			IEnumerable<T> GetList<T>() where T : class, new();
+
+			IQueryable<T> Query<T>() where T : class, new();
 		}
 
 		class SampleService : ISampleService
@@ -54,24 +58,8 @@ namespace Zyan.Tests
 			{
 				return Expression.Invoke(ex, Expression.Constant(data));
 			}
-		}
 
-		interface IMixedInterface
-		{
-			void OverloadedMethod();
-
-			IEnumerable<T> OverloadedMethod<T>() where T : class, new();
-
-			IQueryable<T> Query<T>() where T : class, new();
-		}
-
-		class MixedComponent : IMixedInterface
-		{
-			public void OverloadedMethod()
-			{
-			}
-
-			public IEnumerable<T> OverloadedMethod<T>() where T : class, new()
+			public IEnumerable<T> GetList<T>() where T : class, new()
 			{
 				foreach (var i in Enumerable.Range(1, 10))
 					yield return new T();
@@ -85,15 +73,19 @@ namespace Zyan.Tests
 			}
 		}
 
-		class Sample
+		class RandomValue
 		{
+			public const int MinValue = 500;
+
+			public const int MaxValue = 1000;
+
 			static Random random = new Random();
 
 			public int Value { get; private set; }
 
-			public Sample()
+			public RandomValue()
 			{
-				Value = random.Next(500, 1000);
+				Value = random.Next(MinValue, MaxValue);
 			}
 		}
 
@@ -124,16 +116,11 @@ namespace Zyan.Tests
 			ZyanHost = new ZyanComponentHost("SampleQueryableServer", serverSetup);
 
 			ZyanHost.RegisterComponent<ISampleService, SampleService>();
-			ZyanHost.RegisterQueryableComponent(new SampleObjectSource(new[] { "Hello", "World!" }));
-			ZyanHost.RegisterQueryableComponent("Sample1", new SampleObjectSource(new[] { "this", "is", "an", "example" }));
-			ZyanHost.RegisterQueryableComponent("Sample2", () => new SampleObjectSource(new[] { "lorem", "ipsum", "dolor", "sit", "amet" }));
-			ZyanHost.RegisterQueryableComponent("Sample3", () => new SampleObjectSource(new[] { "consectetur", "adipisicing", "elit" }), ActivationType.SingleCall);
-			ZyanHost.RegisterQueryableComponent("Sample4", (Type t) => new object[] { "quietly", "turning", "the", "backdoor", "key" });
-			ZyanHost.RegisterQueryableComponent("Sample5", (Type t) => (new object[] { "stepping", "outside", "she", "is", "free" }).AsQueryable());
-			ZyanHost.RegisterQueryableComponent<SampleObjectSource>("Sample6");
-			ZyanHost.RegisterQueryableComponent<SampleObjectSource>("Sample7", ActivationType.SingleCall);
-			ZyanHost.RegisterQueryableComponent("DbSample", new DataWrapper());
-			ZyanHost.RegisterComponent<IMixedInterface, MixedComponent>();
+			ZyanHost.RegisterComponent<IObjectSource, SampleObjectSource>(new SampleObjectSource(new[] { "Hello", "World!" }));
+			ZyanHost.RegisterComponent<IObjectSource, SampleObjectSource>("Sample1", new SampleObjectSource(new[] { "this", "is", "an", "example" }));
+			ZyanHost.RegisterComponent<IObjectSource, SampleObjectSource>("Sample6");
+			ZyanHost.RegisterComponent<IObjectSource, SampleObjectSource>("Sample7", ActivationType.SingleCall);
+			ZyanHost.RegisterComponent<IEntitySource, DataWrapper>("DbSample", new DataWrapper());
 
 			var clientSetup = new IpcBinaryClientProtocolSetup();
 			ZyanConnection = new ZyanConnection("ipc://LinqTest/SampleQueryableServer", clientSetup);
@@ -149,7 +136,7 @@ namespace Zyan.Tests
 		[TestMethod]
 		public void TestUntitledComponent()
 		{
-			var proxy = ZyanConnection.CreateQueryableProxy();
+			var proxy = ZyanConnection.CreateProxy<IObjectSource>();
 			var query =
 				from s in proxy.Get<string>()
 				where s.EndsWith("!")
@@ -163,7 +150,7 @@ namespace Zyan.Tests
 		[TestMethod]
 		public void TestSample1Component()
 		{
-			var proxy = ZyanConnection.CreateQueryableProxy("Sample1");
+			var proxy = ZyanConnection.CreateProxy<IObjectSource>("Sample1");
 			var query =
 				from s in proxy.Get<string>()
 				where s.Length > 2
@@ -175,61 +162,9 @@ namespace Zyan.Tests
 		}
 
 		[TestMethod]
-		public void TestSample2Component()
-		{
-			var proxy = ZyanConnection.CreateQueryableProxy("Sample2");
-			var query =
-				from s in proxy.Get<string>()
-				orderby s
-				select s.ToUpper();
-
-			var result = String.Join(" ", query);
-			Assert.AreEqual("AMET DOLOR IPSUM LOREM SIT", result);
-		}
-
-		[TestMethod]
-		public void TestSample3Component()
-		{
-			var proxy = ZyanConnection.CreateQueryableProxy("Sample3");
-			var query =
-				from s in proxy.Get<string>()
-				orderby s.Length
-				select s.Substring(0, 3);
-
-			var result = String.Concat(query);
-			Assert.AreEqual("eliconadi", result);
-		}
-
-		[TestMethod]
-		public void TestSample4Component()
-		{
-			var proxy = ZyanConnection.CreateQueryableProxy("Sample4");
-			var query =
-				from s in proxy.Get<string>()
-				orderby s
-				select s.Substring(0, 1);
-
-			var result = String.Concat(query);
-			Assert.AreEqual("bkqtt", result);
-		}
-
-		[TestMethod]
-		public void TestSample5Component()
-		{
-			var proxy = ZyanConnection.CreateQueryableProxy("Sample5");
-			var query =
-				from s in proxy.Get<string>()
-				orderby s descending
-				select s.Substring(0, 1);
-
-			var result = String.Concat(query);
-			Assert.AreEqual("ssoif", result);
-		}
-
-		[TestMethod]
 		public void TestSample6Component()
 		{
-			var proxy = ZyanConnection.CreateQueryableProxy("Sample6");
+			var proxy = ZyanConnection.CreateProxy<IObjectSource>("Sample6");
 			var query =
 				from s in proxy.Get<string>()
 				where s == "fox" || s == "dog" || s == "frog" || s == "mouse"
@@ -242,7 +177,7 @@ namespace Zyan.Tests
 		[TestMethod]
 		public void TestSample7Component()
 		{
-			var proxy = ZyanConnection.CreateQueryableProxy("Sample7");
+			var proxy = ZyanConnection.CreateProxy<IObjectSource>("Sample7");
 			var query =
 				from s in proxy.Get<string>()
 				where Regex.IsMatch(s, "[nyg]$")
@@ -255,7 +190,7 @@ namespace Zyan.Tests
 		[TestMethod]
 		public void TestDbSampleComponent1()
 		{
-			var proxy = ZyanConnection.CreateQueryableProxy("DbSample");
+			var proxy = ZyanConnection.CreateProxy<IEntitySource>("DbSample");
 			var query =
 				from s in proxy.Get<SampleEntity>()
 				where Regex.IsMatch(s.FirstName, "[rt]$")
@@ -268,7 +203,7 @@ namespace Zyan.Tests
 		[TestMethod]
 		public void TestDbSampleComponent2()
 		{
-			var proxy = ZyanConnection.CreateQueryableProxy("DbSample");
+			var proxy = ZyanConnection.CreateProxy<IEntitySource>("DbSample");
 			var query =
 				from s in proxy.Get<SampleEntity>()
 				orderby s.FirstName.Length, s.FirstName
@@ -304,24 +239,55 @@ namespace Zyan.Tests
 			Assert.AreEqual(expression.ToString(), result.ToString());
 		}
 
+
 		[TestMethod]
-		public void TestMixedQueryable()
+		public void TestSampleEnumerable()
 		{
-			var mc = ZyanConnection.CreateProxy<IMixedInterface>();
-			var count = mc.Query<StringBuilder>().Count();
-			Assert.AreEqual(count, 5);
+			var mc = ZyanConnection.CreateProxy<ISampleService>();
+
+			var count = 0;
+			foreach (var value in mc.GetList<StringBuilder>())
+				count += value.Length + 1;
+
+			Assert.AreEqual(10, count);
 		}
 
 		[TestMethod]
-		public void TestMixedEnumerable()
+		public void TestSampleQueryable1()
 		{
-			var mc = ZyanConnection.CreateProxy<IMixedInterface>();
+			var mc = ZyanConnection.CreateProxy<ISampleService>();
+			var count = mc.Query<RandomValue>().Count();
+			Assert.AreEqual(5, count);
+		}
 
-			var count = 0;
-			foreach (var value in mc.OverloadedMethod<StringBuilder>())
-				count += value.Length + 1;
+		[TestMethod]
+		public void TestSampleQueryable2()
+		{
+			var mc = ZyanConnection.CreateProxy<ISampleService>();
+			var query =
+				from sv in mc.Query<RandomValue>()
+				where sv.Value < RandomValue.MinValue + 100
+				select sv;
 
-			Assert.AreEqual(count, 10);
+			var sum = query.Sum(sv => sv.Value);
+
+			Assert.IsTrue(0 <= sum);
+			Assert.IsTrue(5 * RandomValue.MaxValue >= sum);
+		}
+
+		[TestMethod]
+		public void TestSampleQueryable3()
+		{
+			var mc = ZyanConnection.CreateProxy<ISampleService>();
+			var param = '3';
+			var query =
+				from sv in mc.Query<RandomValue>()
+				where sv.Value.ToString().Contains(param)
+				select new { sv.Value };
+
+			var result = string.Concat(query);
+
+			Assert.IsTrue(result == String.Empty || result.Contains(param));
 		}
 	}
 }
