@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.Remoting;
@@ -171,6 +172,30 @@ namespace Zyan.Communication.Toolbox
 
 			// nothing is found
 			return null;
+		}
+
+		/// <summary>
+		/// Returns method signature, similar to MethodInfo.ToString().
+		/// </summary>
+		/// <param name="mi">MethodInfo to convert.</param>
+		/// <returns>String representation of method signature, equal on .NET and Mono platforms.</returns>
+		public static string GetSignature(this MethodInfo mi)
+		{
+			var sb = new StringBuilder();
+			sb.AppendFormat("{0} {1}{2}(", mi.ReturnType.Name, mi.Name,
+				mi.IsGenericMethod ? "`" + mi.GetGenericArguments().Length : "");
+
+			bool first = true;
+			foreach (var pt in mi.GetParameters().Select(pi => pi.ParameterType))
+			{
+				if (!first)
+					sb.Append(", ");
+				sb.Append(pt.FullName);
+				first = false;
+			}
+
+			sb.Append(")");
+			return sb.ToString();
 		}
 	}
 }

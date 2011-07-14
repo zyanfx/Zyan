@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 using Zyan.Communication;
 using Zyan.Communication.Protocols.Ipc;
 using Zyan.InterLinq;
-using System.Linq.Expressions;
 
 namespace Zyan.Tests
 {
@@ -54,6 +56,47 @@ namespace Zyan.Tests
 			}
 		}
 
+		interface IMixedInterface
+		{
+			void OverloadedMethod();
+
+			IEnumerable<T> OverloadedMethod<T>() where T : class, new();
+
+			IQueryable<T> Query<T>() where T : class, new();
+		}
+
+		class MixedComponent : IMixedInterface
+		{
+			public void OverloadedMethod()
+			{
+			}
+
+			public IEnumerable<T> OverloadedMethod<T>() where T : class, new()
+			{
+				foreach (var i in Enumerable.Range(1, 10))
+					yield return new T();
+
+				yield break;
+			}
+
+			public IQueryable<T> Query<T>() where T : class, new()
+			{
+				return Enumerable.Range(1, 5).Select(i => new T()).ToArray().AsQueryable();
+			}
+		}
+
+		class Sample
+		{
+			static Random random = new Random();
+
+			public int Value { get; private set; }
+
+			public Sample()
+			{
+				Value = random.Next(500, 1000);
+			}
+		}
+
 		#endregion
 
 		public TestContext TestContext { get; set; }
@@ -90,6 +133,7 @@ namespace Zyan.Tests
 			ZyanHost.RegisterQueryableComponent<SampleObjectSource>("Sample6");
 			ZyanHost.RegisterQueryableComponent<SampleObjectSource>("Sample7", ActivationType.SingleCall);
 			ZyanHost.RegisterQueryableComponent("DbSample", new DataWrapper());
+			ZyanHost.RegisterComponent<IMixedInterface, MixedComponent>();
 
 			var clientSetup = new IpcBinaryClientProtocolSetup();
 			ZyanConnection = new ZyanConnection("ipc://LinqTest/SampleQueryableServer", clientSetup);
@@ -258,6 +302,26 @@ namespace Zyan.Tests
 
 			var result = proxy.ProcessExpression(ex, message);
 			Assert.AreEqual(expression.ToString(), result.ToString());
+		}
+
+		[TestMethod]
+		public void TestMixedQueryable()
+		{
+			var mc = ZyanConnection.CreateProxy<IMixedInterface>();
+			var count = mc.Query<StringBuilder>().Count();
+			Assert.AreEqual(count, 5);
+		}
+
+		[TestMethod]
+		public void TestMixedEnumerable()
+		{
+			var mc = ZyanConnection.CreateProxy<IMixedInterface>();
+
+			var count = 0;
+			foreach (var value in mc.OverloadedMethod<StringBuilder>())
+				count += value.Length + 1;
+
+			Assert.AreEqual(count, 10);
 		}
 	}
 }

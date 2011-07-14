@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Zyan.Communication.Toolbox;
+using System.Linq;
+using Zyan.InterLinq;
+using System.Collections;
 
 namespace Zyan.Communication
 {
@@ -61,6 +64,8 @@ namespace Zyan.Communication
 				registration.DisposeWithCatalog = true;
 				ComponentRegistry.Add(uniqueName, registration);
 			}
+
+			RegisterQueryableMethods<I>(uniqueName);
 		}
 
 		/// <summary>
@@ -90,6 +95,8 @@ namespace Zyan.Communication
 				registration.DisposeWithCatalog = true;
 				ComponentRegistry.Add(uniqueName, registration);
 			}
+
+			RegisterQueryableMethods<I>(uniqueName);
 		}
 
 		/// <summary>
@@ -124,6 +131,29 @@ namespace Zyan.Communication
 				ComponentRegistration registration = new ComponentRegistration(interfaceType, instance, uniqueName, cleanUpHandler);
 				registration.DisposeWithCatalog = !externallyOwned;
 				ComponentRegistry.Add(uniqueName, registration);
+			}
+
+			RegisterQueryableMethods<I>(uniqueName);
+		}
+
+		/// <summary>
+		/// Wraps all component methods returning IEnumerable{T} or IQueryable{T}.
+		/// </summary>
+		/// <typeparam name="I">Interface to wrap.</typeparam>
+		/// <param name="uniqueName">Component unique name.</param>
+		private void RegisterQueryableMethods<I>(string uniqueName)
+		{
+			foreach (var mi in typeof(I).GetMethods())
+			{
+				if (mi.IsGenericMethod && mi.GetParameters().Length == 0)
+				{
+					if (typeof(IEnumerable).IsAssignableFrom(mi.ReturnType) || typeof(IQueryable).IsAssignableFrom(mi.ReturnType))
+					{
+						var queryHandler = new ZyanMethodQueryHandler(this, uniqueName, mi);
+						var remoteHandler = new ZyanServerQueryHandler(queryHandler);
+						RegisterComponent<IQueryRemoteHandler, ZyanServerQueryHandler>(queryHandler.MethodQueryHandlerName, remoteHandler, null);
+					}
+				}
 			}
 		}
 
@@ -206,7 +236,7 @@ namespace Zyan.Communication
 		/// </summary>
 		/// <param name="registration">Component registration</param>
 		/// <returns>Component instance</returns>
-		internal object GetComponentInstance(ComponentRegistration registration)
+		public object GetComponentInstance(ComponentRegistration registration)
 		{
 			if (registration == null)
 				throw new ArgumentNullException("registration");
