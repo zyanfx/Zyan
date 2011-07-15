@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Zyan.InterLinq.Types.Anonymous
 {
@@ -22,7 +23,23 @@ namespace Zyan.InterLinq.Types.Anonymous
 		/// </remarks>
 		public static bool IsAnonymous(this Type t)
 		{
-			return t.Name.StartsWith("<>f__AnonymousType");
+			// anonymous types are always generic and [CompilerGenerated]
+			if (!t.IsGenericType || !Attribute.IsDefined(t, typeof(CompilerGeneratedAttribute), false))
+				return false;
+
+			// Microsoft C# anonymous type
+			if (t.Name.StartsWith("<>f__AnonymousType"))
+				return true;
+
+			// Microsoft Visual Basic anonymous type
+			if (t.Name.StartsWith("VB$AnonymousType"))
+				return true;
+
+			// Mono C# anonymous type
+			if (t.Name.StartsWith("<>__AnonType"))
+				return true;
+
+			return false;
 		}
 
 		/// <summary>
@@ -37,7 +54,23 @@ namespace Zyan.InterLinq.Types.Anonymous
 		/// </remarks>
 		public static bool IsDisplayClass(this Type t)
 		{
-			return t.Name.StartsWith("<>c__DisplayClass");
+			// closures are always [CompilerGenerated]
+			if (!Attribute.IsDefined(t, typeof(CompilerGeneratedAttribute), false))
+				return false;
+
+			// Microsoft C# closure
+			if (t.Name.StartsWith("<>c__DisplayClass"))
+				return true;
+
+			// Microsoft Visual Basic closure
+			if (t.Name.StartsWith("_Closure$__"))
+				return true;
+
+			// Mono C# closure
+			if (t.Name.StartsWith("<") && t.Name.Contains(">c__AnonStorey"))
+				return true;
+
+			return false;
 		}
 
 		/// <summary>
