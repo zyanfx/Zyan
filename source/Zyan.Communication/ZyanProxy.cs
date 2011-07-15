@@ -386,6 +386,10 @@ namespace Zyan.Communication
 							// Entfernten Methodenaufruf erneut versuchen
 							returnValue = _remoteInvoker.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, genericArgs, paramTypes, methodCallMessage.Args);
 						}
+						else
+						{
+							throw;
+						}
 					}
 				}
 				// Versuchen den Rückgabewert in einen Serialisierungscontainer zu casten
