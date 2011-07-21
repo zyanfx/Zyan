@@ -257,7 +257,7 @@ namespace Zyan.Tests
 		}
 
 		/// <summary>
-		/// Queryable component is registered as IQueryRemoteHandler.
+		/// Queryable component is not registered as IQueryRemoteHandler anymore. It's plain IEntitySource.
 		/// </summary>
 		[ZyanComponent("UniqueName_MefSample10", typeof(IEntitySource))]
 		public class MefSample10 : IEntitySource, IDisposable
@@ -284,7 +284,7 @@ namespace Zyan.Tests
 		}
 
 		/// <summary>
-		/// Queryable component is registered as IQueryRemoteHandler.
+		/// Queryable component is not registered as IQueryRemoteHandler anymore. It's plain IObjectSource.
 		/// </summary>
 		[ZyanComponent("UniqueName_MefSample11", typeof(IObjectSource))]
 		public class MefSample11 : IObjectSource, IDisposable
@@ -307,6 +307,39 @@ namespace Zyan.Tests
 			{
 				GC.SuppressFinalize(this);
 				Interlocked.Decrement(ref instanceCount);
+			}
+		}
+
+		/// <summary>
+		/// This interface is mixed. It contains simple methods as well as IQueryable/IEnumerable methods.
+		/// </summary>
+		public interface IMefSample12
+		{
+			void DoSomething();
+
+			IQueryable<T> GetTable<T>() where T : class, new();
+
+			IEnumerable<T> GetList<T>() where T : class, new();
+		}
+
+		/// <summary>
+		/// This component is mixed. It contains simple methods as well as IQueryable/IEnumerable methods.
+		/// </summary>
+		[ZyanComponent("UniqueName_MefSample12", typeof(IMefSample12))]
+		public class MefSample12 : IMefSample12
+		{
+			public void DoSomething()
+			{
+			}
+
+			public IQueryable<T> GetTable<T>() where T : class, new()
+			{
+				return new T[10].AsQueryable();
+			}
+
+			public IEnumerable<T> GetList<T>() where T : class, new()
+			{
+				return new T[5];
 			}
 		}
 
@@ -688,7 +721,7 @@ namespace Zyan.Tests
 		}
 
 		[TestMethod]
-		public void IEntitySourceFromMefContainer_IsRegisteredAsQueryRemoteHandler()
+		public void IEntitySourceFromMefContainer_IsRegisteredAsIs()
 		{
 			var cat = new ComponentCatalog();
 			cat.RegisterComponents(MefContainer);
@@ -698,9 +731,9 @@ namespace Zyan.Tests
 			Assert.IsNotNull(reg);
 
 			// get component instance
-			var obj = cat.GetComponent("UniqueName_MefSample10") as IQueryRemoteHandler;
+			var obj = cat.GetComponent("UniqueName_MefSample10") as IEntitySource;
 			Assert.IsNotNull(obj);
-			AssertEx.IsInstanceOf<ZyanServerQueryHandler>(obj);
+			AssertEx.IsInstanceOf<MefSample10>(obj);
 			Assert.AreEqual(1, MefSample10.InstanceCount);
 
 			// clean up component instance
@@ -709,7 +742,7 @@ namespace Zyan.Tests
 		}
 
 		[TestMethod]
-		public void IObjectSourceFromMefContainer_IsRegisteredAsQueryRemoteHandler()
+		public void IObjectSourceFromMefContainer_IsRegisteredAsIs()
 		{
 			var cat = new ComponentCatalog();
 			cat.RegisterComponents(MefContainer);
@@ -719,14 +752,30 @@ namespace Zyan.Tests
 			Assert.IsNotNull(reg);
 
 			// get component instance
-			var obj = cat.GetComponent("UniqueName_MefSample11") as IQueryRemoteHandler;
+			var obj = cat.GetComponent("UniqueName_MefSample11") as IObjectSource;
 			Assert.IsNotNull(obj);
-			AssertEx.IsInstanceOf<ZyanServerQueryHandler>(obj);
+			AssertEx.IsInstanceOf<MefSample11>(obj);
 			Assert.AreEqual(1, MefSample11.InstanceCount);
 
 			// clean up component instance
 			cat.CleanUpComponentInstance(reg, obj);
 			Assert.AreEqual(0, MefSample11.InstanceCount);
+		}
+
+		[TestMethod]
+		public void MixedComponent_IsRegistered()
+		{
+			var cat = new ComponentCatalog();
+			cat.RegisterComponents(MefContainer);
+
+			// get component registration
+			var reg = cat.GetRegistration("UniqueName_MefSample12");
+			Assert.IsNotNull(reg);
+
+			// get component instance
+			var obj = cat.GetComponent("UniqueName_MefSample12") as IMefSample12;
+			Assert.IsNotNull(obj);
+			AssertEx.IsInstanceOf<MefSample12>(obj);
 		}
 	}
 }
