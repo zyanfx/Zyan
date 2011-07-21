@@ -103,90 +103,12 @@ namespace Zyan.Communication.Composition
 		}
 
 		/// <summary>
-		/// MethodInfo for RegisterQueryableComponent{I} method, used to create generic method delegates
-		/// </summary>
-		static MethodInfo RegisterQueryableComponentMethodInfo = typeof(IComponentCatalogMefExtensions).GetMethod("RegisterQueryableComponent", BindingFlags.Static | BindingFlags.NonPublic,
-			null, new[] { typeof(IComponentCatalog), typeof(ComposablePartCatalog), typeof(CompositionContainer), typeof(string) }, null);
-
-		/// <summary>
-		/// Registers queryable component implementing either IObjectSource or IEntitySource. Component instance is provided by MEF container.
-		/// </summary>
-		static void RegisterQueryableComponent<I>(this IComponentCatalog host, ComposablePartCatalog childCatalog, CompositionContainer parentContainer, string contractName = null) where I : IBaseSource
-		{
-			// zyanServerQueryHandler -> owning container
-			var containers = new ConcurrentDictionary<object, CompositionContainer>();
-			var uniqueName = contractName ?? typeof(IQueryRemoteHandler).FullName;
-
-			// MEF's default contract name is set to the type full name, which is not convenient for the queryable components
-			if (uniqueName == typeof(IObjectSource).FullName || uniqueName == typeof(IEntitySource).FullName)
-			{
-				uniqueName = typeof(IQueryRemoteHandler).FullName;
-			}
-
-			// ZyanServerQueryHandler factory for the given object or entity source
-			var createZyanServerQueryHandler = GetZyanServerQueryHandlerFactory<I>();
-
-			// queryable component instance is created inside the child container
-			host.RegisterComponent<IQueryRemoteHandler>
-			(
-				uniqueName,
-				delegate // factory method
-				{
-					// create child container for early component disposal and fetch exported component
-					var childContainer = new CompositionContainer(childCatalog, parentContainer);
-					var component = contractName != null ? childContainer.GetExport<I>(contractName).Value : childContainer.GetExport<I>().Value;
-
-					// create server query handler for exported component
-					var zyanServerQueryHandler = createZyanServerQueryHandler(component);
-					containers[zyanServerQueryHandler] = childContainer;
-					return zyanServerQueryHandler;
-				},
-				delegate(object zyanServerQueryHandler) // cleanup delegate
-				{
-					CompositionContainer childContainer;
-
-					// free child container and release non-shared MEF component
-					if (containers.TryRemove(zyanServerQueryHandler, out childContainer))
-					{
-						childContainer.Dispose();
-					}
-				}
-			);
-		}
-
-		/// <summary>
-		/// Returns factory method for ZyanServerQueryHandler: component -> server query handler
-		/// </summary>
-		/// <typeparam name="I">Component interface</typeparam>
-		/// <returns>Factory method</returns>
-		static Func<object, object> GetZyanServerQueryHandlerFactory<I>() where I : IBaseSource
-		{
-			if (typeof(IObjectSource).IsAssignableFrom(typeof(I)))
-				return component =>
-					new ZyanServerQueryHandler((IObjectSource)component);
-
-			if (typeof(IEntitySource).IsAssignableFrom(typeof(I)))
-				return component =>
-					new ZyanServerQueryHandler((IEntitySource)component);
-
-			// interface should be either IObjectSource or IEntitySource
-			throw new NotSupportedException("Type not supported: " + typeof(I).Name); 
-		}
-
-		/// <summary>
 		/// Registers component of the given type. Component instance is provided by MEF container.
 		/// </summary>
 		static void RegisterComponent(this IComponentCatalog host, ComposablePartCatalog childCatalog, CompositionContainer parentContainer, Type type, string contractName = null)
 		{
-			// select registration method
-			var methodInfo = RegisterComponentMethodInfo;
-			if (typeof(IBaseSource).IsAssignableFrom(type))
-			{
-				methodInfo = RegisterQueryableComponentMethodInfo;
-			}
-
 			// create registration method and register the component
-			var method = methodInfo.MakeGenericMethod(type);
+			var method = RegisterComponentMethodInfo.MakeGenericMethod(type);
 			var registerComponent = method.CreateDelegate<ComponentRegistrationDelegate>();
 			registerComponent(host, childCatalog, parentContainer, contractName);
 		}
