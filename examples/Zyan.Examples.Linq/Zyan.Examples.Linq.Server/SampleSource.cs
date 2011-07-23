@@ -1,47 +1,83 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
-using Zyan.InterLinq;
+using Zyan.Examples.Linq.Interfaces;
 
 namespace Zyan.Examples.Linq.Server
 {
-	public class SampleSource : IObjectSource
+	/// <summary>
+	/// Sample queryable component.
+	/// </summary>
+	public class SampleSource : ISampleSource
 	{
-		public IEnumerable<T> Get<T>() where T : class
+		/// <summary>
+		/// Returns service assembly version.
+		/// </summary>
+		public string GetVersion()
 		{
-			// Get<FileInfo>() returns file list of MyDocuments folder
+			return GetType().Assembly.GetName().Version.ToString();
+		}
+
+		/// <summary>
+		/// Returns queryable information related to server process.
+		/// </summary>
+		public IEnumerable<T> GetProcessInfo<T>() where T : class
+		{
+			// Get<FileInfo>() returns file list of the current folder
 			if (typeof(T) == typeof(FileInfo))
 			{
-				var folder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-				foreach (var s in Directory.GetFiles(folder))
-				{
-					yield return new FileInfo(s).As<T>();
-				}
+				var list =
+					from fileName in Directory.GetFiles(".")
+					select new FileInfo(fileName);
 
-				yield break;
+				return list.OfType<T>();
 			}
 
 			// Get<Assembly>() returns list of loaded assemblies
 			if (typeof(T) == typeof(Assembly))
 			{
-				foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-				{
-					yield return assembly.As<T>();
-				}
+				// exclude server application assembly for safety reason
+				var list =
+					from asm in AppDomain.CurrentDomain.GetAssemblies()
+					where !asm.FullName.Contains("Server")
+					select asm;
 
-				yield break;
+				return list.OfType<T>();
 			}
 
 			throw new NotSupportedException(string.Format("Type {0} is not supported", typeof(T).Name));
 		}
-	}
 
-	internal static class ObjectExtensions
-	{
-		public static T As<T>(this object obj)
+		/// <summary>
+		/// Returns queryable information about server user's desktop folder.
+		/// </summary>
+		public IQueryable<T> GetDesktopInfo<T>() where T : class
 		{
-			return (T)obj;
+			var folder = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+
+			// query desktop files
+			if (typeof(T) == typeof(FileInfo))
+			{
+				var list =
+					from fileName in Directory.GetFiles(folder)
+					select new FileInfo(fileName);
+
+				return list.OfType<T>().AsQueryable();
+			}
+
+			// query desktop folders
+			if (typeof(T) == typeof(DirectoryInfo))
+			{
+				var list =
+					from dirName in Directory.GetDirectories(folder)
+					select new DirectoryInfo(dirName);
+				
+				return list.OfType<T>().AsQueryable();
+			}
+
+			throw new NotSupportedException(string.Format("Type {0} is not supported", typeof(T).Name));
 		}
 	}
 }
