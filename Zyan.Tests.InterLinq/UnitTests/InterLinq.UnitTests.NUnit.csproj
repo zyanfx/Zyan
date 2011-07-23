@@ -75,16 +75,24 @@
     <Compile Include="FaultShieldQueryHandler.cs" />
     <Compile Include="Misc\AssertEx.cs" />
     <Compile Include="Misc\DummyAttribute.cs" />
-    <Compile Include="Objects\CompanyExampleTest.Direct.Generated.cs">
+    <Compile Include="Objects\CompanyExampleTest.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
       <DependentUpon>CompanyExampleTest.tt</DependentUpon>
     </Compile>
     <Compile Include="Objects\CompanyExampleTest.Remoting.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
       <DependentUpon>CompanyExampleTest.tt</DependentUpon>
     </Compile>
     <Compile Include="Objects\CompanyExampleTest.Wcf.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
       <DependentUpon>CompanyExampleTest.tt</DependentUpon>
     </Compile>
     <Compile Include="Objects\CompanyExampleTest.Zyan.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
       <DependentUpon>CompanyExampleTest.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -129,9 +137,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Misc\Manager.ttinclude" />
     <None Include="Objects\CompanyExampleTest.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>CompanyExampleTest.txt</LastGenOutput>
+      <LastGenOutput>CompanyExampleTest.cs</LastGenOutput>
     </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -140,13 +149,6 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Objects\CompanyExampleTest.txt">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>CompanyExampleTest.tt</DependentUpon>
-    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

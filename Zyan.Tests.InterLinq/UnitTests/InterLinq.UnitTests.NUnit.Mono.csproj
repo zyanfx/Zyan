@@ -81,7 +81,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="SerializationTest.cs" />
-    <Compile Include="Objects\CompanyExampleTest.Direct.Generated.cs">
+    <Compile Include="Objects\CompanyExampleTest.cs">
       <DependentUpon>CompanyExampleTest.tt</DependentUpon>
     </Compile>
     <Compile Include="Objects\CompanyExampleTest.Remoting.Generated.cs">
@@ -132,9 +132,8 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="Objects\CompanyExampleTest.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-    </None>
+    <None Include="Misc\Manager.ttinclude" />
+    <None Include="Objects\CompanyExampleTest.tt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
