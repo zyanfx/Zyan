@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using Zyan.Examples.Linq.Interfaces;
 
 namespace Zyan.Examples.Linq.Server
@@ -38,10 +39,13 @@ namespace Zyan.Examples.Linq.Server
 			// Get<Assembly>() returns list of loaded assemblies
 			if (typeof(T) == typeof(Assembly))
 			{
-				// exclude server application assembly for safety reason
+				// exclude dynamic assemblies (they are not serializable)
+				// return only .NET framework assemblies
 				var list =
 					from asm in AppDomain.CurrentDomain.GetAssemblies()
-					where !asm.FullName.Contains("Server")
+					let name = asm.FullName
+					where !(asm is AssemblyBuilder) &&
+						(name.Contains("System") || name.Contains("Microsoft") || name.Contains("corlib"))
 					select asm;
 
 				return list.OfType<T>();
