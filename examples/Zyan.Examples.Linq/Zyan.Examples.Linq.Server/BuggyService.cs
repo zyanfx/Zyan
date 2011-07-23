@@ -1,18 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Runtime.Remoting.Contexts;
+using Zyan.Examples.Linq.Interfaces;
 
 namespace Zyan.Examples.Linq.Server
 {
 	/// <summary>
 	/// Sample buggy service
 	/// </summary>
-	class BuggyService : IDynamicProperty
+	class BuggyService : INamedService
 	{
 		static int counter = 0;
 
+		/// <summary>
+		/// Returns service name.
+		/// </summary>
 		public string Name
 		{
 			get

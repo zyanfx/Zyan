@@ -2,10 +2,9 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Remoting.Contexts;
 using Zyan.Communication;
 using Zyan.Examples.Linq.Client.Properties;
-using Zyan.InterLinq;
+using Zyan.Examples.Linq.Interfaces;
 
 namespace Zyan.Examples.Linq.Client
 {
@@ -19,16 +18,16 @@ namespace Zyan.Examples.Linq.Client
 				conn.Error += ConnectionErrorHandler;
 
 				// create proxy for the default queryable service
-				var proxy = conn.CreateQueryableProxy();
+				var proxy = conn.CreateProxy<ISampleSource>();
 
 				// system assemblies loaded by server
 				var assemblies =
-					from asm in proxy.Get<Assembly>()
+					from asm in proxy.GetProcessInfo<Assembly>()
 					where asm.FullName.ToLower().StartsWith("system")
 					orderby asm.GetName().Name.Length ascending
 					select asm;
 
-				Console.WriteLine("System assemblies loaded by server:");
+				Console.WriteLine("System assemblies loaded by server (ordered by name length):");
 				foreach (var asm in assemblies)
 				{
 					Console.WriteLine("  {0} -> {1}", asm.GetName().Name, asm.ManifestModule.Name);
@@ -36,17 +35,17 @@ namespace Zyan.Examples.Linq.Client
 
 				Console.WriteLine();
 
-				// requesting list of files in server's MyDocuments folder
+				// requesting list of files in server's current folder
 				var files =
-					from file in proxy.Get<FileInfo>()
-					where file.Length > 1024
+					from file in proxy.GetProcessInfo<FileInfo>()
+					where file.Length > (2 << 12)
 					select new 
 					{
 						file.Name,
 						file.Length
 					};
 
-				Console.WriteLine("Documents larger than 1 kb:");
+				Console.WriteLine("Files larger than 8 kb:");
 				foreach (var fi in files)
 				{
 					Console.WriteLine("{0,15:#,0} | {1}", fi.Length, fi.Name);
@@ -55,11 +54,8 @@ namespace Zyan.Examples.Linq.Client
 				Console.WriteLine();
 
 				// request files in server's desktop folder
-				var deskProxy = conn.CreateQueryableProxy("DesktopService");
-
-				// requesting list of files in server's MyDocuments folder
 				var links =
-					from file in deskProxy.Get<FileInfo>()
+					from file in proxy.GetDesktopInfo<FileInfo>()
 					where file.Name.EndsWith(".lnk")
 					orderby file.Name.Length
 					select file.Name;
@@ -71,10 +67,11 @@ namespace Zyan.Examples.Linq.Client
 				}
 
 				Console.WriteLine();
+				Console.WriteLine("Exception handling demo.");
 
 				// test error handling
-				var buggyProxy = conn.CreateProxy<IDynamicProperty>("BuggyService");
-				Console.WriteLine("BuggyService.Name returns: {0}", buggyProxy.Name);
+				var buggyProxy = conn.CreateProxy<INamedService>("BuggyService");
+				Console.WriteLine("BuggyService.Name returns: {0}", buggyProxy.Name ?? "null");
 
 				Console.WriteLine();
 				Console.WriteLine("Press ENTER to quit.");

@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Zyan.Examples.Linq.Client</RootNamespace>
     <AssemblyName>Zyan.Examples.Linq.Client</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -34,12 +34,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="InterLinq">
-      <HintPath>..\..\..\libraries\InterLinq\InterLinq.dll</HintPath>
-    </Reference>
-    <Reference Include="InterLinq.Objects">
-      <HintPath>..\..\..\libraries\InterLinq\InterLinq.Objects.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -68,9 +62,9 @@
       <Project>{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}</Project>
       <Name>Zyan.Communication</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Zyan.InterLinq\Zyan.InterLinq.csproj">
-      <Project>{8F294CBF-AC94-4F77-8263-7E5693798B16}</Project>
-      <Name>Zyan.InterLinq</Name>
+    <ProjectReference Include="..\Zyan.Examples.Linq.Interfaces\Zyan.Examples.Linq.Interfaces.csproj">
+      <Project>{4CADF1C4-7526-4651-A0CD-2D72E64D0FF4}</Project>
+      <Name>Zyan.Examples.Linq.Interfaces</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
