@@ -74,16 +74,24 @@
     <Compile Include="FaultShieldQueryHandler.cs" />
     <Compile Include="Misc\AssertEx.cs" />
     <Compile Include="Misc\DummyAttribute.cs" />
-    <Compile Include="Objects\CompanyExampleTest.Direct.Generated.cs">
+    <Compile Include="Objects\CompanyExampleTest.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
       <DependentUpon>CompanyExampleTest.tt</DependentUpon>
     </Compile>
     <Compile Include="Objects\CompanyExampleTest.Remoting.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
       <DependentUpon>CompanyExampleTest.tt</DependentUpon>
     </Compile>
     <Compile Include="Objects\CompanyExampleTest.Wcf.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
       <DependentUpon>CompanyExampleTest.tt</DependentUpon>
     </Compile>
     <Compile Include="Objects\CompanyExampleTest.Zyan.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
       <DependentUpon>CompanyExampleTest.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -128,9 +136,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Misc\Manager.tt" />
+    <None Include="Misc\Manager.ttinclude" />
     <None Include="Objects\CompanyExampleTest.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>CompanyExampleTest.cs</LastGenOutput>
     </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
