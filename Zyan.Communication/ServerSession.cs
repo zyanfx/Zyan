@@ -71,7 +71,7 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Gibt ein Adapter-Objekt für den Zugriff auf Sitzungsvariablen zurück.
 		/// </summary>
-		public SessionVariableAdapter SessionVariables
+		public ISessionVariableAdapter SessionVariables
 		{
 			get { return _sessionVariableAdapter; }
 		}
