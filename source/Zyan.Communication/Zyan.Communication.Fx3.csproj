@@ -23,7 +23,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\bin\Debug3\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;FX3</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>Zyan.Communication.xml</DocumentationFile>
@@ -32,7 +32,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\bin\Release3\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;FX3</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>Zyan.Communication.xml</DocumentationFile>
@@ -205,11 +205,14 @@
     <Compile Include="SerializationHandlerRepository.cs" />
     <Compile Include="SessionMgmt\InProcSessionManager.cs" />
     <Compile Include="SessionMgmt\ISessionManager.cs" />
+    <Compile Include="SessionMgmt\SessionManagerBase.cs" />
     <Compile Include="SessionMgmt\SessionVariableAdapter.cs" />
     <Compile Include="SessionMgmt\SqlSessionManager.cs" />
+    <Compile Include="Toolbox\ConcurrentDictionaryFx3.cs" />
     <Compile Include="Toolbox\Extensions.cs" />
     <Compile Include="Toolbox\ExtensionsFx3.cs" />
     <Compile Include="Toolbox\MessageHelpers.cs" />
+    <Compile Include="Toolbox\SplitOrderedListFx3.cs" />
     <Compile Include="Toolbox\TypeComparer.cs" />
     <Compile Include="Version.cs" />
     <Compile Include="ZyanComponentHost.cs" />

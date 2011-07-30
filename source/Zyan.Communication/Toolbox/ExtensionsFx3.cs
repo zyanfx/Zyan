@@ -5,13 +5,10 @@ using System.Text;
 
 namespace Zyan.Communication.Toolbox
 {
-	/// <summary>
-	/// Extension methods missing in .NET Framework 3.5
-	/// </summary>
-	public static class ExtensionsFx3
+	public static partial class Extensions
 	{
 		/// <summary>
-		/// Merges two sequences by using specified selector.
+		/// Merges two sequences by using specified selector (missing in .NET Framework 3.5).
 		/// </summary>
 		/// <typeparam name="TFirst">First sequence element type.</typeparam>
 		/// <typeparam name="TSecond">Second sequence element type.</typeparam>
