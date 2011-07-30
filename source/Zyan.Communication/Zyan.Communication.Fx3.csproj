@@ -205,6 +205,7 @@
     <Compile Include="SerializationHandlerRepository.cs" />
     <Compile Include="SessionMgmt\InProcSessionManager.cs" />
     <Compile Include="SessionMgmt\ISessionManager.cs" />
+    <Compile Include="SessionMgmt\ISessionVariableAdapter.cs" />
     <Compile Include="SessionMgmt\SessionManagerBase.cs" />
     <Compile Include="SessionMgmt\SessionVariableAdapter.cs" />
     <Compile Include="SessionMgmt\SqlSessionManager.cs" />
