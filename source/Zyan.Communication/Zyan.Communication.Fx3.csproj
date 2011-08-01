@@ -200,6 +200,9 @@
     <Compile Include="Protocols\Tcp\TcpDuplexServerProtocolSetup.cs" />
     <Compile Include="Scripting\ScriptEngine.cs" />
     <Compile Include="Security\BasicWindowsAuthProvider.cs" />
+    <Compile Include="Security\Exceptions\AccountLockedException.cs" />
+    <Compile Include="Security\Exceptions\AccountNotFoundException.cs" />
+    <Compile Include="Security\Exceptions\PasswordExpiredException.cs" />
     <Compile Include="Security\WindowsSecurityTools.cs" />
     <Compile Include="CustomSerializationContainer.cs" />
     <Compile Include="SerializationHandlerRepository.cs" />
