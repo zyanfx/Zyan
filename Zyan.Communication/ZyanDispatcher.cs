@@ -531,7 +531,10 @@ namespace Zyan.Communication
 				AuthResponseMessage authResponse = _host.Authenticate(new AuthRequestMessage() { Credentials = credentials });
 
 				if (!authResponse.Success)
-					throw new SecurityException(authResponse.ErrorMessage);
+				{
+					var exception = authResponse.Exception ?? new SecurityException(authResponse.ErrorMessage);
+					throw exception;
+				}
 
 				SessionVariableAdapter sessionVariableAdapter = new SessionVariableAdapter(_host.SessionManager, sessionID);
 				ServerSession session = new ServerSession(sessionID, authResponse.AuthenticatedIdentity, sessionVariableAdapter);

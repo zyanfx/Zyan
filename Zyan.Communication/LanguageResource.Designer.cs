@@ -61,6 +61,24 @@ namespace Zyan.Communication {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Account is locked..
+        /// </summary>
+        internal static string AccountLockedException_DefaultMessage {
+            get {
+                return ResourceManager.GetString("AccountLockedException_DefaultMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown username or bad password..
+        /// </summary>
+        internal static string AccountNotFoundException_DefaultMessage {
+            get {
+                return ResourceManager.GetString("AccountNotFoundException_DefaultMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Multiple module controlers per module are not allowed..
         /// </summary>
         internal static string ApplicationException_MultipleModuleControlersNotAllowed {
@@ -363,6 +381,15 @@ namespace Zyan.Communication {
         internal static string MissingMethodException_MethodNotFound {
             get {
                 return ResourceManager.GetString("MissingMethodException_MethodNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password is expired..
+        /// </summary>
+        internal static string PasswordExpiredException_DefaultMessage {
+            get {
+                return ResourceManager.GetString("PasswordExpiredException_DefaultMessage", resourceCulture);
             }
         }
         

@@ -246,4 +246,13 @@
   <data name="MissingMethodException_MethodNotFound" xml:space="preserve">
     <value>Method not found: '{0}'.</value>
   </data>
+  <data name="AccountLockedException_DefaultMessage" xml:space="preserve">
+    <value>Account is locked.</value>
+  </data>
+  <data name="AccountNotFoundException_DefaultMessage" xml:space="preserve">
+    <value>Unknown username or bad password.</value>
+  </data>
+  <data name="PasswordExpiredException_DefaultMessage" xml:space="preserve">
+    <value>Password is expired.</value>
+  </data>
 </root>
