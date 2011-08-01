@@ -246,4 +246,13 @@
   <data name="MissingMethodException_MethodNotFound" xml:space="preserve">
     <value>Метод не найден: '{0}'.</value>
   </data>
+  <data name="AccountLockedException_DefaultMessage" xml:space="preserve">
+    <value>Учетная запись заблокирована.</value>
+  </data>
+  <data name="AccountNotFoundException_DefaultMessage" xml:space="preserve">
+    <value>Неизвестное имя пользователя или неверный пароль.</value>
+  </data>
+  <data name="PasswordExpiredException_DefaultMessage" xml:space="preserve">
+    <value>Срок действия пароля истек.</value>
+  </data>
 </root>

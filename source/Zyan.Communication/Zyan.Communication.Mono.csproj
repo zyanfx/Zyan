@@ -210,6 +210,9 @@
     <Compile Include="Security\AuthRequestMessage.cs" />
     <Compile Include="Security\AuthResponseMessage.cs" />
     <Compile Include="Security\BasicWindowsAuthProvider.cs" />
+    <Compile Include="Security\Exceptions\AccountLockedException.cs" />
+    <Compile Include="Security\Exceptions\AccountNotFoundException.cs" />
+    <Compile Include="Security\Exceptions\PasswordExpiredException.cs" />
     <Compile Include="Security\IAuthenticationProvider.cs" />
     <Compile Include="Security\IntegratedWindowsAuthProvider.cs" />
     <Compile Include="Security\NullAuthenticationProvider.cs" />
