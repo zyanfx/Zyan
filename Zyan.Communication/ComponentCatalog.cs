@@ -223,7 +223,7 @@ namespace Zyan.Communication
 				result.Add(
 					new ComponentInfo()
 					{
-						InterfaceName = registration.InterfaceType.FullName,
+						InterfaceName = registration.InterfaceType.AssemblyQualifiedName,
 						UniqueName = registration.UniqueName,
 						ActivationType = registration.ActivationType
 					});

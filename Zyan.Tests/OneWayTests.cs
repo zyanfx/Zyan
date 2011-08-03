@@ -24,7 +24,7 @@ namespace Zyan.Tests
 	#endregion
 
 	/// <summary>
-	/// Test class for one-way methods
+	/// Test class for one-way methods.
 	///</summary>
 	[TestClass]
 	public class OneWayTests

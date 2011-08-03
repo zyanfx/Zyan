@@ -52,7 +52,8 @@
     <Compile Include="DuckTypingTests.cs" />
     <Compile Include="GenericMethodsTest.cs" />
     <Compile Include="LinqTests.cs" />
-    <Compile Include="MefTests.cs" />
+    <Compile Include="MefClientTests.cs" />
+    <Compile Include="MefServerTests.cs" />
     <Compile Include="Misc\AssertEx.cs" />
     <Compile Include="Misc\DataWrapper.cs" />
     <Compile Include="Misc\DummyAttribute.cs" />
