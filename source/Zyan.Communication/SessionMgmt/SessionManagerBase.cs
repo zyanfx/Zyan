@@ -214,7 +214,7 @@ namespace Zyan.Communication.SessionMgmt
 		/// <summary>
 		/// Sets the new value of the session variable.
 		/// </summary>
-		/// <param name="sessionID">Session unique identifier.</parparam>
+		/// <param name="sessionID">Session unique identifier.</param>
 		/// <param name="name">Variable name.</param>
 		/// <param name="value">Variable value.</param>
 		public abstract void SetSessionVariable(Guid sessionID, string name, object value);
