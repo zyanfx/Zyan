@@ -602,13 +602,19 @@ namespace Zyan.Communication.SessionMgmt
 		}
 
 		/// <summary>
-		/// Removes all sessions older than <see cref="SessionAgeLimit"/>.
+		/// Removes all sessions older than SessionAgeLimit.
 		/// </summary>
 		protected override void SweepExpiredSessions()
 		{
 			SweepExpiredSessionsFromSqlServer();
 		}
 
+		/// <summary>
+		/// Sets the new value of the session variable.
+		/// </summary>
+		/// <param name="sessionID">Session unique identifier.</param>
+		/// <param name="name">Variable name.</param>
+		/// <param name="value">Variable value.</param>
 		public override void SetSessionVariable(Guid sessionID, string name, object value)
 		{
 			if (ExistSession(sessionID))
