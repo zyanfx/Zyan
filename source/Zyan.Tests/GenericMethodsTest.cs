@@ -26,7 +26,7 @@ namespace Zyan.Tests
 	#endregion
 
 	/// <summary>
-	/// Tests for generic method invocation
+	/// Tests for generic method invocation.
 	/// </summary>
 	[TestClass]
 	public class GenericMethodsTest

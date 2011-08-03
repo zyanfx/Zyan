@@ -25,7 +25,7 @@ namespace Zyan.Tests
 	#endregion
 
 	/// <summary>
-	/// Test class for deterministic cleanup
+	/// Test class for deterministic cleanup.
 	/// </summary>
 	[TestClass]
 	public class CleanupTests

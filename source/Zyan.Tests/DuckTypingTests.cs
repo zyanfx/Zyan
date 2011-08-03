@@ -26,7 +26,7 @@ namespace Zyan.Tests
 	#endregion
 
 	/// <summary>
-	/// Test cases for duck typing support
+	/// Test cases for duck typing support.
 	/// </summary>
 	[TestClass]
 	public class DuckTypingTests

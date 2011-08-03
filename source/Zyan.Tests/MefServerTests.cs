@@ -29,10 +29,10 @@ namespace Zyan.Tests
 	#endregion
 
 	/// <summary>
-	/// Test class for MEF integration
+	/// Test class for server-side MEF integration.
 	///</summary>
 	[TestClass]
-	public class MefTests
+	public class MefServerTests
 	{
 		#region Interfaces and components
 
@@ -360,7 +360,7 @@ namespace Zyan.Tests
 		[ClassInitialize]
 		public static void DiscoverComposableParts(TestContext ctx)
 		{
-			MefCatalog = new AssemblyCatalog(typeof(MefTests).Assembly);
+			MefCatalog = new AssemblyCatalog(typeof(MefServerTests).Assembly);
 			MefContainer = new CompositionContainer(MefCatalog);
 		}
 
