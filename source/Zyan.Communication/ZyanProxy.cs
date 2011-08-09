@@ -122,6 +122,12 @@ namespace Zyan.Communication
 			var methodCallMessage = (IMethodCallMessage)message;
 			var methodInfo = (MethodInfo)methodCallMessage.MethodBase;
 
+			// handle Object.GetType() call locally (this branch is never executed under Mono runtime)
+			if (methodInfo.DeclaringType == typeof(object) && methodInfo.Name == "GetType")
+			{
+				return new ReturnMessage(_interfaceType, null, 0, null, methodCallMessage);
+			}
+
 			try
 			{
 				// Check for delegate parameters in properties and events
