@@ -105,6 +105,9 @@
     <Compile Include="Composition\IComponentCatalogMefExtensions.cs" />
     <Compile Include="Composition\NonSharedPartsCatalog.cs" />
     <Compile Include="Composition\ZyanComponentAttribute.cs" />
+    <Compile Include="Composition\ZyanComposablePart.cs" />
+    <Compile Include="Composition\ZyanCatalog.cs" />
+    <Compile Include="Composition\ZyanComposablePartDefinition.cs" />
     <Compile Include="Composition\ZyanInterfaceAttribute.cs" />
     <Compile Include="InterLinq\IBaseSource.cs" />
     <Compile Include="InterLinq\IEntitySource.cs" />
