@@ -10,38 +10,32 @@ using Zyan.Communication.ChannelSinks.ClientAddress;
 namespace Zyan.Communication.Protocols.Tcp
 {
 	/// <summary>
-	/// Protokolleinstellungen für serverseitige TCP-Kommunikation mit benutzerdefinierter Authentifizierung und Verschlüsselung.
+    /// Server protocol setup for TCP communication with support for user defined authentication and security.
 	/// </summary>
-	public class TcpCustomServerProtocolSetup : IServerProtocolSetup
+	public class TcpCustomServerProtocolSetup : ServerProtocolSetup
 	{
-		// Felder
-		private string _channelName = string.Empty;
 		private bool _encryption = true;
 		private string _algorithm = "3DES";
 		private bool _oaep = false;
 		private int _tcpPort = 0;
-		private IAuthenticationProvider _authProvider=null;
 
 		/// <summary>
-		/// Gibt die TCP-Anschlußnummer zurück, oder legt sie fest.
+		/// Gets or sets the TCP port to listen for client calls.
 		/// </summary>
 		public int TcpPort
 		{
 			get { return _tcpPort; }
 			set 
 			{
-				// Wenn keine gültige Anschlussnummer angegeben wurde...
 				if (_tcpPort < 0 || _tcpPort > 65535)
-					// Ausnahme werfen
 					throw new ArgumentOutOfRangeException("tcpPort", LanguageResource.ArgumentOutOfRangeException_InvalidTcpPortRange);
 				
-				// Wert ändern
 				_tcpPort = value; 
 			}
 		}
 		
 		/// <summary>
-		/// Gibt den Namen des zu verwendenden symmetrischen Verschlüsselungsalgorithmus zurück, oder legt ihn fest.
+        /// Gets or sets the name of the symmetric encryption algorithm.
 		/// </summary>
 		public string Algorithm
 		{
@@ -49,69 +43,67 @@ namespace Zyan.Communication.Protocols.Tcp
 			set { _algorithm = value; }
 		}
 
-		/// <summary>
-		/// Gibt zurück, ob OEAP-Padding aktivuert werden soll, oder legt dies fest.
-		/// </summary>
-		public bool Oeap
-		{
-			get { return _oaep; }
-			set { _oaep = value; }
-		}
+        /// <summary>
+        /// Gets or sets, if OEAP padding should be activated.
+        /// </summary>
+        public bool Oeap
+        {
+            get { return _oaep; }
+            set { _oaep = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets, if socket caching is enabled.
+        /// </summary>
+        public bool SocketCachingEnabled
+        { get; set; }
 
 		/// <summary>
-		/// Gibt zurück, ob Socket-Caching aktiviert ist, oder legt dies fest.
+        /// Creates a new instance of the TcpCustomServerProtocolSetup class.
 		/// </summary>
-		public bool SocketCachingEnabled
-		{ get; set; }
-
-		/// <summary>
-		/// Erstellt eine neue Instanz von TcpCustomServerProtocolSetup.
-		/// </summary>
-		public TcpCustomServerProtocolSetup()
+        public TcpCustomServerProtocolSetup()
+            : base((settings, clientSinkChain, serverSinkChain) => new TcpChannel(settings, clientSinkChain, serverSinkChain))
 		{
-			// Socket-Caching standardmäßig einschalten
 			SocketCachingEnabled = true;
-
-			// Zufälligen Kanalnamen vergeben
 			_channelName = "TcpCustomServerProtocolSetup_" + Guid.NewGuid().ToString();
+
+            ClientSinkChain.Add(new BinaryClientFormatterSinkProvider());
+            ServerSinkChain.Add(new BinaryServerFormatterSinkProvider() { TypeFilterLevel = TypeFilterLevel.Full });
 		}
 
 		/// <summary>
-		/// Erstellt eine neue Instanz von TcpCustomServerProtocolSetup.
+        /// Creates a new instance of the TcpCustomServerProtocolSetup class.
 		/// </summary>
-		/// <param name="tcpPort">TCP-Anschlußnummer</param>
-		/// <param name="authProvider">Authentifizierungsanbieter</param>
+		/// <param name="tcpPort">TCP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
 		public TcpCustomServerProtocolSetup(int tcpPort,IAuthenticationProvider authProvider) : this()
 		{
-			// Werte übernehmen
 			TcpPort = tcpPort;
 			AuthenticationProvider=authProvider;
 		}
 
 		/// <summary>
-		/// Erzeugt eine neue Instanz von TcpCustomServerProtocolSetup.
+        /// Creates a new instance of the TcpCustomServerProtocolSetup class.
 		/// </summary>
-		/// <param name="tcpPort">TCP-Anschlußnummer</param>
-		/// <param name="authProvider">Authentifizierungsanbieter</param>
-		/// <param name="encryption">Gibt an, ob die Kommunikation verschlüssel werden soll</param>
+        /// <param name="tcpPort">TCP port number</param>
+        /// <param name="authProvider">Authentication provider</param>
+        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
 		public TcpCustomServerProtocolSetup(int tcpPort,IAuthenticationProvider authProvider,bool encryption) : this()
 		{ 
-			// Werte übernehmen
 			TcpPort=tcpPort;
 			AuthenticationProvider=authProvider;
 			_encryption = encryption;
 		}
 
 		/// <summary>
-		/// Erzeugt eine neue Instanz von TcpCustomServerProtocolSetup.
+        /// Creates a new instance of the TcpCustomServerProtocolSetup class.
 		/// </summary>
-		/// <param name="tcpPort">TCP-Anschlußnummer</param>
-		/// <param name="authProvider">Authentifizierungsanbieter</param>
-		/// <param name="encryption">Gibt an, ob die Kommunikation verschlüssel werden soll</param>
-		/// <param name="algorithm">Verschlüsselungsalgorithmus (z.B. "3DES")</param>
+        /// <param name="tcpPort">TCP port number</param>
+        /// <param name="authProvider">Authentication provider</param>
+        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
+        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
 		public TcpCustomServerProtocolSetup(int tcpPort,IAuthenticationProvider authProvider,bool encryption, string algorithm) : this()
 		{
-			// Werte übernehmen
 			TcpPort=tcpPort;
 			AuthenticationProvider=authProvider;
 			_encryption = encryption;
@@ -119,16 +111,15 @@ namespace Zyan.Communication.Protocols.Tcp
 		}
 
 		/// <summary>
-		/// Erzeugt eine neue Instanz von TcpCustomServerProtocolSetup.
+        /// Creates a new instance of the TcpCustomServerProtocolSetup class.
 		/// </summary>
-		/// <param name="tcpPort">TCP-Anschlußnummer</param>
-		/// <param name="authProvider">Authentifizierungsanbieter</param>
-		/// <param name="encryption">Gibt an, ob die Kommunikation verschlüssel werden soll</param>
-		/// <param name="algorithm">Verschlüsselungsalgorithmus (z.B. "3DES")</param>        
-		/// <param name="oaep">Gibt an, ob OAEP Padding verwendet werden soll</param>
+        /// <param name="tcpPort">TCP port number</param>
+        /// <param name="authProvider">Authentication provider</param>
+        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
+        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+        /// <param name="oaep">Specifies if OAEP padding should be used</param>
 		public TcpCustomServerProtocolSetup(int tcpPort,IAuthenticationProvider authProvider,bool encryption, string algorithm, bool oaep) : this()
 		{
-			// Werte übernehmen
 			TcpPort=tcpPort;
 			AuthenticationProvider=authProvider;
 			_encryption = encryption;
@@ -136,114 +127,74 @@ namespace Zyan.Communication.Protocols.Tcp
 			_oaep = oaep;
 		}
 
-		/// <summary>
-		/// Erzeugt einen fertig konfigurierten Remoting-Kanal.
-		/// <remarks>
-		/// Wenn der Kanal in der aktuellen Anwendungsdomäne bereits registriert wurde, wird null zurückgegeben.
-		/// </remarks>
-		/// </summary>
-		/// <returns>Remoting Kanal</returns>
-		public IChannel CreateChannel()
+        /// <summary>
+        /// Configures encrpytion sinks, if encryption is enabled.
+        /// </summary>
+        private void ConfigureEncryption()
+        {
+            if (_encryption)
+            {
+                this.AddClientSinkAfterFormatter(new CryptoClientChannelSinkProvider()
+                {
+                    Algorithm = _algorithm,
+                    Oaep = _oaep
+                });
+                this.AddServerSinkBeforeFormatter(new CryptoServerChannelSinkProvider()
+                {
+                    Algorithm = _algorithm,
+                    RequireCryptoClient = true,
+                    Oaep = _oaep
+                });
+            }
+        }
+
+        /// <summary>
+        /// Creates and configures a Remoting channel.        
+        /// </summary>
+        /// <returns>Remoting channel</returns>
+		public override IChannel CreateChannel()
 		{
-			// Kanal suchen
 			IChannel channel = ChannelServices.GetChannel(_channelName);
 
-			// Wenn der Kanal nicht gefunden wurde ...
 			if (channel == null)
 			{
-				// Konfiguration für den TCP-Kanal erstellen
-				System.Collections.IDictionary channelSettings = new System.Collections.Hashtable();
-				channelSettings["name"] = _channelName;
-				channelSettings["port"] = _tcpPort;
-				channelSettings["socketCacheTimeout"] = 0;
-				channelSettings["socketCachePolicy"] = SocketCachingEnabled ? SocketCachePolicy.Default : SocketCachePolicy.AbsoluteTimeout;
+				_channelSettings["name"] = _channelName;
+				_channelSettings["port"] = _tcpPort;
+				_channelSettings["socketCacheTimeout"] = 0;
+				_channelSettings["socketCachePolicy"] = SocketCachingEnabled ? SocketCachePolicy.Default : SocketCachePolicy.AbsoluteTimeout;
+				_channelSettings["secure"] = false;
 
-				// Standardmäßige Windows-Authentifizierung des Remoting TCP-Kanals abschalten
-				channelSettings["secure"] = false;
-				
-				// Binären Clientformatierer erzeugen
-				BinaryClientFormatterSinkProvider clientFormatter = new BinaryClientFormatterSinkProvider();
+                ConfigureEncryption();
 
-				// Wenn die Kommunikation verschlüsselt werden soll ...
-				if (_encryption)
-				{
-					// Client-Verschlüsselungs-Kanalsenkenanbieter erzeugen
-					CryptoClientChannelSinkProvider clientEncryption = new CryptoClientChannelSinkProvider();
-					
-					// Verschlüsselung konfigurieren
-					clientEncryption.Algorithm = _algorithm;
-					clientEncryption.Oaep = _oaep;
-					
-					// Verschlüsselungs-Kanalsenkenanbieter hinter den Formatierer hängen
-					clientFormatter.Next = clientEncryption;
-				}
-				// Variable für ersten Server-Senkenanbieter in der Kette
-				IServerChannelSinkProvider firstServerSinkProvider=null;
-				
-				// Binären Serverformatierer erzeugen                
-				BinaryServerFormatterSinkProvider serverFormatter = new BinaryServerFormatterSinkProvider();
+                if (_channelFactory == null)
+                    throw new ApplicationException(LanguageResource.ApplicationException_NoChannelFactorySpecified);
 
-				// Binäre Serialisierung von komplexen Objekten aktivieren
-				serverFormatter.TypeFilterLevel = TypeFilterLevel.Full;
+                channel = _channelFactory(_channelSettings, BuildClientSinkChain(), BuildServerSinkChain());
 
-				serverFormatter.Next = new ClientAddressServerChannelSinkProvider();
-
-				// Wenn die Kommunikation verschlüsselt werden soll ...
-				if (_encryption)
-				{
-					// Server-Verschlüsselungs-Kanalsenkenanbieter erzeugen
-					CryptoServerChannelSinkProvider serverEncryption = new CryptoServerChannelSinkProvider();
-
-					// Verschlüsselung konfigurieren
-					serverEncryption.Algorithm = _algorithm;
-					serverEncryption.Oaep = _oaep;
-					serverEncryption.RequireCryptoClient = true;
-
-					// Formatierer hinter den Verschlüsselungs-Kanalsenkenanbieter hängen
-					serverEncryption.Next = serverFormatter;
-
-					// Verschlüsselungs-Kanalsenkenanbieter als ersten Senkenanbieter festlegen
-					firstServerSinkProvider = serverEncryption;
-				}
-				else
-					// Server-Formatierer als ersten Senkenanbieter festlegen
-					firstServerSinkProvider = serverFormatter;
-				
-				// Neuen TCP-Kanal erzeugen
-				channel = new TcpChannel(channelSettings, clientFormatter, firstServerSinkProvider);
-
-				// Wenn Zyan nicht mit mono ausgeführt wird ...
-				if (!MonoCheck.IsRunningOnMono)
-				{
-					// Sicherstellen, dass vollständige Ausnahmeinformationen übertragen werden
-					if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
-						RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
-				}
-				// Kanal zurückgeben
-				return channel;
-			}
-			// Nichts zurückgeben
-			return null;
+                if (!MonoCheck.IsRunningOnMono)
+                {
+                    if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
+                        RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
+                }
+                return channel;
+            }
+            return null;
 		}
 
-		/// <summary>
-		/// Gibt den Authentifizierungsanbieter zurück.
-		/// </summary>
-		public IAuthenticationProvider AuthenticationProvider
+        /// <summary>
+        /// Gets or sets the authentication provider.
+        /// </summary>
+		public override IAuthenticationProvider AuthenticationProvider
 		{
 			get
 			{
-				// Authentifizierungsanbieter zurückgeben
 				return _authProvider;
 			}
 			set
 			{
-				// Wenn null übergeben wurde ...
 				if (value==null)
-					// Null-Authentifizierungsanbieter verwenden
 					_authProvider=new NullAuthenticationProvider();
 				else
-					// Angegebenen Authentifizierungsanbieter verwenden
 					_authProvider=value;
 			}
 		}

@@ -32,7 +32,7 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 		private IPAddress [] _securityExemptionList = null;
 
         /// <summary>
-        /// Gibt den Namen des zu verwendenden symmetrischen Verschlüsselungsalgorithmus zurück, oder legt ihn fest.
+        /// Gets or sets the name of the symmetric encryption algorithm.
         /// </summary>
         public string Algorithm
         {
@@ -41,7 +41,7 @@ namespace Zyan.Communication.ChannelSinks.Encryption
         }
 
         /// <summary>
-        /// Gibt zurück, ob OEAP-Padding aktivuert werden soll, oder legt dies fest.
+        /// Gets or sets, if OEAP padding should be activated.
         /// </summary>
         public bool Oaep
         {
