@@ -10,19 +10,17 @@ using Zyan.Communication.Security;
 namespace Zyan.Communication.Protocols.Ipc
 {
     /// <summary>
-    /// Beschreibt serverseitige Einstellungen für binäre IPC Kommunkation (über Named Pipes).
+    /// Server protocol setup for inter process communication via Named Pipes.
     /// </summary>
-    public class IpcBinaryServerProtocolSetup : IServerProtocolSetup
+    public class IpcBinaryServerProtocolSetup : ServerProtocolSetup
     {
-        // Felder
         private string _portName = string.Empty;
-        private string _channelName = string.Empty;
         private bool _useWindowsSecurity = false;
         private TokenImpersonationLevel _impersonationLevel = TokenImpersonationLevel.Identification;
         private ProtectionLevel _protectionLevel = ProtectionLevel.EncryptAndSign;
 
         /// <summary>
-        /// Gibt den IPC-Portnamen zurück, oder legt ihn fest.
+        /// Gets or sets the unique IPC port name.
         /// </summary>
         public string PortName
         {
@@ -31,7 +29,7 @@ namespace Zyan.Communication.Protocols.Ipc
         }
 
         /// <summary>
-        /// Gibt zurück, ob integrierte Windows-Sicherheit verwendet werden soll, oder legt dies fest.
+        /// Gets or sets, if Windows Security should be used.
         /// </summary>
         public bool UseWindowsSecurity
         {
@@ -40,7 +38,7 @@ namespace Zyan.Communication.Protocols.Ipc
         }
 
         /// <summary>
-        /// Gibt die Impersonierungsstufe zurück, oder legt sie fest.
+        /// Gets or sets the level of impersonation.
         /// </summary>
         public TokenImpersonationLevel ImpersonationLevel
         {
@@ -49,7 +47,7 @@ namespace Zyan.Communication.Protocols.Ipc
         }
 
         /// <summary>
-        /// Gibt den Absicherungsgrad zurück, oder legt ihn fest.
+        /// Get or sets the level of protection (sign or encrypt, or both)
         /// </summary>
         public ProtectionLevel ProtectionLevel
         {
@@ -58,84 +56,68 @@ namespace Zyan.Communication.Protocols.Ipc
         }
 
         /// <summary>
-        /// Erstellt eine neue Instanz von TcpBinaryServerProtocolSetup.
+        /// Creates a new instance of the IpcBinaryServerProtocolSetup class.
         /// </summary>
-        /// <param name="portName">IPC-Portname</param>
+        /// <param name="portName">IPC port name</param>
         public IpcBinaryServerProtocolSetup(string portName)
-        {
-            // Zufälligen Kanalnamen vergeben
-            _channelName = "IpcWindowsSecuredServerProtocolSetup_" + Guid.NewGuid().ToString();
-
-            // Portnamen übernehmen
+            : base((settings, clientSinkChain, serverSinkChain) => new IpcChannel(settings, clientSinkChain, serverSinkChain))
+        {            
             _portName = portName;
+            _channelName = "IpcBinaryServerProtocolSetup_" + Guid.NewGuid().ToString();
+
+            ClientSinkChain.Add(new BinaryClientFormatterSinkProvider());
+            ServerSinkChain.Add(new BinaryServerFormatterSinkProvider() { TypeFilterLevel = TypeFilterLevel.Full });
         }
 
         /// <summary>
-        /// Erzeugt einen fertig konfigurierten Remoting-Kanal.
-        /// <remarks>
-        /// Wenn der Kanal in der aktuellen Anwendungsdomäne bereits registriert wurde, wird null zurückgegeben.
-        /// </remarks>
+        /// Creates and configures a Remoting channel.        
         /// </summary>
-        /// <returns>Remoting Kanal</returns>
-        public IChannel CreateChannel()
+        /// <returns>Remoting channel</returns>
+        public override IChannel CreateChannel()
         {
-            // Kanal suchen
             IChannel channel = ChannelServices.GetChannel(_channelName);
 
-            // Wenn der Kanal nicht gefunden wurde ...
             if (channel == null)
             {
-                // Konfiguration für den TCP-Kanal erstellen
-                System.Collections.IDictionary channelSettings = new System.Collections.Hashtable();
-                channelSettings["name"] = _channelName;
-                channelSettings["portName"] = _portName;
-                channelSettings["secure"] = _useWindowsSecurity;
+                _channelSettings["name"] = _channelName;
+                _channelSettings["portName"] = _portName;
+                _channelSettings["secure"] = _useWindowsSecurity;
                 
-                // Wenn Sicherheit aktiviert ist ...
                 if (_useWindowsSecurity)
                 {
-                    // Impersonierung entsprechend der Einstellung aktivieren oder deaktivieren
-                    channelSettings["tokenImpersonationLevel"] = _impersonationLevel;
-
-                    // Signatur und Verschlüssung explizit aktivieren
-                    channelSettings["protectionLevel"] = _protectionLevel;
+                    _channelSettings["tokenImpersonationLevel"] = _impersonationLevel;
+                    _channelSettings["protectionLevel"] = _protectionLevel;
                 }
-                // Binäre Serialisierung von komplexen Objekten aktivieren
-                BinaryServerFormatterSinkProvider serverFormatter = new BinaryServerFormatterSinkProvider();
-                serverFormatter.TypeFilterLevel = TypeFilterLevel.Full;
-                BinaryClientFormatterSinkProvider clientFormatter = new BinaryClientFormatterSinkProvider();
+                if (_channelFactory == null)
+                    throw new ApplicationException(LanguageResource.ApplicationException_NoChannelFactorySpecified);
 
-                // Neuen IPC-Kanal erzeugen
-                channel = new IpcChannel(channelSettings, clientFormatter, serverFormatter);
+                channel = _channelFactory(_channelSettings, BuildClientSinkChain(), BuildServerSinkChain());
 
-                // Wenn Zyan nicht mit mono ausgeführt wird ...
                 if (!MonoCheck.IsRunningOnMono)
                 {
-                    // Sicherstellen, dass vollständige Ausnahmeinformationen übertragen werden
                     if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
                         RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
                 }
-                // Kanal zurückgeben
                 return channel;
             }
-            // Nichts zurückgeben
             return null;
         }
 
         /// <summary>
-        /// Gibt den Authentifizierungsanbieter zurück.
+        /// Gets the authentication provider.
         /// </summary>
-        public IAuthenticationProvider AuthenticationProvider
+        public override IAuthenticationProvider AuthenticationProvider
         {
             get
             {
-                // Wenn Windows-Sicherheit aktiviert ist ...
                 if (_useWindowsSecurity)
-                    // Authentifizierungsanbieter für integrierte Windows-Sicherheit zurückgeben
                     return new IntegratedWindowsAuthProvider();
                 else
-                    // Null-Authentifizierungsanbieter zurückgeben
                     return new NullAuthenticationProvider();
+            }
+            set
+            {
+                throw new NotSupportedException();
             }
         }
     }

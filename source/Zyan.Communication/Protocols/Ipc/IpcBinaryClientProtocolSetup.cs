@@ -9,18 +9,16 @@ using System.Security.Principal;
 namespace Zyan.Communication.Protocols.Ipc
 {
     /// <summary>
-    /// Beschreibt clientseitige Einstellungen für binäre IPC Kommunkation (über Named Pipes).
+    /// Client protocol setup for inter process communication via Named Pipes.
     /// </summary>
-    public class IpcBinaryClientProtocolSetup : IClientProtocolSetup
+    public class IpcBinaryClientProtocolSetup : ClientProtocolSetup
     {
-        // Felder
-        private string _channelName=string.Empty;
         private bool _useWindowsSecurity=false;
         private TokenImpersonationLevel _impersonationLevel=TokenImpersonationLevel.Identification;
         private ProtectionLevel _protectionLevel=ProtectionLevel.EncryptAndSign;
-        
+
         /// <summary>
-        /// Gibt zurück, ob integrierte Windows-Sicherheit verwendet werden soll, oder legt dies fest.
+        /// Gets or sets, if Windows Security should be used.
         /// </summary>
         public bool UseWindowsSecurity
         {
@@ -29,7 +27,7 @@ namespace Zyan.Communication.Protocols.Ipc
         }
 
         /// <summary>
-        /// Gibt die Impersonierungsstufe zurück, oder legt sie fest.
+        /// Gets or sets the level of impersonation.
         /// </summary>
         public TokenImpersonationLevel ImpersonationLevel
         {
@@ -38,7 +36,7 @@ namespace Zyan.Communication.Protocols.Ipc
         }
 
         /// <summary>
-        /// Gibt den Absicherungsgrad zurück, oder legt ihn fest.
+        /// Get or sets the level of protection (sign or encrypt, or both)
         /// </summary>
         public ProtectionLevel ProtectionLevel
         {
@@ -47,63 +45,46 @@ namespace Zyan.Communication.Protocols.Ipc
         }
 
         /// <summary>
-        /// Erstellt eine neue Instanz von IpcBinaryClientProtocolSetup.
+        /// Creates a new instance of the IpcBinaryClientProtocolSetup class.
         /// </summary>
-        public IpcBinaryClientProtocolSetup ()
+        public IpcBinaryClientProtocolSetup()
+            : base((settings, clientSinkChain, serverSinkChain) => new IpcChannel(settings, clientSinkChain, serverSinkChain))
 	    {
             // Zufälligen Kanalnamen vergeben
-            _channelName = "IpcWindowsSecuredClientProtocol_" + Guid.NewGuid().ToString();
+            _channelName = "IpcBinaryClientProtocol_" + Guid.NewGuid().ToString();
 	    }
 
         /// <summary>
-        /// Erzeugt einen fertig konfigurierten Remoting-Kanal.
-        /// <remarks>
-        /// Wenn der Kanal in der aktuellen Anwendungsdomäne bereits registriert wurde, wird null zurückgegeben.
-        /// </remarks>
+        /// Creates and configures a Remoting channel.        
         /// </summary>
-        /// <returns>Remoting Kanal</returns>
-        public IChannel CreateChannel()
+        /// <returns>Remoting channel</returns>
+        public override IChannel CreateChannel()
         {
-            // Kanal suchen
             IChannel channel = ChannelServices.GetChannel(_channelName);
 
-            // Wenn der Kanal nicht gefunden wurde ...
             if (channel == null)
             {
-                // Konfiguration für den TCP-Kanal erstellen
-                System.Collections.IDictionary channelSettings = new System.Collections.Hashtable();
-                channelSettings["name"] = _channelName;
-                channelSettings["portName"] = "zyan_" + Guid.NewGuid().ToString();
-                channelSettings["secure"] = _useWindowsSecurity;
+                _channelSettings["name"] = _channelName;
+                _channelSettings["portName"] = "zyan_" + Guid.NewGuid().ToString();
+                _channelSettings["secure"] = _useWindowsSecurity;
 
-                // Wenn Sicherheit aktiviert ist ...
                 if (_useWindowsSecurity)
                 {
-                    // Impersonierung entsprechend der Einstellung aktivieren oder deaktivieren
-                    channelSettings["tokenImpersonationLevel"] = _impersonationLevel;
-
-                    // Signatur und Verschlüssung explizit aktivieren
-                    channelSettings["protectionLevel"] = _protectionLevel;
+                    _channelSettings["tokenImpersonationLevel"] = _impersonationLevel;
+                    _channelSettings["protectionLevel"] = _protectionLevel;
                 }
-                // Binäre Serialisierung von komplexen Objekten aktivieren
-                BinaryServerFormatterSinkProvider serverFormatter = new BinaryServerFormatterSinkProvider();
-                serverFormatter.TypeFilterLevel = TypeFilterLevel.Full;
-                BinaryClientFormatterSinkProvider clientFormatter = new BinaryClientFormatterSinkProvider();
+                if (_channelFactory == null)
+                    throw new ApplicationException(LanguageResource.ApplicationException_NoChannelFactorySpecified);
 
-                // Neuen IPC-Kanal erzeugen
-                channel = new IpcChannel(channelSettings, clientFormatter, serverFormatter);
+                channel = _channelFactory(_channelSettings, BuildClientSinkChain(), BuildServerSinkChain());
 
-                // Wenn Zyan nicht mit mono ausgeführt wird ...
                 if (!MonoCheck.IsRunningOnMono)
                 {
-                    // Sicherstellen, dass vollständige Ausnahmeinformationen übertragen werden
                     if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
                         RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
                 }
-                // Kanal zurückgeben
                 return channel;
             }
-            // Nichts zurückgeben
             return null;
         }
     }

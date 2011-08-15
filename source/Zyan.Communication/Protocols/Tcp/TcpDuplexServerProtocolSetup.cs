@@ -3,6 +3,7 @@ using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Serialization.Formatters;
 using Zyan.Communication.ChannelSinks.Encryption;
+using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp.DuplexChannel;
 using Zyan.Communication.Security;
 using Zyan.Communication.ChannelSinks.ClientAddress;
@@ -10,17 +11,14 @@ using Zyan.Communication.ChannelSinks.ClientAddress;
 namespace Zyan.Communication.Protocols.Tcp
 {
 	/// <summary>
-	/// Protokolleinstellungen für serverseitige bi-direktionale TCP-Kommunikation mit benutzerdefinierter Authentifizierung und Verschlüsselung.
+    /// Server protocol setup for bi-directional TCP communication with support for user defined authentication and security.
 	/// </summary>
-	public class TcpDuplexServerProtocolSetup : IServerProtocolSetup
+	public class TcpDuplexServerProtocolSetup : ServerProtocolSetup
 	{
-		// Felder
-		private string _channelName = string.Empty;
 		private bool _encryption = true;
 		private string _algorithm = "3DES";
 		private bool _oaep = false;
 		private int _tcpPort = 0;
-		private IAuthenticationProvider _authProvider = null;
 
 		private bool _tcpKeepAliveEnabled = true;
 		private ulong _tcpKeepAliveTime = 30000;
@@ -53,26 +51,23 @@ namespace Zyan.Communication.Protocols.Tcp
 			set { _tcpKeepAliveInterval = value; }
 		}
 
-		/// <summary>
-		/// Gibt die TCP-Anschlußnummer zurück, oder legt sie fest.
-		/// </summary>
-		public int TcpPort
-		{
-			get { return _tcpPort; }
-			set
-			{
-				// Wenn keine gültige Anschlussnummer angegeben wurde...
-				if (_tcpPort < 0 || _tcpPort > 65535)
-					// Ausnahme werfen
-					throw new ArgumentOutOfRangeException("tcpPort", LanguageResource.ArgumentOutOfRangeException_InvalidTcpPortRange);
+        /// <summary>
+        /// Gets or sets the TCP port to listen for client calls.
+        /// </summary>
+        public int TcpPort
+        {
+            get { return _tcpPort; }
+            set
+            {
+                if (_tcpPort < 0 || _tcpPort > 65535)
+                    throw new ArgumentOutOfRangeException("tcpPort", LanguageResource.ArgumentOutOfRangeException_InvalidTcpPortRange);
 
-				// Wert ändern
-				_tcpPort = value;
-			}
-		}
+                _tcpPort = value;
+            }
+        }
 
 		/// <summary>
-		/// Gibt den Namen des zu verwendenden symmetrischen Verschlüsselungsalgorithmus zurück, oder legt ihn fest.
+		/// Gets or sets the name of the symmetric encryption algorithm.
 		/// </summary>
 		public string Algorithm
 		{
@@ -81,7 +76,7 @@ namespace Zyan.Communication.Protocols.Tcp
 		}
 
 		/// <summary>
-		/// Gibt zurück, ob OEAP-Padding aktivuert werden soll, oder legt dies fest.
+		/// Gets or sets, if OEAP padding should be activated.
 		/// </summary>
 		public bool Oeap
 		{
@@ -90,39 +85,41 @@ namespace Zyan.Communication.Protocols.Tcp
 		}
 
 		/// <summary>
-		/// Erstellt eine neue Instanz von TcpDuplexServerProtocolSetup.
+		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
 		/// </summary>
-		public TcpDuplexServerProtocolSetup()
-		{
-			// Zufälligen Kanalnamen vergeben
-			_channelName = "TcpDuplexServerProtocolSetup" + Guid.NewGuid().ToString();
+        public TcpDuplexServerProtocolSetup()
+            : base((settings, clientSinkChain, serverSinkChain) => new TcpExChannel(settings, clientSinkChain, serverSinkChain))
+		{	
+			_channelName = "TcpDuplexServerProtocolSetup_" + Guid.NewGuid().ToString();
+
+            ClientSinkChain.Add(new BinaryClientFormatterSinkProvider());
+            ServerSinkChain.Add(new BinaryServerFormatterSinkProvider() { TypeFilterLevel = TypeFilterLevel.Full });
+            ServerSinkChain.Add(new ClientAddressServerChannelSinkProvider());
 		}
 
 		/// <summary>
-		/// Erstellt eine neue Instanz von TcpDuplexServerProtocolSetup.
+		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
 		/// </summary>
-		/// <param name="tcpPort">TCP-Anschlußnummer</param>
-		/// <param name="authProvider">Authentifizierungsanbieter</param>
+		/// <param name="tcpPort">TCP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
 		public TcpDuplexServerProtocolSetup(int tcpPort, IAuthenticationProvider authProvider)
 			: this()
 		{
-			// Werte übernehmen
 			TcpPort = tcpPort;
 			AuthenticationProvider = authProvider;
 		}
 
 		/// <summary>
-		/// Erstellt eine neue Instanz von TcpDuplexServerProtocolSetup.
+		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
 		/// </summary>
-		/// <param name="tcpPort">TCP-Anschlußnummer</param>
-		/// <param name="authProvider">Authentifizierungsanbieter</param>
+		/// <param name="tcpPort">TCP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
 		/// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
 		/// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
 		/// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
 		public TcpDuplexServerProtocolSetup(int tcpPort, IAuthenticationProvider authProvider, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
 			: this()
 		{
-			// Werte übernehmen
 			TcpPort = tcpPort;
 			AuthenticationProvider = authProvider;
 			TcpKeepAliveEnabled = keepAlive;
@@ -131,33 +128,31 @@ namespace Zyan.Communication.Protocols.Tcp
 		}
 
 		/// <summary>
-		/// Erzeugt eine neue Instanz von TcpDuplexServerProtocolSetup.
+		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
 		/// </summary>
-		/// <param name="tcpPort">TCP-Anschlußnummer</param>
-		/// <param name="authProvider">Authentifizierungsanbieter</param>
-		/// <param name="encryption">Gibt an, ob die Kommunikation verschlüssel werden soll</param>
+		/// <param name="tcpPort">TCP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
 		public TcpDuplexServerProtocolSetup(int tcpPort, IAuthenticationProvider authProvider, bool encryption)
 			: this()
 		{
-			// Werte übernehmen
 			TcpPort = tcpPort;
 			AuthenticationProvider = authProvider;
 			_encryption = encryption;
 		}
 
 		/// <summary>
-		/// Erzeugt eine neue Instanz von TcpDuplexServerProtocolSetup.
+		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
 		/// </summary>
-		/// <param name="tcpPort">TCP-Anschlußnummer</param>
-		/// <param name="authProvider">Authentifizierungsanbieter</param>
-		/// <param name="encryption">Gibt an, ob die Kommunikation verschlüssel werden soll</param>
+		/// <param name="tcpPort">TCP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
 		/// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
 		/// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
 		/// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
 		public TcpDuplexServerProtocolSetup(int tcpPort, IAuthenticationProvider authProvider, bool encryption, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
 			: this()
 		{
-			// Werte übernehmen
 			TcpPort = tcpPort;
 			AuthenticationProvider = authProvider;
 			_encryption = encryption;
@@ -167,16 +162,15 @@ namespace Zyan.Communication.Protocols.Tcp
 		}
 
 		/// <summary>
-		/// Erzeugt eine neue Instanz von TcpDuplexServerProtocolSetup.
+		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
 		/// </summary>
-		/// <param name="tcpPort">TCP-Anschlußnummer</param>
-		/// <param name="authProvider">Authentifizierungsanbieter</param>
-		/// <param name="encryption">Gibt an, ob die Kommunikation verschlüssel werden soll</param>
-		/// <param name="algorithm">Verschlüsselungsalgorithmus (z.B. "3DES")</param>
+		/// <param name="tcpPort">TCP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
 		public TcpDuplexServerProtocolSetup(int tcpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm)
 			: this()
 		{
-			// Werte übernehmen
 			TcpPort = tcpPort;
 			AuthenticationProvider = authProvider;
 			_encryption = encryption;
@@ -184,19 +178,18 @@ namespace Zyan.Communication.Protocols.Tcp
 		}
 
 		/// <summary>
-		/// Erzeugt eine neue Instanz von TcpDuplexServerProtocolSetup.
+		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
 		/// </summary>
-		/// <param name="tcpPort">TCP-Anschlußnummer</param>
-		/// <param name="authProvider">Authentifizierungsanbieter</param>
-		/// <param name="encryption">Gibt an, ob die Kommunikation verschlüssel werden soll</param>
-		/// <param name="algorithm">Verschlüsselungsalgorithmus (z.B. "3DES")</param>
+		/// <param name="tcpPort">TCP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
 		/// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
 		/// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
 		/// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
 		public TcpDuplexServerProtocolSetup(int tcpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
 			: this()
 		{
-			// Werte übernehmen
 			TcpPort = tcpPort;
 			AuthenticationProvider = authProvider;
 			_encryption = encryption;
@@ -207,17 +200,16 @@ namespace Zyan.Communication.Protocols.Tcp
 		}
 
 		/// <summary>
-		/// Erzeugt eine neue Instanz von TcpDuplexServerProtocolSetup.
+		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
 		/// </summary>
-		/// <param name="tcpPort">TCP-Anschlußnummer</param>
-		/// <param name="authProvider">Authentifizierungsanbieter</param>
-		/// <param name="encryption">Gibt an, ob die Kommunikation verschlüssel werden soll</param>
-		/// <param name="algorithm">Verschlüsselungsalgorithmus (z.B. "3DES")</param>        
-		/// <param name="oaep">Gibt an, ob OAEP Padding verwendet werden soll</param>
+		/// <param name="tcpPort">TCP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>        
+        /// <param name="oaep">Specifies if OAEP padding should be activated</param>
 		public TcpDuplexServerProtocolSetup(int tcpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm, bool oaep)
 			: this()
 		{
-			// Werte übernehmen
 			TcpPort = tcpPort;
 			AuthenticationProvider = authProvider;
 			_encryption = encryption;
@@ -226,20 +218,19 @@ namespace Zyan.Communication.Protocols.Tcp
 		}
 
 		/// <summary>
-		/// Erzeugt eine neue Instanz von TcpDuplexServerProtocolSetup.
+		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
 		/// </summary>
-		/// <param name="tcpPort">TCP-Anschlußnummer</param>
-		/// <param name="authProvider">Authentifizierungsanbieter</param>
-		/// <param name="encryption">Gibt an, ob die Kommunikation verschlüssel werden soll</param>
-		/// <param name="algorithm">Verschlüsselungsalgorithmus (z.B. "3DES")</param>        
-		/// <param name="oaep">Gibt an, ob OAEP Padding verwendet werden soll</param>
+		/// <param name="tcpPort">TCP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>        
+        /// <param name="oaep">Specifies if OAEP padding should be activated</param>
 		/// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
 		/// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
 		/// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
 		public TcpDuplexServerProtocolSetup(int tcpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm, bool oaep, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
 			: this()
 		{
-			// Werte übernehmen
 			TcpPort = tcpPort;
 			AuthenticationProvider = authProvider;
 			_encryption = encryption;
@@ -249,115 +240,77 @@ namespace Zyan.Communication.Protocols.Tcp
 			TcpKeepAliveTime = keepAliveTime;
 			TcpKeepAliveInterval = KeepAliveInterval;
 		}
+        
+        /// <summary>
+        /// Adds encryption sinks to client and server sink chains, if encryption is needed.
+        /// </summary>
+        private void ConfigureEncryption()
+        {
+            if (_encryption)
+            {
+                this.AddClientSinkAfterFormatter(new CryptoClientChannelSinkProvider()
+                {
+                    Algorithm = _algorithm,
+                    Oaep = _oaep
+                });
+                this.AddServerSinkBeforeFormatter(new CryptoServerChannelSinkProvider()
+                {
+                    Algorithm = _algorithm,
+                    Oaep = _oaep,
+                    RequireCryptoClient = true
+                });
+            }
+        }
 
-		/// <summary>
-		/// Erzeugt einen fertig konfigurierten Remoting-Kanal.
-		/// <remarks>
-		/// Wenn der Kanal in der aktuellen Anwendungsdomäne bereits registriert wurde, wird null zurückgegeben.
-		/// </remarks>
-		/// </summary>
-		/// <returns>Remoting Kanal</returns>
-		public IChannel CreateChannel()
+        /// <summary>
+        /// Creates and configures a Remoting channel.        
+        /// </summary>
+        /// <returns>Remoting channel</returns>
+		public override IChannel CreateChannel()
 		{
-			// Kanal suchen
 			IChannel channel = ChannelServices.GetChannel(_channelName);
 
-			// Wenn der Kanal nicht gefunden wurde ...
 			if (channel == null)
 			{
-				// Konfiguration für den TCP-Kanal erstellen
-				System.Collections.IDictionary channelSettings = new System.Collections.Hashtable();
-				channelSettings["name"] = _channelName;
-				channelSettings["port"] = _tcpPort;
-				channelSettings["listen"] = true;
-				channelSettings["typeFilterLevel"] = TypeFilterLevel.Full;
-				channelSettings["keepAliveEnabled"] = _tcpKeepAliveEnabled;
-				channelSettings["keepAliveTime"] = _tcpKeepAliveTime;
-				channelSettings["keepAliveInterval"] = _tcpKeepAliveInterval;
-				
-				// Binären Clientformatierer erzeugen
-				BinaryClientFormatterSinkProvider clientFormatter = new BinaryClientFormatterSinkProvider();
+				_channelSettings["name"] = _channelName;
+				_channelSettings["port"] = _tcpPort;
+				_channelSettings["listen"] = true;
+				_channelSettings["typeFilterLevel"] = TypeFilterLevel.Full;
+				_channelSettings["keepAliveEnabled"] = _tcpKeepAliveEnabled;
+				_channelSettings["keepAliveTime"] = _tcpKeepAliveTime;
+				_channelSettings["keepAliveInterval"] = _tcpKeepAliveInterval;
 
-				// Wenn die Kommunikation verschlüsselt werden soll ...
-				if (_encryption)
-				{
-					// Client-Verschlüsselungs-Kanalsenkenanbieter erzeugen
-					CryptoClientChannelSinkProvider clientEncryption = new CryptoClientChannelSinkProvider();
+                ConfigureEncryption();
 
-					// Verschlüsselung konfigurieren
-					clientEncryption.Algorithm = _algorithm;
-					clientEncryption.Oaep = _oaep;
+                if (_channelFactory == null)
+                    throw new ApplicationException(LanguageResource.ApplicationException_NoChannelFactorySpecified);
 
-					// Verschlüsselungs-Kanalsenkenanbieter hinter den Formatierer hängen
-					clientFormatter.Next = clientEncryption;
-				}
-				// Variable für ersten Server-Senkenanbieter in der Kette
-				IServerChannelSinkProvider firstServerSinkProvider = null;
+                channel = _channelFactory(_channelSettings, BuildClientSinkChain(), BuildServerSinkChain());
 
-				// Binären Serverformatierer erzeugen
-				BinaryServerFormatterSinkProvider serverFormatter = new BinaryServerFormatterSinkProvider();
-
-				// Binäre Serialisierung von komplexen Objekten aktivieren
-				serverFormatter.TypeFilterLevel = TypeFilterLevel.Full;
-
-				serverFormatter.Next = new ClientAddressServerChannelSinkProvider();
-
-				// Wenn die Kommunikation verschlüsselt werden soll ...
-				if (_encryption)
-				{
-					// Server-Verschlüsselungs-Kanalsenkenanbieter erzeugen
-					CryptoServerChannelSinkProvider serverEncryption = new CryptoServerChannelSinkProvider();
-
-					// Verschlüsselung konfigurieren
-					serverEncryption.Algorithm = _algorithm;
-					serverEncryption.Oaep = _oaep;
-					serverEncryption.RequireCryptoClient = true;
-
-					// Formatierer hinter den Verschlüsselungs-Kanalsenkenanbieter hängen
-					serverEncryption.Next = serverFormatter;
-
-					// Verschlüsselungs-Kanalsenkenanbieter als ersten Senkenanbieter festlegen
-					firstServerSinkProvider = serverEncryption;
-				}
-				else
-					// Server-Formatierer als ersten Senkenanbieter festlegen
-					firstServerSinkProvider = serverFormatter;
-
-				// Neuen TCP-Kanal erzeugen
-				channel = new TcpExChannel(channelSettings, clientFormatter, firstServerSinkProvider);
-				
-				// Wenn Zyan nicht mit mono ausgeführt wird ...
-				if (!MonoCheck.IsRunningOnMono)
-				{
-					// Sicherstellen, dass vollständige Ausnahmeinformationen übertragen werden
-					if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
-						RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
-				}
-				// Kanal zurückgeben
-				return channel;
-			}
-			// Nichts zurückgeben
-			return null;
+                if (!MonoCheck.IsRunningOnMono)
+                {
+                    if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
+                        RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
+                }
+                return channel;
+            }
+            return null;
 		}
 
 		/// <summary>
-		/// Gibt den Authentifizierungsanbieter zurück.
+		/// Gets or sets the Authentication Provider to be used.
 		/// </summary>
-		public IAuthenticationProvider AuthenticationProvider
+		public override IAuthenticationProvider AuthenticationProvider
 		{
 			get
 			{
-				// Authentifizierungsanbieter zurückgeben
 				return _authProvider;
 			}
 			set
 			{
-				// Wenn null übergeben wurde ...
 				if (value == null)
-					// Null-Authentifizierungsanbieter verwenden
 					_authProvider = new NullAuthenticationProvider();
 				else
-					// Angegebenen Authentifizierungsanbieter verwenden
 					_authProvider = value;
 			}
 		}
