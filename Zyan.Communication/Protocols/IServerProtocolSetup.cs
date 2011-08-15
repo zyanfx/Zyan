@@ -1,24 +1,32 @@
 ﻿using System.Runtime.Remoting.Channels;
 using Zyan.Communication.Security;
+using System.Collections.Generic;
 
 namespace Zyan.Communication.Protocols
 {
     /// <summary>
-    /// Beschreibt Protokoll-Einstellungen für die Netzwerkkommunikation.
+    /// Describes server side communication protocol settings.
     /// </summary>
     public interface IServerProtocolSetup
     {
         /// <summary>
-        /// Erzeugt einen fertig konfigurierten Remoting-Kanal.
-        /// <remarks>
-        /// Wenn der Kanal in der aktuellen Anwendungsdomäne bereits registriert wurde, wird null zurückgegeben.
-        /// </remarks>
+        /// Gets a list of all Remoting sinks from the client sink chain.
         /// </summary>
-        /// <returns>Remoting Kanal</returns>
+        List<IClientChannelSinkProvider> ClientSinkChain { get; }
+
+        /// <summary>
+        /// Gets a list of all Remoting sinks from the server sink chain.
+        /// </summary>
+        List<IServerChannelSinkProvider> ServerSinkChain { get; }
+
+        /// <summary>
+        /// Creates and configures a Remoting channel.        
+        /// </summary>
+        /// <returns>Remoting channel</returns>
         IChannel CreateChannel();
 
         /// <summary>
-        /// Gibt den Authentifizierungsanbieter zurück.
+        /// Gets the authentication provider.
         /// </summary>
         IAuthenticationProvider AuthenticationProvider
         {

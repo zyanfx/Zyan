@@ -9,18 +9,16 @@ using System.Security.Principal;
 namespace Zyan.Communication.Protocols.Tcp
 {
 	/// <summary>
-	/// Beschreibt clientseitige Einstellungen für binäre TCP Kommunkation.
+	/// Client protocol setup for TCP communication with support for Windows authentication and security.
 	/// </summary>
-	public class TcpBinaryClientProtocolSetup : IClientProtocolSetup
-	{
-		// Felder
-		private string _channelName=string.Empty;
+	public class TcpBinaryClientProtocolSetup : ClientProtocolSetup
+	{		
 		private bool _useWindowsSecurity=false;
 		private TokenImpersonationLevel _impersonationLevel=TokenImpersonationLevel.Identification;
 		private ProtectionLevel _protectionLevel=ProtectionLevel.EncryptAndSign;
 		
 		/// <summary>
-		/// Gibt zurück, ob integrierte Windows-Sicherheit verwendet werden soll, oder legt dies fest.
+		/// Gets or sets, if Windows Security should be used.
 		/// </summary>
 		public bool UseWindowsSecurity
 		{
@@ -29,8 +27,8 @@ namespace Zyan.Communication.Protocols.Tcp
 		}
 
 		/// <summary>
-		/// Gibt die Impersonierungsstufe zurück, oder legt sie fest.
-		/// </summary>
+		/// Gets or sets the level of impersonation.
+        /// </summary>
 		public TokenImpersonationLevel ImpersonationLevel
 		{
 			get { return _impersonationLevel; }
@@ -38,7 +36,7 @@ namespace Zyan.Communication.Protocols.Tcp
 		}
 
 		/// <summary>
-		/// Gibt den Absicherungsgrad zurück, oder legt ihn fest.
+		/// Get or sets the level of protection (sign or encrypt, or both)
 		/// </summary>
 		public ProtectionLevel ProtectionLevel
 		{
@@ -47,75 +45,61 @@ namespace Zyan.Communication.Protocols.Tcp
 		}
 
 		/// <summary>
-		/// Gibt zurück, ob Socket-Caching aktiviert ist, oder legt dies fest.
+		/// Gets or sets, if sockets should be cached and reused.
+        /// <remarks>
+        /// Caching sockets may reduce ressource consumption but may cause trouble in Network Load Balancing clusters.
+        /// </remarks>
 		/// </summary>
 		public bool SocketCachingEnabled
 		{ get; set; }
 
 		/// <summary>
-		/// Erstellt eine neue Instanz von TcpBinaryClientProtocolSetup.
+		/// Creates a new instance of the TcpBinaryClientProtocolSetup class.
 		/// </summary>
-		public TcpBinaryClientProtocolSetup ()
+        public TcpBinaryClientProtocolSetup()
+            : base((settings, clientSinkChain, serverSinkChain) => new TcpChannel(settings, clientSinkChain, serverSinkChain))
 		{
-			// Socket-Caching standardmäßig einschalten
 			SocketCachingEnabled = true;
+			_channelName = "TcpBinaryClientProtocol_" + Guid.NewGuid().ToString();
 
-			// Zufälligen Kanalnamen vergeben
-			_channelName = "TcpWindowsSecuredClientProtocol_" + Guid.NewGuid().ToString();
+            ClientSinkChain.Add(new BinaryClientFormatterSinkProvider());
+            ServerSinkChain.Add(new BinaryServerFormatterSinkProvider() { TypeFilterLevel = TypeFilterLevel.Full });
 		}
 
-		/// <summary>
-		/// Erzeugt einen fertig konfigurierten Remoting-Kanal.
-		/// <remarks>
-		/// Wenn der Kanal in der aktuellen Anwendungsdomäne bereits registriert wurde, wird null zurückgegeben.
-		/// </remarks>
-		/// </summary>
-		/// <returns>Remoting Kanal</returns>
-		public IChannel CreateChannel()
+        /// <summary>
+        /// Creates and configures a Remoting channel.        
+        /// </summary>
+        /// <returns>Remoting channel</returns>
+        public override IChannel CreateChannel()
 		{
-			// Kanal suchen
 			IChannel channel = ChannelServices.GetChannel(_channelName);
 
-			// Wenn der Kanal nicht gefunden wurde ...
 			if (channel == null)
 			{
-				// Konfiguration für den TCP-Kanal erstellen
-				System.Collections.IDictionary channelSettings = new System.Collections.Hashtable();
-				channelSettings["name"] = _channelName;
-				channelSettings["port"] = 0;
-				channelSettings["secure"] = _useWindowsSecurity;
-				channelSettings["socketCacheTimeout"] = 0;
-				channelSettings["socketCachePolicy"] = SocketCachingEnabled ? SocketCachePolicy.Default : SocketCachePolicy.AbsoluteTimeout;
+				_channelSettings["name"] = _channelName;
+				_channelSettings["port"] = 0;
+				_channelSettings["secure"] = _useWindowsSecurity;
+				_channelSettings["socketCacheTimeout"] = 0;
+				_channelSettings["socketCachePolicy"] = SocketCachingEnabled ? SocketCachePolicy.Default : SocketCachePolicy.AbsoluteTimeout;
 
-				// Wenn Sicherheit aktiviert ist ...
 				if (_useWindowsSecurity)
 				{
-					// Impersonierung entsprechend der Einstellung aktivieren oder deaktivieren
-					channelSettings["tokenImpersonationLevel"] = _impersonationLevel;
-
-					// Signatur und Verschlüssung explizit aktivieren
-					channelSettings["protectionLevel"] = _protectionLevel;
+					_channelSettings["tokenImpersonationLevel"] = _impersonationLevel;
+					_channelSettings["protectionLevel"] = _protectionLevel;
 				}
-				// Binäre Serialisierung von komplexen Objekten aktivieren
-				BinaryServerFormatterSinkProvider serverFormatter = new BinaryServerFormatterSinkProvider();
-				serverFormatter.TypeFilterLevel = TypeFilterLevel.Full;
-				BinaryClientFormatterSinkProvider clientFormatter = new BinaryClientFormatterSinkProvider();
+                if (_channelFactory == null)
+                    throw new ApplicationException(LanguageResource.ApplicationException_NoChannelFactorySpecified);
 
-				// Neuen TCP-Kanal erzeugen
-				channel = new TcpChannel(channelSettings, clientFormatter, serverFormatter);
+                channel = _channelFactory(_channelSettings, BuildClientSinkChain(), BuildServerSinkChain());
 
-				// Wenn Zyan nicht mit mono ausgeführt wird ...
-				if (!MonoCheck.IsRunningOnMono)
-				{
-					// Sicherstellen, dass vollständige Ausnahmeinformationen übertragen werden
-					if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
-						RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
-				}
-				// Kanal zurückgeben
-				return channel;
-			}
-			// Nichts zurückgeben
-			return null;
+                if (!MonoCheck.IsRunningOnMono)
+                {
+                    if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
+                        RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
+                }
+                return channel;
+            }
+            return null;
 		}
 	}
 }

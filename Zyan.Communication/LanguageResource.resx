@@ -255,4 +255,10 @@
   <data name="PasswordExpiredException_DefaultMessage" xml:space="preserve">
     <value>Password is expired.</value>
   </data>
+  <data name="ApplicationException_NoFormatterSpecified" xml:space="preserve">
+    <value>No formatter specified.</value>
+  </data>
+  <data name="ApplicationException_NoChannelFactorySpecified" xml:space="preserve">
+    <value>No channel factory method specified.</value>
+  </data>
 </root>

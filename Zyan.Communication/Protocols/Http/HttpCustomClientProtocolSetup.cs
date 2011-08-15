@@ -8,92 +8,87 @@ using Zyan.Communication.ChannelSinks.Encryption;
 namespace Zyan.Communication.Protocols.Http
 {
     /// <summary>
-    /// Protokolleinstellungen für clientseitige HTTP-Kommunikation mit benutzerdefinierter Authentifizierung und Verschlüsselung.
+    /// Client protocol setup for HTTP communication with support for user defined authentication and security.
     /// </summary>
-    public class HttpCustomClientProtocolSetup : IClientProtocolSetup
+    public class HttpCustomClientProtocolSetup : ClientProtocolSetup
     {
-        // Felder
-        private string _channelName = string.Empty;
         private bool _encryption = true;
         private string _algorithm = "3DES";
         private bool _oaep = false;
         private int _maxAttempts = 2;
-        private bool _useBinaryFormatter = true;
-
+        
         /// <summary>
-        /// Erzeugt eine neue Instanz von HttpCustomClientProtocolSetup.
+        /// Creates a new instance of the HttpCustomClientProtocolSetup class.
         /// </summary>
         public HttpCustomClientProtocolSetup()
+            : base((settings, clientSinkChain, serverSinkChain) => new HttpChannel(settings, clientSinkChain, serverSinkChain))
         {
-            // Zufälligen Kanalnamen vergeben
             _channelName = "HttpCustomClientProtocolSetup" + Guid.NewGuid().ToString();
+
+            ClientSinkChain.Add(new BinaryClientFormatterSinkProvider());
+            ServerSinkChain.Add(new BinaryServerFormatterSinkProvider() { TypeFilterLevel = TypeFilterLevel.Full });
         }
 
         /// <summary>
-        /// Erzeugt eine neue Instanz von HttpCustomClientProtocolSetup.
+        /// Creates a new instance of the HttpCustomClientProtocolSetup class.
         /// </summary>
-        /// <param name="encryption">Gibt an, ob die Kommunikation verschlüssel werden soll</param>
+        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
         public HttpCustomClientProtocolSetup(bool encryption)
             : this()
         {
-            // Werte übernehmen
             _encryption = encryption;
         }
 
         /// <summary>
-        /// Erzeugt eine neue Instanz von HttpCustomClientProtocolSetup.
+        /// Creates a new instance of the HttpCustomClientProtocolSetup class.
         /// </summary>
-        /// <param name="encryption">Gibt an, ob die Kommunikation verschlüssel werden soll</param>
-        /// <param name="algorithm">Verschlüsselungsalgorithmus (z.B. "3DES")</param>
+        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
+        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
         public HttpCustomClientProtocolSetup(bool encryption, string algorithm)
             : this()
         {
-            // Werte übernehmen
             _encryption = encryption;
             _algorithm = algorithm;
         }
 
         /// <summary>
-        /// Erzeugt eine neue Instanz von HttpCustomClientProtocolSetup.
+        /// Creates a new instance of the HttpCustomClientProtocolSetup class.
         /// </summary>
-        /// <param name="encryption">Gibt an, ob die Kommunikation verschlüssel werden soll</param>
-        /// <param name="algorithm">Verschlüsselungsalgorithmus (z.B. "3DES")</param>
-        /// <param name="maxAttempts">Anzahl der maximalen Verbindungsversuche</param>
+        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
+        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+        /// <param name="maxAttempts">Maximum number of connection attempts</param>
         public HttpCustomClientProtocolSetup(bool encryption, string algorithm, int maxAttempts)
             : this()
         {
-            // Werte übernehmen
             _encryption = encryption;
             _algorithm = algorithm;
             _maxAttempts = maxAttempts;
         }
 
         /// <summary>
-        /// Erzeugt eine neue Instanz von HttpCustomClientProtocolSetup.
+        /// Creates a new instance of the HttpCustomClientProtocolSetup class.
         /// </summary>
-        /// <param name="encryption">Gibt an, ob die Kommunikation verschlüssel werden soll</param>
-        /// <param name="algorithm">Verschlüsselungsalgorithmus (z.B. "3DES")</param>        
-        /// <param name="oaep">Gibt an, ob OAEP Padding verwendet werden soll</param>
+        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
+        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>        
+        /// <param name="oaep">Specifies if OAEP padding should be activated</param>
         public HttpCustomClientProtocolSetup(bool encryption, string algorithm, bool oaep)
             : this()
         {
-            // Werte übernehmen
             _encryption = encryption;
             _algorithm = algorithm;
             _oaep = oaep;
         }
 
         /// <summary>
-        /// Erzeugt eine neue Instanz von HttpCustomClientProtocolSetup.
+        /// Creates a new instance of the HttpCustomClientProtocolSetup class.
         /// </summary>
-        /// <param name="encryption">Gibt an, ob die Kommunikation verschlüssel werden soll</param>
-        /// <param name="algorithm">Verschlüsselungsalgorithmus (z.B. "3DES")</param>
-        /// <param name="maxAttempts">Anzahl der maximalen Verbindungsversuche</param>
-        /// <param name="oaep">Gibt an, ob OAEP Padding verwendet werden soll</param>
+        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
+        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+        /// <param name="maxAttempts">Maximum number of connection attempts</param>
+        /// <param name="oaep">Specifies if OAEP padding should be activated</param>
         public HttpCustomClientProtocolSetup(bool encryption, string algorithm, int maxAttempts, bool oaep)
             : this()
         {
-            // Werte übernehmen
             _encryption = encryption;
             _algorithm = algorithm;
             _maxAttempts = maxAttempts;
@@ -101,7 +96,7 @@ namespace Zyan.Communication.Protocols.Http
         }
 
         /// <summary>
-        /// Gibt den Namen des zu verwendenden symmetrischen Verschlüsselungsalgorithmus zurück, oder legt ihn fest.
+        /// Gets or sets the name of the symmetric encryption algorithm.
         /// </summary>
         public string Algorithm
         {
@@ -110,7 +105,7 @@ namespace Zyan.Communication.Protocols.Http
         }
 
         /// <summary>
-        /// Gibt zurück, ob OEAP-Padding aktiviert werden soll, oder legt dies fest.
+        /// Gets or sets, if OEAP padding should be activated.
         /// </summary>
         public bool Oeap
         {
@@ -119,16 +114,7 @@ namespace Zyan.Communication.Protocols.Http
         }
 
         /// <summary>
-        /// Gibt zurück, ob binäre Formatierung aktivuert werden soll, oder legt dies fest.
-        /// </summary>
-        public bool UseBinaryFormatter
-        {
-            get { return _useBinaryFormatter; }
-            set { _useBinaryFormatter = value; }
-        }
-
-        /// <summary>
-        /// Gibt die Anzahl der Versuche zurück, oder legt sie fest.
+        /// Gets or sets the maximum number of attempts when trying to establish a encrypted conection.
         /// </summary>
         public int MaxAttempts
         {
@@ -137,108 +123,54 @@ namespace Zyan.Communication.Protocols.Http
         }
 
         /// <summary>
-        /// Erzeugt einen fertig konfigurierten Remoting-Kanal.
-        /// <remarks>
-        /// Wenn der Kanal in der aktuellen Anwendungsdomäne bereits registriert wurde, wird null zurückgegeben.
-        /// </remarks>
+        /// Configures encrpytion sinks, if encryption is enabled.
         /// </summary>
-        /// <returns>Remoting Kanal</returns>
-        public IChannel CreateChannel()
+        private void ConfigureEncryption()
         {
-            // Kanal suchen
+            if (_encryption)
+            {
+                this.AddClientSinkAfterFormatter(new CryptoClientChannelSinkProvider()
+                {
+                    Algorithm = _algorithm,
+                    MaxAttempts = _maxAttempts,
+                    Oaep = _oaep
+                });
+                this.AddServerSinkBeforeFormatter(new CryptoServerChannelSinkProvider()
+                {
+                    Algorithm = _algorithm,
+                    RequireCryptoClient = true,
+                    Oaep = _oaep
+                });
+            }
+        }
+
+        /// <summary>
+        /// Creates and configures a Remoting channel.        
+        /// </summary>
+        /// <returns>Remoting channel</returns>
+        public override IChannel CreateChannel()
+        {
             IChannel channel = ChannelServices.GetChannel(_channelName);
 
-            // Wenn der Kanal nicht gefunden wurde ...
             if (channel == null)
             {
-                // Konfiguration für den HTTP-Kanal erstellen
-                System.Collections.IDictionary channelSettings = new System.Collections.Hashtable();
-                channelSettings["name"] = _channelName;
-                channelSettings["port"] = 0;
+                _channelSettings["name"] = _channelName;
+                _channelSettings["port"] = 0;
 
-                // Variable für Clientformatierer
-                IClientFormatterSinkProvider clientFormatter = null;
+                ConfigureEncryption();
 
-                // Wenn binäre Formatierung verwendet werden soll ...
-                if (_useBinaryFormatter)
-                    // Binären Clientformatierer erzeugen                
-                    clientFormatter = new BinaryClientFormatterSinkProvider();
-                else
-                    // SOAP Clientformatierer erzeugen                
-                    clientFormatter = new SoapClientFormatterSinkProvider();
+                if (_channelFactory == null)
+                    throw new ApplicationException(LanguageResource.ApplicationException_NoChannelFactorySpecified);
 
-                // Wenn die Kommunikation verschlüsselt werden soll ...
-                if (_encryption)
-                {
-                    // Client-Verschlüsselungs-Kanalsenkenanbieter erzeugen
-                    CryptoClientChannelSinkProvider clientEncryption = new CryptoClientChannelSinkProvider();
+                channel = _channelFactory(_channelSettings, BuildClientSinkChain(), BuildServerSinkChain());
 
-                    // Verschlüsselung konfigurieren
-                    clientEncryption.Algorithm = _algorithm;
-                    clientEncryption.Oaep = _oaep;
-                    clientEncryption.MaxAttempts = _maxAttempts;
-
-                    // Verschlüsselungs-Kanalsenkenanbieter hinter den Formatierer hängen
-                    clientFormatter.Next = clientEncryption;
-                }
-                // Variable für ersten Server-Senkenanbieter in der Kette
-                IServerChannelSinkProvider firstServerSinkProvider = null;
-
-                // Variable für Serverformatierer
-                IServerFormatterSinkProvider serverFormatter = null;
-
-                // Wenn binäre Formatierung verwendet werden soll ...
-                if (_useBinaryFormatter)
-                {
-                    // Binären Serverformatierer erzeugen                
-                    serverFormatter = new BinaryServerFormatterSinkProvider();
-
-                    // Serialisierung von komplexen Objekten aktivieren
-                    ((BinaryServerFormatterSinkProvider)serverFormatter).TypeFilterLevel = TypeFilterLevel.Full;
-                }
-                else
-                {
-                    // SOAP Serverformatierer erzeugen                
-                    serverFormatter = new SoapServerFormatterSinkProvider();
-
-                    // Serialisierung von komplexen Objekten aktivieren
-                    ((SoapServerFormatterSinkProvider)serverFormatter).TypeFilterLevel = TypeFilterLevel.Full;
-                }
-                // Wenn die Kommunikation verschlüsselt werden soll ...
-                if (_encryption)
-                {
-                    // Server-Verschlüsselungs-Kanalsenkenanbieter erzeugen
-                    CryptoServerChannelSinkProvider serverEncryption = new CryptoServerChannelSinkProvider();
-
-                    // Verschlüsselung konfigurieren
-                    serverEncryption.Algorithm = _algorithm;
-                    serverEncryption.Oaep = _oaep;
-                    serverEncryption.RequireCryptoClient = true;
-
-                    // Formatierer hinter den Verschlüsselungs-Kanalsenkenanbieter hängen
-                    serverEncryption.Next = serverFormatter;
-
-                    // Verschlüsselungs-Kanalsenkenanbieter als ersten Senkenanbieter festlegen
-                    firstServerSinkProvider = serverEncryption;
-                }
-                else
-                    // Server-Formatierer als ersten Senkenanbieter festlegen
-                    firstServerSinkProvider = serverFormatter;
-
-                // Neuen HTTP-Kanal erzeugen
-                channel = new HttpChannel(channelSettings, clientFormatter, firstServerSinkProvider);
-
-                // Wenn Zyan nicht mit mono ausgeführt wird ...
                 if (!MonoCheck.IsRunningOnMono)
                 {
-                    // Sicherstellen, dass vollständige Ausnahmeinformationen übertragen werden
                     if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
                         RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
                 }
-                // Kanal zurückgeben
                 return channel;
             }
-            // Nichts zurückgeben
             return null;
         }
     }

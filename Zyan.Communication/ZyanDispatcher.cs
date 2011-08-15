@@ -1,4 +1,4 @@
-ï»¿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -27,12 +27,12 @@ namespace Zyan.Communication
 		/// <param name="host">Komponentenhost</param>
 		public ZyanDispatcher(ZyanComponentHost host)
 		{
-			// Wenn kein Komponentenhost Ã¼bergeben wurde ...
+			// Wenn kein Komponentenhost übergeben wurde ...
 			if (host == null)
 				// Ausnahme werfen
 				throw new ArgumentNullException("host");
 
-			// Host Ã¼bernehmen
+			// Host übernehmen
 			_host = host;
 		}
 
@@ -123,9 +123,9 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Verarbeitet BeforeInvoke-Abos (falls welche registriert sind).
 		/// </summary>
-		/// <param name="trackingID">AufrufschlÃ¼ssel zur Nachverfolgung</param>
+		/// <param name="trackingID">Aufrufschlüssel zur Nachverfolgung</param>
 		/// <param name="interfaceName">Name der Komponentenschnittstelle</param>
-		/// <param name="delegateCorrelationSet">Korrelationssatz fÃ¼r die Verdrahtung bestimmter Delegaten und Ereignisse mit entfernten Methoden</param>
+		/// <param name="delegateCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Delegaten und Ereignisse mit entfernten Methoden</param>
 		/// <param name="methodName">Methodenname</param>
 		/// <param name="args">Parameter</param>   
 		private void ProcessBeforeInvoke(Guid trackingID, ref string interfaceName, ref List<DelegateCorrelationInfo> delegateCorrelationSet, ref string methodName, ref object[] args)
@@ -133,7 +133,7 @@ namespace Zyan.Communication
 			// Wenn BeforeInvoke-Abos vorhanden sind ...
 			if (_host.HasBeforeInvokeSubscriptions())
 			{
-				// Ereignisargumente fÃ¼r BeforeInvoke erstellen
+				// Ereignisargumente für BeforeInvoke erstellen
 				BeforeInvokeEventArgs cancelArgs = new BeforeInvokeEventArgs()
 				{
 					TrackingID = trackingID,
@@ -162,7 +162,7 @@ namespace Zyan.Communication
 				}
 				else // Wenn der Aufruf nicht abgebrochen werden soll ...
 				{
-					// Einstellungen der Ereignisargumente Ã¼bernehmen
+					// Einstellungen der Ereignisargumente übernehmen
 					interfaceName = cancelArgs.InterfaceName;
 					delegateCorrelationSet = cancelArgs.DelegateCorrelationSet;
 					methodName = cancelArgs.MethodName;
@@ -174,18 +174,18 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Verarbeitet AfterInvoke-Abos (falls welche registriert sind).
 		/// </summary>
-		/// <param name="trackingID">AufrufschlÃ¼ssel zur Nachverfolgung</param>
+		/// <param name="trackingID">Aufrufschlüssel zur Nachverfolgung</param>
 		/// <param name="interfaceName">Name der Komponentenschnittstelle</param>
-		/// <param name="delegateCorrelationSet">Korrelationssatz fÃ¼r die Verdrahtung bestimmter Delegaten und Ereignisse mit entfernten Methoden</param>
+		/// <param name="delegateCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Delegaten und Ereignisse mit entfernten Methoden</param>
 		/// <param name="methodName">Methodenname</param>
 		/// <param name="args">Parameter</param>   
-		/// <param name="returnValue">RÃ¼ckgabewert</param>
+		/// <param name="returnValue">Rückgabewert</param>
 		private void ProcessAfterInvoke(Guid trackingID, ref string interfaceName, ref List<DelegateCorrelationInfo> delegateCorrelationSet, ref string methodName, ref object[] args, ref object returnValue)
 		{
 			// Wenn AfterInvoke-Abos registriert sind ...
 			if (_host.HasAfterInvokeSubscriptions())
 			{
-				// Ereignisargumente fÃ¼r AfterInvoke erstellen
+				// Ereignisargumente für AfterInvoke erstellen
 				AfterInvokeEventArgs afterInvokeArgs = new AfterInvokeEventArgs()
 				{
 					TrackingID = trackingID,
@@ -225,7 +225,7 @@ namespace Zyan.Communication
 				ServerSession.CurrentSession.ClientAddress = string.Empty;
 		}
 
-		//TODO: This method needs refactoring. ItÂ´s too big.
+		//TODO: This method needs refactoring. It´s too big.
 		/// <summary>
 		/// Processes remote method invocation.
 		/// </summary>
@@ -418,7 +418,7 @@ namespace Zyan.Communication
 
 		#endregion
 
-		#region Ereignis-UnterstÃ¼tzung
+		#region Ereignis-Unterstützung
 
 		/// <summary>
 		/// Abonniert ein Ereignis einer Serverkomponente.
@@ -432,10 +432,10 @@ namespace Zyan.Communication
 				// Ausnahme werfen
 				throw new ArgumentException(LanguageResource.ArgumentException_InterfaceNameMissing, "interfaceName");
 
-			// Wenn fÃ¼r den angegebenen Schnittstellennamen keine Komponente registriert ist ...
+			// Wenn für den angegebenen Schnittstellennamen keine Komponente registriert ist ...
 			if (!_host.ComponentRegistry.ContainsKey(interfaceName))
 				// Ausnahme erzeugen
-				throw new KeyNotFoundException(string.Format("FÃ¼r die angegebene Schnittstelle '{0}' ist keine Komponente registiert.", interfaceName));
+				throw new KeyNotFoundException(string.Format("Für die angegebene Schnittstelle '{0}' ist keine Komponente registiert.", interfaceName));
 
 			// Komponentenregistrierung abrufen
 			ComponentRegistration registration = _host.ComponentRegistry[interfaceName];
@@ -451,7 +451,7 @@ namespace Zyan.Communication
 			// Implementierungstyp abrufen
 			Type type = instance.GetType();
 
-			// Liste fÃ¼r Ãœbergabe der Korrelationsinformation erzeugen
+			// Liste für Übergabe der Korrelationsinformation erzeugen
 			List<DelegateCorrelationInfo> correlationSet = new List<DelegateCorrelationInfo>();
 			correlationSet.Add(correlation);
 
@@ -471,10 +471,10 @@ namespace Zyan.Communication
 				// Ausnahme werfen
 				throw new ArgumentException(LanguageResource.ArgumentException_InterfaceNameMissing, "interfaceName");
 
-			// Wenn fÃ¼r den angegebenen Schnittstellennamen keine Komponente registriert ist ...
+			// Wenn für den angegebenen Schnittstellennamen keine Komponente registriert ist ...
 			if (!_host.ComponentRegistry.ContainsKey(interfaceName))
 				// Ausnahme erzeugen
-				throw new KeyNotFoundException(string.Format("FÃ¼r die angegebene Schnittstelle '{0}' ist keine Komponente registiert.", interfaceName));
+				throw new KeyNotFoundException(string.Format("Für die angegebene Schnittstelle '{0}' ist keine Komponente registiert.", interfaceName));
 
 			// Komponentenregistrierung abrufen
 			ComponentRegistration registration = _host.ComponentRegistry[interfaceName];
@@ -490,7 +490,7 @@ namespace Zyan.Communication
 			// Implementierungstyp abrufen
 			Type type = instance.GetType();
 
-			// Liste fÃ¼r Ãœbergabe der Korrelationsinformation erzeugen
+			// Liste für Übergabe der Korrelationsinformation erzeugen
 			List<DelegateCorrelationInfo> correlationSet = new List<DelegateCorrelationInfo>();
 			correlationSet.Add(correlation);
 
@@ -503,7 +503,7 @@ namespace Zyan.Communication
 		#region Metadaten abfragen
 
 		/// <summary>
-		/// Gibt eine Liste mit allen registrierten Komponenten zurÃ¼ck.
+		/// Gibt eine Liste mit allen registrierten Komponenten zurück.
 		/// </summary>
 		/// <returns>Liste mit Namen der registrierten Komponenten</returns>
 		public ComponentInfo[] GetRegisteredComponents()
@@ -519,7 +519,7 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Meldet einen Client am Applikationserver an.
 		/// </summary>
-		/// <param name="sessionID">SitzungsschlÃ¼ssel (wird vom Client erstellt)</param>
+		/// <param name="sessionID">Sitzungsschlüssel (wird vom Client erstellt)</param>
 		/// <param name="credentials">Anmeldeinformationen</param>
 		public void Logon(Guid sessionID, Hashtable credentials)
 		{
@@ -540,7 +540,7 @@ namespace Zyan.Communication
 				ServerSession session = new ServerSession(sessionID, authResponse.AuthenticatedIdentity, sessionVariableAdapter);
 				_host.SessionManager.StoreSession(session);
 				ServerSession.CurrentSession = session;
-
+                
 				string clientIP = string.Empty;
 				IPAddress clientAddress = GetCallingClientIPAddress();
 
@@ -554,7 +554,7 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Meldet einen Client vom Applikationsserver ab.
 		/// </summary>
-		/// <param name="sessionID">SitzungsschlÃ¼ssel</param>
+		/// <param name="sessionID">Sitzungsschlüssel</param>
 		public void Logoff(Guid sessionID)
 		{
 			IIdentity identity = null;
@@ -585,29 +585,29 @@ namespace Zyan.Communication
 		#region Benachrichtigungen
 
 		/// <summary>
-		/// Registriert einen Client fÃ¼r den Empfang von Benachrichtigungen bei einem bestimmten Ereignis.
+		/// Registriert einen Client für den Empfang von Benachrichtigungen bei einem bestimmten Ereignis.
 		/// </summary>
 		/// <param name="eventName">Ereignisname</param>
 		/// <param name="handler">Delegat auf Client-Ereignisprozedur</param>
 		public void Subscribe(string eventName, EventHandler<NotificationEventArgs> handler)
 		{
-			// Wenn auf dem Host kein Benachrichtigungsdienst lÃ¤uft ...
+			// Wenn auf dem Host kein Benachrichtigungsdienst läuft ...
 			if (!_host.IsNotificationServiceRunning)
 				// Ausnahme werfen
 				throw new ApplicationException(LanguageResource.ApplicationException_NotificationServiceNotRunning);
 
-			// FÃ¼r Benachrichtigung registrieren
+			// Für Benachrichtigung registrieren
 			_host.NotificationService.Subscribe(eventName, handler);
 		}
 
 		/// <summary>
-		/// Hebt eine Registrierung fÃ¼r den Empfang von Benachrichtigungen eines bestimmten Ereignisses auf.
+		/// Hebt eine Registrierung für den Empfang von Benachrichtigungen eines bestimmten Ereignisses auf.
 		/// </summary>
 		/// <param name="eventName">Ereignisname</param>
 		/// <param name="handler">Delegat auf Client-Ereignisprozedur</param>
 		public void Unsubscribe(string eventName, EventHandler<NotificationEventArgs> handler)
 		{
-			// Wenn auf dem Host kein Benachrichtigungsdienst lÃ¤uft ...
+			// Wenn auf dem Host kein Benachrichtigungsdienst läuft ...
 			if (!_host.IsNotificationServiceRunning)
 				// Ausnahme werfen
 				throw new ApplicationException(LanguageResource.ApplicationException_NotificationServiceNotRunning);
@@ -621,7 +621,7 @@ namespace Zyan.Communication
 		#region Sitzungsverwaltung
 
 		/// <summary>
-		/// Gibt die maximale Sitzungslebensdauer (in Minuten) zurÃ¼ck.
+		/// Gibt die maximale Sitzungslebensdauer (in Minuten) zurück.
 		/// </summary>
 		public int SessionAgeLimit
 		{
@@ -629,7 +629,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// VerlÃ¤ngert die Sitzung des Aufrufers und gibt die aktuelle Sitzungslebensdauer zurÃ¼ck.
+		/// Verlängert die Sitzung des Aufrufers und gibt die aktuelle Sitzungslebensdauer zurück.
 		/// </summary>
 		/// <returns>Sitzungslebensdauer (in Minuten)</returns>
 		public int RenewSession()
@@ -637,22 +637,22 @@ namespace Zyan.Communication
 			// Kontextdaten aus dem Aufrufkontext lesen (Falls welche hinterlegt sind)
 			LogicalCallContextData data = CallContext.GetData("__ZyanContextData_" + _host.Name) as LogicalCallContextData;
 
-			// Wenn Kontextdaten Ã¼bertragen wurden ...
+			// Wenn Kontextdaten übertragen wurden ...
 			if (data != null)
 			{
-				// Wenn ein SitzungsschlÃ¼ssel Ã¼bertragen wurde ...
+				// Wenn ein Sitzungsschlüssel übertragen wurde ...
 				if (data.Store.ContainsKey("sessionid"))
 				{
-					// SitzungsschlÃ¼ssel lesen
+					// Sitzungsschlüssel lesen
 					Guid sessionID = (Guid)data.Store["sessionid"];
 
-					// Wenn eine Sitzung mit dem angegebenen SchlÃ¼ssel existiert ...
+					// Wenn eine Sitzung mit dem angegebenen Schlüssel existiert ...
 					if (_host.SessionManager.ExistSession(sessionID))
 					{
 						// Sitzung abrufen
 						ServerSession session = _host.SessionManager.GetSessionBySessionID(sessionID);
 
-						// Sitzung verlÃ¤ngern
+						// Sitzung verlängern
 						session.Timestamp = DateTime.Now;
 
 						// Aktuelle Sitzung im Threadspeicher ablegen
@@ -661,7 +661,7 @@ namespace Zyan.Communication
 					else
 					{
 						// Ausnahme erzeugen
-						InvalidSessionException ex = new InvalidSessionException(string.Format("SitzungsschlÃ¼ssel '{0}' ist ungÃ¼ltig! Bitte melden Sie sich erneut am Server an.", sessionID.ToString()));
+						InvalidSessionException ex = new InvalidSessionException(string.Format("Sitzungsschlüssel '{0}' ist ungültig! Bitte melden Sie sich erneut am Server an.", sessionID.ToString()));
 
 						// Ausnahme werfen
 						throw ex;
@@ -676,7 +676,7 @@ namespace Zyan.Communication
 				// Ausnahme werfen
 				throw ex;
 			}
-			// Sitzungslebensdauer zurÃ¼ckgeben
+			// Sitzungslebensdauer zurückgeben
 			return SessionAgeLimit;
 		}
 
@@ -690,7 +690,7 @@ namespace Zyan.Communication
 		/// <returns>Lease</returns>
 		public override object InitializeLifetimeService()
 		{
-			// Laufzeitumgebungen fÃ¼r Ereignisbasierte Komponenten leben ewig
+			// Laufzeitumgebungen für Ereignisbasierte Komponenten leben ewig
 			return null;
 		}
 

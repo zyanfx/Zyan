@@ -22,7 +22,7 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 		private int _maxAttempts = 2;
 
         /// <summary>
-        /// Gibt den Namen des zu verwendenden symmetrischen Verschlüsselungsalgorithmus zurück, oder legt ihn fest.
+        /// Gets or sets the name of the symmetric encryption algorithm.
         /// </summary>
         public string Algorithm
         {
@@ -31,7 +31,7 @@ namespace Zyan.Communication.ChannelSinks.Encryption
         }
 
         /// <summary>
-        /// Gibt zurück, ob OEAP-Padding aktivuert werden soll, oder legt dies fest.
+        /// Gets or sets, if OEAP padding should be activated.
         /// </summary>
         public bool Oaep
         {
@@ -40,7 +40,7 @@ namespace Zyan.Communication.ChannelSinks.Encryption
         }
 
         /// <summary>
-        /// Gibt die Anzahl der Versuche zurück, oder legt sie fest.
+        /// Gets or sets the maximum number of attempts when trying to establish a encrypted conection.
         /// </summary>
         public int MaxAttempts
         {
