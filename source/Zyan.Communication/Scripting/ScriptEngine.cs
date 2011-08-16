@@ -54,7 +54,7 @@ namespace Zyan.Communication.Scripting
 					errorReport.AppendLine(error.ErrorText);
 				}
 
-				throw new Exception(errorReport.ToString());
+				throw new ApplicationException(errorReport.ToString());
 			}
 		}
 

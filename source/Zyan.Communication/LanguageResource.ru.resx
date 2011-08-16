@@ -112,10 +112,10 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ApplicationException_MultipleModuleControlersNotAllowed" xml:space="preserve">
     <value>Несколько контроллеров на один модуль не допускается.</value>
@@ -254,5 +254,11 @@
   </data>
   <data name="PasswordExpiredException_DefaultMessage" xml:space="preserve">
     <value>Срок действия пароля истек.</value>
+  </data>
+  <data name="ApplicationException_NoFormatterSpecified" xml:space="preserve">
+    <value>Форматировщик не задан.</value>
+  </data>
+  <data name="ApplicationException_NoChannelFactorySpecified" xml:space="preserve">
+    <value>Фабричный метод для канала не задан.</value>
   </data>
 </root>
