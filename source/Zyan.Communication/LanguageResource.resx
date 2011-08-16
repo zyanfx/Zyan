@@ -187,7 +187,7 @@
     <value>No public key transmitted.</value>
   </data>
   <data name="SecurityException_ContextInfoMissing" xml:space="preserve">
-    <value>Es wurden keine Kontextinformationen übertragen.</value>
+    <value>Context information is missing.</value>
   </data>
   <data name="SecurityException_CredentialsMissing" xml:space="preserve">
     <value>Credentials missing.</value>
