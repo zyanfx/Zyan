@@ -186,12 +186,16 @@
     <Compile Include="Notification\NotificationReceiver.cs" />
     <Compile Include="Notification\NotificationSender.cs" />
     <Compile Include="Notification\NotificationService.cs" />
+    <Compile Include="Protocols\ClientProtocolSetup.cs" />
+    <Compile Include="Protocols\ClientProtocolSetupExtensions.cs" />
     <Compile Include="Protocols\IClientProtocolSetup.cs" />
     <Compile Include="Protocols\IServerProtocolSetup.cs" />
     <Compile Include="Protocols\Http\HttpCustomClientProtocolSetup.cs" />
     <Compile Include="Protocols\Http\HttpCustomServerProtocolSetup.cs" />
     <Compile Include="Protocols\Ipc\IpcBinaryClientProtocolSetup.cs" />
     <Compile Include="Protocols\Ipc\IpcBinaryServerProtocolSetup.cs" />
+    <Compile Include="Protocols\ServerProtocolSetup.cs" />
+    <Compile Include="Protocols\ServerProtocolSetupExtensions.cs" />
     <Compile Include="Protocols\Tcp\TcpBinaryClientProtocolSetup.cs" />
     <Compile Include="Protocols\Tcp\TcpBinaryServerProtocolSetup.cs" />
     <Compile Include="Protocols\Tcp\TcpCustomClientProtocolSetup.cs" />
