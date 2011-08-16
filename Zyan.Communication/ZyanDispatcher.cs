@@ -214,7 +214,7 @@ namespace Zyan.Communication
 		/// </summary>
 		private void PutClientAddressToCurrentSession()
 		{
-			if (ServerSession.CurrentSession==null)
+			if (ServerSession.CurrentSession == null)
 				return;
 
 			IPAddress clientAddress = GetCallingClientIPAddress();
@@ -528,19 +528,21 @@ namespace Zyan.Communication
 
 			if (!_host.SessionManager.ExistSession(sessionID))
 			{
-				AuthResponseMessage authResponse = _host.Authenticate(new AuthRequestMessage() { Credentials = credentials });
+				// reset current session before authentication is complete
+				ServerSession.CurrentSession = null;
 
+				AuthResponseMessage authResponse = _host.Authenticate(new AuthRequestMessage() { Credentials = credentials });
 				if (!authResponse.Success)
 				{
 					var exception = authResponse.Exception ?? new SecurityException(authResponse.ErrorMessage);
 					throw exception;
 				}
 
-				SessionVariableAdapter sessionVariableAdapter = new SessionVariableAdapter(_host.SessionManager, sessionID);
-				ServerSession session = new ServerSession(sessionID, authResponse.AuthenticatedIdentity, sessionVariableAdapter);
+				var sessionVariableAdapter = new SessionVariableAdapter(_host.SessionManager, sessionID);
+				var session = new ServerSession(sessionID, authResponse.AuthenticatedIdentity, sessionVariableAdapter);
 				_host.SessionManager.StoreSession(session);
 				ServerSession.CurrentSession = session;
-                
+
 				string clientIP = string.Empty;
 				IPAddress clientAddress = GetCallingClientIPAddress();
 
@@ -559,25 +561,28 @@ namespace Zyan.Communication
 		{
 			IIdentity identity = null;
 			DateTime timestamp = DateTime.MinValue;
-			
-			ServerSession session = _host.SessionManager.GetSessionBySessionID(sessionID);
 
+			var session = _host.SessionManager.GetSessionBySessionID(sessionID);
 			if (session != null)
 			{
 				identity = session.Identity;
 				timestamp = session.Timestamp;
 			}
+
 			// Sitzung entfernen
 			_host.SessionManager.RemoveSession(sessionID);
 
-			string clientIP=string.Empty;
+			string clientIP = string.Empty;
 			IPAddress clientAddress = GetCallingClientIPAddress();
-			
+
 			if (clientAddress!=null)
 				clientIP=clientAddress.ToString();
 
 			if (identity!=null)
 				_host.OnClientLoggedOff(new LoginEventArgs(LoginEventType.Logoff, identity, clientIP , timestamp));
+
+			// reset current session after the client is logged off
+			ServerSession.CurrentSession = null;
 		}
 
 		#endregion
