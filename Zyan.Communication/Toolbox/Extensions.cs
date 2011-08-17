@@ -98,11 +98,19 @@ namespace Zyan.Communication.Toolbox
 		}
 
 		/// <summary>
-		/// Creates invocation delegate for the method represented by given MethodInfo
+		/// Creates invocation delegate for the static method represented by the given MethodInfo.
 		/// </summary>
 		public static T CreateDelegate<T>(this MethodInfo method) where T : class
 		{
 			return Delegate.CreateDelegate(typeof(T), method) as T;
+		}
+
+		/// <summary>
+		/// Creates invocation delegate for the non-static method represented by the given MethodInfo.
+		/// </summary>
+		public static T CreateDelegate<T>(this MethodInfo method, object instance) where T : class
+		{
+			return Delegate.CreateDelegate(typeof(T), instance, method) as T;
 		}
 
 		/// <summary>
