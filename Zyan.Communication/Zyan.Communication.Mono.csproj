@@ -217,7 +217,6 @@
     <Compile Include="Protocols\Tcp\DuplexChannel\TcpExChannelData.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\TransportHeaderWrapper.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\Diagnostics\Trace.cs" />
-    <Compile Include="Scripting\ScriptEngine.cs" />
     <Compile Include="Security\AuthRequestMessage.cs" />
     <Compile Include="Security\AuthResponseMessage.cs" />
     <Compile Include="Security\BasicWindowsAuthProvider.cs" />
