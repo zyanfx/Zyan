@@ -74,6 +74,8 @@
     <Compile Include="CustomSerializationContainer.cs" />
     <Compile Include="DelegateCorrelationInfo.cs" />
     <Compile Include="DelegateInterceptor.cs" />
+    <Compile Include="DynamicEventWire.cs" />
+    <Compile Include="DynamicWire.cs" />
     <Compile Include="DynamicWireFactory.cs" />
     <Compile Include="IComponentCatalog.cs" />
     <Compile Include="IComponentCatalogExtensions.cs" />
