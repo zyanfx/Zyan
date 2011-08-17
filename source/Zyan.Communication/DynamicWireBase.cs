@@ -6,61 +6,50 @@ using System.Reflection;
 namespace Zyan.Communication
 {
 	/// <summary>
-	/// Strongly typed wrapper for DelegateInterceptor.
+	/// Base class for dynamic wires.
 	/// </summary>
-	/// <typeparam name="T">Delegate type.</typeparam>
-	public class DynamicWire<T>
+	public abstract class DynamicWireBase
 	{
-		/// <summary>
-		/// Initializes <see cref="DynamicWire{T}"/> instance.
-		/// </summary>
-		public DynamicWire()
-		{
-			if (!typeof(Delegate).IsAssignableFrom(typeof(T)))
-			{
-				throw new ApplicationException("Type is not delegate: " + typeof(T).FullName);
-			}
-		}
-
 		/// <summary>
 		/// Client delegate interceptor.
 		/// </summary>
 		public DelegateInterceptor Interceptor { get; set; }
 
 		/// <summary>
-		/// Invokes interceptor's delegate.
+		/// Invokes intercepted delegate.
 		/// </summary>
-		/// <param name="args">Method parameters.</param>
-		/// <returns>Method return value.</returns>
+		/// <param name="args">Delegate parameters.</param>
+		/// <returns>Delegate return value.</returns>
 		protected virtual object InvokeClientDelegate(params object[] args)
 		{
 			return Interceptor.InvokeClientDelegate(args);
 		}
 
-		static MethodInfo InvokeClientDelegateMethodInfo = 
-			typeof(DynamicWire<T>).GetMethod("InvokeClientDelegate",
-				BindingFlags.Instance | BindingFlags.NonPublic);
+		/// <summary>
+		/// <see cref="MethodInfo"/> for <see cref="InvokeClientDelegate"/> method.
+		/// </summary>
+		protected static readonly MethodInfo InvokeClientDelegateMethodInfo = 
+			typeof(DynamicWireBase).GetMethod("InvokeClientDelegate", BindingFlags.Instance | BindingFlags.NonPublic);
 
 		/// <summary>
-		/// Dynamic wire delegate.
+		/// Gets the untyped In delegate.
 		/// </summary>
-		public T In
+		public abstract Delegate InDelegate { get; }
+
+		/// <summary>
+		/// Builds strong-typed delegate of type <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Delegate type.</typeparam>
+		/// <returns>Delegate to call <see cref="InvokeClientDelegate"/> method.</returns>
+		protected T BuildDelegate<T>()
 		{
-			get
+			// validate generic argument
+			if (!typeof(Delegate).IsAssignableFrom(typeof(T)))
 			{
-				if (delegateValue == null)
-				{
-					delegateValue = BuildDelegate();
-				}
-
-				return delegateValue;
+				throw new ApplicationException("Type is not delegate: " + typeof(T).FullName);
 			}
-		}
 
-		private T delegateValue;
-
-		private T BuildDelegate()
-		{
+			// get delegate MethodInfo
 			var delegateType = typeof(T);
 			var invokeMethod = delegateType.GetMethod("Invoke");
 

@@ -1,16 +1,16 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using System.Security;
+using System.Security.Principal;
 using System.Transactions;
 using Zyan.Communication.Notification;
 using Zyan.Communication.Security;
 using Zyan.Communication.SessionMgmt;
 using Zyan.Communication.Toolbox;
-using System.Security.Principal;
-using System.Net;
 
 namespace Zyan.Communication
 {
@@ -51,39 +51,34 @@ namespace Zyan.Communication
 		/// <param name="delegateCorrelationSet">Correlation set (say how to wire)</param>
 		/// <param name="wiringList">Collection of built wires</param>
 		private void CreateClientServerWires(Type type, object instance, List<DelegateCorrelationInfo> delegateCorrelationSet, Dictionary<Guid, Delegate> wiringList)
-		{			
+		{
 			if (delegateCorrelationSet == null)
 				return;
 			
 			foreach (DelegateCorrelationInfo correlationInfo in delegateCorrelationSet)
-			{				
-				if (wiringList.ContainsKey(correlationInfo.CorrelationID))					
+			{
+				if (wiringList.ContainsKey(correlationInfo.CorrelationID))
 					continue;
 
-				object dynamicWire = DynamicWireFactory.Instance.CreateDynamicWire(type, correlationInfo.DelegateMemberName, correlationInfo.IsEvent);
-				Type dynamicWireType = dynamicWire.GetType();
-				dynamicWireType.GetProperty("Interceptor").SetValue(dynamicWire, correlationInfo.ClientDelegateInterceptor, null);
+				var dynamicWire = DynamicWireFactory.CreateDynamicWire(type, correlationInfo.DelegateMemberName, correlationInfo.IsEvent);
+				dynamicWire.Interceptor = correlationInfo.ClientDelegateInterceptor;
 
 				if (correlationInfo.IsEvent)
 				{
-					EventInfo eventInfo = type.GetEvent(correlationInfo.DelegateMemberName);
+					var eventInfo = type.GetEvent(correlationInfo.DelegateMemberName);
+					var dynamicEventWire = (DynamicEventWireBase)dynamicWire;
 
-					dynamicWireType.GetProperty("ServerEventInfo").SetValue(dynamicWire, eventInfo, null);
-					dynamicWireType.GetProperty("Component").SetValue(dynamicWire, instance, null);
+					dynamicEventWire.ServerEventInfo = eventInfo;
+					dynamicEventWire.Component = instance;
 
-					Delegate dynamicWireDelegate = Delegate.CreateDelegate(eventInfo.EventHandlerType, dynamicWire, dynamicWireType.GetMethod("In"));
-
-					eventInfo.AddEventHandler(instance, dynamicWireDelegate);
-					
-					wiringList.Add(correlationInfo.CorrelationID, dynamicWireDelegate);
+					eventInfo.AddEventHandler(instance, dynamicEventWire.InDelegate);
+					wiringList.Add(correlationInfo.CorrelationID, dynamicEventWire.InDelegate);
 				}
 				else
 				{
-					PropertyInfo outputPinMetaData = type.GetProperty(correlationInfo.DelegateMemberName);
-					Delegate dynamicWireDelegate = Delegate.CreateDelegate(outputPinMetaData.PropertyType, dynamicWire, dynamicWireType.GetMethod("In"));
-					outputPinMetaData.SetValue(instance, dynamicWireDelegate, null);
-
-					wiringList.Add(correlationInfo.CorrelationID, dynamicWireDelegate);
+					var outputPinMetaData = type.GetProperty(correlationInfo.DelegateMemberName);
+					outputPinMetaData.SetValue(instance, dynamicWire.InDelegate, null);
+					wiringList.Add(correlationInfo.CorrelationID, dynamicWire.InDelegate);
 				}
 			}
 		}
@@ -359,18 +354,16 @@ namespace Zyan.Communication
 					throw new MissingMethodException(exceptionMessage);
 				}
 
-				ParameterInfo[] serverMethodParamDefs = methodInfo.GetParameters();
+				var serverMethodParamDefs = methodInfo.GetParameters();
 
 				foreach (int index in delegateParamIndexes.Keys)
 				{
-					DelegateInterceptor delegateParamInterceptor = delegateParamIndexes[index];
-					ParameterInfo serverMethodParamDef = serverMethodParamDefs[index];
+					var delegateParamInterceptor = delegateParamIndexes[index];
+					var serverMethodParamDef = serverMethodParamDefs[index];
 
-					object dynamicWire = DynamicWireFactory.Instance.CreateDynamicWire(type, serverMethodParamDef.ParameterType);
-					Type dynamicWireType = dynamicWire.GetType();
-					dynamicWireType.GetProperty("Interceptor").SetValue(dynamicWire, delegateParamInterceptor, null);
-					Delegate dynamicWireDelegate = Delegate.CreateDelegate(serverMethodParamDef.ParameterType, dynamicWire, dynamicWireType.GetMethod("In"));
-					args[index] = dynamicWireDelegate;
+					var dynamicWire = DynamicWireFactory.CreateDynamicWire(type, serverMethodParamDef.ParameterType);
+					dynamicWire.Interceptor = delegateParamInterceptor;
+					args[index] = dynamicWire.InDelegate;
 				}
 
 				returnValue = methodInfo.Invoke(instance, args, methodInfo.IsOneWay());

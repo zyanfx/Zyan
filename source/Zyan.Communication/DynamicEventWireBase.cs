@@ -4,9 +4,9 @@ using System.Reflection;
 namespace Zyan.Communication
 {
 	/// <summary>
-	/// Strongly typed event handler wrapper for DelegateInterceptor.
+	/// Base class for event wires.
 	/// </summary>
-	public class DynamicEventWire<T> : DynamicWire<T>
+	public abstract class DynamicEventWireBase : DynamicWireBase
 	{
 		/// <summary>
 		/// Server component.
@@ -33,8 +33,7 @@ namespace Zyan.Communication
 			catch
 			{
 				// unsubscribe
-				var dynamicWireDelegate = (Delegate)(object)In;
-				ServerEventInfo.RemoveEventHandler(Component, dynamicWireDelegate);
+				ServerEventInfo.RemoveEventHandler(Component, InDelegate);
 				throw;
 			}
 		}
