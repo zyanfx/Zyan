@@ -78,6 +78,8 @@
     <Compile Include="Composition\ZyanComposablePartDefinition.cs" />
     <Compile Include="Composition\ZyanInterfaceAttribute.cs" />
     <Compile Include="DelegateCorrelationInfo.cs" />
+    <Compile Include="DynamicEventWire.cs" />
+    <Compile Include="DynamicWire.cs" />
     <Compile Include="DynamicWireFactory.cs" />
     <Compile Include="CallInterceptionData.cs" />
     <Compile Include="CallInterceptor.cs" />
