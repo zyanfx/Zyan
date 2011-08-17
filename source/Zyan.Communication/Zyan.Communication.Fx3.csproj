@@ -69,9 +69,11 @@
     <Compile Include="ComponentCatalog.cs" />
     <Compile Include="ComponentInfo.cs" />
     <Compile Include="DelegateCorrelationInfo.cs" />
-    <Compile Include="DynamicEventWire.cs" />
-    <Compile Include="DynamicWire.cs" />
+    <Compile Include="DynamicEventWireBase.cs" />
+    <Compile Include="DynamicEventWireT.cs" />
+    <Compile Include="DynamicWireBase.cs" />
     <Compile Include="DynamicWireFactory.cs" />
+    <Compile Include="DynamicWireT.cs" />
     <Compile Include="CallInterceptionData.cs" />
     <Compile Include="CallInterceptor.cs" />
     <Compile Include="IComponentCatalog.cs" />
@@ -204,7 +206,6 @@
     <Compile Include="Protocols\IServerProtocolSetup.cs" />
     <Compile Include="Protocols\Tcp\TcpDuplexClientProtocolSetup.cs" />
     <Compile Include="Protocols\Tcp\TcpDuplexServerProtocolSetup.cs" />
-    <Compile Include="Scripting\ScriptEngine.cs" />
     <Compile Include="Security\BasicWindowsAuthProvider.cs" />
     <Compile Include="Security\Exceptions\AccountLockedException.cs" />
     <Compile Include="Security\Exceptions\AccountNotFoundException.cs" />
