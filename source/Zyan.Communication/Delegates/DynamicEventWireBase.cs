@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Zyan.Communication
+namespace Zyan.Communication.Delegates
 {
 	/// <summary>
 	/// Base class for event wires.
 	/// </summary>
-	public abstract class DynamicEventWireBase : DynamicWireBase
+	internal abstract class DynamicEventWireBase : DynamicWireBase
 	{
 		/// <summary>
 		/// Server component.

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Zyan.Communication
+namespace Zyan.Communication.Delegates
 {
 	/// <summary>
 	/// Strongly typed event handler wrapper for DelegateInterceptor.
 	/// </summary>
-	public class DynamicEventWire<T> : DynamicEventWireBase
+	internal class DynamicEventWire<T> : DynamicEventWireBase
 	{
 		/// <summary>
 		/// Initializes <see cref="DynamicWire{T}"/> instance.

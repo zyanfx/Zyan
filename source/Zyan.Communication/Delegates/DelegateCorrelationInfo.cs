@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Zyan.Communication
+namespace Zyan.Communication.Delegates
 {
 	/// <summary>
 	/// Beschreibt Korrelationsinformationen zur Verdrahtung eines Server-Delegaten mit einer Client-Methode.

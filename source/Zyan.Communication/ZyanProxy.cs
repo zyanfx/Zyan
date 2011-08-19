@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using System.Runtime.Remoting.Proxies;
 using Zyan.InterLinq;
+using Zyan.Communication.Delegates;
 
 namespace Zyan.Communication
 {
