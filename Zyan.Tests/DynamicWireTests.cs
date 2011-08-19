@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Zyan.Communication;
+using Zyan.Communication.Delegates;
 
 namespace Zyan.Tests
 {

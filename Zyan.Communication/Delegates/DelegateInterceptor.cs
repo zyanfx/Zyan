@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Zyan.Communication
+namespace Zyan.Communication.Delegates
 {
 	/// <summary>
 	/// Abfangvorrichtung für Delegaten.

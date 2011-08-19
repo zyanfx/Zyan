@@ -69,12 +69,13 @@
     <Compile Include="ChannelSinks\ClientAddress\ClientAddressServerChannelSinkProvider.cs" />
     <Compile Include="ComponentCatalog.cs" />
     <Compile Include="ComponentInfo.cs" />
-    <Compile Include="DelegateCorrelationInfo.cs" />
-    <Compile Include="DynamicEventWireBase.cs" />
-    <Compile Include="DynamicEventWireT.cs" />
-    <Compile Include="DynamicWireBase.cs" />
-    <Compile Include="DynamicWireFactory.cs" />
-    <Compile Include="DynamicWireT.cs" />
+    <Compile Include="Delegates\DelegateCorrelationInfo.cs" />
+    <Compile Include="Delegates\DelegateInterceptor.cs" />
+    <Compile Include="Delegates\DynamicEventWireBase.cs" />
+    <Compile Include="Delegates\DynamicEventWireT.cs" />
+    <Compile Include="Delegates\DynamicWireBase.cs" />
+    <Compile Include="Delegates\DynamicWireFactory.cs" />
+    <Compile Include="Delegates\DynamicWireT.cs" />
     <Compile Include="CallInterceptionData.cs" />
     <Compile Include="CallInterceptor.cs" />
     <Compile Include="IComponentCatalog.cs" />
@@ -223,6 +224,7 @@
     <Compile Include="Toolbox\ConcurrentDictionaryFx3.cs" />
     <Compile Include="Toolbox\Extensions.cs" />
     <Compile Include="Toolbox\ExtensionsFx3.cs" />
+    <Compile Include="Toolbox\LazyFx3.cs" />
     <Compile Include="Toolbox\MessageHelpers.cs" />
     <Compile Include="Toolbox\SplitOrderedListFx3.cs" />
     <Compile Include="Toolbox\TypeComparer.cs" />
@@ -236,7 +238,6 @@
     <Compile Include="ZyanConnectionSetup.cs" />
     <Compile Include="ZyanErrorEventArgs.cs" />
     <Compile Include="ZyanProxy.cs" />
-    <Compile Include="DelegateInterceptor.cs" />
     <Compile Include="Security\AuthRequestMessage.cs" />
     <Compile Include="Security\AuthResponseMessage.cs" />
     <Compile Include="Security\IAuthenticationProvider.cs" />

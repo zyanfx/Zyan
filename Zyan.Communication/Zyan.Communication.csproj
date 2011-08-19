@@ -78,12 +78,13 @@
     <Compile Include="Composition\ZyanCatalog.cs" />
     <Compile Include="Composition\ZyanComposablePartDefinition.cs" />
     <Compile Include="Composition\ZyanInterfaceAttribute.cs" />
-    <Compile Include="DelegateCorrelationInfo.cs" />
-    <Compile Include="DynamicEventWireBase.cs" />
-    <Compile Include="DynamicEventWireT.cs" />
-    <Compile Include="DynamicWireBase.cs" />
-    <Compile Include="DynamicWireFactory.cs" />
-    <Compile Include="DynamicWireT.cs" />
+    <Compile Include="Delegates\DelegateCorrelationInfo.cs" />
+    <Compile Include="Delegates\DelegateInterceptor.cs" />
+    <Compile Include="Delegates\DynamicEventWireBase.cs" />
+    <Compile Include="Delegates\DynamicEventWireT.cs" />
+    <Compile Include="Delegates\DynamicWireBase.cs" />
+    <Compile Include="Delegates\DynamicWireFactory.cs" />
+    <Compile Include="Delegates\DynamicWireT.cs" />
     <Compile Include="CallInterceptionData.cs" />
     <Compile Include="CallInterceptor.cs" />
     <Compile Include="IComponentCatalog.cs" />
@@ -254,7 +255,6 @@
     <Compile Include="ZyanConnectionSetup.cs" />
     <Compile Include="ZyanErrorEventArgs.cs" />
     <Compile Include="ZyanProxy.cs" />
-    <Compile Include="DelegateInterceptor.cs" />
     <Compile Include="Security\AuthRequestMessage.cs" />
     <Compile Include="Security\AuthResponseMessage.cs" />
     <Compile Include="Security\IAuthenticationProvider.cs" />

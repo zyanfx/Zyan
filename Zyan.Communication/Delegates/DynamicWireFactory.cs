@@ -1,14 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 using Zyan.Communication.Toolbox;
 
-namespace Zyan.Communication
+namespace Zyan.Communication.Delegates
 {
+	#region Synonym definitions
+
 	// Factory method for dynamic wires.
 	using DynamicWireFactoryMethod = Func<bool, DynamicWireBase>;
+
+#if !FX3
+	using DynamicWireFactoryCache = System.Collections.Concurrent.ConcurrentDictionary<string, Func<bool, DynamicWireBase>>;
+#else
+	using DynamicWireFactoryCache = Zyan.Communication.Toolbox.ConcurrentDictionary<string, Func<bool, DynamicWireBase>>;
+#endif
+
+	#endregion
 
 	/// <summary>
 	/// Factory class for creation of dynamic wires.
@@ -17,53 +26,25 @@ namespace Zyan.Communication
 	{
 		#region Singleton implementation
 
-		// Locking object
-		private static object _singletonLockObject = new object();
-
-		// Singleton instance
-		private static volatile DynamicWireFactory _singleton = null;
-
 		/// <summary>
-		/// Gets a singleton instance of the DynamicWirefactory class.
-		/// </summary>
-		public static DynamicWireFactory Instance
-		{
-			get
-			{
-				if (_singleton == null)
-				{
-					lock (_singletonLockObject)
-					{
-						if (_singleton == null)
-							_singleton = new DynamicWireFactory();
-					}
-				}
-
-				return _singleton;
-			}
-		}
-
-		#endregion
-
-		#region Constructor
-
-		/// <summary>
-		/// Creates a new instance of the DynamicWireFactory class.
+		/// This constructor is private, so DynamicWireFactory class cannot be created from the outside.
 		/// </summary>
 		private DynamicWireFactory()
 		{
-			_wireFactoryCache = new Dictionary<string, DynamicWireFactoryMethod>();
 		}
+
+		/// <summary>
+		/// Lazy-initialized singleton instance.
+		/// </summary>
+		private static readonly Lazy<DynamicWireFactory> Instance =
+			new Lazy<DynamicWireFactory>(() => new DynamicWireFactory(), true);
 
 		#endregion
 
-		#region Wire Factory Cache
+		#region Wiring
 
 		// Cache for created dynamic wire factories
-		private Dictionary<string, DynamicWireFactoryMethod> _wireFactoryCache = null;
-
-		// Locking object for thread sync of the wire factory cache
-		private object _wireFactoryCacheLockObject = new object();
+		DynamicWireFactoryCache _wireFactoryCache = new DynamicWireFactoryCache();
 
 		/// <summary>
 		/// Creates a unique wire cache key for a delegate wire factory.
@@ -81,33 +62,6 @@ namespace Zyan.Communication
 			wireKeyBuilder.Append(delegateType.FullName);
 
 			return wireKeyBuilder.ToString();
-		}
-
-		#endregion
-
-		#region Wiring
-
-		/// <summary>
-		/// Creates a dynamic wire for a specified event or delegate property of a component.
-		/// </summary>
-		/// <param name="componentType">Component type</param>
-		/// <param name="delegateMemberName">Event name or name of the delegate property</param>
-		/// <param name="isEvent">Sets if the member is a event (if false, the memeber must be a delegate property)</param>
-		/// <returns>Instance of the created dynamic wire type (ready to use)</returns>
-		public static DynamicWireBase CreateDynamicWire(Type componentType, string delegateMemberName, bool isEvent)
-		{
-			return Instance.CreateWire(componentType, delegateMemberName, isEvent);
-		}
-
-		/// <summary>
-		/// Creates a dynamic wire for a specified event or delegate property of a component.
-		/// </summary>
-		/// <param name="componentType">Component type</param>
-		/// <param name="delegateType">Type of the delegate</param>
-		/// <returns>Instance of the created dynamic wire type (ready to use)</returns>
-		public static DynamicWireBase CreateDynamicWire(Type componentType, Type delegateType)
-		{
-			return Instance.CreateWire(componentType, delegateType);
 		}
 
 		private DynamicWireBase CreateWire(Type componentType, string delegateMemberName, bool isEvent)
@@ -139,23 +93,13 @@ namespace Zyan.Communication
 
 			// look for cached factory method value
 			var key = CreateKeyForWire(componentType, delegateType, isEvent);
-			if (!_wireFactoryCache.ContainsKey(key))
+			return _wireFactoryCache.GetOrAdd(key, x =>
 			{
-				lock (_wireFactoryCacheLockObject)
-				{
-					if (!_wireFactoryCache.ContainsKey(key))
-					{
-						// create wire factory method and save to cache
-						var methodInfo = CreateDynamicWireGenericMethodInfo.MakeGenericMethod(delegateType);
-						var dynamicWireFactoryMethod = methodInfo.CreateDelegate<Func<bool, DynamicWireBase>>(this);
-						_wireFactoryCache[key] = dynamicWireFactoryMethod;
-						return dynamicWireFactoryMethod;
-					}
-				}
-			}
-
-			// return cached value
-			return _wireFactoryCache[key];
+				// create wire factory method
+				var methodInfo = CreateDynamicWireGenericMethodInfo.MakeGenericMethod(delegateType);
+				var dynamicWireFactoryMethod = methodInfo.CreateDelegate<Func<bool, DynamicWireBase>>(this);
+				return dynamicWireFactoryMethod;
+			});
 		}
 
 		/// <summary>
@@ -195,5 +139,28 @@ namespace Zyan.Communication
 		}
 
 		#endregion
+
+		/// <summary>
+		/// Creates a dynamic wire for a specified event or delegate property of a component.
+		/// </summary>
+		/// <param name="componentType">Component type.</param>
+		/// <param name="delegateMemberName">Event name or name of the delegate property.</param>
+		/// <param name="isEvent">Sets if the member is a event (if false, the memeber must be a delegate property).</param>
+		/// <returns>Instance of the created dynamic wire type (ready to use).</returns>
+		public static DynamicWireBase CreateDynamicWire(Type componentType, string delegateMemberName, bool isEvent)
+		{
+			return Instance.Value.CreateWire(componentType, delegateMemberName, isEvent);
+		}
+
+		/// <summary>
+		/// Creates a dynamic wire for a specified event or delegate property of a component.
+		/// </summary>
+		/// <param name="componentType">Component type.</param>
+		/// <param name="delegateType">Type of the delegate.</param>
+		/// <returns>Instance of the created dynamic wire type (ready to use).</returns>
+		public static DynamicWireBase CreateDynamicWire(Type componentType, Type delegateType)
+		{
+			return Instance.Value.CreateWire(componentType, delegateType);
+		}
 	}
 }
