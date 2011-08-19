@@ -91,7 +91,7 @@ namespace Zyan.Communication
 		/// Creates a dynamic wire for a specified event or delegate property of a component.
 		/// </summary>
 		/// <param name="componentType">Component type</param>
-		/// <param name="eventMemberName">Event name or name of the delegate property</param>
+		/// <param name="delegateMemberName">Event name or name of the delegate property</param>
 		/// <param name="isEvent">Sets if the member is a event (if false, the memeber must be a delegate property)</param>
 		/// <returns>Instance of the created dynamic wire type (ready to use)</returns>
 		public static DynamicWireBase CreateDynamicWire(Type componentType, string delegateMemberName, bool isEvent)

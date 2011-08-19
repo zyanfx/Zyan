@@ -242,106 +242,82 @@ namespace Zyan.Communication
 
 			ProcessBeforeInvoke(trackingID, ref interfaceName, ref delegateCorrelationSet, ref methodName, ref args);
 
+			// look up the component registration info
 			if (!_host.ComponentRegistry.ContainsKey(interfaceName))
 			{
-				KeyNotFoundException ex = new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_CannotFindComponentForInterface, interfaceName));
+				var ex = new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_CannotFindComponentForInterface, interfaceName));
 				_host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
 				throw ex;
 			}
-			ComponentRegistration registration = _host.ComponentRegistry[interfaceName];
-			object instance = _host.GetComponentInstance(registration);
-			Type type = instance.GetType();
+
+			// check for logical context data
+			var data = CallContext.GetData("__ZyanContextData_" + _host.Name) as LogicalCallContextData;
+			if (data == null)
+			{
+				var ex = new SecurityException(LanguageResource.SecurityException_ContextInfoMissing);
+				_host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
+				throw ex;
+			}
+
+			// validate session
+			var sessionID = data.Store.ContainsKey("sessionid") ? (Guid)data.Store["sessionid"] : Guid.Empty;
+			if (!_host.SessionManager.ExistSession(sessionID))
+			{
+				var ex = new InvalidSessionException(string.Format(LanguageResource.InvalidSessionException_SessionIDInvalid, sessionID.ToString()));
+				_host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
+				throw ex;
+			}
+
+			// set current session
+			var session = _host.SessionManager.GetSessionBySessionID(sessionID);
+			session.Timestamp = DateTime.Now;
+			ServerSession.CurrentSession = session;
+			PutClientAddressToCurrentSession();
+
+			// convert method arguments
+			var delegateParamIndexes = new Dictionary<int, DelegateInterceptor>();
+			for (int i = 0; i < paramTypes.Length; i++)
+			{
+				var delegateParamInterceptor = args[i] as DelegateInterceptor;
+				if (delegateParamInterceptor != null)
+				{
+					delegateParamIndexes.Add(i, delegateParamInterceptor);
+					continue;
+				}
+
+				var container = args[i] as CustomSerializationContainer;
+				if (container != null)
+				{
+					var serializationHandler = _host.SerializationHandling[container.HandledType];
+					if (serializationHandler == null)
+					{
+						var ex = new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_SerializationHandlerNotFound, container.HandledType.FullName));
+						_host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
+						throw ex;
+					}
+
+					args[i] = serializationHandler.Deserialize(container.DataType, container.Data);
+				}
+			}
+
+			// transfer implicit transaction
+			var transaction = data.Store.ContainsKey("transaction") ? (Transaction)data.Store["transaction"] : null;
+			var scope = transaction != null ? new TransactionScope(transaction) : null;
+
+			// get component instance and wire it up
+			var registration = _host.ComponentRegistry[interfaceName];
+			var instance = _host.GetComponentInstance(registration);
+			var type = instance.GetType();
 
 			Dictionary<Guid, Delegate> wiringList = null;
-
 			if (registration.ActivationType == ActivationType.SingleCall)
 			{
 				wiringList = new Dictionary<Guid, Delegate>();
 				CreateClientServerWires(type, instance, delegateCorrelationSet, wiringList);
 			}
-			TransactionScope scope = null;
 
-			LogicalCallContextData data = CallContext.GetData("__ZyanContextData_" + _host.Name) as LogicalCallContextData;
-
-			if (data != null)
-			{
-				if (data.Store.ContainsKey("sessionid"))
-				{
-					Guid sessionID = (Guid)data.Store["sessionid"];
-
-					if (_host.SessionManager.ExistSession(sessionID))
-					{
-						ServerSession session = _host.SessionManager.GetSessionBySessionID(sessionID);
-						session.Timestamp = DateTime.Now;
-						ServerSession.CurrentSession = session;
-					}
-					else
-					{
-						InvalidSessionException ex = new InvalidSessionException(string.Format(LanguageResource.InvalidSessionException_SessionIDInvalid, sessionID.ToString()));
-						_host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
-
-						if (registration.ActivationType == ActivationType.SingleCall)
-						{
-							RemoveClientServerWires(type, instance, delegateCorrelationSet, wiringList);
-							_host.ComponentCatalog.CleanUpComponentInstance(registration, instance);
-						}
-
-						throw ex;
-					}
-				}
-				if (data.Store.ContainsKey("transaction"))
-					scope = new TransactionScope((Transaction)data.Store["transaction"]);
-			}
-			else
-			{
-				SecurityException ex = new SecurityException(LanguageResource.SecurityException_ContextInfoMissing);
-				_host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
-
-				if (registration.ActivationType == ActivationType.SingleCall)
-				{
-					RemoveClientServerWires(type, instance, delegateCorrelationSet, wiringList);
-					_host.ComponentCatalog.CleanUpComponentInstance(registration, instance);
-				}
-				
-				throw ex;
-			}
+			// prepare return value and invoke method
 			object returnValue = null;
-
-			PutClientAddressToCurrentSession();
-
-			Dictionary<int, DelegateInterceptor> delegateParamIndexes = new Dictionary<int, DelegateInterceptor>();
-
-			for (int i = 0; i < paramTypes.Length; i++)
-			{
-				DelegateInterceptor delegateParamInterceptor = args[i] as DelegateInterceptor;
-
-				if (delegateParamInterceptor != null)
-					delegateParamIndexes.Add(i, delegateParamInterceptor);
-				else
-				{
-					CustomSerializationContainer container = args[i] as CustomSerializationContainer;
-
-					if (container != null)
-					{
-						ISerializationHandler serializationHandler = _host.SerializationHandling[container.HandledType];
-
-						if (serializationHandler == null)
-						{
-							KeyNotFoundException ex = new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_SerializationHandlerNotFound, container.HandledType.FullName));
-							_host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
-
-							if (registration.ActivationType == ActivationType.SingleCall)
-							{
-								RemoveClientServerWires(type, instance, delegateCorrelationSet, wiringList);
-								_host.ComponentCatalog.CleanUpComponentInstance(registration, instance);
-							}
-							
-							throw ex;
-						}
-						args[i] = serializationHandler.Deserialize(container.DataType, container.Data);
-					}
-				}
-			}
 			bool exceptionThrown = false;
 
 			try
@@ -355,7 +331,6 @@ namespace Zyan.Communication
 				}
 
 				var serverMethodParamDefs = methodInfo.GetParameters();
-
 				foreach (int index in delegateParamIndexes.Keys)
 				{
 					var delegateParamInterceptor = delegateParamIndexes[index];
@@ -367,7 +342,6 @@ namespace Zyan.Communication
 				}
 
 				returnValue = methodInfo.Invoke(instance, args, methodInfo.IsOneWay());
-
 				if (returnValue != null)
 				{
 					Type returnValueType = returnValue.GetType();
@@ -398,12 +372,14 @@ namespace Zyan.Communication
 
 					scope.Dispose();
 				}
+
 				if (registration.ActivationType == ActivationType.SingleCall)
 				{
 					RemoveClientServerWires(type, instance, delegateCorrelationSet, wiringList);
 					_host.ComponentCatalog.CleanUpComponentInstance(registration, instance);
 				}
 			}
+
 			ProcessAfterInvoke(trackingID, ref interfaceName, ref delegateCorrelationSet, ref methodName, ref args, ref returnValue);
 
 			return returnValue;
