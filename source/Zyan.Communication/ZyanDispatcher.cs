@@ -11,6 +11,7 @@ using Zyan.Communication.Notification;
 using Zyan.Communication.Security;
 using Zyan.Communication.SessionMgmt;
 using Zyan.Communication.Toolbox;
+using Zyan.Communication.Delegates;
 
 namespace Zyan.Communication
 {
@@ -55,7 +56,7 @@ namespace Zyan.Communication
 			if (delegateCorrelationSet == null)
 				return;
 			
-			foreach (DelegateCorrelationInfo correlationInfo in delegateCorrelationSet)
+			foreach (var correlationInfo in delegateCorrelationSet)
 			{
 				if (wiringList.ContainsKey(correlationInfo.CorrelationID))
 					continue;

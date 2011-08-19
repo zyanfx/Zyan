@@ -3,12 +3,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Zyan.Communication
+namespace Zyan.Communication.Delegates
 {
 	/// <summary>
 	/// Base class for dynamic wires.
 	/// </summary>
-	public abstract class DynamicWireBase
+	internal abstract class DynamicWireBase
 	{
 		/// <summary>
 		/// Client delegate interceptor.

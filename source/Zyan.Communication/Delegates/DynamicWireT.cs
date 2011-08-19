@@ -3,13 +3,13 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Zyan.Communication
+namespace Zyan.Communication.Delegates
 {
 	/// <summary>
 	/// Strongly typed wrapper for DelegateInterceptor.
 	/// </summary>
 	/// <typeparam name="T">Delegate type.</typeparam>
-	public class DynamicWire<T> : DynamicWireBase
+	internal class DynamicWire<T> : DynamicWireBase
 	{
 		/// <summary>
 		/// Initializes <see cref="DynamicWire{T}"/> instance.
