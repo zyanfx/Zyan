@@ -2,16 +2,16 @@
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Serialization.Formatters;
+using Zyan.Communication.ChannelSinks.ClientAddress;
 using Zyan.Communication.ChannelSinks.Encryption;
-using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp.DuplexChannel;
 using Zyan.Communication.Security;
-using Zyan.Communication.ChannelSinks.ClientAddress;
+using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication.Protocols.Tcp
 {
 	/// <summary>
-    /// Server protocol setup for bi-directional TCP communication with support for user defined authentication and security.
+	/// Server protocol setup for bi-directional TCP communication with support for user defined authentication and security.
 	/// </summary>
 	public class TcpDuplexServerProtocolSetup : ServerProtocolSetup
 	{
@@ -23,7 +23,7 @@ namespace Zyan.Communication.Protocols.Tcp
 		private bool _tcpKeepAliveEnabled = true;
 		private ulong _tcpKeepAliveTime = 30000;
 		private ulong _tcpKeepAliveInterval = 1000;
-		
+
 		/// <summary>
 		/// Enables or disables TCP KeepAlive.
 		/// </summary>
@@ -51,20 +51,20 @@ namespace Zyan.Communication.Protocols.Tcp
 			set { _tcpKeepAliveInterval = value; }
 		}
 
-        /// <summary>
-        /// Gets or sets the TCP port to listen for client calls.
-        /// </summary>
-        public int TcpPort
-        {
-            get { return _tcpPort; }
-            set
-            {
-                if (_tcpPort < 0 || _tcpPort > 65535)
-                    throw new ArgumentOutOfRangeException("tcpPort", LanguageResource.ArgumentOutOfRangeException_InvalidTcpPortRange);
+		/// <summary>
+		/// Gets or sets the TCP port to listen for client calls.
+		/// </summary>
+		public int TcpPort
+		{
+			get { return _tcpPort; }
+			set
+			{
+				if (_tcpPort < 0 || _tcpPort > 65535)
+					throw new ArgumentOutOfRangeException("tcpPort", LanguageResource.ArgumentOutOfRangeException_InvalidTcpPortRange);
 
-                _tcpPort = value;
-            }
-        }
+				_tcpPort = value;
+			}
+		}
 
 		/// <summary>
 		/// Gets or sets the name of the symmetric encryption algorithm.
@@ -87,14 +87,14 @@ namespace Zyan.Communication.Protocols.Tcp
 		/// <summary>
 		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
 		/// </summary>
-        public TcpDuplexServerProtocolSetup()
-            : base((settings, clientSinkChain, serverSinkChain) => new TcpExChannel(settings, clientSinkChain, serverSinkChain))
-		{	
+		public TcpDuplexServerProtocolSetup()
+			: base((settings, clientSinkChain, serverSinkChain) => new TcpExChannel(settings, clientSinkChain, serverSinkChain))
+		{
 			_channelName = "TcpDuplexServerProtocolSetup_" + Guid.NewGuid().ToString();
 
-            ClientSinkChain.Add(new BinaryClientFormatterSinkProvider());
-            ServerSinkChain.Add(new BinaryServerFormatterSinkProvider() { TypeFilterLevel = TypeFilterLevel.Full });
-            ServerSinkChain.Add(new ClientAddressServerChannelSinkProvider());
+			ClientSinkChain.Add(new BinaryClientFormatterSinkProvider());
+			ServerSinkChain.Add(new BinaryServerFormatterSinkProvider() { TypeFilterLevel = TypeFilterLevel.Full });
+			ServerSinkChain.Add(new ClientAddressServerChannelSinkProvider());
 		}
 
 		/// <summary>
@@ -206,7 +206,7 @@ namespace Zyan.Communication.Protocols.Tcp
 		/// <param name="authProvider">Authentication provider</param>
 		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
 		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>        
-        /// <param name="oaep">Specifies if OAEP padding should be activated</param>
+		/// <param name="oaep">Specifies if OAEP padding should be activated</param>
 		public TcpDuplexServerProtocolSetup(int tcpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm, bool oaep)
 			: this()
 		{
@@ -224,7 +224,7 @@ namespace Zyan.Communication.Protocols.Tcp
 		/// <param name="authProvider">Authentication provider</param>
 		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
 		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>        
-        /// <param name="oaep">Specifies if OAEP padding should be activated</param>
+		/// <param name="oaep">Specifies if OAEP padding should be activated</param>
 		/// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
 		/// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
 		/// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
@@ -240,32 +240,32 @@ namespace Zyan.Communication.Protocols.Tcp
 			TcpKeepAliveTime = keepAliveTime;
 			TcpKeepAliveInterval = KeepAliveInterval;
 		}
-        
-        /// <summary>
-        /// Adds encryption sinks to client and server sink chains, if encryption is needed.
-        /// </summary>
-        private void ConfigureEncryption()
-        {
-            if (_encryption)
-            {
-                this.AddClientSinkAfterFormatter(new CryptoClientChannelSinkProvider()
-                {
-                    Algorithm = _algorithm,
-                    Oaep = _oaep
-                });
-                this.AddServerSinkBeforeFormatter(new CryptoServerChannelSinkProvider()
-                {
-                    Algorithm = _algorithm,
-                    Oaep = _oaep,
-                    RequireCryptoClient = true
-                });
-            }
-        }
 
-        /// <summary>
-        /// Creates and configures a Remoting channel.        
-        /// </summary>
-        /// <returns>Remoting channel</returns>
+		/// <summary>
+		/// Adds encryption sinks to client and server sink chains, if encryption is needed.
+		/// </summary>
+		private void ConfigureEncryption()
+		{
+			if (_encryption)
+			{
+				this.AddClientSinkAfterFormatter(new CryptoClientChannelSinkProvider()
+				{
+					Algorithm = _algorithm,
+					Oaep = _oaep
+				});
+				this.AddServerSinkBeforeFormatter(new CryptoServerChannelSinkProvider()
+				{
+					Algorithm = _algorithm,
+					Oaep = _oaep,
+					RequireCryptoClient = true
+				});
+			}
+		}
+
+		/// <summary>
+		/// Creates and configures a Remoting channel.        
+		/// </summary>
+		/// <returns>Remoting channel</returns>
 		public override IChannel CreateChannel()
 		{
 			IChannel channel = ChannelServices.GetChannel(_channelName);
@@ -280,21 +280,21 @@ namespace Zyan.Communication.Protocols.Tcp
 				_channelSettings["keepAliveTime"] = _tcpKeepAliveTime;
 				_channelSettings["keepAliveInterval"] = _tcpKeepAliveInterval;
 
-                ConfigureEncryption();
+				ConfigureEncryption();
 
-                if (_channelFactory == null)
-                    throw new ApplicationException(LanguageResource.ApplicationException_NoChannelFactorySpecified);
+				if (_channelFactory == null)
+					throw new ApplicationException(LanguageResource.ApplicationException_NoChannelFactorySpecified);
 
-                channel = _channelFactory(_channelSettings, BuildClientSinkChain(), BuildServerSinkChain());
+				channel = _channelFactory(_channelSettings, BuildClientSinkChain(), BuildServerSinkChain());
 
-                if (!MonoCheck.IsRunningOnMono)
-                {
-                    if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
-                        RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
-                }
-                return channel;
-            }
-            return null;
+				if (!MonoCheck.IsRunningOnMono)
+				{
+					if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
+						RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
+				}
+				return channel;
+			}
+			return null;
 		}
 
 		/// <summary>

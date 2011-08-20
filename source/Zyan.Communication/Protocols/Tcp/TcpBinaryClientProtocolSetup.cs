@@ -5,6 +5,7 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Serialization.Formatters;
 using System.Security.Principal;
+using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication.Protocols.Tcp
 {
@@ -12,11 +13,11 @@ namespace Zyan.Communication.Protocols.Tcp
 	/// Client protocol setup for TCP communication with support for Windows authentication and security.
 	/// </summary>
 	public class TcpBinaryClientProtocolSetup : ClientProtocolSetup
-	{		
-		private bool _useWindowsSecurity=false;
-		private TokenImpersonationLevel _impersonationLevel=TokenImpersonationLevel.Identification;
-		private ProtectionLevel _protectionLevel=ProtectionLevel.EncryptAndSign;
-		
+	{
+		private bool _useWindowsSecurity = false;
+		private TokenImpersonationLevel _impersonationLevel = TokenImpersonationLevel.Identification;
+		private ProtectionLevel _protectionLevel = ProtectionLevel.EncryptAndSign;
+
 		/// <summary>
 		/// Gets or sets, if Windows Security should be used.
 		/// </summary>
@@ -28,7 +29,7 @@ namespace Zyan.Communication.Protocols.Tcp
 
 		/// <summary>
 		/// Gets or sets the level of impersonation.
-        /// </summary>
+		/// </summary>
 		public TokenImpersonationLevel ImpersonationLevel
 		{
 			get { return _impersonationLevel; }
@@ -46,31 +47,30 @@ namespace Zyan.Communication.Protocols.Tcp
 
 		/// <summary>
 		/// Gets or sets, if sockets should be cached and reused.
-        /// <remarks>
-        /// Caching sockets may reduce ressource consumption but may cause trouble in Network Load Balancing clusters.
-        /// </remarks>
+		/// <remarks>
+		/// Caching sockets may reduce ressource consumption but may cause trouble in Network Load Balancing clusters.
+		/// </remarks>
 		/// </summary>
-		public bool SocketCachingEnabled
-		{ get; set; }
+		public bool SocketCachingEnabled { get; set; }
 
 		/// <summary>
 		/// Creates a new instance of the TcpBinaryClientProtocolSetup class.
 		/// </summary>
-        public TcpBinaryClientProtocolSetup()
-            : base((settings, clientSinkChain, serverSinkChain) => new TcpChannel(settings, clientSinkChain, serverSinkChain))
+		public TcpBinaryClientProtocolSetup()
+			: base((settings, clientSinkChain, serverSinkChain) => new TcpChannel(settings, clientSinkChain, serverSinkChain))
 		{
 			SocketCachingEnabled = true;
 			_channelName = "TcpBinaryClientProtocol_" + Guid.NewGuid().ToString();
 
-            ClientSinkChain.Add(new BinaryClientFormatterSinkProvider());
-            ServerSinkChain.Add(new BinaryServerFormatterSinkProvider() { TypeFilterLevel = TypeFilterLevel.Full });
+			ClientSinkChain.Add(new BinaryClientFormatterSinkProvider());
+			ServerSinkChain.Add(new BinaryServerFormatterSinkProvider() { TypeFilterLevel = TypeFilterLevel.Full });
 		}
 
-        /// <summary>
-        /// Creates and configures a Remoting channel.        
-        /// </summary>
-        /// <returns>Remoting channel</returns>
-        public override IChannel CreateChannel()
+		/// <summary>
+		/// Creates and configures a Remoting channel.
+		/// </summary>
+		/// <returns>Remoting channel</returns>
+		public override IChannel CreateChannel()
 		{
 			IChannel channel = ChannelServices.GetChannel(_channelName);
 
@@ -87,19 +87,19 @@ namespace Zyan.Communication.Protocols.Tcp
 					_channelSettings["tokenImpersonationLevel"] = _impersonationLevel;
 					_channelSettings["protectionLevel"] = _protectionLevel;
 				}
-                if (_channelFactory == null)
-                    throw new ApplicationException(LanguageResource.ApplicationException_NoChannelFactorySpecified);
+				if (_channelFactory == null)
+					throw new ApplicationException(LanguageResource.ApplicationException_NoChannelFactorySpecified);
 
-                channel = _channelFactory(_channelSettings, BuildClientSinkChain(), BuildServerSinkChain());
+				channel = _channelFactory(_channelSettings, BuildClientSinkChain(), BuildServerSinkChain());
 
-                if (!MonoCheck.IsRunningOnMono)
-                {
-                    if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
-                        RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
-                }
-                return channel;
-            }
-            return null;
+				if (!MonoCheck.IsRunningOnMono)
+				{
+					if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
+						RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
+				}
+				return channel;
+			}
+			return null;
 		}
 	}
 }

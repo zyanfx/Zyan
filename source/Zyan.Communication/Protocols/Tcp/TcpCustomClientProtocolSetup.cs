@@ -4,6 +4,7 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Serialization.Formatters;
 using Zyan.Communication.ChannelSinks.Encryption;
+using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication.Protocols.Tcp
 {
@@ -18,30 +19,31 @@ namespace Zyan.Communication.Protocols.Tcp
 		private int _maxAttempts = 2;
 
 		/// <summary>
-        /// Creates a new instance of the TcpCustomClientProtocolSetup class.
+		/// Creates a new instance of the TcpCustomClientProtocolSetup class.
 		/// </summary>
-		public TcpCustomClientProtocolSetup() : base((settings,clientSinkChain,serverSinkChain) => new TcpChannel(settings,clientSinkChain,serverSinkChain))
+		public TcpCustomClientProtocolSetup()
+			: base((settings, clientSinkChain, serverSinkChain) => new TcpChannel(settings, clientSinkChain, serverSinkChain))
 		{
 			SocketCachingEnabled = true;
 			_channelName = "TcpCustomClientProtocolSetup" + Guid.NewGuid().ToString();
 
-            ClientSinkChain.Add(new BinaryClientFormatterSinkProvider());
-            ServerSinkChain.Add(new BinaryServerFormatterSinkProvider() { TypeFilterLevel = TypeFilterLevel.Full });
+			ClientSinkChain.Add(new BinaryClientFormatterSinkProvider());
+			ServerSinkChain.Add(new BinaryServerFormatterSinkProvider() { TypeFilterLevel = TypeFilterLevel.Full });
 		}
 
 		/// <summary>
-        /// Creates a new instance of the TcpCustomClientProtocolSetup class.
+		/// Creates a new instance of the TcpCustomClientProtocolSetup class.
 		/// </summary>
 		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
 		public TcpCustomClientProtocolSetup(bool encryption) : this()
-		{ 
+		{
 			_encryption = encryption;
 		}
 
 		/// <summary>
-        /// Creates a new instance of the TcpCustomClientProtocolSetup class.
+		/// Creates a new instance of the TcpCustomClientProtocolSetup class.
 		/// </summary>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
 		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
 		public TcpCustomClientProtocolSetup(bool encryption, string algorithm) : this()
 		{
@@ -50,26 +52,26 @@ namespace Zyan.Communication.Protocols.Tcp
 		}
 
 		/// <summary>
-        /// Creates a new instance of the TcpCustomClientProtocolSetup class.
+		/// Creates a new instance of the TcpCustomClientProtocolSetup class.
 		/// </summary>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
 		/// <param name="maxAttempts">Maximum number of connection attempts</param>
 		public TcpCustomClientProtocolSetup(bool encryption, string algorithm, int maxAttempts) : this()
-		{	
+		{
 			_encryption = encryption;
 			_algorithm = algorithm;
 			_maxAttempts = maxAttempts;
 		}
 
 		/// <summary>
-        /// Creates a new instance of the TcpCustomClientProtocolSetup class.
+		/// Creates a new instance of the TcpCustomClientProtocolSetup class.
 		/// </summary>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
 		/// <param name="oaep">Specifies if OAEP padding should be used</param>
 		public TcpCustomClientProtocolSetup(bool encryption, string algorithm, bool oaep) : this()
-		{			
+		{
 			_encryption = encryption;
 			_algorithm = algorithm;
 			_oaep = oaep;
@@ -78,12 +80,12 @@ namespace Zyan.Communication.Protocols.Tcp
 		/// <summary>
 		/// Creates a new instance of the TcpCustomClientProtocolSetup class.
 		/// </summary>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
-        /// <param name="maxAttempts">Maximum number of connection attempts</param>
-        /// <param name="oaep">Specifies if OAEP padding should be used</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+		/// <param name="maxAttempts">Maximum number of connection attempts</param>
+		/// <param name="oaep">Specifies if OAEP padding should be used</param>
 		public TcpCustomClientProtocolSetup(bool encryption, string algorithm, int maxAttempts, bool oaep) : this()
-		{			
+		{
 			_encryption = encryption;
 			_algorithm = algorithm;
 			_maxAttempts = maxAttempts;
@@ -117,66 +119,66 @@ namespace Zyan.Communication.Protocols.Tcp
 			set { _maxAttempts = value; }
 		}
 
-        /// <summary>
-        /// Gets or sets, if sockets should be cached and reused.
-        /// <remarks>
-        /// Caching sockets may reduce ressource consumption but may cause trouble in Network Load Balancing clusters.
-        /// </remarks>
-        /// </summary>
+		/// <summary>
+		/// Gets or sets, if sockets should be cached and reused.
+		/// <remarks>
+		/// Caching sockets may reduce ressource consumption but may cause trouble in Network Load Balancing clusters.
+		/// </remarks>
+		/// </summary>
 		public bool SocketCachingEnabled
 		{ get; set; }
 
-        /// <summary>
-        /// Configures encrpytion sinks, if encryption is enabled.
-        /// </summary>
-        private void ConfigureEncryption()
-        {
-            if (_encryption)
-            {
-                this.AddClientSinkAfterFormatter(new CryptoClientChannelSinkProvider()
-                {
-                    Algorithm = _algorithm,
-                    MaxAttempts = _maxAttempts,
-                    Oaep = _oaep
-                });
-                this.AddServerSinkBeforeFormatter(new CryptoServerChannelSinkProvider()
-                {
-                    Algorithm = _algorithm,
-                    RequireCryptoClient = true,
-                    Oaep = _oaep
-                });
-            }
-        }
+		/// <summary>
+		/// Configures encrpytion sinks, if encryption is enabled.
+		/// </summary>
+		private void ConfigureEncryption()
+		{
+			if (_encryption)
+			{
+				this.AddClientSinkAfterFormatter(new CryptoClientChannelSinkProvider()
+				{
+					Algorithm = _algorithm,
+					MaxAttempts = _maxAttempts,
+					Oaep = _oaep
+				});
+				this.AddServerSinkBeforeFormatter(new CryptoServerChannelSinkProvider()
+				{
+					Algorithm = _algorithm,
+					RequireCryptoClient = true,
+					Oaep = _oaep
+				});
+			}
+		}
 
-        /// <summary>
-        /// Creates and configures a Remoting channel.        
-        /// </summary>
-        /// <returns>Remoting channel</returns>
+		/// <summary>
+		/// Creates and configures a Remoting channel.        
+		/// </summary>
+		/// <returns>Remoting channel</returns>
 		public override IChannel CreateChannel()
 		{
 			IChannel channel = ChannelServices.GetChannel(_channelName);
 
 			if (channel == null)
-			{	
+			{
 				_channelSettings["name"] = _channelName;
 				_channelSettings["port"] = 0;
 				_channelSettings["socketCacheTimeout"] = 0;
 				_channelSettings["socketCachePolicy"] = SocketCachingEnabled ? SocketCachePolicy.Default : SocketCachePolicy.AbsoluteTimeout;
 				_channelSettings["secure"] = false;
 
-                ConfigureEncryption();
-				
-                if (_channelFactory == null)
-                    throw new ApplicationException(LanguageResource.ApplicationException_NoChannelFactorySpecified);
+				ConfigureEncryption();
 
-                channel = _channelFactory(_channelSettings, BuildClientSinkChain(), BuildServerSinkChain());
-                
-                if (!MonoCheck.IsRunningOnMono)
-                {
-                    if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
-                        RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
-                }
-                return channel;
+				if (_channelFactory == null)
+					throw new ApplicationException(LanguageResource.ApplicationException_NoChannelFactorySpecified);
+
+				channel = _channelFactory(_channelSettings, BuildClientSinkChain(), BuildServerSinkChain());
+
+				if (!MonoCheck.IsRunningOnMono)
+				{
+					if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
+						RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
+				}
+				return channel;
 			}
 			return null;
 		}

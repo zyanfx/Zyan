@@ -7,11 +7,11 @@ using System.Runtime.Remoting.Messaging;
 using System.Security;
 using System.Security.Principal;
 using System.Transactions;
+using Zyan.Communication.Delegates;
 using Zyan.Communication.Notification;
 using Zyan.Communication.Security;
 using Zyan.Communication.SessionMgmt;
 using Zyan.Communication.Toolbox;
-using Zyan.Communication.Delegates;
 
 namespace Zyan.Communication
 {
@@ -243,37 +243,53 @@ namespace Zyan.Communication
 
 			ProcessBeforeInvoke(trackingID, ref interfaceName, ref delegateCorrelationSet, ref methodName, ref args);
 
-			// look up the component registration info
-			if (!_host.ComponentRegistry.ContainsKey(interfaceName))
+			TransactionScope scope = null;
+
+			try
 			{
-				var ex = new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_CannotFindComponentForInterface, interfaceName));
-				_host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
+				// look up the component registration info
+				if (!_host.ComponentRegistry.ContainsKey(interfaceName))
+				{
+					throw new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_CannotFindComponentForInterface, interfaceName));
+				}
+
+				// check for logical context data
+				var data = CallContext.GetData("__ZyanContextData_" + _host.Name) as LogicalCallContextData;
+				if (data == null)
+				{
+					throw new SecurityException(LanguageResource.SecurityException_ContextInfoMissing);
+				}
+
+				// validate session
+				var sessionID = data.Store.ContainsKey("sessionid") ? (Guid)data.Store["sessionid"] : Guid.Empty;
+				if (!_host.SessionManager.ExistSession(sessionID))
+				{
+					throw new InvalidSessionException(string.Format(LanguageResource.InvalidSessionException_SessionIDInvalid, sessionID.ToString()));
+				}
+
+				// set current session
+				var session = _host.SessionManager.GetSessionBySessionID(sessionID);
+				session.Timestamp = DateTime.Now;
+				ServerSession.CurrentSession = session;
+				PutClientAddressToCurrentSession();
+
+				// transfer implicit transaction
+				var transaction = data.Store.ContainsKey("transaction") ? (Transaction)data.Store["transaction"] : null;
+				if (transaction != null)
+				{
+					scope = new TransactionScope(transaction);
+				}
+			}
+			catch (Exception ex)
+			{
+				_host.OnInvokeCanceled(new InvokeCanceledEventArgs
+				{
+					TrackingID = trackingID,
+					CancelException = ex
+				});
+
 				throw ex;
 			}
-
-			// check for logical context data
-			var data = CallContext.GetData("__ZyanContextData_" + _host.Name) as LogicalCallContextData;
-			if (data == null)
-			{
-				var ex = new SecurityException(LanguageResource.SecurityException_ContextInfoMissing);
-				_host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
-				throw ex;
-			}
-
-			// validate session
-			var sessionID = data.Store.ContainsKey("sessionid") ? (Guid)data.Store["sessionid"] : Guid.Empty;
-			if (!_host.SessionManager.ExistSession(sessionID))
-			{
-				var ex = new InvalidSessionException(string.Format(LanguageResource.InvalidSessionException_SessionIDInvalid, sessionID.ToString()));
-				_host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
-				throw ex;
-			}
-
-			// set current session
-			var session = _host.SessionManager.GetSessionBySessionID(sessionID);
-			session.Timestamp = DateTime.Now;
-			ServerSession.CurrentSession = session;
-			PutClientAddressToCurrentSession();
 
 			// convert method arguments
 			var delegateParamIndexes = new Dictionary<int, DelegateInterceptor>();
@@ -301,15 +317,12 @@ namespace Zyan.Communication
 				}
 			}
 
-			// transfer implicit transaction
-			var transaction = data.Store.ContainsKey("transaction") ? (Transaction)data.Store["transaction"] : null;
-			var scope = transaction != null ? new TransactionScope(transaction) : null;
-
-			// get component instance and wire it up
+			// get component instance
 			var registration = _host.ComponentRegistry[interfaceName];
 			var instance = _host.GetComponentInstance(registration);
 			var type = instance.GetType();
 
+			// wire up event handlers
 			Dictionary<Guid, Delegate> wiringList = null;
 			if (registration.ActivationType == ActivationType.SingleCall)
 			{
@@ -361,7 +374,13 @@ namespace Zyan.Communication
 			catch (Exception ex)
 			{
 				exceptionThrown = true;
-				_host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
+
+				_host.OnInvokeCanceled(new InvokeCanceledEventArgs
+				{
+					TrackingID = trackingID,
+					CancelException = ex
+				});
+
 				throw ex;
 			}
 			finally
