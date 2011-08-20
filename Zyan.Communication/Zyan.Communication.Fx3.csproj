@@ -168,7 +168,6 @@
       <DependentUpon>LanguageResource.resx</DependentUpon>
     </Compile>
     <Compile Include="LoginEventArgs.cs" />
-    <Compile Include="MonoCheck.cs" />
     <Compile Include="Notification\NotificationEventArgs.cs" />
     <Compile Include="Notification\NotificationReceiver.cs" />
     <Compile Include="Notification\NotificationSender.cs" />
@@ -226,6 +225,7 @@
     <Compile Include="Toolbox\ExtensionsFx3.cs" />
     <Compile Include="Toolbox\LazyFx3.cs" />
     <Compile Include="Toolbox\MessageHelpers.cs" />
+    <Compile Include="Toolbox\MonoCheck.cs" />
     <Compile Include="Toolbox\SplitOrderedListFx3.cs" />
     <Compile Include="Toolbox\TypeComparer.cs" />
     <Compile Include="Version.cs" />

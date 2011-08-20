@@ -6,12 +6,12 @@ using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Serialization.Formatters;
 using System.Security.Principal;
 using Zyan.Communication.Security;
-using Zyan.Communication.ChannelSinks.ClientAddress;
+using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication.Protocols.Tcp
 {
 	/// <summary>
-    /// Server protocol setup for TCP communication with support for Windows authentication and security.
+	/// Server protocol setup for TCP communication with support for Windows authentication and security.
 	/// </summary>
 	public class TcpBinaryServerProtocolSetup : ServerProtocolSetup
 	{
@@ -26,53 +26,53 @@ namespace Zyan.Communication.Protocols.Tcp
 		public int TcpPort
 		{
 			get { return _tcpPort; }
-			set 
+			set
 			{
 				if (_tcpPort < 0 || _tcpPort > 65535)
 					throw new ArgumentOutOfRangeException("tcpPort", LanguageResource.ArgumentOutOfRangeException_InvalidTcpPortRange);
-				
-				_tcpPort = value; 
+
+				_tcpPort = value;
 			}
 		}
 
-        /// <summary>
-        /// Gets or sets the level of impersonation.
-        /// </summary>
-        public TokenImpersonationLevel ImpersonationLevel
-        {
-            get { return _impersonationLevel; }
-            set { _impersonationLevel = value; }
-        }
+		/// <summary>
+		/// Gets or sets the level of impersonation.
+		/// </summary>
+		public TokenImpersonationLevel ImpersonationLevel
+		{
+			get { return _impersonationLevel; }
+			set { _impersonationLevel = value; }
+		}
 
-        /// <summary>
-        /// Get or sets the level of protection (sign or encrypt, or both)
-        /// </summary>
-        public ProtectionLevel ProtectionLevel
-        {
-            get { return _protectionLevel; }
-            set { _protectionLevel = value; }
-        }
+		/// <summary>
+		/// Get or sets the level of protection (sign or encrypt, or both)
+		/// </summary>
+		public ProtectionLevel ProtectionLevel
+		{
+			get { return _protectionLevel; }
+			set { _protectionLevel = value; }
+		}
 
-        /// <summary>
-        /// Gets or sets, if sockets should be cached and reused.
-        /// <remarks>
-        /// Caching sockets may reduce ressource consumption but may cause trouble in Network Load Balancing clusters.
-        /// </remarks>
-        /// </summary>
-        public bool SocketCachingEnabled
-        { get; set; }
+		/// <summary>
+		/// Gets or sets, if sockets should be cached and reused.
+		/// <remarks>
+		/// Caching sockets may reduce ressource consumption but may cause trouble in Network Load Balancing clusters.
+		/// </remarks>
+		/// </summary>
+		public bool SocketCachingEnabled
+		{ get; set; }
 
 		/// <summary>
 		/// Creates a new instance of the TcpBinaryServerProtocolSetup class.
 		/// </summary>
-        public TcpBinaryServerProtocolSetup()
-            : base((settings, clientSinkChain, serverSinkChain) => new TcpChannel(settings, clientSinkChain, serverSinkChain))
+		public TcpBinaryServerProtocolSetup()
+			: base((settings, clientSinkChain, serverSinkChain) => new TcpChannel(settings, clientSinkChain, serverSinkChain))
 		{
 			SocketCachingEnabled = true;
-            _channelName = "TcpBinaryServerProtocolSetup_" + Guid.NewGuid().ToString();
+			_channelName = "TcpBinaryServerProtocolSetup_" + Guid.NewGuid().ToString();
 
-            ClientSinkChain.Add(new BinaryClientFormatterSinkProvider());
-            ServerSinkChain.Add(new BinaryServerFormatterSinkProvider() { TypeFilterLevel = TypeFilterLevel.Full });
+			ClientSinkChain.Add(new BinaryClientFormatterSinkProvider());
+			ServerSinkChain.Add(new BinaryServerFormatterSinkProvider() { TypeFilterLevel = TypeFilterLevel.Full });
 		}
 
 		/// <summary>
@@ -84,11 +84,11 @@ namespace Zyan.Communication.Protocols.Tcp
 			TcpPort = tcpPort;
 		}
 
-        /// <summary>
-        /// Creates and configures a Remoting channel.        
-        /// </summary>
-        /// <returns>Remoting channel</returns>
-        public override IChannel CreateChannel()
+		/// <summary>
+		/// Creates and configures a Remoting channel.
+		/// </summary>
+		/// <returns>Remoting channel</returns>
+		public override IChannel CreateChannel()
 		{
 			IChannel channel = ChannelServices.GetChannel(_channelName);
 
@@ -105,24 +105,24 @@ namespace Zyan.Communication.Protocols.Tcp
 					_channelSettings["tokenImpersonationLevel"] = _impersonationLevel;
 					_channelSettings["protectionLevel"] = _protectionLevel;
 				}
-                if (_channelFactory == null)
-                    throw new ApplicationException(LanguageResource.ApplicationException_NoChannelFactorySpecified);
+				if (_channelFactory == null)
+					throw new ApplicationException(LanguageResource.ApplicationException_NoChannelFactorySpecified);
 
-                channel = _channelFactory(_channelSettings, BuildClientSinkChain(), BuildServerSinkChain());
+				channel = _channelFactory(_channelSettings, BuildClientSinkChain(), BuildServerSinkChain());
 
-                if (!MonoCheck.IsRunningOnMono)
-                {
-                    if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
-                        RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
-                }
-                return channel;
-            }
-            return null;
+				if (!MonoCheck.IsRunningOnMono)
+				{
+					if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
+						RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
+				}
+				return channel;
+			}
+			return null;
 		}
 
-        /// <summary>
-        /// Gets the authentication provider.
-        /// </summary>
+		/// <summary>
+		/// Gets the authentication provider.
+		/// </summary>
 		public override IAuthenticationProvider AuthenticationProvider
 		{
 			get
@@ -132,10 +132,10 @@ namespace Zyan.Communication.Protocols.Tcp
 				else
 					return new NullAuthenticationProvider();
 			}
-            set
-            {
-                throw new NotSupportedException();
-            }
+			set
+			{
+				throw new NotSupportedException();
+			}
 		}
 	}
 }
