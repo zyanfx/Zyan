@@ -5,14 +5,15 @@ using System.Runtime.Serialization.Formatters;
 using Zyan.Communication.ChannelSinks.Encryption;
 using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp.DuplexChannel;
+using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication.Protocols.Tcp
 {
 	/// <summary>
-    /// Client protocol setup for bi-directional TCP communication with support for user defined authentication and security.
+	/// Client protocol setup for bi-directional TCP communication with support for user defined authentication and security.
 	/// </summary>
 	public class TcpDuplexClientProtocolSetup : ClientProtocolSetup
-	{		
+	{
 		private bool _encryption = true;
 		private string _algorithm = "3DES";
 		private bool _oaep = false;
@@ -50,21 +51,21 @@ namespace Zyan.Communication.Protocols.Tcp
 		}
 
 		/// <summary>
-        /// Creates a new instance of the TcpDuplexClientProtocolSetup class.
+		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
 		/// </summary>
-        public TcpDuplexClientProtocolSetup()
-            : base((settings, clientSinkChain, serverSinkChain) => new TcpExChannel(settings, clientSinkChain, serverSinkChain))
-		{	
+		public TcpDuplexClientProtocolSetup()
+			: base((settings, clientSinkChain, serverSinkChain) => new TcpExChannel(settings, clientSinkChain, serverSinkChain))
+		{
 			_channelName = "TcpDuplexClientProtocolSetup" + Guid.NewGuid().ToString();
 
-            ClientSinkChain.Add(new BinaryClientFormatterSinkProvider());
-            ServerSinkChain.Add(new BinaryServerFormatterSinkProvider() { TypeFilterLevel = TypeFilterLevel.Full });
+			ClientSinkChain.Add(new BinaryClientFormatterSinkProvider());
+			ServerSinkChain.Add(new BinaryServerFormatterSinkProvider() { TypeFilterLevel = TypeFilterLevel.Full });
 		}
 
-        /// <summary>
-        /// Creates a new instance of the TcpDuplexClientProtocolSetup class.
-        /// </summary>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <summary>
+		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
+		/// </summary>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
 		public TcpDuplexClientProtocolSetup(bool encryption)
 			: this()
 		{
@@ -72,9 +73,9 @@ namespace Zyan.Communication.Protocols.Tcp
 		}
 
 		/// <summary>
-        /// Creates a new instance of the TcpDuplexClientProtocolSetup class.
+		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
 		/// </summary>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
 		/// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
 		/// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
 		/// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
@@ -88,10 +89,10 @@ namespace Zyan.Communication.Protocols.Tcp
 		}
 
 		/// <summary>
-        /// Creates a new instance of the TcpDuplexClientProtocolSetup class.
+		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
 		/// </summary>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
 		public TcpDuplexClientProtocolSetup(bool encryption, string algorithm)
 			: this()
 		{
@@ -100,10 +101,10 @@ namespace Zyan.Communication.Protocols.Tcp
 		}
 
 		/// <summary>
-        /// Creates a new instance of the TcpDuplexClientProtocolSetup class.
+		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
 		/// </summary>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
 		/// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
 		/// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
 		/// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
@@ -118,10 +119,10 @@ namespace Zyan.Communication.Protocols.Tcp
 		}
 
 		/// <summary>
-        /// Creates a new instance of the TcpDuplexClientProtocolSetup class.
+		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
 		/// </summary>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
 		/// <param name="maxAttempts">Maximum number of connection attempts</param>
 		public TcpDuplexClientProtocolSetup(bool encryption, string algorithm, int maxAttempts)
 			: this()
@@ -132,10 +133,10 @@ namespace Zyan.Communication.Protocols.Tcp
 		}
 
 		/// <summary>
-        /// Creates a new instance of the TcpDuplexClientProtocolSetup class.
+		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
 		/// </summary>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
 		/// <param name="maxAttempts">Maximum number of connection attempts</param>
 		/// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
 		/// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
@@ -152,11 +153,11 @@ namespace Zyan.Communication.Protocols.Tcp
 		}
 
 		/// <summary>
-        /// Creates a new instance of the TcpDuplexClientProtocolSetup class.
+		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
 		/// </summary>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
-        /// <param name="oaep">Specifies if OAEP padding should be activated</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
+		/// <param name="oaep">Specifies if OAEP padding should be activated</param>
 		public TcpDuplexClientProtocolSetup(bool encryption, string algorithm, bool oaep)
 			: this()
 		{
@@ -166,11 +167,11 @@ namespace Zyan.Communication.Protocols.Tcp
 		}
 
 		/// <summary>
-        /// Creates a new instance of the TcpDuplexClientProtocolSetup class.
+		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
 		/// </summary>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
-        /// <param name="oaep">Specifies if OAEP padding should be activated</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
+		/// <param name="oaep">Specifies if OAEP padding should be activated</param>
 		/// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
 		/// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
 		/// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
@@ -186,12 +187,12 @@ namespace Zyan.Communication.Protocols.Tcp
 		}
 
 		/// <summary>
-        /// Creates a new instance of the TcpDuplexClientProtocolSetup class.
+		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
 		/// </summary>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
 		/// <param name="maxAttempts">Maximum number of connection attempts</param>
-        /// <param name="oaep">Specifies if OAEP padding should be activated</param>
+		/// <param name="oaep">Specifies if OAEP padding should be activated</param>
 		public TcpDuplexClientProtocolSetup(bool encryption, string algorithm, int maxAttempts, bool oaep)
 			: this()
 		{
@@ -202,12 +203,12 @@ namespace Zyan.Communication.Protocols.Tcp
 		}
 
 		/// <summary>
-        /// Creates a new instance of the TcpDuplexClientProtocolSetup class.
+		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
 		/// </summary>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
 		/// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
 		/// <param name="maxAttempts">Maximum number of connection attempts</param>
-        /// <param name="oaep">Specifies if OAEP padding should be activated</param>
+		/// <param name="oaep">Specifies if OAEP padding should be activated</param>
 		/// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
 		/// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
 		/// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
@@ -250,33 +251,33 @@ namespace Zyan.Communication.Protocols.Tcp
 			set { _maxAttempts = value; }
 		}
 
-        /// <summary>
-        /// Adds encryption sinks to client and server sink chains, if encryption is needed.
-        /// </summary>
-        private void ConfigureEncryption()
-        {
-            if (_encryption)
-            {
-                this.AddClientSinkAfterFormatter(new CryptoClientChannelSinkProvider() 
-                { 
-                    Algorithm=_algorithm,
-                    Oaep=_oaep,
-                    MaxAttempts=_maxAttempts
-                });
-                this.AddServerSinkBeforeFormatter(new CryptoServerChannelSinkProvider()
-                {
-                    Algorithm=_algorithm,
-                    Oaep=_oaep,
-                    RequireCryptoClient=true
-                });
-            }
-        }
+		/// <summary>
+		/// Adds encryption sinks to client and server sink chains, if encryption is needed.
+		/// </summary>
+		private void ConfigureEncryption()
+		{
+			if (_encryption)
+			{
+				this.AddClientSinkAfterFormatter(new CryptoClientChannelSinkProvider()
+				{
+					Algorithm = _algorithm,
+					Oaep = _oaep,
+					MaxAttempts = _maxAttempts
+				});
+				this.AddServerSinkBeforeFormatter(new CryptoServerChannelSinkProvider()
+				{
+					Algorithm = _algorithm,
+					Oaep = _oaep,
+					RequireCryptoClient = true
+				});
+			}
+		}
 
-        /// <summary>
-        /// Creates and configures a Remoting channel.        
-        /// </summary>
-        /// <returns>Remoting channel</returns>
-        public override IChannel CreateChannel()
+		/// <summary>
+		/// Creates and configures a Remoting channel.        
+		/// </summary>
+		/// <returns>Remoting channel</returns>
+		public override IChannel CreateChannel()
 		{
 			IChannel channel = ChannelServices.GetChannel(_channelName);
 
@@ -290,21 +291,21 @@ namespace Zyan.Communication.Protocols.Tcp
 				_channelSettings["keepAliveTime"] = _tcpKeepAliveTime;
 				_channelSettings["keepAliveInterval"] = _tcpKeepAliveInterval;
 
-                ConfigureEncryption();
+				ConfigureEncryption();
 
-                if (_channelFactory == null)
-                    throw new ApplicationException(LanguageResource.ApplicationException_NoChannelFactorySpecified);
+				if (_channelFactory == null)
+					throw new ApplicationException(LanguageResource.ApplicationException_NoChannelFactorySpecified);
 
-                channel = _channelFactory(_channelSettings, BuildClientSinkChain(), BuildServerSinkChain());
+				channel = _channelFactory(_channelSettings, BuildClientSinkChain(), BuildServerSinkChain());
 
-                if (!MonoCheck.IsRunningOnMono)
-                {
-                    if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
-                        RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
-                }
-                return channel;
-            }
-            return null;
+				if (!MonoCheck.IsRunningOnMono)
+				{
+					if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
+						RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
+				}
+				return channel;
+			}
+			return null;
 		}
 	}
 }
