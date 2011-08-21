@@ -22,19 +22,19 @@ namespace Zyan.Communication
 	/// </summary>
 	public class ZyanConnection : IDisposable
 	{
-		#region Konfiguration
+		#region Configuration
 
-		// URL zum Server-Prozess
+		// URL of server
 		private string _serverUrl = string.Empty;
 
-		// Name des entfernten Komponentenhosts
+		// Name of the remote component host
 		private string _componentHostName = string.Empty;
 
-		// Protokoll-Einstellungen
+		// Protocol and communication settings
 		private IClientProtocolSetup _protocolSetup = null;
 
 		/// <summary>
-		/// Gibt den URL zum Server-Prozess zurück.
+		/// Gets the URL of the remote server.
 		/// </summary>
 		public string ServerUrl
 		{
@@ -42,7 +42,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Gibt den Namen des Komponentenhosts zurück.
+		/// Gets the name of the remote component host.
 		/// </summary>
 		public string ComponentHostName
 		{
@@ -51,10 +51,10 @@ namespace Zyan.Communication
 
 		#endregion
 
-		#region Konstruktoren
+		#region Construction
 
 		/// <summary>
-		/// Konstruktor.
+		/// Creates a new instance of the ZyanConnection class.
 		/// </summary>
 		/// <param name="setup">Objekt mit Konfigurationseinstellungen für die Verbindung</param>
 		public ZyanConnection(ZyanConnectionSetup setup)
@@ -62,226 +62,169 @@ namespace Zyan.Communication
 		{ }
 
 		/// <summary>
-		/// Konstruktor.
+		/// Creates a new instance of the ZyanConnection class.
 		/// </summary>
-		/// <param name="serverUrl">Server-URL (z.B. "tcp://server1:46123/ebcserver")</param>                
+		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp")</param>                
 		public ZyanConnection(string serverUrl)
 			: this(serverUrl, new TcpBinaryClientProtocolSetup(), null, false, true)
 		{ }
 
 		/// <summary>
-		/// Konstruktor.
+		/// Creates a new instance of the ZyanConnection class.
 		/// </summary>
-		/// <param name="serverUrl">Server-URL (z.B. "tcp://server1:46123/ebcserver")</param>                
-		/// <param name="autoLoginOnExpiredSession">Gibt an, ob sich der Proxy automatisch neu anmelden soll, wenn die Sitzung abgelaufen ist</param>
+		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp")</param>                
+		/// <param name="autoLoginOnExpiredSession">Specifies whether the proxy should relogin automatically when the session expired</param>
 		public ZyanConnection(string serverUrl, bool autoLoginOnExpiredSession)
 			: this(serverUrl, new TcpBinaryClientProtocolSetup(), null, autoLoginOnExpiredSession, !autoLoginOnExpiredSession)
 		{ }
 
 		/// <summary>
-		/// Konstruktor.
+		/// Creates a new instance of the ZyanConnection class.
 		/// </summary>
-		/// <param name="serverUrl">Server-URL (z.B. "tcp://server1:46123/ebcserver")</param>                
-		/// <param name="protocolSetup">Protokoll-Einstellungen</param>
+		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp")</param>                
+		/// <param name="protocolSetup">Protocol an communication settings</param>
 		public ZyanConnection(string serverUrl, IClientProtocolSetup protocolSetup)
 			: this(serverUrl, protocolSetup, null, false, true)
 		{ }
 
 		/// <summary>
-		/// Konstruktor.
+		/// Creates a new instance of the ZyanConnection class.
 		/// </summary>
-		/// <param name="serverUrl">Server-URL (z.B. "tcp://server1:46123/ebcserver")</param>                
-		/// <param name="protocolSetup">Protokoll-Einstellungen</param>
-		/// <param name="autoLoginOnExpiredSession">Gibt an, ob sich der Proxy automatisch neu anmelden soll, wenn die Sitzung abgelaufen ist</param>
+		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp")</param>                
+		/// <param name="protocolSetup">Protocol an communication settings</param>
+		/// <param name="autoLoginOnExpiredSession">Specifies whether the proxy should relogin automatically when the session expired</param>
 		public ZyanConnection(string serverUrl, IClientProtocolSetup protocolSetup, bool autoLoginOnExpiredSession)
 			: this(serverUrl, protocolSetup, null, autoLoginOnExpiredSession, true)
 		{ }
 
 		/// <summary>
-		/// Konstruktor.
+		/// Creates a new instance of the ZyanConnection class.
 		/// </summary>
-		/// <param name="serverUrl">Server-URL (z.B. "tcp://server1:46123/ebcserver")</param>        
-		/// <param name="protocolSetup">Protokoll-Einstellungen</param>
-		/// <param name="credentials">Anmeldeinformationen</param>
-		/// <param name="autoLoginOnExpiredSession">Gibt an, ob sich der Proxy automatisch neu anmelden soll, wenn die Sitzung abgelaufen ist</param>
-		/// <param name="keepSessionAlive">Gib an, ob die Sitzung automatisch verlängert werden soll</param>
+		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp")</param>        
+		/// <param name="protocolSetup">Protocol an communication settings</param>
+		/// <param name="credentials">Login credentials</param>
+		/// <param name="autoLoginOnExpiredSession">Specifies whether the proxy should relogin automatically when the session expired</param>
+		/// <param name="keepSessionAlive">Specifies whether the session should be automaticly kept alive</param>
 		public ZyanConnection(string serverUrl, IClientProtocolSetup protocolSetup, Hashtable credentials, bool autoLoginOnExpiredSession, bool keepSessionAlive)
 		{
-			// Wenn kein Server-URL angegeben wurde ...
 			if (string.IsNullOrEmpty(serverUrl))
-				// Ausnahme werfen
 				throw new ArgumentException(LanguageResource.ArgumentException_ServerUrlMissing, "serverUrl");
 
-			// Wenn keine Protokoll-Einstellungen angegeben wurde ...
 			if (protocolSetup == null)
-				// Ausnahme werfen
 				throw new ArgumentNullException("protocolSetup");
 
-			// Protokoll-Einstellungen übernehmen
 			_protocolSetup = protocolSetup;
-
-			// Eindeutigen Sitzungsschlüssel generieren
 			_sessionID = Guid.NewGuid();
-
-			// Server-URL übernehmen
 			_serverUrl = serverUrl;
-
-			// Einstellung für automatisches Anmelden bei abgelaufener Sitzung übernehmen
 			_autoLoginOnExpiredSession = autoLoginOnExpiredSession;
-
-			// Einstellung für automatische Sitzungsverlängung übernehmen
 			_keepSessionAlive = keepSessionAlive;
 
-			// Wenn automatisches Anmelden aktiv ist ...
 			if (_autoLoginOnExpiredSession)
-				// Anmeldedaten speichern
 				_autoLoginCredentials = credentials;
 
-			// Verwaltung für Serialisierungshandling erzeugen
 			_serializationHandling = new SerializationHandlerRepository();
-
-			// Standardmäßig keine Aufrufabfangvorrichtungen verarbeiten
 			CallInterceptionEnabled = false;
-
-			// Auflistung für Aufrufabfangvorrichtungen erzeugen
 			_callInterceptors = new CallInterceptorCollection();
-
-			// register standard serialization handlers
 			RegisterStandardSerializationHandlers();
-
-			// Server-URL in Bestandteile zerlegen
 			string[] addressParts = _serverUrl.Split('/');
-
-			// Name des Komponentenhots speichern
 			_componentHostName = addressParts[addressParts.Length - 1];
-
-			// TCP-Kommunikationskanal öffnen
+			
 			IChannel channel = _protocolSetup.CreateChannel();
 
-			// Wenn der Kanal erzeugt wurde ...
 			if (channel != null)
-				// Kanal registrieren
 				ChannelServices.RegisterChannel(channel, false);
 
-			// Wörterbuch für Benachrichtigungs-Registrierungen erzeugen
 			_subscriptions = new Dictionary<Guid, NotificationReceiver>();
-
-			// Wenn leere Anmeldeinformationen angegben wurden ...
+			
 			if (credentials != null && credentials.Count == 0)
-				// Auflistung löschen
 				credentials = null;
 
-			// Am Server anmelden
-			RemoteComponentFactory.Logon(_sessionID, credentials);
+			RemoteDispatcher.Logon(_sessionID, credentials);
 
-			// Registrierte Komponenten vom Server abrufen
-			_registeredComponents = new List<ComponentInfo>(RemoteComponentFactory.GetRegisteredComponents());
+			_registeredComponents = new List<ComponentInfo>(RemoteDispatcher.GetRegisteredComponents());
+			_sessionAgeLimit = RemoteDispatcher.SessionAgeLimit;
 
-			// Sitzungslimit abrufen
-			_sessionAgeLimit = RemoteComponentFactory.SessionAgeLimit;
-
-			// Zeitgeber starten (Wenn die automatische Sitzungsverlängerung aktiv ist)
 			StartKeepSessionAliveTimer();
 
-			// Verbindung der Auflistung zufügen
 			_connections.Add(this);
 		}
 
 		#endregion
 
-		#region Sitzungsverwaltung
+		#region Session Management
 
-		// Sitzungsschlüssel
+		// Unique Session key
 		private Guid _sessionID = Guid.Empty;
 
-		// Schalter für automatisches Anmelden, bei abgelaufender Sitzung
+		// Switch for relogin after expired session
 		private bool _autoLoginOnExpiredSession = false;
 
-		// Anmeldeinformationen für automatisches Anmelden
+		// Login credentials
 		private Hashtable _autoLoginCredentials = null;
 
-		// Schalter für automatische Sitzungsverlängerung
+		// Switch for keeping session alive
 		private bool _keepSessionAlive = true;
 
-		// Zeitgeber
+		// Timer to provide interval for keeping session alive
 		private Timer _keepSessionAliveTimer = null;
 
-		// Maximale Sitzungslebensdauer in Minuten
+		// Maximum session lifetime (in minutes)
 		private int _sessionAgeLimit = 0;
 
 		/// <summary>
-		/// Bereitet den Aufrufkontext für die Übertragung vor.
+		/// Prepares the .NET Remoting call context before a remote call.
 		/// </summary>
 		internal void PrepareCallContext(bool implicitTransactionTransfer)
 		{
-			// Transferobjekt für Kontextdaten erzeugen, die implizit übertragen werden sollen 
 			LogicalCallContextData data = new LogicalCallContextData();
-
-			// Sitzungsschlüssel im Transferobjekt ablegen
 			data.Store.Add("sessionid", _sessionID);
 
-			// Wenn eine Umgebungstransaktion aktiv ist die implizite Transaktionsübertragung eingeschaltet ist ...
 			if (implicitTransactionTransfer && Transaction.Current != null)
 			{
-				// Umgebungstransaktion abrufen
 				Transaction transaction = Transaction.Current;
 
-				// Wenn die Transaktion noch aktiv ist ...
 				if (transaction.TransactionInformation.Status == TransactionStatus.InDoubt ||
 					transaction.TransactionInformation.Status == TransactionStatus.Active)
 				{
-					// Transaktion im Transferobjekt ablegen                        
 					data.Store.Add("transaction", transaction);
 				}
 			}
-			// Transferobjekt in den Aufrufkontext einhängen
 			CallContext.SetData("__ZyanContextData_" + _componentHostName, data);
 		}
 
 		/// <summary>
-		/// Startet den Zeitgeber für automatische Sitzungsverlängerung.
+		/// Starts the session keep alive timer.
 		/// <remarks>
-		/// Wenn der Zeitgeber läuft, wird er neu gestartet.
+		/// If the timer runs already, it will be restarted with current settings.
 		/// </remarks>
 		/// </summary>
 		private void StartKeepSessionAliveTimer()
 		{
-			// Wenn der Zeitgeber für automatische Sitzungsverlängerung existiert ...
 			if (_keepSessionAliveTimer != null)
-				// Zeitgeber entsorgen
 				_keepSessionAliveTimer.Dispose();
 
-			// Wenn die Sitzung automatisch verlängert werden soll ...
 			if (_keepSessionAlive)
 			{
-				// Intervall in Millisekunden berechnen
 				int interval = (_sessionAgeLimit / 2) * 60000;
-				// Zeitgeber erzeugen
 				_keepSessionAliveTimer = new Timer(new TimerCallback(KeepSessionAlive), null, interval, interval);
 			}
 		}
 
 		/// <summary>
-		/// Wird vom Zeitgeber aufgerufen, wenn die Sitzung verlängert werden soll. 
+		/// Will be called from session keep alive timer on ervery interval.
 		/// </summary>
-		/// <param name="state">Statusobjekt</param>
+		/// <param name="state">State (not used)</param>
 		private void KeepSessionAlive(object state)
 		{
 			try
 			{
-				// Aufrufkontext vorbereiten
 				PrepareCallContext(false);
 
-				// Sitzung erneuern
-				int serverSessionAgeLimit = RemoteComponentFactory.RenewSession();
+				int serverSessionAgeLimit = RemoteDispatcher.RenewSession();
 
-				// Wenn der Wert für die Sitzungslebensdauer auf dem Server in der Zwischenzeit geändert wurde ...
 				if (_sessionAgeLimit != serverSessionAgeLimit)
 				{
-					// Neuen Wert für Sitzungslebendauer speichern
 					_sessionAgeLimit = serverSessionAgeLimit;
-
-					// Zeitgeber neu starten
 					StartKeepSessionAliveTimer();
 				}
 			}
@@ -291,39 +234,37 @@ namespace Zyan.Communication
 
 		#endregion
 
-		#region Komponentenzugriff
+		#region Accessing remote components
 
-		// Liste mit allen registrierten Komponenten des verbundenen Servers
+		// List of registered remote components (provided by remote components host)
 		private List<ComponentInfo> _registeredComponents = null;
 
 		/// <summary>
-		/// Erzeugt im Server-Prozess eine neue Instanz einer bestimmten Komponente und gibt einen Proxy dafür zurück.
+		/// Creates a local proxy object of a specified remote component.
 		/// </summary>
-		/// <typeparam name="T">Typ der öffentlichen Schnittstelle der zu konsumierenden Komponente</typeparam>        
+		/// <typeparam name="T">Remote component interface type</typeparam>        
 		/// <returns>Proxy</returns>
 		public T CreateProxy<T>()
 		{
-			// Andere Überladung aufrufen
 			return CreateProxy<T>(string.Empty, false);
 		}
 
 		/// <summary>
-		/// Erzeugt im Server-Prozess eine neue Instanz einer bestimmten Komponente und gibt einen Proxy dafür zurück.
+		/// Creates a local proxy object of a specified remote component.
 		/// </summary>
-		/// <typeparam name="T">Typ der öffentlichen Schnittstelle der zu konsumierenden Komponente</typeparam>        
-		/// <param name="uniqueName">Eindeutiger Name der Komponente</param>
+		/// <typeparam name="T">Remote component interface type</typeparam>        
+		/// <param name="uniqueName">Unique component name</param>
 		/// <returns>Proxy</returns>
 		public T CreateProxy<T>(string uniqueName)
 		{
-			// Andere Überladung aufrufen
 			return CreateProxy<T>(uniqueName, false);
 		}
 
 		/// <summary>
-		/// Erzeugt im Server-Prozess eine neue Instanz einer bestimmten Komponente und gibt einen Proxy dafür zurück.
+		/// Creates a local proxy object of a specified remote component.
 		/// </summary>
-		/// <typeparam name="T">Typ der öffentlichen Schnittstelle der zu konsumierenden Komponente</typeparam>
-		/// <param name="implicitTransactionTransfer">Implizite Transaktionsübertragung</param>
+		/// <typeparam name="T">Remote component interface type</typeparam>
+		/// <param name="implicitTransactionTransfer">Specify whether transactions (System.Transactions) should be transferred to remote component automaticly</param>
 		/// <returns>Proxy</returns>
 		public T CreateProxy<T>(bool implicitTransactionTransfer)
 		{
@@ -331,80 +272,68 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Erzeugt im Server-Prozess eine neue Instanz einer bestimmten Komponente und gibt einen Proxy dafür zurück.
+		/// Creates a local proxy object of a specified remote component.
 		/// </summary>
-		/// <typeparam name="T">Typ der öffentlichen Schnittstelle der zu konsumierenden Komponente</typeparam>
-		/// <param name="uniqueName">Eindeutiger Name der Komponente</param>
-		/// <param name="implicitTransactionTransfer">Implizite Transaktionsübertragung</param>
+		/// <typeparam name="T">Remote component interface type</typeparam>
+		/// <param name="uniqueName">Unique component name</param>
+		/// <param name="implicitTransactionTransfer">Specify whether transactions (System.Transactions) should be transferred to remote component automaticly</param>
 		/// <returns>Proxy</returns>
 		public T CreateProxy<T>(string uniqueName, bool implicitTransactionTransfer)
 		{
-			// Typeninformationen lesen
 			Type interfaceType = typeof(T);
 
-			// Wenn kein eindeutiger Name angegeben ist ...
 			if (string.IsNullOrEmpty(uniqueName))
-				// Name der Schnittstelle verwenden
 				uniqueName = interfaceType.FullName;
 
-			// Wenn keine Schnittstelle angegeben wurde ...
 			if (!interfaceType.IsInterface)
-				// Ausnahme werfen
 				throw new ApplicationException(string.Format("Der angegebene Typ '{0}' ist keine Schnittstelle! Für die Erzeugung einer entfernten Komponenteninstanz, wird deren öffentliche Schnittstelle benötigt!", interfaceType.FullName));
 
-			// Komponenteninformation abrufen
 			ComponentInfo info = (from entry in _registeredComponents
 								  where entry.UniqueName.Equals(uniqueName)
 								  select entry).FirstOrDefault();
 
-			// Wenn für die Schnittstelle auf dem verbundenen Server keine Komponente registriert ist ...
 			if (info == null)
-				// Ausnahme werfne
 				throw new ApplicationException(string.Format("Für Schnittstelle '{0}' ist auf dem Server '{1}' keine Komponente registriert.", interfaceType.FullName, _serverUrl));
 
-			// Proxy erzeugen
 			ZyanProxy proxy = new ZyanProxy(info.UniqueName, typeof(T), this, implicitTransactionTransfer, _sessionID, _componentHostName, _autoLoginOnExpiredSession, _autoLoginCredentials, info.ActivationType);
-
-			// Proxy transparent machen und zurückgeben
 			return (T)proxy.GetTransparentProxy();
 		}
 
-		// Proxy für den Zugriff auf die entfernte Komponentenfabrik des Komponentenhosts
-		private IZyanDispatcher _remoteComponentFactory = null;
+		// Proxy of remote dispatcher
+		private IZyanDispatcher _remoteDispatcher = null;
 
 		/// <summary>
-		/// Gibt einen Proxy für den Zugriff auf die entfernte Komponentenfabrik des Komponentenhosts zurück.
+		/// Gets a proxy to access the remote dispatcher.
 		/// </summary>
-		protected internal IZyanDispatcher RemoteComponentFactory
+		protected internal IZyanDispatcher RemoteDispatcher
 		{
 			get
 			{
-				// Wenn noch keine Verbindung zur entfernten Komponentenfabrik existiert ...
-				if (_remoteComponentFactory == null)
-				{
-					// Verbindung zur entfernten Komponentenfabrik herstellen
-					_remoteComponentFactory = (IZyanDispatcher)Activator.GetObject(typeof(IZyanDispatcher), _serverUrl);
-				}
-				// Fabrik-Proxy zurückgeben
-				return _remoteComponentFactory;
+				if (_remoteDispatcher == null)
+					_remoteDispatcher = (IZyanDispatcher)Activator.GetObject(typeof(IZyanDispatcher), _serverUrl);
+				
+				return _remoteDispatcher;
 			}
 		}
 
 		#endregion
 
-		#region Benutzerdefinierte Serialisierung
+		#region User defined serialization
 
-		// Serialisierungshandling.
+		// Repository of seialization handlers
 		private SerializationHandlerRepository _serializationHandling = null;
 
 		/// <summary>
-		/// Gibt die Verwaltung für benutzerdefinierte Serialisierungsbehandlung zurück.
+		/// Returns the repository of serialization handlers.
 		/// </summary>
 		public SerializationHandlerRepository SerializationHandling
 		{
 			get { return _serializationHandling; }
 		}
 
+		/// <summary>
+		/// Registeres standard serialization handlers.
+		/// </summary>
 		private void RegisterStandardSerializationHandlers()
 		{
 			// TODO: use MEF to discover and register standard serialization handlers:
@@ -414,27 +343,27 @@ namespace Zyan.Communication
 
 		#endregion
 
-		#region Aufrufverfolgung
+		#region Call tracking
 
 		/// <summary>
-		/// Ereignis: Bevor ein Komponentenaufruf durchgeführt wird.
+		/// Event: Before a remote call is invoked.
 		/// </summary>
 		public event EventHandler<BeforeInvokeEventArgs> BeforeInvoke;
 
 		/// <summary>
-		/// Ereignis: Nachdem ein Komponentenaufruf durchgeführt wurde.
+		/// Event: After a remote call is invoked.
 		/// </summary>
 		public event EventHandler<AfterInvokeEventArgs> AfterInvoke;
 
 		/// <summary>
-		/// Ereignis: Wenn ein Komponentenaufruf abgebrochen wurde.
+		/// Event: When a remote call is canceled.
 		/// </summary>
 		public event EventHandler<InvokeCanceledEventArgs> InvokeCanceled;
 
 		/// <summary>
-		/// Feuert das BeforeInvoke-Ereignis.
+		/// Fires the BeforeInvoke event.
 		/// </summary>
-		/// <param name="e">Ereignisargumente</param>
+		/// <param name="e">Event arguments</param>
 		protected internal virtual void OnBeforeInvoke(BeforeInvokeEventArgs e)
 		{
 			// Wenn für BeforeInvoke Ereignisprozeduren registriert sind ...
@@ -444,9 +373,9 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Feuert das AfterInvoke-Ereignis.
+		/// Fires the AfterInvoke event.
 		/// </summary>
-		/// <param name="e">Ereignisargumente</param>
+		/// <param name="e">Event arguments</param>
 		protected internal virtual void OnAfterInvoke(AfterInvokeEventArgs e)
 		{
 			// Wenn für AfterInvoke Ereignisprozeduren registriert sind ...
@@ -456,9 +385,9 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Feuert das InvokeCanceled-Ereignis.
+		/// Fires the InvokeCanceled event.
 		/// </summary>
-		/// <param name="e">Ereignisargumente</param>
+		/// <param name="e">Event arguments</param>
 		protected internal virtual void OnInvokeCanceled(InvokeCanceledEventArgs e)
 		{
 			// Wenn für AfterInvoke Ereignisprozeduren registriert sind ...
@@ -469,60 +398,51 @@ namespace Zyan.Communication
 
 		#endregion
 
-		#region Benachrichtigungen
+		#region Notification (old NotificationService feature) 
 
-		// Wörterbuch für Benachrichtigungs-Registrierungen
+		// Repository for event subscriptions (NotficationService)
 		private volatile Dictionary<Guid, NotificationReceiver> _subscriptions = null;
 
-		// Sperrobjekt für Threadsynchronisierung
+		// Object for thread synchronization of event subscriptions
 		private object _subscriptionsLockObject = new object();
 
 		/// <summary>
-		/// Registriert einen Client für den Empfang von Benachrichtigungen bei einem bestimmten Ereignis.
+		/// Subscribes for receiving notifications of a specified event.
 		/// </summary>
-		/// <param name="eventName">Ereignisname</param>
-		/// <param name="handler">Delegat auf Client-Ereignisprozedur</param>
+		/// <param name="eventName">Event name</param>
+		/// <param name="handler">Client side event handler</param>
+		/// <returns>Unique subscription ID</returns>
+		[Obsolete("The NotificationService feature may not be supported in future Zyan versions. Please use remote delegates to create your notification system.",false)]
 		public Guid SubscribeEvent(string eventName, EventHandler<NotificationEventArgs> handler)
 		{
-			// Empfangsvorrichtung für Benachrichtigung erzeugen
 			NotificationReceiver receiver = new NotificationReceiver(eventName, handler);
+			RemoteDispatcher.Subscribe(eventName, receiver.FireNotifyEvent);
 
-			// Für Benachrichtigung beim entfernten Komponentenhost registrieren
-			RemoteComponentFactory.Subscribe(eventName, receiver.FireNotifyEvent);
-
-			// Registrerungsschlüssel erzeugen
 			Guid subscriptionID = Guid.NewGuid();
 
 			lock (_subscriptionsLockObject)
 			{
-				// Empfangsvorrichtung in Wörterbuch speichern
 				_subscriptions.Add(subscriptionID, receiver);
 			}
-			// Registrerungsschlüssel zurückgeben
 			return subscriptionID;
 		}
 
 		/// <summary>
-		/// Hebt eine Registrierung für den Empfang von Benachrichtigungen eines bestimmten Ereignisses auf.
+		/// Unsubscribe for receiving notifications of a specified event.
 		/// </summary>
-		/// <param name="subscriptionID">Registrerungsschlüssel</param>
+		/// <param name="subscriptionID">Unique subscription ID</param>
+		[Obsolete("The NotificationService feature may not be supported in future Zyan versions. Please use remote delegates to create your notification system.")]
 		public void UnsubscribeEvent(Guid subscriptionID)
 		{
 			lock (_subscriptionsLockObject)
 			{
-				// Wenn die angegebene Registrerungsschlüssel bekannt ist ...
 				if (_subscriptions.ContainsKey(subscriptionID))
 				{
-					// Empfangsvorrichtung abrufen
 					NotificationReceiver receiver = _subscriptions[subscriptionID];
+					RemoteDispatcher.Unsubscribe(receiver.EventName, receiver.FireNotifyEvent);
 
-					// Für Benachrichtigung beim entfernten Komponentenhost registrieren
-					RemoteComponentFactory.Unsubscribe(receiver.EventName, receiver.FireNotifyEvent);
-
-					// Empfängervorrichtung aus Wörterbuch löschen
 					_subscriptions.Remove(subscriptionID);
 
-					// Empfängervorrichtung entsorgen
 					receiver.Dispose();
 				}
 			}
@@ -530,10 +450,10 @@ namespace Zyan.Communication
 
 		#endregion
 
-		#region Aufrufe abfangen
+		#region Intercept calls
 
 		/// <summary>
-		/// Gibt zurück, ob registrierte Aufrufabfangvorrichtungen verarbeitet werden, oder legt diest fest.
+		/// Gets whether registered call interceptors should be processed.
 		/// </summary>
 		public bool CallInterceptionEnabled
 		{
@@ -541,11 +461,11 @@ namespace Zyan.Communication
 			set;
 		}
 
-		// Auflistung für Aufrufabfangvorrichtungen
+		// List of registered call interceptors.
 		private CallInterceptorCollection _callInterceptors = null;
 
 		/// <summary>
-		/// Gibt eine Auflistung der registrierten Aufrufabfangvorrichtungen zurück.
+		/// Returns a collection of registred call interceptors.
 		/// </summary>
 		public CallInterceptorCollection CallInterceptors
 		{
@@ -554,10 +474,10 @@ namespace Zyan.Communication
 
 		#endregion
 
-		#region Fehlerbehandlung
+		#region Centralized error handling
 
 		/// <summary>
-		/// Occures when a error is detected.
+		/// Event: Occures when a error is detected.
 		/// </summary>
 		public event EventHandler<ZyanErrorEventArgs> Error;
 
@@ -581,33 +501,28 @@ namespace Zyan.Communication
 
 		#endregion
 
-		#region Dispose-Implementierung
+		#region Dispose implementation
 
-		// Schalter der angibt, ob Dispose bereits aufgerufen wurde
+		// Switch to mark object as disposed.
 		private bool _isDisposed = false;
 
 		/// <summary>
-		/// Verwaltete Ressourcen freigeben.
+		/// Release managed resources.
 		/// </summary>
 		public void Dispose()
 		{
-			// Wenn Dispose nicht bereits ausgeführt wurde ...
 			if (!_isDisposed)
 			{
-				// Schalter setzen
 				_isDisposed = true;
 
-				// Wenn der Zeitgeber noch existiert ...
 				if (_keepSessionAliveTimer != null)
 				{
-					// Zeitgeber entsorgen
 					_keepSessionAliveTimer.Dispose();
 					_keepSessionAliveTimer = null;
 				}
 				try
 				{
-					// Vom Server abmelden
-					RemoteComponentFactory.Logoff(_sessionID);
+					RemoteDispatcher.Logoff(_sessionID);
 				}
 				catch (RemotingException)
 				{ }
@@ -617,11 +532,9 @@ namespace Zyan.Communication
 				{ }
 				finally
 				{
-					// Verbindung aus der Auflistung entfernen
 					_connections.Remove(this);
 				}
-				// Variablen freigeben                
-				_remoteComponentFactory = null;
+				_remoteDispatcher = null;
 				_serverUrl = string.Empty;
 				_sessionID = Guid.Empty;
 				_protocolSetup = null;
@@ -648,23 +561,22 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Destruktor.
+		/// Called from CLR when the object is finalized.
 		/// </summary>
 		~ZyanConnection()
 		{
-			// Ressourcen freigeben
 			Dispose();
 		}
 
 		#endregion
 
-		#region Statischer Zugriff auf alle Verbindungen
+		#region Accessing connections
 
-		// Auflistung der bekannten Verbindungen
+		// List of connections
 		private static List<ZyanConnection> _connections = new List<ZyanConnection>();
 
 		/// <summary>
-		/// Gibt eine Auflistung aller bekanten Verbindungen Hosts zurück.
+		/// Gets a list of all known Zyan connections in the current Application Domain.
 		/// </summary>
 		public static List<ZyanConnection> Connections
 		{

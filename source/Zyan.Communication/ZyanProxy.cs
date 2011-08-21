@@ -25,7 +25,7 @@ namespace Zyan.Communication
 	{
 		// Felder
 		private Type _interfaceType = null;
-		private IZyanDispatcher _remoteInvoker = null;
+		private IZyanDispatcher _remoteDispatcher = null;
 		private List<DelegateCorrelationInfo> _delegateCorrelationSet = null;
 		private bool _implicitTransactionTransfer = false;
 		private Guid _sessionID;
@@ -84,7 +84,7 @@ namespace Zyan.Communication
 			_activationType = activationType;
 
 			// Aufrufer von Verbindung übernehmen
-			_remoteInvoker = _connection.RemoteComponentFactory;
+			_remoteDispatcher = _connection.RemoteDispatcher;
 
 			// Schalter für implizite Transaktionsübertragung übernehmen
 			_implicitTransactionTransfer = implicitTransactionTransfer;
@@ -160,7 +160,7 @@ namespace Zyan.Communication
 
 					// If component is singleton, attach event handler
 					if (_activationType == ActivationType.Singleton)
-						_connection.RemoteComponentFactory.AddEventHandler(_interfaceType.FullName, correlationInfo);
+						_connection.RemoteDispatcher.AddEventHandler(_interfaceType.FullName, correlationInfo);
 
 					// Save delegate correlation info
 					_delegateCorrelationSet.Add(correlationInfo);
@@ -201,7 +201,7 @@ namespace Zyan.Communication
 							else
 							{
 								// Ereignisabo entfernen
-								_connection.RemoteComponentFactory.RemoveEventHandler(_interfaceType.FullName, found);
+								_connection.RemoteDispatcher.RemoveEventHandler(_interfaceType.FullName, found);
 							}
 						}
 					}
@@ -367,7 +367,7 @@ namespace Zyan.Communication
 						object[] checkedArgs = InterceptDelegateParameters(methodCallMessage);
 
 						// Entfernten Methodenaufruf durchführen
-						returnValue = _remoteInvoker.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, genericArgs, paramTypes, checkedArgs);
+						returnValue = _remoteDispatcher.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, genericArgs, paramTypes, checkedArgs);
 
 						// Ereignisargumente für AfterInvoke erstellen
 						AfterInvokeEventArgs afterInvokeArgs = new AfterInvokeEventArgs()
@@ -388,10 +388,10 @@ namespace Zyan.Communication
 						if (_autoLoginOnExpiredSession)
 						{
 							// Neu anmelden
-							_remoteInvoker.Logon(_sessionID, _autoLoginCredentials);
+							_remoteDispatcher.Logon(_sessionID, _autoLoginCredentials);
 
 							// Entfernten Methodenaufruf erneut versuchen
-							returnValue = _remoteInvoker.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, genericArgs, paramTypes, methodCallMessage.Args);
+							returnValue = _remoteDispatcher.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, genericArgs, paramTypes, methodCallMessage.Args);
 						}
 						else
 						{
