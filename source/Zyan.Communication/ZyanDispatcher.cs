@@ -12,6 +12,7 @@ using Zyan.Communication.Notification;
 using Zyan.Communication.Security;
 using Zyan.Communication.SessionMgmt;
 using Zyan.Communication.Toolbox;
+using System.Threading;
 
 namespace Zyan.Communication
 {
@@ -20,26 +21,23 @@ namespace Zyan.Communication
 	/// </summary>
 	public class ZyanDispatcher : MarshalByRefObject, IZyanDispatcher
 	{
-		#region Konstruktor
+		#region Construction
 
 		/// <summary>
-		/// Konstruktor.
+		/// Creates a new instance of the ZyanDispatcher class.
 		/// </summary>
-		/// <param name="host">Komponentenhost</param>
+		/// <param name="host">Component host</param>
 		public ZyanDispatcher(ZyanComponentHost host)
 		{
-			// Wenn kein Komponentenhost übergeben wurde ...
 			if (host == null)
-				// Ausnahme werfen
 				throw new ArgumentNullException("host");
 
-			// Host übernehmen
 			_host = host;
 		}
 
 		#endregion
 
-		#region Komponentenaufruf
+		#region Method invocation
 
 		// Component Host this dispatcher is dispatching for
 		private ZyanComponentHost _host = null;
@@ -117,19 +115,17 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Verarbeitet BeforeInvoke-Abos (falls welche registriert sind).
+		/// Processes BeforeInvoke event subscriptions (if there any).
 		/// </summary>
-		/// <param name="trackingID">Aufrufschlüssel zur Nachverfolgung</param>
-		/// <param name="interfaceName">Name der Komponentenschnittstelle</param>
-		/// <param name="delegateCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Delegaten und Ereignisse mit entfernten Methoden</param>
-		/// <param name="methodName">Methodenname</param>
-		/// <param name="args">Parameter</param>   
+		/// <param name="trackingID">Unique key for call tracking</param>
+		/// <param name="interfaceName">Component interface name</param>
+		/// <param name="delegateCorrelationSet">Set of correlation information to wire events and delegates</param>
+		/// <param name="methodName">Method name</param>
+		/// <param name="args">Arguments</param>   
 		private void ProcessBeforeInvoke(Guid trackingID, ref string interfaceName, ref List<DelegateCorrelationInfo> delegateCorrelationSet, ref string methodName, ref object[] args)
 		{
-			// Wenn BeforeInvoke-Abos vorhanden sind ...
 			if (_host.HasBeforeInvokeSubscriptions())
 			{
-				// Ereignisargumente für BeforeInvoke erstellen
 				BeforeInvokeEventArgs cancelArgs = new BeforeInvokeEventArgs()
 				{
 					TrackingID = trackingID,
@@ -139,26 +135,19 @@ namespace Zyan.Communication
 					Arguments = args,
 					Cancel = false
 				};
-				// BeforeInvoke-Ereignis feuern
 				_host.OnBeforeInvoke(cancelArgs);
 
-				// Wenn der Aufruf abgebrochen werden soll ...
 				if (cancelArgs.Cancel)
 				{
-					// Wenn keine Abbruchausnahme definiert ist ...
 					if (cancelArgs.CancelException == null)
-						// Standard-Abbruchausnahme erstellen
 						cancelArgs.CancelException = new InvokeCanceledException();
 
-					// InvokeCanceled-Ereignis feuern
 					_host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = cancelArgs.CancelException });
 
-					// Abbruchausnahme werfen
 					throw cancelArgs.CancelException;
 				}
-				else // Wenn der Aufruf nicht abgebrochen werden soll ...
+				else
 				{
-					// Einstellungen der Ereignisargumente übernehmen
 					interfaceName = cancelArgs.InterfaceName;
 					delegateCorrelationSet = cancelArgs.DelegateCorrelationSet;
 					methodName = cancelArgs.MethodName;
@@ -168,20 +157,18 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Verarbeitet AfterInvoke-Abos (falls welche registriert sind).
+		/// Processes AfterInvoke event subscriptions (if there any).
 		/// </summary>
-		/// <param name="trackingID">Aufrufschlüssel zur Nachverfolgung</param>
-		/// <param name="interfaceName">Name der Komponentenschnittstelle</param>
-		/// <param name="delegateCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Delegaten und Ereignisse mit entfernten Methoden</param>
-		/// <param name="methodName">Methodenname</param>
-		/// <param name="args">Parameter</param>   
-		/// <param name="returnValue">Rückgabewert</param>
+		/// <param name="trackingID">Unique key for call tracking</param>
+		/// <param name="interfaceName">Component interface name</param>
+		/// <param name="delegateCorrelationSet">Set of correlation information to wire events and delegates</param>
+		/// <param name="methodName">Method name</param>
+		/// <param name="args">Arguments</param>   
+		/// <param name="returnValue">Return value</param>
 		private void ProcessAfterInvoke(Guid trackingID, ref string interfaceName, ref List<DelegateCorrelationInfo> delegateCorrelationSet, ref string methodName, ref object[] args, ref object returnValue)
 		{
-			// Wenn AfterInvoke-Abos registriert sind ...
 			if (_host.HasAfterInvokeSubscriptions())
 			{
-				// Ereignisargumente für AfterInvoke erstellen
 				AfterInvokeEventArgs afterInvokeArgs = new AfterInvokeEventArgs()
 				{
 					TrackingID = trackingID,
@@ -191,7 +178,6 @@ namespace Zyan.Communication
 					Arguments = args,
 					ReturnValue = returnValue
 				};
-				// AfterInvoke-Ereignis feuern
 				_host.OnAfterInvoke(afterInvokeArgs);
 			}
 		}
@@ -407,109 +393,84 @@ namespace Zyan.Communication
 
 		#endregion
 
-		#region Ereignis-Unterstützung
+		#region Event support
 
 		/// <summary>
-		/// Abonniert ein Ereignis einer Serverkomponente.
+		/// Adds a handler to an event of a server component.
 		/// </summary>
-		/// <param name="interfaceName">Schnittstellenname der Serverkomponente</param>
-		/// <param name="correlation">Korrelationsinformation</param>
+		/// <param name="interfaceName">Name of the server component interface</param>
+		/// <param name="correlation">Correlation information</param>
 		public void AddEventHandler(string interfaceName, DelegateCorrelationInfo correlation)
 		{
-			// Wenn kein Schnittstellenname angegeben wurde ...
 			if (string.IsNullOrEmpty(interfaceName))
-				// Ausnahme werfen
 				throw new ArgumentException(LanguageResource.ArgumentException_InterfaceNameMissing, "interfaceName");
 
-			// Wenn für den angegebenen Schnittstellennamen keine Komponente registriert ist ...
 			if (!_host.ComponentRegistry.ContainsKey(interfaceName))
-				// Ausnahme erzeugen
 				throw new KeyNotFoundException(string.Format("Für die angegebene Schnittstelle '{0}' ist keine Komponente registiert.", interfaceName));
 
-			// Komponentenregistrierung abrufen
 			ComponentRegistration registration = _host.ComponentRegistry[interfaceName];
 
-			// Wenn die Komponente nicht Singletonaktiviert ist ...
 			if (registration.ActivationType != ActivationType.Singleton)
-				// Prozedur abbrechen
 				return;
 
-			// Komponenteninstanz erzeugen
 			object instance = _host.GetComponentInstance(registration);
-
-			// Implementierungstyp abrufen
 			Type type = instance.GetType();
 
-			// Liste für Übergabe der Korrelationsinformation erzeugen
 			List<DelegateCorrelationInfo> correlationSet = new List<DelegateCorrelationInfo>();
 			correlationSet.Add(correlation);
 
-			// Client- und Server-Komponente miteinander verdrahten
 			CreateClientServerWires(type, instance, correlationSet, registration.EventWirings);
 		}
 
 		/// <summary>
-		/// Entfernt das Abonnement eines Ereignisses einer Serverkomponente.
+		/// Removes a handler from an event of a server component.
 		/// </summary>
-		/// <param name="interfaceName">Schnittstellenname der Serverkomponente</param>
-		/// <param name="correlation">Korrelationsinformation</param>
+		/// <param name="interfaceName">Name of the server component interface</param>
+		/// <param name="correlation">Correlation information</param>
 		public void RemoveEventHandler(string interfaceName, DelegateCorrelationInfo correlation)
 		{
-			// Wenn kein Schnittstellenname angegeben wurde ...
 			if (string.IsNullOrEmpty(interfaceName))
-				// Ausnahme werfen
 				throw new ArgumentException(LanguageResource.ArgumentException_InterfaceNameMissing, "interfaceName");
 
-			// Wenn für den angegebenen Schnittstellennamen keine Komponente registriert ist ...
 			if (!_host.ComponentRegistry.ContainsKey(interfaceName))
-				// Ausnahme erzeugen
 				throw new KeyNotFoundException(string.Format("Für die angegebene Schnittstelle '{0}' ist keine Komponente registiert.", interfaceName));
 
-			// Komponentenregistrierung abrufen
 			ComponentRegistration registration = _host.ComponentRegistry[interfaceName];
 
-			// Wenn die Komponente nicht Singletonaktiviert ist ...
 			if (registration.ActivationType != ActivationType.Singleton)
-				// Prozedur abbrechen
 				return;
 
-			// Komponenteninstanz erzeugen
 			object instance = _host.GetComponentInstance(registration);
-
-			// Implementierungstyp abrufen
 			Type type = instance.GetType();
 
-			// Liste für Übergabe der Korrelationsinformation erzeugen
 			List<DelegateCorrelationInfo> correlationSet = new List<DelegateCorrelationInfo>();
 			correlationSet.Add(correlation);
 
-			// Client- und Server-Komponente miteinander verdrahten
 			RemoveClientServerWires(type, instance, correlationSet, registration.EventWirings);
 		}
 
 		#endregion
 
-		#region Metadaten abfragen
+		#region Metadata
 
 		/// <summary>
-		/// Gibt eine Liste mit allen registrierten Komponenten zurück.
+		/// Returns an array with metadata about all registered components.
 		/// </summary>
-		/// <returns>Liste mit Namen der registrierten Komponenten</returns>
+		/// <returns>Array with registered component metadata</returns>
 		public ComponentInfo[] GetRegisteredComponents()
 		{
-			// Daten vom Host abrufen
 			return _host.GetRegisteredComponents().ToArray();
 		}
 
 		#endregion
 
-		#region An- und Abmelden
+		#region Logon and Logoff
 
 		/// <summary>
-		/// Meldet einen Client am Applikationserver an.
+		/// Processes logon.
 		/// </summary>
-		/// <param name="sessionID">Sitzungsschlüssel (wird vom Client erstellt)</param>
-		/// <param name="credentials">Anmeldeinformationen</param>
+		/// <param name="sessionID">Unique session key (created on client side)</param>
+		/// <param name="credentials">Logon credentials</param>
 		public void Logon(Guid sessionID, Hashtable credentials)
 		{
 			if (sessionID == Guid.Empty)
@@ -531,21 +492,16 @@ namespace Zyan.Communication
 				var session = new ServerSession(sessionID, authResponse.AuthenticatedIdentity, sessionVariableAdapter);
 				_host.SessionManager.StoreSession(session);
 				ServerSession.CurrentSession = session;
+				PutClientAddressToCurrentSession();
 
-				string clientIP = string.Empty;
-				IPAddress clientAddress = GetCallingClientIPAddress();
-
-				if (clientAddress != null)
-					clientIP = clientAddress.ToString();
-
-				_host.OnClientLoggedOn(new LoginEventArgs(LoginEventType.Logon, session.Identity, clientIP, session.Timestamp));
+				_host.OnClientLoggedOn(new LoginEventArgs(LoginEventType.Logon, session.Identity, session.ClientAddress, session.Timestamp));
 			}
 		}
 
 		/// <summary>
-		/// Meldet einen Client vom Applikationsserver ab.
+		/// Process logoff.
 		/// </summary>
-		/// <param name="sessionID">Sitzungsschlüssel</param>
+		/// <param name="sessionID">Unique session key</param>
 		public void Logoff(Guid sessionID)
 		{
 			IIdentity identity = null;
@@ -557,8 +513,6 @@ namespace Zyan.Communication
 				identity = session.Identity;
 				timestamp = session.Timestamp;
 			}
-
-			// Sitzung entfernen
 			_host.SessionManager.RemoveSession(sessionID);
 
 			string clientIP = string.Empty;
@@ -567,55 +521,54 @@ namespace Zyan.Communication
 			if (clientAddress!=null)
 				clientIP=clientAddress.ToString();
 
-			if (identity!=null)
-				_host.OnClientLoggedOff(new LoginEventArgs(LoginEventType.Logoff, identity, clientIP , timestamp));
-
-			// reset current session after the client is logged off
-			ServerSession.CurrentSession = null;
+			try
+			{
+				if (identity != null)
+					_host.OnClientLoggedOff(new LoginEventArgs(LoginEventType.Logoff, identity, clientIP, timestamp));
+			}
+			finally
+			{
+				// reset current session after the client is logged off
+				ServerSession.CurrentSession = null;
+			}
 		}
 
 		#endregion
 
-		#region Benachrichtigungen
+		#region Notification (old NotificationService feature)
 
 		/// <summary>
-		/// Registriert einen Client für den Empfang von Benachrichtigungen bei einem bestimmten Ereignis.
+		/// Subscribe to a specified NotificationService event.
 		/// </summary>
-		/// <param name="eventName">Ereignisname</param>
-		/// <param name="handler">Delegat auf Client-Ereignisprozedur</param>
+		/// <param name="eventName">Event name</param>
+		/// <param name="handler">Delegate to client side event handler</param>
 		public void Subscribe(string eventName, EventHandler<NotificationEventArgs> handler)
 		{
-			// Wenn auf dem Host kein Benachrichtigungsdienst läuft ...
 			if (!_host.IsNotificationServiceRunning)
-				// Ausnahme werfen
 				throw new ApplicationException(LanguageResource.ApplicationException_NotificationServiceNotRunning);
 
-			// Für Benachrichtigung registrieren
 			_host.NotificationService.Subscribe(eventName, handler);
 		}
 
 		/// <summary>
-		/// Hebt eine Registrierung für den Empfang von Benachrichtigungen eines bestimmten Ereignisses auf.
+		/// Unsubscribe from a specified NotificationService event.
 		/// </summary>
-		/// <param name="eventName">Ereignisname</param>
-		/// <param name="handler">Delegat auf Client-Ereignisprozedur</param>
+		/// <param name="eventName">Event name</param>
+		/// <param name="handler">Delegate to client side event handler</param>
 		public void Unsubscribe(string eventName, EventHandler<NotificationEventArgs> handler)
 		{
-			// Wenn auf dem Host kein Benachrichtigungsdienst läuft ...
 			if (!_host.IsNotificationServiceRunning)
-				// Ausnahme werfen
 				throw new ApplicationException(LanguageResource.ApplicationException_NotificationServiceNotRunning);
 
-			// Registrierung aufheben
 			_host.NotificationService.Unsubscribe(eventName, handler);
 		}
 
 		#endregion
 
-		#region Sitzungsverwaltung
+		#region Session management
 
 		/// <summary>
-		/// Gibt die maximale Sitzungslebensdauer (in Minuten) zurück.
+		/// Gets the maximum sesseion age (in minutes).
 		/// </summary>
 		public int SessionAgeLimit
 		{
@@ -623,69 +576,84 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Verlängert die Sitzung des Aufrufers und gibt die aktuelle Sitzungslebensdauer zurück.
+		/// Extends the lifetime of the current session and returs the current session age limit.
 		/// </summary>
-		/// <returns>Sitzungslebensdauer (in Minuten)</returns>
+		/// <returns>Session age limit (in minutes)</returns>
 		public int RenewSession()
 		{
-			// Kontextdaten aus dem Aufrufkontext lesen (Falls welche hinterlegt sind)
 			LogicalCallContextData data = CallContext.GetData("__ZyanContextData_" + _host.Name) as LogicalCallContextData;
 
-			// Wenn Kontextdaten übertragen wurden ...
 			if (data != null)
 			{
-				// Wenn ein Sitzungsschlüssel übertragen wurde ...
 				if (data.Store.ContainsKey("sessionid"))
 				{
-					// Sitzungsschlüssel lesen
 					Guid sessionID = (Guid)data.Store["sessionid"];
 
-					// Wenn eine Sitzung mit dem angegebenen Schlüssel existiert ...
 					if (_host.SessionManager.ExistSession(sessionID))
 					{
-						// Sitzung abrufen
 						ServerSession session = _host.SessionManager.GetSessionBySessionID(sessionID);
-
-						// Sitzung verlängern
 						session.Timestamp = DateTime.Now;
 
-						// Aktuelle Sitzung im Threadspeicher ablegen
 						ServerSession.CurrentSession = session;
 					}
 					else
 					{
-						// Ausnahme erzeugen
 						InvalidSessionException ex = new InvalidSessionException(string.Format("Sitzungsschlüssel '{0}' ist ungültig! Bitte melden Sie sich erneut am Server an.", sessionID.ToString()));
-
-						// Ausnahme werfen
 						throw ex;
 					}
 				}
 			}
 			else
 			{
-				// Ausnahme erzeugen
 				SecurityException ex = new SecurityException(LanguageResource.SecurityException_ContextInfoMissing);
-
-				// Ausnahme werfen
 				throw ex;
 			}
-			// Sitzungslebensdauer zurückgeben
 			return SessionAgeLimit;
 		}
 
 		#endregion
 
-		#region Lebenszeitsteuerung
+		#region Lifetime management
 
 		/// <summary>
-		/// Inizialisiert die Lebenszeitsteuerung des Objekts.
+		/// Initializes the .NET Remoting limetime service of this object.
 		/// </summary>
 		/// <returns>Lease</returns>
 		public override object InitializeLifetimeService()
 		{
-			// Laufzeitumgebungen für Ereignisbasierte Komponenten leben ewig
+			// Unlimited lifetime
 			return null;
+		}
+
+		#endregion
+
+		#region Detect unexpected disconnection (Polling)
+
+		/// <summary>
+		/// Event: Occours when a heartbeat signal is received from a client.
+		/// </summary>
+		public event EventHandler<ClientHeartbeatEventArgs> ClientHeartbeatReceived;
+
+		/// <summary>
+		/// Fires the ClientHeartbeatReceived event.
+		/// <remarks>
+		/// Event is fired in a different thread to avoid blocking the client.
+		/// </remarks>
+		/// </summary>
+		/// <param name="e">Event arguments</param>
+		protected virtual void OnClientHeartbeatReceived(ClientHeartbeatEventArgs e)
+		{
+			if (ClientHeartbeatReceived!=null)
+				ThreadPool.QueueUserWorkItem(state  => ClientHeartbeatReceived(this,e));
+		}
+
+		/// <summary>
+		/// Called from client to send a heartbeat signal.
+		/// </summary>
+		/// <param name="sessionID">Client´s session key</param>
+		public void ReceiveClientHeartbeat(Guid sessionID)
+		{
+			OnClientHeartbeatReceived(new ClientHeartbeatEventArgs(DateTime.Now, sessionID));
 		}
 
 		#endregion
