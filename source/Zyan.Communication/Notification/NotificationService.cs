@@ -6,7 +6,7 @@ namespace Zyan.Communication.Notification
     /// <summary>
     /// Benachrichtigungsdienst.
     /// </summary>
-    public class NotificationService 
+	public class NotificationService 
     {
         // Delegat für asynchrone Benachrichtigung
         private delegate void AsyncNotificationDelegate(string eventName, NotificationEventArgs e, EventHandler<NotificationEventArgs> eventDelegate);        

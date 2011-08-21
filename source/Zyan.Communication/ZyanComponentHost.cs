@@ -449,6 +449,7 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Startet den Benachrichtigungsdienst.
 		/// </summary>
+		[Obsolete("The NotificationService feature may not be supported in future Zyan versions. Please use remote delegates to create your notification system.", false)]
 		public void StartNotificationService()
 		{
 			lock (_notificationServiceLockObject)
@@ -480,7 +481,7 @@ namespace Zyan.Communication
 
 		/// <summary>
 		/// Gibt den Benachrichtigungsdienst zurück.
-		/// </summary>
+		/// </summary>		
 		public NotificationService NotificationService
 		{
 			get
@@ -497,6 +498,7 @@ namespace Zyan.Communication
 		/// </summary>
 		/// <param name="eventName">Ereignisname</param>
 		/// <returns>Delegat für Benachrichtigungsversand an registrierte Clients</returns>
+		[Obsolete("The NotificationService feature may not be supported in future Zyan versions. Please use remote delegates to create your notification system.", false)]
 		public EventHandler<NotificationEventArgs> PublishEvent(string eventName)
 		{
 			// Wenn kein Benachrichtigungsdienst läuft ...
