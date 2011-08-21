@@ -515,6 +515,13 @@ namespace Zyan.Communication
 			{
 				_isDisposed = true;
 
+				if (_pollingTimer != null)
+				{
+					_pollingTimer.Dispose();
+					_pollingTimer = null;
+				}
+				_pollingEnabled = false;
+				
 				if (_keepSessionAliveTimer != null)
 				{
 					_keepSessionAliveTimer.Dispose();
@@ -581,6 +588,133 @@ namespace Zyan.Communication
 		public static List<ZyanConnection> Connections
 		{
 			get { return _connections.ToList<ZyanConnection>(); }
+		}
+
+		#endregion
+
+		#region Detect unexpected disconnection (Polling)
+
+		// Polling timer (Triggers check for unexpected disconnection when elapsed)
+		private Timer _pollingTimer = null;
+
+		// Interval of polling timer
+		private TimeSpan _pollingInterval = TimeSpan.FromMinutes(1);
+
+		// Switch to enable polling
+		private bool _pollingEnabled = false;
+
+		/// <summary>
+		/// Event: Fired when disconnected.
+		/// </summary>
+		public event EventHandler<DisconnectedEventArgs> Disconnected;
+
+		/// <summary>
+		/// Fires the Disconnected event.
+		/// </summary>
+		/// <param name="e">Event arguments</param>
+		protected virtual void OnDisconnected(DisconnectedEventArgs e)
+		{
+			if (Disconnected!=null)
+				Disconnected(this,e);
+		}
+
+		/// <summary>
+		/// Gets whether polling is enabled.
+		/// </summary>
+		public bool PollingEnabled
+		{
+			get { return _pollingEnabled; }
+			set 
+			{
+				if (value != _pollingEnabled)
+				{
+					_pollingEnabled = value;
+					StartPollingTimer();
+				}
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets the polling interval.
+		/// <remarks>
+		/// Default is 1 minute.
+		/// </remarks>
+		/// </summary>
+		public TimeSpan PollingInterval
+		{
+			get { return _pollingInterval; }
+			set
+			{ 
+				_pollingInterval=value;
+				StartPollingTimer();
+			}
+		}
+
+		/// <summary>
+		/// Starts the polling timer.
+		/// <remarks>
+		/// If the timer runs already, it will be restarted with current settings.
+		/// </remarks>
+		/// </summary>
+		private void StartPollingTimer()
+		{
+			if (_pollingTimer != null)
+				_pollingTimer.Dispose();
+
+			if (_pollingEnabled)
+			{
+				int interval = Convert.ToInt32(_pollingInterval.TotalMilliseconds);
+				_pollingTimer = new Timer(new TimerCallback(SendHeartbeat), null, interval, interval);
+			}
+		}
+
+		/// <summary>
+		/// Will be called from polling timer on ervery interval.
+		/// </summary>
+		/// <param name="state">State (not used)</param>
+		private void SendHeartbeat(object state)
+		{
+			try
+			{
+				RemoteDispatcher.ReceiveClientHeartbeat(_sessionID);	
+			}
+			catch (Exception ex)
+			{
+				PollingEnabled = false;
+				bool problemSolved = false;
+
+				DisconnectedEventArgs e = new DisconnectedEventArgs() 
+				{ 
+					Exception=ex,
+					RetryCount=0,
+					Retry=false
+				};
+
+				OnDisconnected(e);
+
+				while (e.Retry)
+				{					
+					e.Retry = false;
+
+					Thread.Sleep(Convert.ToInt32(_pollingInterval.TotalMilliseconds));
+
+					try
+					{
+						RemoteDispatcher.ReceiveClientHeartbeat(_sessionID);
+						problemSolved = true;						
+					}
+					catch (Exception retryEx)
+					{
+						e.Exception = retryEx;
+						e.RetryCount++;
+						OnDisconnected(e);
+					}
+				}
+				if (problemSolved)
+					PollingEnabled = true;
+				else
+					Dispose();
+			}
 		}
 
 		#endregion

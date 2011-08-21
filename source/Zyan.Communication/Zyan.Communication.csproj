@@ -68,6 +68,7 @@
     <Compile Include="CallInterceptorHelper.cs" />
     <Compile Include="ChannelSinks\ClientAddress\ClientAddressServerChannelSink.cs" />
     <Compile Include="ChannelSinks\ClientAddress\ClientAddressServerChannelSinkProvider.cs" />
+    <Compile Include="ClientHeartbeatEventArgs.cs" />
     <Compile Include="ComponentCatalog.cs" />
     <Compile Include="ComponentInfo.cs" />
     <Compile Include="Composition\DefinitionExtensions.cs" />
@@ -87,6 +88,7 @@
     <Compile Include="Delegates\DynamicWireT.cs" />
     <Compile Include="CallInterceptionData.cs" />
     <Compile Include="CallInterceptor.cs" />
+    <Compile Include="DisconnectedEventArgs.cs" />
     <Compile Include="IComponentCatalog.cs" />
     <Compile Include="IComponentCatalogExtensions.cs">
       <DependentUpon>IComponentCatalog.cs</DependentUpon>
