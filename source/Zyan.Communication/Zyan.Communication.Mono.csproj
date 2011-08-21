@@ -68,6 +68,7 @@
     <Compile Include="CallInterceptor.cs" />
     <Compile Include="CallInterceptorCollection.cs" />
     <Compile Include="CallInterceptorHelper.cs" />
+    <Compile Include="ClientHeartbeatEventArgs.cs" />
     <Compile Include="ComponentCatalog.cs" />
     <Compile Include="ComponentInfo.cs" />
     <Compile Include="ComponentRegistration.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Delegates\DynamicWireBase.cs" />
     <Compile Include="Delegates\DynamicWireFactory.cs" />
     <Compile Include="Delegates\DynamicWireT.cs" />
+    <Compile Include="DisconnectedEventArgs.cs" />
     <Compile Include="IComponentCatalog.cs" />
     <Compile Include="IComponentCatalogExtensions.cs" />
     <Compile Include="InvalidSessionException.cs" />
@@ -216,7 +218,6 @@
     <Compile Include="Protocols\Tcp\DuplexChannel\TcpExChannelData.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\TransportHeaderWrapper.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\Diagnostics\Trace.cs" />
-    <Compile Include="Scripting\ScriptEngine.cs" />
     <Compile Include="Security\AuthRequestMessage.cs" />
     <Compile Include="Security\AuthResponseMessage.cs" />
     <Compile Include="Security\BasicWindowsAuthProvider.cs" />
