@@ -13,54 +13,53 @@ namespace Zyan.Communication
 	public interface IZyanDispatcher
 	{
 		/// <summary>
-		/// Ruft eine bestimmte Methode einer Komponente auf und übergibt die angegebene Nachricht als Parameter.
-		/// Für jeden Aufruf wird temporär eine neue Instanz der Komponente erstellt.
+		/// Processes remote method invocation.
 		/// </summary>
-		/// <param name="trackingID">Aufrufschlüssel zur Nachverfolgung</param>
-		/// <param name="interfaceName">Name der Komponentenschnittstelle</param>
-		/// <param name="delegateCorrelationSet">Korrelationssatz für die Verdrahtung bestimmter Delegaten und Ereignisse mit entfernten Methoden</param>
-		/// <param name="genericArguments">Generic parameters for the method</param>
-		/// <param name="methodName">Methodenname</param>
+		/// <param name="trackingID">Key for call tracking</param>
+		/// <param name="interfaceName">Name of the component interface</param>
+		/// <param name="delegateCorrelationSet">Correlation set for dynamic event and delegate wiring</param>
+		/// <param name="methodName">Name of the invoked method</param>
+		/// <param name="genericArguments">Generic arguments of the invoked method</param>
 		/// <param name="paramTypes">Parameter types</param>
-		/// <param name="args">Parameter</param>
-		/// <returns>Rückgabewert</returns>
+		/// <param name="args">Parameter values</param>
+		/// <returns>Return value</returns>
 		object Invoke(Guid trackingID, string interfaceName, List<DelegateCorrelationInfo> delegateCorrelationSet, string methodName, Type[] genericArguments, Type[] paramTypes, params object[] args);
 
 		/// <summary>
-		/// Gibt eine Liste mit allen registrierten Komponenten zurück.
+		/// Returns an array with metadata about all registered components.
 		/// </summary>
-		/// <returns>Liste mit Namen der registrierten Komponenten</returns>
+		/// <returns>Array with registered component metadata</returns>
 		ComponentInfo[] GetRegisteredComponents();
 
 		/// <summary>
-		/// Meldet einen Client am Applikationserver an.
+		/// Processes logon.
 		/// </summary>
-		/// <param name="sessionID">Sitzungsschlüssel (wird vom Client erstellt)</param>
-		/// <param name="credentials">Anmeldeinformationen</param>
+		/// <param name="sessionID">Unique session key (created on client side)</param>
+		/// <param name="credentials">Logon credentials</param>
 		void Logon(Guid sessionID, Hashtable credentials);
 
 		/// <summary>
-		/// Meldet einen Client vom Applikationsserver ab.
+		/// Process logoff.
 		/// </summary>
-		/// <param name="sessionID">Sitzungsschlüssel</param>
+		/// <param name="sessionID">Unique session key</param>
 		void Logoff(Guid sessionID);
 
 		/// <summary>
-		/// Registriert einen Client für den Empfang von Benachrichtigungen bei einem bestimmten Ereignis.
+		/// Subscribe to a specified NotificationService event.
 		/// </summary>
-		/// <param name="eventName">Ereignisname</param>
-		/// <param name="handler">Delegat auf Client-Ereignisprozedur</param>
+		/// <param name="eventName">Event name</param>
+		/// <param name="handler">Delegate to client side event handler</param>
 		void Subscribe(string eventName, EventHandler<NotificationEventArgs> handler);
 
 		/// <summary>
-		/// Hebt eine Registrierung für den Empfang von Benachrichtigungen eines bestimmten Ereignisses auf.
+		/// Unsubscribe from a specified NotificationService event.
 		/// </summary>
-		/// <param name="eventName">Ereignisname</param>
-		/// <param name="handler">Delegat auf Client-Ereignisprozedur</param>
+		/// <param name="eventName">Event name</param>
+		/// <param name="handler">Delegate to client side event handler</param>
 		void Unsubscribe(string eventName, EventHandler<NotificationEventArgs> handler);
 
 		/// <summary>
-		/// Gibt die maximale Sitzungslebensdauer (in Minuten) zurück.
+		/// Gets the maximum sesseion age (in minutes).
 		/// </summary>
 		int SessionAgeLimit
 		{
@@ -68,23 +67,34 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Verlängert die Sitzung des Aufrufers und gibt die aktuelle Sitzungslebensdauer zurück.
+		/// Extends the lifetime of the current session and returs the current session age limit.
 		/// </summary>
-		/// <returns>Sitzungslebensdauer (in Minuten)</returns>
+		/// <returns>Session age limit (in minutes)</returns>
 		int RenewSession();
 
 		/// <summary>
-		/// Abonniert ein Ereignis einer Serverkomponente.
+		/// Adds a handler to an event of a server component.
 		/// </summary>
-		/// <param name="interfaceName">Schnittstellenname der Serverkomponente</param>
-		/// <param name="correlation">Korrelationsinformation</param>
+		/// <param name="interfaceName">Name of the server component interface</param>
+		/// <param name="correlation">Correlation information</param>
 		void AddEventHandler(string interfaceName, DelegateCorrelationInfo correlation);
 
 		/// <summary>
-		/// Entfernt das Abonnement eines Ereignisses einer Serverkomponente.
+		/// Removes a handler from an event of a server component.
 		/// </summary>
-		/// <param name="interfaceName">Schnittstellenname der Serverkomponente</param>
-		/// <param name="correlation">Korrelationsinformation</param>
+		/// <param name="interfaceName">Name of the server component interface</param>
+		/// <param name="correlation">Correlation information</param>
 		void RemoveEventHandler(string interfaceName, DelegateCorrelationInfo correlation);
+
+		/// <summary>
+		/// Event: Occours when a heartbeat signal is received from a client.
+		/// </summary>
+		event EventHandler<ClientHeartbeatEventArgs> ClientHeartbeatReceived;
+
+		/// <summary>
+		/// Called from client to send a heartbeat signal.
+		/// </summary>
+		/// <param name="sessionID">Client´s session key</param>
+		void ReceiveClientHeartbeat(Guid sessionID);
 	}
 }

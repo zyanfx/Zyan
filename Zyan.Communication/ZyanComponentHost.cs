@@ -107,7 +107,7 @@ namespace Zyan.Communication
 			_serializationHandling = new SerializationHandlerRepository();
 			
 			// Komponentenaufrufer erzeugen
-			_invoker = new ZyanDispatcher(this);
+			_dispatcher = new ZyanDispatcher(this);
 
 			// Authentifizierungsanbieter übernehmen und verdrahten
 			_authProvider = protocolSetup.AuthenticationProvider;
@@ -153,7 +153,7 @@ namespace Zyan.Communication
 		#region Component Hosting
 
 		private ComponentCatalog _catalog = null;
-		private ZyanDispatcher _invoker = null;
+		private ZyanDispatcher _dispatcher = null;
 		private static List<ZyanComponentHost> _hosts = new List<ZyanComponentHost>();
 
 		/// <summary>
@@ -274,12 +274,13 @@ namespace Zyan.Communication
 
 		#region Network Communication
 
+		// Protocol and communication settings
 		private IServerProtocolSetup _protocolSetup = null;
 
-		// Name dieses Komponentenhosts
+		// Name of the component host (will be included in server URL)
 		private string _name = string.Empty;
 
-		// Kanalname
+		// Name of the transport channel
 		private string _channelName = string.Empty;
 
 		/// <summary>
@@ -308,7 +309,7 @@ namespace Zyan.Communication
 				ChannelServices.RegisterChannel(channel, false);
 
 				// Komponentenhost für entfernte Zugriffe veröffentlichen
-				RemotingServices.Marshal(_invoker, _name);
+				RemotingServices.Marshal(_dispatcher, _name);
 			}
 			else
 				throw new ApplicationException(LanguageResource.ApplicationException_NoChannel);
@@ -320,7 +321,7 @@ namespace Zyan.Communication
 		private void StopListening()
 		{
 			// Veröffentlichung des Komponentenhosts für entfernte Zugriffe löschen
-			RemotingServices.Disconnect(_invoker);
+			RemotingServices.Disconnect(_dispatcher);
 
 			// Kommunikationskanal schließen
 			CloseChannel();
@@ -566,8 +567,8 @@ namespace Zyan.Communication
 
 				StopListening();
 
-				if (_invoker != null)
-					_invoker = null;
+				if (_dispatcher != null)
+					_dispatcher = null;
 
 				if (_sessionManager != null)
 				{
@@ -633,6 +634,58 @@ namespace Zyan.Communication
 		{
 			if (ClientLoggedOff != null)
 				ClientLoggedOff(this, e);
+		}
+
+		#endregion
+
+		#region Trace Polling Events
+
+		// Switch to enable polling event trace
+		private bool _pollingEventTacingEnabled = false;
+
+		/// <summary>
+		/// Event: Occours when a heartbeat signal is received from a client.
+		/// </summary>
+		public event EventHandler<ClientHeartbeatEventArgs> ClientHeartbeatReceived;
+
+		/// <summary>
+		/// Fires the ClientHeartbeatReceived event.		
+		/// </summary>
+		/// <param name="e">Event arguments</param>
+		protected virtual void OnClientHeartbeatReceived(ClientHeartbeatEventArgs e)
+		{
+			if (ClientHeartbeatReceived != null)
+				ClientHeartbeatReceived(this, e);
+		}
+
+		/// <summary>
+		/// Gets or sets whether polling event tracing is enabled.
+		/// </summary>
+		public virtual bool PollingEventTracingEnabled
+		{
+			get { return _pollingEventTacingEnabled; }
+			set
+			{
+				if (_pollingEventTacingEnabled != value)
+				{
+					_pollingEventTacingEnabled = value;
+
+					if (_pollingEventTacingEnabled)
+						_dispatcher.ClientHeartbeatReceived += new EventHandler<ClientHeartbeatEventArgs>(_dispatcher_ClientHeartbeatReceived);
+					else
+						_dispatcher.ClientHeartbeatReceived -= new EventHandler<ClientHeartbeatEventArgs>(_dispatcher_ClientHeartbeatReceived);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Called, when dispatcher receives a heartbeat signal from a client.
+		/// </summary>
+		/// <param name="sender">Sender</param>
+		/// <param name="e">Event arguments</param>
+		private void _dispatcher_ClientHeartbeatReceived(object sender, ClientHeartbeatEventArgs e)
+		{
+			OnClientHeartbeatReceived(e);
 		}
 
 		#endregion
