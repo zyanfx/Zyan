@@ -54,6 +54,15 @@ namespace Zyan.Communication.Protocols.Tcp
 		}
 
 		/// <summary>
+		/// Gets or sets, if Windows Security should be used.
+		/// </summary>
+		public bool UseWindowsSecurity
+		{
+			get { return _useWindowsSecurity; }
+			set { _useWindowsSecurity = value; }
+		}
+
+		/// <summary>
 		/// Gets or sets, if sockets should be cached and reused.
 		/// <remarks>
 		/// Caching sockets may reduce ressource consumption but may cause trouble in Network Load Balancing clusters.
