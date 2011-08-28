@@ -70,7 +70,7 @@ namespace Zyan.Communication
 					dynamicEventWire.ServerEventInfo = eventInfo;
 					dynamicEventWire.Component = instance;
 
-					eventInfo.AddEventHandler(instance, dynamicEventWire.InDelegate);
+					eventInfo.AddEventHandler(instance, dynamicEventWire.InDelegate);					
 					wiringList.Add(correlationInfo.CorrelationID, dynamicEventWire.InDelegate);
 				}
 				else
