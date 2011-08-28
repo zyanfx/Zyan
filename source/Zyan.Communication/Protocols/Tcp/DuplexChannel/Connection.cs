@@ -19,6 +19,7 @@ using System.Runtime.Remoting;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
 using System.Threading;
+using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
@@ -668,7 +669,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				_tcpKeepAliveEnabled = value; 
 				
 				if (_socket!=null)
-					SetTcpKeepAlive(_socket, _tcpKeepAliveEnabled ? TcpKeepAliveTime : 0, _tcpKeepAliveEnabled ? TcpKeepAliveInterval : 0);                
+					_tcpKeepAliveEnabled = SetTcpKeepAlive(_socket, _tcpKeepAliveEnabled ? TcpKeepAliveTime : 0, _tcpKeepAliveEnabled ? TcpKeepAliveInterval : 0);                
 			}
 		}
 
@@ -699,6 +700,9 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// <returns>True if successful, otherwiese false</returns>
 		private bool SetTcpKeepAlive(Socket socket, ulong time, ulong interval)
 		{
+			if (MonoCheck.IsRunningOnMono && MonoCheck.NoWindowsOS)
+				return false; // Socket.IOControl method doesn´t work on Linux or Mac with mono
+
 			try
 			{
 				byte[] sioKeepAliveValues = new byte[3 * BYTES_PER_LONG];

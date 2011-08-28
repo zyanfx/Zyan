@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Security;
 using System.Security.Principal;
+using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication.Security
 {
@@ -18,12 +19,13 @@ namespace Zyan.Communication.Security
         /// <returns>Wahr, wenn die Anmeldung erflgreich war, ansonsten Falsch</returns>
         private bool ValidateWindowsCredentials(string username, string password, string domain)
         {
-            // Variable für Windows-Sicherheitstoken
+			if (MonoCheck.IsRunningOnMono && MonoCheck.NoWindowsOS)
+				return false; // Windows-Authentication isn´t supported on Linux or Mac.
+
             IntPtr token = IntPtr.Zero;
 
             try
             {
-                // Windows-Anmeldung durchführen
                 bool success = WindowsSecurityTools.LogonUser(
                        username,
                        domain,
@@ -32,21 +34,15 @@ namespace Zyan.Communication.Security
                        WindowsSecurityTools.ProviderType.LOGON32_PROVIDER_DEFAULT,
                        out token)!=0;
 
-                // Wenn die Anmeldefunktion erfolgreich verarbeitet wurde ...
                 if (success && token != IntPtr.Zero)
                 {
-                    // Authentifizierte Identität abfragen
                     WindowsIdentity identity = new WindowsIdentity(token);
-
-                    // Wahr zurückgeben, wenn die Identität weder ein Gast noch anonym ist
                     return identity.IsAuthenticated && !(identity.IsGuest || identity.IsAnonymous);
                 }
-                // Falsch zurückgeben
                 return false;
             }
             finally
             {
-                // Unverwalteten Hande auf den Sicherheitstoken schließen
                 WindowsSecurityTools.CloseHandle(token);
             }
         }

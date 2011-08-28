@@ -3,19 +3,19 @@
 namespace Zyan.Communication.Delegates
 {
 	/// <summary>
-	/// Abfangvorrichtung für Delegaten.
+	/// Interception fixture for remote delegate invocation.
 	/// </summary>
 	public class DelegateInterceptor : MarshalByRefObject
 	{
 		/// <summary>
-		/// Erzeugt eine neue Instanz der DelegateInterceptor-Klasse.
+		/// Creates a new instance of the DelegateInterceptor class.
 		/// </summary>
 		public DelegateInterceptor()
 		{
 		}
 
 		/// <summary>
-		/// Gibt den clientseitigen Empfängerdelegaten zurück, oder legt ihn fest.
+		/// Gets or sets the client delegate.
 		/// </summary>
 		public object ClientDelegate
 		{
@@ -24,17 +24,15 @@ namespace Zyan.Communication.Delegates
 		}
 
 		/// <summary>
-		/// Ruft den verdrahteten Client-Delegaten dynamisch auf.
+		/// Invokes the wired client delegate.
 		/// </summary>
-		/// <param name="args">Argumente</param>
+		/// <param name="args">Parameters</param>
 		public object InvokeClientDelegate(params object[] args)
 		{
-			// Clientdelegat als Delegat casten
 			Delegate clientDelegate = (Delegate)ClientDelegate;
-
-			// Aufruf ausführen
 			return clientDelegate.DynamicInvoke(args);
 		}
+
 
 		/// <summary>
 		/// Ensures unlimited Remoting lifetime.
