@@ -42,7 +42,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		private ulong _tcpKeepAliveInterval = 1000;
 		private short _maxRetries = 10;
 		private int _retryDelay = 1000;
-
+		
 		#region TCP KeepAlive
 
 		/// <summary>
