@@ -33,6 +33,9 @@ namespace Zyan.Communication
 		// Protocol and communication settings
 		private IClientProtocolSetup _protocolSetup = null;
 
+		// Remoting-Channel
+		private IChannel _remotingChannel = null;
+
 		/// <summary>
 		/// Gets the URL of the remote server.
 		/// </summary>
@@ -128,11 +131,11 @@ namespace Zyan.Communication
 			RegisterStandardSerializationHandlers();
 			string[] addressParts = _serverUrl.Split('/');
 			_componentHostName = addressParts[addressParts.Length - 1];
-			
-			IChannel channel = _protocolSetup.CreateChannel();
 
-			if (channel != null)
-				ChannelServices.RegisterChannel(channel, false);
+			_remotingChannel = _protocolSetup.CreateChannel();
+
+			if (_remotingChannel != null)
+				ChannelServices.RegisterChannel(_remotingChannel, false);
 
 			_subscriptions = new Dictionary<Guid, NotificationReceiver>();
 			
@@ -541,6 +544,13 @@ namespace Zyan.Communication
 				{
 					_connections.Remove(this);
 				}
+				if (_remotingChannel != null)
+				{
+					if (ChannelServices.GetChannel(_remotingChannel.ChannelName)!=null)
+						ChannelServices.UnregisterChannel(_remotingChannel);
+
+					_remotingChannel = null;
+				}
 				_remoteDispatcher = null;
 				_serverUrl = string.Empty;
 				_sessionID = Guid.Empty;
@@ -562,7 +572,7 @@ namespace Zyan.Communication
 				{
 					_autoLoginCredentials.Clear();
 					_autoLoginCredentials = null;
-				}
+				}				
 				GC.WaitForPendingFinalizers();
 			}
 		}
