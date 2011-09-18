@@ -74,11 +74,31 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 			string hostname = Dns.GetHostName();
 			IPHostEntry hostEntry = Dns.GetHostEntry(hostname);
+			
 			if (port != 0)
 			{
+				AddressFamily addressFamily;
+
+				#if FX3
+
+				addressFamily = System.Net.Sockets.Socket.SupportsIPv4 ? AddressFamily.InterNetwork : AddressFamily.InterNetworkV6;
+
+				#else
+
+				addressFamily = System.Net.Sockets.Socket.OSSupportsIPv4 ? AddressFamily.InterNetwork : AddressFamily.InterNetworkV6;
+
+				#endif
+
 				foreach (IPAddress address in hostEntry.AddressList)
-					if (port != 0)
-						retVal.Add(string.Format("{0}:{1}", address, port));
+				{
+					if (address.AddressFamily == addressFamily)
+					{
+						string hostAndPort = string.Format("{0}:{1}", address, port);
+
+						if (!retVal.Contains(hostAndPort))
+							retVal.Add(hostAndPort);						
+					}
+				}
 				if (!retVal.Contains(string.Format("{0}:{1}", IPAddress.Loopback, port)))
 					retVal.Add(string.Format("{0}:{1}", IPAddress.Loopback, port));
 			}
