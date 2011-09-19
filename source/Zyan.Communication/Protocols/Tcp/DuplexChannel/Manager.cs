@@ -22,7 +22,7 @@ using System.Runtime.Serialization;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
-	internal class Manager
+	internal partial class Manager
 	{
 		#region Uri Utilities
 
@@ -61,46 +61,6 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			{
 				foreach (IPAddress address in hostEntry.AddressList)
 					retVal.Add(string.Format("tcpex://{0}:{1}{2}", address, port, objectUri));
-			}
-
-			return (string[])retVal.ToArray(typeof(string));
-		}
-
-		public static string[] GetAddresses(int port, Guid guid)
-		{
-			ArrayList retVal = new ArrayList();
-			if (guid != Guid.Empty)
-				retVal.Add(string.Format("{0}", guid));
-
-			string hostname = Dns.GetHostName();
-			IPHostEntry hostEntry = Dns.GetHostEntry(hostname);
-			
-			if (port != 0)
-			{
-				AddressFamily addressFamily;
-
-				#if FX3
-
-				addressFamily = System.Net.Sockets.Socket.SupportsIPv4 ? AddressFamily.InterNetwork : AddressFamily.InterNetworkV6;
-
-				#else
-
-				addressFamily = System.Net.Sockets.Socket.OSSupportsIPv4 ? AddressFamily.InterNetwork : AddressFamily.InterNetworkV6;
-
-				#endif
-
-				foreach (IPAddress address in hostEntry.AddressList)
-				{
-					if (address.AddressFamily == addressFamily)
-					{
-						string hostAndPort = string.Format("{0}:{1}", address, port);
-
-						if (!retVal.Contains(hostAndPort))
-							retVal.Add(hostAndPort);						
-					}
-				}
-				if (!retVal.Contains(string.Format("{0}:{1}", IPAddress.Loopback, port)))
-					retVal.Add(string.Format("{0}:{1}", IPAddress.Loopback, port));
 			}
 
 			return (string[])retVal.ToArray(typeof(string));
