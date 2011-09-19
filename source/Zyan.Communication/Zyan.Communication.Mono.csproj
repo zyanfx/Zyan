@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -89,6 +89,7 @@
     <Compile Include="ISerializationHandler.cs" />
     <Compile Include="IZyanDispatcher.cs" />
     <Compile Include="LoginEventArgs.cs" />
+    <Compile Include="Protocols\Tcp\DuplexChannel\Manager.GetAddresses.Fx3.cs" />
     <Compile Include="SerializationHandlerRepository.cs" />
     <Compile Include="ServerSession.cs" />
     <Compile Include="ZyanComponentHost.cs" />
