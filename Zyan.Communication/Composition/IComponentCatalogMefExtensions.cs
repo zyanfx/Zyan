@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
 using System.Linq;
@@ -10,7 +11,7 @@ using Zyan.InterLinq;
 namespace Zyan.Communication.Composition
 {
 	// Shortcut name for registration method delegate
-	using ComponentRegistrationDelegate = Action<IComponentCatalog, ComposablePartCatalog, CompositionContainer, string>;
+	using ComponentRegistrationDelegate = Action<IComponentCatalog, ComposablePartCatalog, CompositionContainer, string, ActivationType>;
 
 	/// <summary>
 	/// Server-side MEF integration
@@ -57,7 +58,20 @@ namespace Zyan.Communication.Composition
 				var type = export.Metadata[ZyanComponentAttribute.ComponentInterfaceKeyName] as Type;
 				if (type != null)
 				{
-					host.RegisterComponent(childCatalog, parentContainer, type, export.ContractName);
+					// treat shared parts as singletons (influences event handling in ZyanDispatcher)
+					var activationType = ActivationType.SingleCall;
+					var creationPolicyKey = typeof(CreationPolicy).FullName;
+					if (export.Metadata.ContainsKey(creationPolicyKey))
+					{
+						var creationPolicy = export.Metadata[creationPolicyKey];
+						if (creationPolicy is CreationPolicy && (CreationPolicy)creationPolicy == CreationPolicy.Shared)
+						{
+							activationType = ActivationType.Singleton;
+						}
+					}
+
+					// register exported component
+					host.RegisterComponent(childCatalog, parentContainer, type, export.ContractName, activationType);
 				}
 			}
 		}
@@ -66,18 +80,43 @@ namespace Zyan.Communication.Composition
 		/// MethodInfo for RegisterComponent{I} method, used to create generic method delegates
 		/// </summary>
 		static MethodInfo RegisterComponentMethodInfo = typeof(IComponentCatalogMefExtensions).GetMethod("RegisterComponent", BindingFlags.Static | BindingFlags.NonPublic,
-			null, new[] { typeof(IComponentCatalog), typeof(ComposablePartCatalog), typeof(CompositionContainer), typeof(string) }, null);
+			null, new[] { typeof(IComponentCatalog), typeof(ComposablePartCatalog), typeof(CompositionContainer), typeof(string), typeof(ActivationType) }, null);
 
 		/// <summary>
 		/// Registers component implementing interface I. Component instance is provided by MEF container.
 		/// </summary>
-		static void RegisterComponent<I>(this IComponentCatalog host, ComposablePartCatalog childCatalog, CompositionContainer parentContainer, string contractName = null)
+		static void RegisterComponent<I>(this IComponentCatalog host, ComposablePartCatalog childCatalog, CompositionContainer parentContainer, string contractName, ActivationType activationType)
 		{
-			// component -> owning container
-			var containers = new ConcurrentDictionary<object, CompositionContainer>();
 			var uniqueName = contractName ?? typeof(I).FullName;
 
-			// component instance is created inside the child container
+			// Singleton component instance is created in the parent container
+			if (activationType == ActivationType.Singleton)
+			{
+				host.RegisterComponent<I>
+				(
+					uniqueName,
+					delegate // lazy-initialized singleton factory
+					{
+						var component = contractName != null ?
+							parentContainer.GetExport<I>(contractName).Value :
+							parentContainer.GetExport<I>().Value;
+
+						return component;
+					},
+					ActivationType.Singleton,
+					delegate (object component) // empty cleanup handler
+					{
+						// do not clean up component instance
+						// even if it implements IDisposable
+					}
+				);
+				return;
+			}
+
+			// Dictionary: component -> owning container
+			var containers = new ConcurrentDictionary<object, CompositionContainer>();
+
+			// SingleCall component instance is created inside the child container
 			host.RegisterComponent<I>
 			(
 				uniqueName,
@@ -85,10 +124,14 @@ namespace Zyan.Communication.Composition
 				{
 					// create child container for early component disposal
 					var childContainer = new CompositionContainer(childCatalog, parentContainer);
-					var component = contractName != null ? childContainer.GetExport<I>(contractName).Value : childContainer.GetExport<I>().Value;
+					var component = contractName != null ? 
+						childContainer.GetExport<I>(contractName).Value : 
+						childContainer.GetExport<I>().Value;
+
 					containers[component] = childContainer;
 					return component;
 				},
+				ActivationType.SingleCall,
 				delegate (object component) // cleanup delegate
 				{
 					CompositionContainer childContainer;
@@ -105,12 +148,12 @@ namespace Zyan.Communication.Composition
 		/// <summary>
 		/// Registers component of the given type. Component instance is provided by MEF container.
 		/// </summary>
-		static void RegisterComponent(this IComponentCatalog host, ComposablePartCatalog childCatalog, CompositionContainer parentContainer, Type type, string contractName = null)
+		static void RegisterComponent(this IComponentCatalog host, ComposablePartCatalog childCatalog, CompositionContainer parentContainer, Type type, string contractName, ActivationType activationType)
 		{
 			// create registration method and register the component
 			var method = RegisterComponentMethodInfo.MakeGenericMethod(type);
 			var registerComponent = method.CreateDelegate<ComponentRegistrationDelegate>();
-			registerComponent(host, childCatalog, parentContainer, contractName);
+			registerComponent(host, childCatalog, parentContainer, contractName, activationType);
 		}
 	}
 }
