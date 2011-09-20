@@ -65,5 +65,28 @@ namespace InterLinq.UnitTests
 
 			Assert.AreEqual(expression.ToString(), dx.ToString());
 		}
+
+		class Sample
+		{
+			public event EventHandler TestEvent;
+
+			public Expression<Func<Sample, Delegate>> GetExpression()
+			{
+				return x => x.TestEvent;
+			}
+		}
+
+		/// <summary>
+		/// Expression with member access.
+		/// </summary>
+		[TestMethod]
+		public void TestMemberExpressionSerialization()
+		{
+			Expression<Func<Sample, Delegate>> expression = new Sample().GetExpression();
+			var sx = expression.MakeSerializable();
+			var dx = sx.Deserialize();
+
+			Assert.AreEqual(expression.ToString(), dx.ToString());
+		}
 	}
 }

@@ -80,8 +80,13 @@ namespace Zyan.InterLinq.Types
 					return tsInstance.GetClrVersion<FieldInfo>(this);
 				}
 
-				Type declaringType = (Type)DeclaringType.GetClrVersion();
-				FieldInfo foundField = declaringType.GetField(Name);
+				var declaringType = (Type)DeclaringType.GetClrVersion();
+				var foundField = declaringType.GetField(Name);
+				if (foundField == null)
+				{
+					foundField = declaringType.GetField(Name, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+				}
+
 				tsInstance.SetClrVersion(this, foundField);
 				return foundField;
 			}
