@@ -66,7 +66,7 @@
     <Compile Include="CleanupTests.cs" />
     <Compile Include="DuckTypingTests.cs" />
     <Compile Include="DynamicWireTests.cs" />
-    <Compile Include="GenericMethodsTest.cs" />
+    <Compile Include="GenericMethodsTests.cs" />
     <Compile Include="LinqTests.cs" />
     <Compile Include="MefClientTests.cs" />
     <Compile Include="MefServerTests.cs" />
@@ -77,6 +77,7 @@
     <Compile Include="Misc\SampleObjectSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="OneWayTests.cs" />
+    <Compile Include="ZyanProxyTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Zyan.Communication\Zyan.Communication.csproj">

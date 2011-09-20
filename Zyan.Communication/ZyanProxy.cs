@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Remoting;
 using System.Runtime.Remoting.Messaging;
 using System.Runtime.Remoting.Proxies;
-using Zyan.InterLinq;
 using Zyan.Communication.Delegates;
+using Zyan.InterLinq;
 
 namespace Zyan.Communication
 {
@@ -123,10 +124,14 @@ namespace Zyan.Communication
 			var methodCallMessage = (IMethodCallMessage)message;
 			var methodInfo = (MethodInfo)methodCallMessage.MethodBase;
 
-			// handle Object.GetType() call locally (this branch is never executed under Mono runtime)
-			if (methodInfo.DeclaringType == typeof(object) && methodInfo.Name == "GetType")
+			// handle Object class method calls locally
+			if (methodInfo.DeclaringType == typeof(object))
 			{
-				return new ReturnMessage(_interfaceType, null, 0, null, methodCallMessage);
+				var returnMessage = InvokeLocally(methodInfo.Name, methodCallMessage);
+				if (returnMessage != null)
+				{
+					return returnMessage;
+				}
 			}
 
 			try
@@ -263,6 +268,56 @@ namespace Zyan.Communication
 				}
 
 				throw ex;
+			}
+		}
+
+		/// <summary>
+		/// Handles certain invocations locally for methods declared by System.Object class.
+		/// </summary>
+		private ReturnMessage InvokeLocally(string methodName, IMethodCallMessage methodCallMessage)
+		{
+			Func<object, ReturnMessage> GetResult =
+				result => new ReturnMessage(result, null, 0, null, methodCallMessage);
+
+			switch (methodName)
+			{
+				case "GetType":
+					return GetResult(_interfaceType);
+
+				case "GetHashCode":
+					var hashCode = 0xBadFace;
+					hashCode ^= _connection.ServerUrl.GetHashCode();
+					hashCode ^= _interfaceType.FullName.GetHashCode();
+					return GetResult(hashCode);
+
+				case "Equals":
+					var falseResult = GetResult(false);
+
+					// is other object also a transparent proxy?
+					var other = methodCallMessage.Args[0];
+					if (!RemotingServices.IsTransparentProxy(other))
+						return falseResult;
+
+					// is other object proxied by ZyanProxy?
+					var proxy = RemotingServices.GetRealProxy(other) as ZyanProxy;
+					if (proxy == null)
+						return falseResult;
+
+					// are properties the same?
+					if (proxy._sessionID != _sessionID ||
+						proxy._connection.ServerUrl != _connection.ServerUrl ||
+						proxy._interfaceType != _interfaceType ||
+						proxy._uniqueName != _uniqueName)
+						return falseResult;
+
+					return GetResult(true);
+
+				case "ToString":
+					var result = _connection.ServerUrl + "/" + _interfaceType.FullName;
+					return GetResult(result);
+
+				default:
+					return null;
 			}
 		}
 
