@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Zyan.Communication.SessionMgmt;
 
 namespace Zyan.Communication.Delegates
 {
@@ -19,6 +20,12 @@ namespace Zyan.Communication.Delegates
 		public EventInfo ServerEventInfo { get; set; }
 
 		/// <summary>
+		/// Session validation handler.
+		/// Returns True if client's session is valid, otherwise, False.
+		/// </summary>
+		public Func<bool> ValidateSession { get; set; }
+
+		/// <summary>
 		/// Invokes client event handler.
 		/// If the handler throws an exception, event subsription is cancelled.
 		/// </summary>
@@ -28,6 +35,9 @@ namespace Zyan.Communication.Delegates
 		{
 			try
 			{
+				if (ValidateSession != null && !ValidateSession())
+					throw new InvalidSessionException();
+
 				return Interceptor.InvokeClientDelegate(args);
 			} 
 			catch

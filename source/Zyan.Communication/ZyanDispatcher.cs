@@ -70,7 +70,12 @@ namespace Zyan.Communication
 					dynamicEventWire.ServerEventInfo = eventInfo;
 					dynamicEventWire.Component = instance;
 
-					eventInfo.AddEventHandler(instance, dynamicEventWire.InDelegate);					
+					// add session validation handler
+					var sessionId = ServerSession.CurrentSession.SessionID;
+					var sessionManager = _host.SessionManager;
+					dynamicEventWire.ValidateSession = () => sessionManager.ExistSession(sessionId);
+
+					eventInfo.AddEventHandler(instance, dynamicEventWire.InDelegate);
 					wiringList.Add(correlationInfo.CorrelationID, dynamicEventWire.InDelegate);
 				}
 				else
