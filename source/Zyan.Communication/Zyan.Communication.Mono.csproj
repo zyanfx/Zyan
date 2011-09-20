@@ -20,6 +20,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -89,7 +90,6 @@
     <Compile Include="ISerializationHandler.cs" />
     <Compile Include="IZyanDispatcher.cs" />
     <Compile Include="LoginEventArgs.cs" />
-    <Compile Include="Protocols\Tcp\DuplexChannel\Manager.GetAddresses.Fx3.cs" />
     <Compile Include="SerializationHandlerRepository.cs" />
     <Compile Include="ServerSession.cs" />
     <Compile Include="ZyanComponentHost.cs" />
@@ -212,7 +212,6 @@
     <Compile Include="Protocols\Tcp\DuplexChannel\Connection.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\DuplicateConnectionException.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\Manager.cs" />
-    <Compile Include="Protocols\Tcp\DuplexChannel\Manager.GetAddresses.Fx3.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\Message.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\MessageException.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\ServerTransportSink.cs" />
@@ -247,6 +246,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="LanguageResource.Designer.cs" />
     <Compile Include="InterLinq\Communication\ZyanMethodQueryHandler.cs" />
+    <Compile Include="Protocols\Tcp\DuplexChannel\Manager.GetAddresses.Fx4.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
