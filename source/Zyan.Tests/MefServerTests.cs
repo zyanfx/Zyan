@@ -343,6 +343,20 @@ namespace Zyan.Tests
 			}
 		}
 
+		/// <summary>
+		/// Shared component should be registered as singleton.
+		/// </summary>
+		[ZyanComponent("UniqueName_MefSample13", typeof(IMefSample)), PartCreationPolicy(CreationPolicy.Shared)]
+		public class MefSample13 : IMefSample, IDisposable
+		{
+			public Guid Guid = Guid.NewGuid();
+
+			public void Dispose()
+			{
+				Guid = Guid.Empty;
+			}
+		}
+
 		#endregion
 
 		public TestContext TestContext { get; set; }
@@ -365,7 +379,7 @@ namespace Zyan.Tests
 		}
 
 		[TestMethod]
-		public void ZyanComponentFromMefCatalog_IsRegistered()
+		public void ZyanComponentFromMefCatalog_IsRegisteredAsSingleCall()
 		{
 			var cat = new ComponentCatalog();
 			cat.RegisterComponents(MefCatalog);
@@ -373,6 +387,7 @@ namespace Zyan.Tests
 			// get component registration
 			var reg = cat.GetRegistration(typeof(IMefSample));
 			Assert.IsNotNull(reg);
+			Assert.AreEqual(ActivationType.SingleCall, reg.ActivationType);
 
 			// get component instance
 			var obj = cat.GetComponent<IMefSample>();
@@ -386,7 +401,7 @@ namespace Zyan.Tests
 		}
 
 		[TestMethod]
-		public void ZyanComponentFromMefContainer_IsRegistered()
+		public void ZyanComponentFromMefContainer_IsRegisteredAsSingleCall()
 		{
 			var cat = new ComponentCatalog();
 			cat.RegisterComponents(MefContainer);
@@ -394,6 +409,7 @@ namespace Zyan.Tests
 			// get component registration
 			var reg = cat.GetRegistration(typeof(IMefSample));
 			Assert.IsNotNull(reg);
+			Assert.AreEqual(ActivationType.SingleCall, reg.ActivationType);
 
 			// get component instance
 			var obj = cat.GetComponent<IMefSample>();
@@ -687,6 +703,7 @@ namespace Zyan.Tests
 			// get component registration
 			var reg = cat.GetRegistration("UniqueName_MefSample9");
 			Assert.IsNotNull(reg);
+			Assert.AreEqual(ActivationType.Singleton, reg.ActivationType);
 
 			// get component instance
 			var obj = cat.GetComponent("UniqueName_MefSample9") as IMefSample;
@@ -694,8 +711,12 @@ namespace Zyan.Tests
 			AssertEx.IsInstanceOf<MefSample9>(obj);
 			Assert.AreNotEqual(0, MefSample9.InstanceCount);
 
-			// clean up component instance
+			// make sure component instance is not cleaned up
 			cat.CleanUpComponentInstance(reg, obj);
+			Assert.AreNotEqual(0, MefSample9.InstanceCount);
+
+			// make sure component instance is not disposed with catalog
+			cat.Dispose();
 			Assert.AreNotEqual(0, MefSample9.InstanceCount);
 		}
 
@@ -708,6 +729,7 @@ namespace Zyan.Tests
 			// get component registration
 			var reg = cat.GetRegistration("UniqueName_MefSample9");
 			Assert.IsNotNull(reg);
+			Assert.AreEqual(ActivationType.Singleton, reg.ActivationType);
 
 			// get component instance
 			var obj = cat.GetComponent("UniqueName_MefSample9") as IMefSample;
@@ -715,8 +737,12 @@ namespace Zyan.Tests
 			AssertEx.IsInstanceOf<MefSample9>(obj);
 			Assert.AreNotEqual(0, MefSample9.InstanceCount);
 
-			// clean up component instance
+			// make sure component instance is not cleaned up
 			cat.CleanUpComponentInstance(reg, obj);
+			Assert.AreNotEqual(0, MefSample9.InstanceCount);
+
+			// make sure component instance is not disposed with catalog
+			cat.Dispose();
 			Assert.AreNotEqual(0, MefSample9.InstanceCount);
 		}
 
@@ -776,6 +802,33 @@ namespace Zyan.Tests
 			var obj = cat.GetComponent("UniqueName_MefSample12") as IMefSample12;
 			Assert.IsNotNull(obj);
 			AssertEx.IsInstanceOf<MefSample12>(obj);
+		}
+
+		[TestMethod]
+		public void ZyanComponentWithSharedPolicyAttribute_IsRegisteredAsSingleton()
+		{
+			var cat = new ComponentCatalog();
+			cat.RegisterComponents(MefCatalog);
+
+			// get component registration
+			var reg = cat.GetRegistration("UniqueName_MefSample13");
+			Assert.IsNotNull(reg);
+			Assert.AreEqual(ActivationType.Singleton, reg.ActivationType);
+
+			// get component instance
+			var obj = cat.GetComponent("UniqueName_MefSample13") as IMefSample;
+			Assert.IsNotNull(obj);
+			AssertEx.IsInstanceOf<MefSample13>(obj);
+			var ms13 = (MefSample13)obj;
+			var guid = ms13.Guid;
+
+			// make sure component instance is not cleaned up
+			cat.CleanUpComponentInstance(reg, obj);
+			Assert.AreEqual(guid, ms13.Guid);
+
+			// make sure component instance is not disposed with component catalog
+			cat.Dispose();
+			Assert.AreEqual(guid, ms13.Guid);
 		}
 	}
 }
