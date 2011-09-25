@@ -165,12 +165,13 @@ namespace Zyan.Communication
 
 					// If component is singleton, attach event handler
 					if (_activationType == ActivationType.Singleton)
+					{
+						_connection.PrepareCallContext(false);
 						_connection.RemoteDispatcher.AddEventHandler(_interfaceType.FullName, correlationInfo);
-
+					}
 					// Save delegate correlation info
 					_delegateCorrelationSet.Add(correlationInfo);
 
-					// Create empty return message
 					return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
 				}
 				else if (methodInfo.ReturnType.Equals(typeof(void)) &&
@@ -180,37 +181,26 @@ namespace Zyan.Communication
 					typeof(Delegate).IsAssignableFrom(methodCallMessage.Args[0].GetType()) &&
 					(methodCallMessage.MethodName.StartsWith("remove_")))
 				{
-					// EBC-Eingangsnachricht abrufen
 					object inputMessage = methodCallMessage.GetArg(0);
-
-					// "remove_" wegschneiden
 					string propertyName = methodCallMessage.MethodName.Substring(7);
 
-					// Wenn Verdrahtungen gespeichert sind ...
 					if (_delegateCorrelationSet.Count > 0)
 					{
-						// Verdrahtungskonfiguration suchen
 						DelegateCorrelationInfo found = (from correlationInfo in _delegateCorrelationSet.ToArray()
 														 where correlationInfo.DelegateMemberName.Equals(propertyName) && correlationInfo.ClientDelegateInterceptor.ClientDelegate.Equals(inputMessage)
 														 select correlationInfo).FirstOrDefault();
 
-						// Wenn eine passende Verdrahtungskonfiguration gefunden wurde ...
 						if (found != null)
 						{
-							// Wenn die Serverkomponente SingleCallaktiviert ist ...
 							if (_activationType == ActivationType.SingleCall)
-							{
-								// Verdrahtungskonfiguration entfernen
 								_delegateCorrelationSet.Remove(found);
-							}
 							else
 							{
-								// Ereignisabo entfernen
+								_connection.PrepareCallContext(false);
 								_connection.RemoteDispatcher.RemoveEventHandler(_interfaceType.FullName, found);
 							}
 						}
 					}
-					// Leere Remoting-Antwortnachricht erstellen und zurückgeben
 					return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
 				}
 				else if (methodInfo.GetParameters().Length == 0 &&
@@ -235,10 +225,7 @@ namespace Zyan.Communication
 				}
 				else
 				{
-					// Aufrufkontext vorbereiten
 					_connection.PrepareCallContext(_implicitTransactionTransfer);
-
-					// Entfernten Methodenaufruf durchführen und jede Antwortnachricht sofort über einen Rückkanal empfangen
 					return InvokeRemoteMethod(methodCallMessage, true);
 				}
 			}
@@ -539,6 +526,31 @@ namespace Zyan.Communication
 			}
 			// Arument-Array zurückgeben
 			return result;
+		}
+
+		/// <summary>
+		/// Removes all remote event handlers.
+		/// </summary>
+		internal void RemoveAllRemoteEventHandlers()
+		{
+			if (_delegateCorrelationSet == null)
+				return;
+
+			if (_delegateCorrelationSet.Count > 0)
+			{
+				for(int i=_delegateCorrelationSet.Count-1; i>=0;i--)				
+				{
+					var correlationInfo = _delegateCorrelationSet[i];
+
+					if (_activationType == ActivationType.SingleCall)
+						_delegateCorrelationSet.Remove(correlationInfo);
+					else
+					{
+						_connection.PrepareCallContext(false);
+						_connection.RemoteDispatcher.RemoveEventHandler(_interfaceType.FullName, correlationInfo);
+					}
+				}
+			}
 		}
 	}
 }
