@@ -125,22 +125,18 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Processes BeforeInvoke event subscriptions (if there any).
 		/// </summary>
-		/// <param name="trackingID">Unique key for call tracking</param>
-		/// <param name="interfaceName">Component interface name</param>
-		/// <param name="delegateCorrelationSet">Set of correlation information to wire events and delegates</param>
-		/// <param name="methodName">Method name</param>
-		/// <param name="args">Arguments</param>   
-		private void ProcessBeforeInvoke(Guid trackingID, ref string interfaceName, ref List<DelegateCorrelationInfo> delegateCorrelationSet, ref string methodName, ref object[] args)
+		/// <param name="details">Invocation details</param>
+		private void ProcessBeforeInvoke(InvocationDetails details)
 		{
 			if (_host.HasBeforeInvokeSubscriptions())
 			{
 				BeforeInvokeEventArgs cancelArgs = new BeforeInvokeEventArgs()
 				{
-					TrackingID = trackingID,
-					InterfaceName = interfaceName,
-					DelegateCorrelationSet = delegateCorrelationSet,
-					MethodName = methodName,
-					Arguments = args,
+					TrackingID = details.TrackingID,
+					InterfaceName = details.InterfaceName,
+					DelegateCorrelationSet =  details.DelegateCorrelationSet,
+					MethodName = details.MethodName,
+					Arguments = details.Args,
 					Cancel = false
 				};
 				_host.OnBeforeInvoke(cancelArgs);
@@ -150,16 +146,16 @@ namespace Zyan.Communication
 					if (cancelArgs.CancelException == null)
 						cancelArgs.CancelException = new InvokeCanceledException();
 
-					_host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = cancelArgs.CancelException });
+					_host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = details.TrackingID, CancelException = cancelArgs.CancelException });
 
 					throw cancelArgs.CancelException;
 				}
 				else
 				{
-					interfaceName = cancelArgs.InterfaceName;
-					delegateCorrelationSet = cancelArgs.DelegateCorrelationSet;
-					methodName = cancelArgs.MethodName;
-					args = cancelArgs.Arguments;
+					details.InterfaceName = cancelArgs.InterfaceName;
+					details.DelegateCorrelationSet = cancelArgs.DelegateCorrelationSet;
+					details.MethodName = cancelArgs.MethodName;
+					details.Args = cancelArgs.Arguments;
 				}
 			}
 		}
@@ -167,24 +163,19 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Processes AfterInvoke event subscriptions (if there any).
 		/// </summary>
-		/// <param name="trackingID">Unique key for call tracking</param>
-		/// <param name="interfaceName">Component interface name</param>
-		/// <param name="delegateCorrelationSet">Set of correlation information to wire events and delegates</param>
-		/// <param name="methodName">Method name</param>
-		/// <param name="args">Arguments</param>   
-		/// <param name="returnValue">Return value</param>
-		private void ProcessAfterInvoke(Guid trackingID, ref string interfaceName, ref List<DelegateCorrelationInfo> delegateCorrelationSet, ref string methodName, ref object[] args, ref object returnValue)
+		/// <param name="details">Invocation details</param>
+		private void ProcessAfterInvoke(InvocationDetails details)
 		{
 			if (_host.HasAfterInvokeSubscriptions())
 			{
 				AfterInvokeEventArgs afterInvokeArgs = new AfterInvokeEventArgs()
 				{
-					TrackingID = trackingID,
-					InterfaceName = interfaceName,
-					DelegateCorrelationSet = delegateCorrelationSet,
-					MethodName = methodName,
-					Arguments = args,
-					ReturnValue = returnValue
+					TrackingID = details.TrackingID,
+					InterfaceName = details.InterfaceName,
+					DelegateCorrelationSet =  details.DelegateCorrelationSet,
+					MethodName = details.MethodName,
+					Arguments = details.Args,
+					ReturnValue = details.ReturnValue
 				};
 				_host.OnAfterInvoke(afterInvokeArgs);
 			}
@@ -215,7 +206,228 @@ namespace Zyan.Communication
 				ServerSession.CurrentSession.ClientAddress = string.Empty;
 		}
 
-		//TODO: This method needs refactoring. It´s too big.
+		/// <summary>
+		/// Checks if the provided interface name belongs to a registered component.
+		/// </summary>
+		/// <param name="details">Invocation details</param>
+		private void Invoke_CheckInterfaceName(InvocationDetails details)
+		{
+			// look up the component registration info
+			if (!_host.ComponentRegistry.ContainsKey(details.InterfaceName))			
+				throw new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_CannotFindComponentForInterface, details.InterfaceName));			
+		}
+
+		/// <summary>
+		/// Loads data from the logical call context.
+		/// </summary>
+		/// <param name="details">Invocation details</param>
+		private void Invoke_LoadCallContextData(InvocationDetails details)
+		{
+			// check for logical context data
+			details.CallContextData = CallContext.GetData("__ZyanContextData_" + _host.Name) as LogicalCallContextData;
+			if (details.CallContextData == null)
+			{
+				throw new SecurityException(LanguageResource.SecurityException_ContextInfoMissing);
+			}
+		}
+
+		/// <summary>
+		/// Sets the session for the current worker thread.
+		/// </summary>
+		/// <param name="details">Invocation details</param>
+		private void Invoke_SetSession(InvocationDetails details)
+		{
+			// validate session
+			var sessionID = details.CallContextData.Store.ContainsKey("sessionid") ? (Guid)details.CallContextData.Store["sessionid"] : Guid.Empty;
+			if (!_host.SessionManager.ExistSession(sessionID))
+			{
+				throw new InvalidSessionException(string.Format(LanguageResource.InvalidSessionException_SessionIDInvalid, sessionID.ToString()));
+			}
+
+			// set current session
+			details.Session = _host.SessionManager.GetSessionBySessionID(sessionID);
+			details.Session.Timestamp = DateTime.Now;
+			ServerSession.CurrentSession = details.Session;
+			PutClientAddressToCurrentSession();
+		}
+
+		/// <summary>
+		/// Sets a transaction for the current worker thread, if provied.
+		/// </summary>
+		/// <param name="details">Invocation details</param>
+		private void Invoke_SetTransaction(InvocationDetails details)
+		{
+			// transfer implicit transaction
+			var transaction = details.CallContextData.Store.ContainsKey("transaction") ? (Transaction)details.CallContextData.Store["transaction"] : null;
+			if (transaction != null)			
+				details.Scope = new TransactionScope(transaction);			
+		}
+
+		/// <summary>
+		/// Fires the InvokeCanceled event.
+		/// </summary>
+		/// <param name="details">Invocation details</param>
+		/// <param name="ex">Exception</param>
+		private void Invoke_FireInvokeCanceledEvent(InvocationDetails details, Exception ex)
+		{
+			details.ExceptionThrown = true;
+
+			_host.OnInvokeCanceled(new InvokeCanceledEventArgs
+			{
+				TrackingID = details.TrackingID,
+				CancelException = ex
+			});
+
+			throw ex;
+		}
+
+		/// <summary>
+		/// Converts method arguments, if needed.
+		/// <remarks>
+		/// Conversion is needed when Types configured for custom serialization or arguments are delegates.
+		/// </remarks>
+		/// </summary>
+		/// <param name="details">Invocation details</param>
+		private void Invoke_ConvertMethodArguments(InvocationDetails details)
+		{
+			details.DelegateParamIndexes = new Dictionary<int, DelegateInterceptor>();
+			for (int i = 0; i < details.ParamTypes.Length; i++)
+			{
+				var delegateParamInterceptor = details.Args[i] as DelegateInterceptor;
+				if (delegateParamInterceptor != null)
+				{
+					details.DelegateParamIndexes.Add(i, delegateParamInterceptor);
+					continue;
+				}
+
+				var container = details.Args[i] as CustomSerializationContainer;
+				if (container != null)
+				{
+					var serializationHandler = _host.SerializationHandling[container.HandledType];
+					if (serializationHandler == null)
+					{
+						var ex = new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_SerializationHandlerNotFound, container.HandledType.FullName));
+						_host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = details.TrackingID, CancelException = ex });
+						throw ex;
+					}
+
+					details.Args[i] = serializationHandler.Deserialize(container.DataType, container.Data);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Resolves the component instance to be invoked.
+		/// </summary>
+		/// <param name="details">Invocation details</param>
+		private void Invoke_ResolveComponentInstance(InvocationDetails details)
+		{
+			// get component instance
+			details.Registration = _host.ComponentRegistry[details.InterfaceName];
+			details.Instance = _host.GetComponentInstance(details.Registration);
+			details.Type = details.Instance.GetType();
+		}
+
+		/// <summary>
+		/// Wires up event handlers.
+		/// </summary>
+		/// <param name="details">Invocation details</param>
+		private void Invoke_WireUpEventHandlers(InvocationDetails details)
+		{
+			details.WiringList = null;
+			if (details.Registration.ActivationType == ActivationType.SingleCall)
+			{
+				details.WiringList = new Dictionary<Guid, Delegate>();
+				CreateClientServerWires(details.Type, details.Instance, details.DelegateCorrelationSet, details.WiringList);
+			}
+		}
+
+		/// <summary>
+		/// Obtains metadata of the invoked method via reflection.
+		/// </summary>
+		/// <param name="details">Invocation details</param>
+		private void Invoke_ObtainMethodMetadata(InvocationDetails details)
+		{
+			details.MethodInfo = details.Type.GetMethod(details.MethodName, details.GenericArguments, details.ParamTypes);
+			if (details.MethodInfo == null)
+			{
+				var methodSignature = MessageHelpers.GetMethodSignature(details.Type, details.MethodName, details.ParamTypes);
+				var exceptionMessage = String.Format(LanguageResource.MissingMethodException_MethodNotFound, methodSignature);
+				throw new MissingMethodException(exceptionMessage);
+			}
+		}
+
+		/// <summary>
+		/// Intercepts delegate parameters.
+		/// </summary>
+		/// <param name="details">Invocation details</param>
+		private void Invoke_InterceptDelegateParams(InvocationDetails details)
+		{
+			var serverMethodParamDefs = details.MethodInfo.GetParameters();
+			foreach (int index in details.DelegateParamIndexes.Keys)
+			{
+				var delegateParamInterceptor = details.DelegateParamIndexes[index];
+				var serverMethodParamDef = serverMethodParamDefs[index];
+
+				var dynamicWire = DynamicWireFactory.CreateDynamicWire(details.Type, serverMethodParamDef.ParameterType);
+				dynamicWire.Interceptor = delegateParamInterceptor;
+				details.Args[index] = dynamicWire.InDelegate;
+			}
+		}
+
+		/// <summary>
+		/// Applies custom serialization on return value (if configured).
+		/// </summary>
+		/// <param name="details">Invocation details</param>
+		private void Invoke_ApplyCustomSerializationOnReturnValue(InvocationDetails details)
+		{
+			if (details.ReturnValue != null)
+			{
+				Type returnValueType = details.ReturnValue.GetType();
+
+				Type handledType;
+				ISerializationHandler handler;
+				_host.SerializationHandling.FindMatchingSerializationHandler(returnValueType, out handledType, out handler);
+
+				if (handler != null)
+				{
+					byte[] raw = handler.Serialize(details.ReturnValue);
+					details.ReturnValue = new CustomSerializationContainer(handledType, returnValueType, raw);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Completes the transaction scope, if no exception occured.
+		/// </summary>
+		/// <param name="details">Invocation details</param>
+		private void Invoke_CompleteTransactionScope(InvocationDetails details)
+		{
+			if (details.Scope != null)
+			{
+				if (!details.ExceptionThrown)
+					details.Scope.Complete();
+
+				details.Scope.Dispose();
+			}
+		}
+
+		/// <summary>
+		/// Cleans up event handlers and component instance (if needed).
+		/// </summary>
+		/// <param name="details">Invocation details</param>
+		private void Invoke_CleanUp(InvocationDetails details)
+		{
+			if (details.Registration.ActivationType == ActivationType.SingleCall)
+			{
+				if (details.WiringList!=null)
+					RemoveClientServerWires(details.Type, details.Instance, details.DelegateCorrelationSet, details.WiringList);
+				
+				if (details.Instance!=null)
+					_host.ComponentCatalog.CleanUpComponentInstance(details.Registration, details.Instance);
+			}
+		}
+
 		/// <summary>
 		/// Processes remote method invocation.
 		/// </summary>
@@ -235,168 +447,48 @@ namespace Zyan.Communication
 			if (string.IsNullOrEmpty(methodName))
 				throw new ArgumentException(LanguageResource.ArgumentException_MethodNameMissing, "methodName");
 
-			ProcessBeforeInvoke(trackingID, ref interfaceName, ref delegateCorrelationSet, ref methodName, ref args);
+			var details = new InvocationDetails()
+			{
+				TrackingID = trackingID,
+				InterfaceName = interfaceName,
+				DelegateCorrelationSet = delegateCorrelationSet,
+				MethodName = methodName,
+				GenericArguments = genericArguments,
+				ParamTypes = paramTypes,
+				Args = args
+			};
 
-			TransactionScope scope = null;
+			ProcessBeforeInvoke(details);
 
 			try
 			{
-				// look up the component registration info
-				if (!_host.ComponentRegistry.ContainsKey(interfaceName))
-				{
-					throw new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_CannotFindComponentForInterface, interfaceName));
-				}
+				Invoke_CheckInterfaceName(details);
+				Invoke_LoadCallContextData(details);
+				Invoke_SetSession(details);
+				Invoke_SetTransaction(details);
+				Invoke_ConvertMethodArguments(details);
+				Invoke_ResolveComponentInstance(details);
+				Invoke_WireUpEventHandlers(details);
+				Invoke_ObtainMethodMetadata(details);
+				Invoke_InterceptDelegateParams(details);
 
-				// check for logical context data
-				var data = CallContext.GetData("__ZyanContextData_" + _host.Name) as LogicalCallContextData;
-				if (data == null)
-				{
-					throw new SecurityException(LanguageResource.SecurityException_ContextInfoMissing);
-				}
+				details.ReturnValue = details.MethodInfo.Invoke(details.Instance, details.Args, details.MethodInfo.IsOneWay());
 
-				// validate session
-				var sessionID = data.Store.ContainsKey("sessionid") ? (Guid)data.Store["sessionid"] : Guid.Empty;
-				if (!_host.SessionManager.ExistSession(sessionID))
-				{
-					throw new InvalidSessionException(string.Format(LanguageResource.InvalidSessionException_SessionIDInvalid, sessionID.ToString()));
-				}
-
-				// set current session
-				var session = _host.SessionManager.GetSessionBySessionID(sessionID);
-				session.Timestamp = DateTime.Now;
-				ServerSession.CurrentSession = session;
-				PutClientAddressToCurrentSession();
-
-				// transfer implicit transaction
-				var transaction = data.Store.ContainsKey("transaction") ? (Transaction)data.Store["transaction"] : null;
-				if (transaction != null)
-				{
-					scope = new TransactionScope(transaction);
-				}
+				Invoke_ApplyCustomSerializationOnReturnValue(details);
 			}
 			catch (Exception ex)
 			{
-				_host.OnInvokeCanceled(new InvokeCanceledEventArgs
-				{
-					TrackingID = trackingID,
-					CancelException = ex
-				});
-
-				throw ex;
-			}
-
-			// convert method arguments
-			var delegateParamIndexes = new Dictionary<int, DelegateInterceptor>();
-			for (int i = 0; i < paramTypes.Length; i++)
-			{
-				var delegateParamInterceptor = args[i] as DelegateInterceptor;
-				if (delegateParamInterceptor != null)
-				{
-					delegateParamIndexes.Add(i, delegateParamInterceptor);
-					continue;
-				}
-
-				var container = args[i] as CustomSerializationContainer;
-				if (container != null)
-				{
-					var serializationHandler = _host.SerializationHandling[container.HandledType];
-					if (serializationHandler == null)
-					{
-						var ex = new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_SerializationHandlerNotFound, container.HandledType.FullName));
-						_host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = ex });
-						throw ex;
-					}
-
-					args[i] = serializationHandler.Deserialize(container.DataType, container.Data);
-				}
-			}
-
-			// get component instance
-			var registration = _host.ComponentRegistry[interfaceName];
-			var instance = _host.GetComponentInstance(registration);
-			var type = instance.GetType();
-
-			// wire up event handlers
-			Dictionary<Guid, Delegate> wiringList = null;
-			if (registration.ActivationType == ActivationType.SingleCall)
-			{
-				wiringList = new Dictionary<Guid, Delegate>();
-				CreateClientServerWires(type, instance, delegateCorrelationSet, wiringList);
-			}
-
-			// prepare return value and invoke method
-			object returnValue = null;
-			bool exceptionThrown = false;
-
-			try
-			{
-				var methodInfo = type.GetMethod(methodName, genericArguments, paramTypes);
-				if (methodInfo == null)
-				{
-					var methodSignature = MessageHelpers.GetMethodSignature(type, methodName, paramTypes);
-					var exceptionMessage = String.Format(LanguageResource.MissingMethodException_MethodNotFound, methodSignature);
-					throw new MissingMethodException(exceptionMessage);
-				}
-
-				var serverMethodParamDefs = methodInfo.GetParameters();
-				foreach (int index in delegateParamIndexes.Keys)
-				{
-					var delegateParamInterceptor = delegateParamIndexes[index];
-					var serverMethodParamDef = serverMethodParamDefs[index];
-
-					var dynamicWire = DynamicWireFactory.CreateDynamicWire(type, serverMethodParamDef.ParameterType);
-					dynamicWire.Interceptor = delegateParamInterceptor;
-					args[index] = dynamicWire.InDelegate;
-				}
-
-				returnValue = methodInfo.Invoke(instance, args, methodInfo.IsOneWay());
-				if (returnValue != null)
-				{
-					Type returnValueType = returnValue.GetType();
-
-					Type handledType;
-					ISerializationHandler handler;
-					_host.SerializationHandling.FindMatchingSerializationHandler(returnValueType, out handledType, out handler);
-
-					if (handler != null)
-					{
-						byte[] raw = handler.Serialize(returnValue);
-						returnValue = new CustomSerializationContainer(handledType, returnValueType, raw);
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				exceptionThrown = true;
-
-				_host.OnInvokeCanceled(new InvokeCanceledEventArgs
-				{
-					TrackingID = trackingID,
-					CancelException = ex
-				});
-
-				throw ex;
+				Invoke_FireInvokeCanceledEvent(details, ex);
 			}
 			finally
 			{
-				if (scope != null)
-				{
-					if (!exceptionThrown)
-						scope.Complete();
-
-					scope.Dispose();
-				}
-
-				if (registration.ActivationType == ActivationType.SingleCall)
-				{
-					RemoveClientServerWires(type, instance, delegateCorrelationSet, wiringList);
-					_host.ComponentCatalog.CleanUpComponentInstance(registration, instance);
-				}
+				Invoke_CompleteTransactionScope(details);
+				Invoke_CleanUp(details);				
 			}
 
-			ProcessAfterInvoke(trackingID, ref interfaceName, ref delegateCorrelationSet, ref methodName, ref args, ref returnValue);
+			ProcessAfterInvoke(details);
 
-			return returnValue;
+			return details.ReturnValue;
 		}
 
 		#endregion

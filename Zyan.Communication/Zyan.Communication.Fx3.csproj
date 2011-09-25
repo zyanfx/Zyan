@@ -159,6 +159,7 @@
     <Compile Include="InterLinq\Types\InterLinqTypeSystem.cs" />
     <Compile Include="InterLinq\Types\TypeConverter.cs" />
     <Compile Include="InvalidSessionException.cs" />
+    <Compile Include="InvocationDetails.cs" />
     <Compile Include="InvokeCanceledEventArgs.cs" />
     <Compile Include="InvokeCanceledException.cs" />
     <Compile Include="BeforeInvokeEventArgs.cs" />
