@@ -36,6 +36,9 @@ namespace Zyan.Communication
 		// Remoting-Channel
 		private IChannel _remotingChannel = null;
 
+		// List of created proxies
+		private List<WeakReference> _proxies; 
+
 		/// <summary>
 		/// Gets the URL of the remote server.
 		/// </summary>
@@ -115,6 +118,8 @@ namespace Zyan.Communication
 
 			if (protocolSetup == null)
 				throw new ArgumentNullException("protocolSetup");
+
+			_proxies = new List<WeakReference>();
 
 			_protocolSetup = protocolSetup;
 			_sessionID = Guid.NewGuid();
@@ -299,6 +304,10 @@ namespace Zyan.Communication
 				throw new ApplicationException(string.Format("Für Schnittstelle '{0}' ist auf dem Server '{1}' keine Komponente registriert.", interfaceType.FullName, _serverUrl));
 
 			ZyanProxy proxy = new ZyanProxy(info.UniqueName, typeof(T), this, implicitTransactionTransfer, _sessionID, _componentHostName, _autoLoginOnExpiredSession, _autoLoginCredentials, info.ActivationType);
+			
+			WeakReference proxyReference = new WeakReference(proxy);
+			_proxies.Add(proxyReference);
+			
 			return (T)proxy.GetTransparentProxy();
 		}
 
@@ -532,6 +541,17 @@ namespace Zyan.Communication
 				}
 				try
 				{
+					if (_proxies != null)
+					{
+						foreach (var proxyReference in _proxies)
+						{
+							if (proxyReference.IsAlive)
+							{
+								var proxy = proxyReference.Target as ZyanProxy;
+								proxy.RemoveAllRemoteEventHandlers();								
+							}
+						}
+					}
 					RemoteDispatcher.Logoff(_sessionID);
 				}
 				catch (RemotingException)

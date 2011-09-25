@@ -322,8 +322,7 @@ namespace Zyan.Communication
 		/// <param name="details">Invocation details</param>
 		private void Invoke_ResolveComponentInstance(InvocationDetails details)
 		{
-			// get component instance
-			details.Registration = _host.ComponentRegistry[details.InterfaceName];
+			// get component instance			
 			details.Instance = _host.GetComponentInstance(details.Registration);
 			details.Type = details.Instance.GetType();
 		}
@@ -467,6 +466,9 @@ namespace Zyan.Communication
 				Invoke_SetSession(details);
 				Invoke_SetTransaction(details);
 				Invoke_ConvertMethodArguments(details);
+
+				details.Registration = _host.ComponentRegistry[details.InterfaceName];
+
 				Invoke_ResolveComponentInstance(details);
 				Invoke_WireUpEventHandlers(details);
 				Invoke_ObtainMethodMetadata(details);
@@ -508,18 +510,25 @@ namespace Zyan.Communication
 			if (!_host.ComponentRegistry.ContainsKey(interfaceName))
 				throw new KeyNotFoundException(string.Format("Für die angegebene Schnittstelle '{0}' ist keine Komponente registiert.", interfaceName));
 
-			ComponentRegistration registration = _host.ComponentRegistry[interfaceName];
+			var details = new InvocationDetails() 
+			{ 
+				InterfaceName=interfaceName
+			};
 
-			if (registration.ActivationType != ActivationType.Singleton)
+			Invoke_LoadCallContextData(details);
+			
+			details.Registration = _host.ComponentRegistry[interfaceName];
+
+			if (details.Registration.ActivationType != ActivationType.Singleton)
 				return;
 
-			object instance = _host.GetComponentInstance(registration);
-			Type type = instance.GetType();
-
-			List<DelegateCorrelationInfo> correlationSet = new List<DelegateCorrelationInfo>();
+			Invoke_SetSession(details);
+			Invoke_ResolveComponentInstance(details);
+			
+			var correlationSet = new List<DelegateCorrelationInfo>();
 			correlationSet.Add(correlation);
 
-			CreateClientServerWires(type, instance, correlationSet, registration.EventWirings);
+			CreateClientServerWires(details.Type, details.Instance, correlationSet, details.Registration.EventWirings);
 		}
 
 		/// <summary>
