@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Zyan.Communication.Delegates;
-using System.Transactions;
 using System.Reflection;
+using System.Transactions;
+using Zyan.Communication.Delegates;
 
 namespace Zyan.Communication
 {
@@ -18,32 +16,32 @@ namespace Zyan.Communication
 		/// Gets or sets the unique key for call tracking.
 		/// </summary>
 		public Guid TrackingID { get; set; }
-		
+
 		/// <summary>
 		/// Gets or sets the name of the component (namespace included) interface.
 		/// </summary>
 		public string InterfaceName { get; set; }
-		
+
 		/// <summary>
 		/// Gets or sets correlation set for dynamic event and delegate wiring.
 		/// </summary>
 		public List<DelegateCorrelationInfo> DelegateCorrelationSet { get; set; }
-		
+
 		/// <summary>
 		/// Gets or sets the name of the invoked method.
 		/// </summary>
 		public string MethodName { get; set; }
-		
+
 		/// <summary>
 		/// Gets or sets Generic arguments of the invoked method.
 		/// </summary>
 		public Type[] GenericArguments { get; set; }
-		
+
 		/// <summary>
 		/// Gets or sets parameter types of the invoked method.
 		/// </summary>
 		public Type[] ParamTypes { get; set; }
-		
+
 		/// <summary>
 		/// Gets or sets parameter values of the invoked method.
 		/// </summary>

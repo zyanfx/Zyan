@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.Remoting;
@@ -12,7 +13,6 @@ using System.Transactions;
 using Zyan.Communication.Notification;
 using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp;
-using System.Linq.Expressions;
 using Zyan.InterLinq.Expressions;
 
 namespace Zyan.Communication
@@ -70,7 +70,7 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Creates a new instance of the ZyanConnection class.
 		/// </summary>
-		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp")</param>                
+		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp")</param>
 		public ZyanConnection(string serverUrl)
 			: this(serverUrl, new TcpBinaryClientProtocolSetup(), null, false, true)
 		{ }
@@ -78,7 +78,7 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Creates a new instance of the ZyanConnection class.
 		/// </summary>
-		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp")</param>                
+		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp")</param>
 		/// <param name="autoLoginOnExpiredSession">Specifies whether the proxy should relogin automatically when the session expired</param>
 		public ZyanConnection(string serverUrl, bool autoLoginOnExpiredSession)
 			: this(serverUrl, new TcpBinaryClientProtocolSetup(), null, autoLoginOnExpiredSession, !autoLoginOnExpiredSession)
@@ -87,7 +87,7 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Creates a new instance of the ZyanConnection class.
 		/// </summary>
-		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp")</param>                
+		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp")</param>
 		/// <param name="protocolSetup">Protocol an communication settings</param>
 		public ZyanConnection(string serverUrl, IClientProtocolSetup protocolSetup)
 			: this(serverUrl, protocolSetup, null, false, true)
@@ -96,7 +96,7 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Creates a new instance of the ZyanConnection class.
 		/// </summary>
-		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp")</param>                
+		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp")</param>
 		/// <param name="protocolSetup">Protocol an communication settings</param>
 		/// <param name="autoLoginOnExpiredSession">Specifies whether the proxy should relogin automatically when the session expired</param>
 		public ZyanConnection(string serverUrl, IClientProtocolSetup protocolSetup, bool autoLoginOnExpiredSession)
@@ -106,7 +106,7 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Creates a new instance of the ZyanConnection class.
 		/// </summary>
-		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp")</param>        
+		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp")</param>
 		/// <param name="protocolSetup">Protocol an communication settings</param>
 		/// <param name="credentials">Login credentials</param>
 		/// <param name="autoLoginOnExpiredSession">Specifies whether the proxy should relogin automatically when the session expired</param>
@@ -250,7 +250,7 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Creates a local proxy object of a specified remote component.
 		/// </summary>
-		/// <typeparam name="T">Remote component interface type</typeparam>        
+		/// <typeparam name="T">Remote component interface type</typeparam>
 		/// <returns>Proxy</returns>
 		public T CreateProxy<T>()
 		{
@@ -260,7 +260,7 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Creates a local proxy object of a specified remote component.
 		/// </summary>
-		/// <typeparam name="T">Remote component interface type</typeparam>        
+		/// <typeparam name="T">Remote component interface type</typeparam>
 		/// <param name="uniqueName">Unique component name</param>
 		/// <returns>Proxy</returns>
 		public T CreateProxy<T>(string uniqueName)
@@ -548,7 +548,7 @@ namespace Zyan.Communication
 							if (proxyReference.IsAlive)
 							{
 								var proxy = proxyReference.Target as ZyanProxy;
-								proxy.RemoveAllRemoteEventHandlers();								
+								proxy.RemoveAllRemoteEventHandlers();
 							}
 						}
 					}
@@ -592,7 +592,7 @@ namespace Zyan.Communication
 				{
 					_autoLoginCredentials.Clear();
 					_autoLoginCredentials = null;
-				}				
+				}
 				GC.WaitForPendingFinalizers();
 			}
 		}
@@ -723,7 +723,7 @@ namespace Zyan.Communication
 				OnDisconnected(e);
 
 				while (e.Retry)
-				{					
+				{
 					e.Retry = false;
 
 					Thread.Sleep(Convert.ToInt32(_pollingInterval.TotalMilliseconds));
@@ -731,7 +731,7 @@ namespace Zyan.Communication
 					try
 					{
 						RemoteDispatcher.ReceiveClientHeartbeat(_sessionID);
-						problemSolved = true;						
+						problemSolved = true;
 					}
 					catch (Exception retryEx)
 					{

@@ -246,6 +246,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="LanguageResource.Designer.cs" />
     <Compile Include="InterLinq\Communication\ZyanMethodQueryHandler.cs" />
+    <Compile Include="InvocationDetails.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\Manager.GetAddresses.Fx4.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
