@@ -6,13 +6,13 @@ using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using System.Security;
 using System.Security.Principal;
+using System.Threading;
 using System.Transactions;
 using Zyan.Communication.Delegates;
 using Zyan.Communication.Notification;
 using Zyan.Communication.Security;
 using Zyan.Communication.SessionMgmt;
 using Zyan.Communication.Toolbox;
-using System.Threading;
 
 namespace Zyan.Communication
 {
@@ -53,11 +53,14 @@ namespace Zyan.Communication
 		{
 			if (delegateCorrelationSet == null)
 				return;
-			
+
 			foreach (var correlationInfo in delegateCorrelationSet)
 			{
 				if (wiringList.ContainsKey(correlationInfo.CorrelationID))
 					continue;
+
+				if (ServerSession.CurrentSession == null)
+					throw new InvalidSessionException(string.Format(LanguageResource.InvalidSessionException_SessionIDInvalid, "(null)"));
 
 				var dynamicWire = DynamicWireFactory.CreateDynamicWire(type, correlationInfo.DelegateMemberName, correlationInfo.IsEvent);
 				dynamicWire.Interceptor = correlationInfo.ClientDelegateInterceptor;
@@ -71,12 +74,9 @@ namespace Zyan.Communication
 					dynamicEventWire.Component = instance;
 
 					// add session validation handler
-					if (ServerSession.CurrentSession != null)
-					{
-						var sessionId = ServerSession.CurrentSession.SessionID;
-						var sessionManager = _host.SessionManager;
-						dynamicEventWire.ValidateSession = () => sessionManager.ExistSession(sessionId);
-					}
+					var sessionId = ServerSession.CurrentSession.SessionID;
+					var sessionManager = _host.SessionManager;
+					dynamicEventWire.ValidateSession = () => sessionManager.ExistSession(sessionId);
 
 					eventInfo.AddEventHandler(instance, dynamicEventWire.InDelegate);
 					wiringList.Add(correlationInfo.CorrelationID, dynamicEventWire.InDelegate);
@@ -98,7 +98,7 @@ namespace Zyan.Communication
 		/// <param name="delegateCorrelationSet">Correlation set with wiring information</param>
 		/// <param name="wiringList">List with known wirings</param>
 		private void RemoveClientServerWires(Type type, object instance, List<DelegateCorrelationInfo> delegateCorrelationSet, Dictionary<Guid, Delegate> wiringList)
-		{	
+		{
 			if (delegateCorrelationSet == null)
 				return;
 
@@ -213,8 +213,8 @@ namespace Zyan.Communication
 		private void Invoke_CheckInterfaceName(InvocationDetails details)
 		{
 			// look up the component registration info
-			if (!_host.ComponentRegistry.ContainsKey(details.InterfaceName))			
-				throw new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_CannotFindComponentForInterface, details.InterfaceName));			
+			if (!_host.ComponentRegistry.ContainsKey(details.InterfaceName))
+				throw new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_CannotFindComponentForInterface, details.InterfaceName));
 		}
 
 		/// <summary>
@@ -259,8 +259,8 @@ namespace Zyan.Communication
 		{
 			// transfer implicit transaction
 			var transaction = details.CallContextData.Store.ContainsKey("transaction") ? (Transaction)details.CallContextData.Store["transaction"] : null;
-			if (transaction != null)			
-				details.Scope = new TransactionScope(transaction);			
+			if (transaction != null)
+				details.Scope = new TransactionScope(transaction);
 		}
 
 		/// <summary>
@@ -322,7 +322,7 @@ namespace Zyan.Communication
 		/// <param name="details">Invocation details</param>
 		private void Invoke_ResolveComponentInstance(InvocationDetails details)
 		{
-			// get component instance			
+			// get component instance
 			details.Instance = _host.GetComponentInstance(details.Registration);
 			details.Type = details.Instance.GetType();
 		}
@@ -421,7 +421,7 @@ namespace Zyan.Communication
 			{
 				if (details.WiringList!=null)
 					RemoveClientServerWires(details.Type, details.Instance, details.DelegateCorrelationSet, details.WiringList);
-				
+
 				if (details.Instance!=null)
 					_host.ComponentCatalog.CleanUpComponentInstance(details.Registration, details.Instance);
 			}
@@ -485,7 +485,7 @@ namespace Zyan.Communication
 			finally
 			{
 				Invoke_CompleteTransactionScope(details);
-				Invoke_CleanUp(details);				
+				Invoke_CleanUp(details);
 			}
 
 			ProcessAfterInvoke(details);
@@ -512,7 +512,7 @@ namespace Zyan.Communication
 
 			var details = new InvocationDetails() 
 			{ 
-				InterfaceName=interfaceName
+				InterfaceName = interfaceName
 			};
 
 			Invoke_LoadCallContextData(details);
