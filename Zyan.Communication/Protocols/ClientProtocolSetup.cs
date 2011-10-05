@@ -98,8 +98,12 @@ namespace Zyan.Communication.Protocols
 				if (lastProvider == null)
 					lastProvider = clientProvider;
 				else
+				{
 					lastProvider.Next = clientProvider;
+					lastProvider = clientProvider;
+				}
 			}
+
 			return firstProvider;
 		}
 
@@ -120,8 +124,12 @@ namespace Zyan.Communication.Protocols
 				if (lastProvider == null)
 					lastProvider = clientProvider;
 				else
+				{
 					lastProvider.Next = clientProvider;
+					lastProvider = clientProvider;
+				}
 			}
+
 			return firstProvider;
 		}
 
