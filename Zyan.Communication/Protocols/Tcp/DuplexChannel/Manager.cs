@@ -19,6 +19,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.IO;
 using System.Runtime.Serialization;
+using System.Collections.Generic;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
@@ -64,6 +65,19 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			}
 
 			return (string[])retVal.ToArray(typeof(string));
+		}
+
+		public static string[] GetAddresses(int port, Guid guid)
+		{
+			var addresses = new List<string>();
+
+			if (guid != Guid.Empty)
+				addresses.Add(guid.ToString());
+
+			if (port != 0)
+				_addresses.Value.ForEach(addr => addresses.Add(String.Format("{0}:{1}", addr, port)));
+
+			return addresses.Distinct().ToArray();
 		}
 
 		public static string CreateUrl(Guid guid)

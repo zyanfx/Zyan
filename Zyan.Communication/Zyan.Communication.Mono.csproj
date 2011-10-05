@@ -20,7 +20,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn>618</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -212,6 +212,7 @@
     <Compile Include="Protocols\Tcp\DuplexChannel\Connection.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\DuplicateConnectionException.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\Manager.cs" />
+    <Compile Include="Protocols\Tcp\DuplexChannel\Manager.GetAddresses.Fx3.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\Message.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\MessageException.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\ServerTransportSink.cs" />
@@ -247,7 +248,6 @@
     <Compile Include="LanguageResource.Designer.cs" />
     <Compile Include="InterLinq\Communication\ZyanMethodQueryHandler.cs" />
     <Compile Include="InvocationDetails.cs" />
-    <Compile Include="Protocols\Tcp\DuplexChannel\Manager.GetAddresses.Fx4.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
