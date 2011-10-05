@@ -13,42 +13,27 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using System.Net;
-using System.Collections;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
 	internal partial class Manager
 	{
-		public static string[] GetAddresses(int port, Guid guid)
+		static Lazy<List<string>> _addresses = new Lazy<List<string>>(() =>
 		{
-			ArrayList retVal = new ArrayList();
-			if (guid != Guid.Empty)
-				retVal.Add(string.Format("{0}", guid));
+			// prefer IPv4 address
+			var addressFamily = Socket.OSSupportsIPv4 ? AddressFamily.InterNetwork : AddressFamily.InterNetworkV6;
 
-			string hostname = Dns.GetHostName();
-			IPHostEntry hostEntry = Dns.GetHostEntry(hostname);
+			// GetAllNetworkInterfaces() may be slow, so execute it once and cache results
+			var query =
+				from nic in NetworkInterface.GetAllNetworkInterfaces()
+				from ua in nic.GetIPProperties().UnicastAddresses
+				where ua.Address.AddressFamily == addressFamily
+				select ua.Address.ToString();
 
-			if (port != 0)
-			{
-				AddressFamily addressFamily = Socket.OSSupportsIPv4 ? AddressFamily.InterNetwork : AddressFamily.InterNetworkV6;
-				foreach (IPAddress address in hostEntry.AddressList)
-				{
-					if (address.AddressFamily == addressFamily)
-					{
-						string hostAndPort = string.Format("{0}:{1}", address, port);
+			return query.ToList();
 
-						if (!retVal.Contains(hostAndPort))
-							retVal.Add(hostAndPort);
-					}
-				}
-				if (!retVal.Contains(string.Format("{0}:{1}", IPAddress.Loopback, port)))
-					retVal.Add(string.Format("{0}:{1}", IPAddress.Loopback, port));
-			}
-
-			return (string[])retVal.ToArray(typeof(string));
-		}
+		}, true);
 	}
 }
