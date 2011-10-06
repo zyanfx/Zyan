@@ -24,5 +24,10 @@ namespace Zyan.Communication.Protocols
         /// </summary>
         /// <returns>Remoting channel</returns>
         IChannel CreateChannel();
+
+		/// <summary>
+		/// Gets a dictionary with channel settings.
+		/// </summary>
+		Dictionary<string, object> ChannelSettings { get; }
     }
 }
