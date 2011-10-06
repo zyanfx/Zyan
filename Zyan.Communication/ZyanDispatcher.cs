@@ -508,7 +508,7 @@ namespace Zyan.Communication
 				throw new ArgumentException(LanguageResource.ArgumentException_InterfaceNameMissing, "interfaceName");
 
 			if (!_host.ComponentRegistry.ContainsKey(interfaceName))
-				throw new KeyNotFoundException(string.Format("Für die angegebene Schnittstelle '{0}' ist keine Komponente registiert.", interfaceName));
+				throw new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_CannotFindComponentForInterface, interfaceName));
 
 			var details = new InvocationDetails() 
 			{ 
@@ -542,7 +542,7 @@ namespace Zyan.Communication
 				throw new ArgumentException(LanguageResource.ArgumentException_InterfaceNameMissing, "interfaceName");
 
 			if (!_host.ComponentRegistry.ContainsKey(interfaceName))
-				throw new KeyNotFoundException(string.Format("Für die angegebene Schnittstelle '{0}' ist keine Komponente registiert.", interfaceName));
+				throw new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_CannotFindComponentForInterface, interfaceName));
 
 			var details = new InvocationDetails()
 			{
