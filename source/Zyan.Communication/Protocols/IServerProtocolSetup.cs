@@ -32,5 +32,10 @@ namespace Zyan.Communication.Protocols
         {
             get;
         }
+
+		/// <summary>
+		/// Gets a dictionary with channel settings.
+		/// </summary>
+		Dictionary<string, object> ChannelSettings { get; }
     }
 }
