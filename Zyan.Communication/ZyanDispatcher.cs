@@ -544,18 +544,25 @@ namespace Zyan.Communication
 			if (!_host.ComponentRegistry.ContainsKey(interfaceName))
 				throw new KeyNotFoundException(string.Format("Für die angegebene Schnittstelle '{0}' ist keine Komponente registiert.", interfaceName));
 
-			ComponentRegistration registration = _host.ComponentRegistry[interfaceName];
+			var details = new InvocationDetails()
+			{
+				InterfaceName = interfaceName
+			};
 
-			if (registration.ActivationType != ActivationType.Singleton)
+			Invoke_LoadCallContextData(details);
+
+			details.Registration = _host.ComponentRegistry[interfaceName];
+
+			if (details.Registration.ActivationType != ActivationType.Singleton)
 				return;
 
-			object instance = _host.GetComponentInstance(registration);
-			Type type = instance.GetType();
+			Invoke_SetSession(details);
+			Invoke_ResolveComponentInstance(details);
 
 			List<DelegateCorrelationInfo> correlationSet = new List<DelegateCorrelationInfo>();
 			correlationSet.Add(correlation);
 
-			RemoveClientServerWires(type, instance, correlationSet, registration.EventWirings);
+			RemoveClientServerWires(details.Type, details.Instance, correlationSet, details.Registration.EventWirings);
 		}
 
 		#endregion
