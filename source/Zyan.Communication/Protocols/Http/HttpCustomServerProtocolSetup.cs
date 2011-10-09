@@ -124,6 +124,8 @@ namespace Zyan.Communication.Protocols.Http
 			_oaep = oaep;
 		}
 
+		private bool _encryptionConfigured = false;
+
 		/// <summary>
 		/// Configures encrpytion sinks, if encryption is enabled.
 		/// </summary>
@@ -131,6 +133,11 @@ namespace Zyan.Communication.Protocols.Http
 		{
 			if (_encryption)
 			{
+				if (_encryptionConfigured)
+					return;
+
+				_encryptionConfigured = true;
+
 				this.AddClientSinkAfterFormatter(new CryptoClientChannelSinkProvider()
 				{
 					Algorithm = _algorithm,
@@ -173,7 +180,7 @@ namespace Zyan.Communication.Protocols.Http
 				}
 				return channel;
 			}
-			return null;
+			return channel;
 		}
 
 		/// <summary>
