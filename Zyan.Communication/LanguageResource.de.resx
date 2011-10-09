@@ -261,4 +261,7 @@
   <data name="ApplicationException_NoChannelFactorySpecified" xml:space="preserve">
     <value>Keine Methode zur Kanalerzeugung spezifiziert.</value>
   </data>
+  <data name="ApplicationException_NoChannelCreated" xml:space="preserve">
+    <value>Es wurde kein Remotingkanal erzeugt.</value>
+  </data>
 </root>

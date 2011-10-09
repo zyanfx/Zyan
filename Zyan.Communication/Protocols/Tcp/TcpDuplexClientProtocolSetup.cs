@@ -251,24 +251,31 @@ namespace Zyan.Communication.Protocols.Tcp
 			set { _maxAttempts = value; }
 		}
 
+		private bool _encryptionConfigured = false;
+
 		/// <summary>
-		/// Adds encryption sinks to client and server sink chains, if encryption is needed.
+		/// Configures encrpytion sinks, if encryption is enabled.
 		/// </summary>
 		private void ConfigureEncryption()
 		{
 			if (_encryption)
 			{
+				if (_encryptionConfigured)
+					return;
+
+				_encryptionConfigured = true;
+
 				this.AddClientSinkAfterFormatter(new CryptoClientChannelSinkProvider()
 				{
 					Algorithm = _algorithm,
-					Oaep = _oaep,
-					MaxAttempts = _maxAttempts
+					MaxAttempts = _maxAttempts,
+					Oaep = _oaep
 				});
 				this.AddServerSinkBeforeFormatter(new CryptoServerChannelSinkProvider()
 				{
 					Algorithm = _algorithm,
-					Oaep = _oaep,
-					RequireCryptoClient = true
+					RequireCryptoClient = true,
+					Oaep = _oaep
 				});
 			}
 		}
@@ -305,7 +312,7 @@ namespace Zyan.Communication.Protocols.Tcp
 				}
 				return channel;
 			}
-			return null;
+			return channel;
 		}
 	}
 }

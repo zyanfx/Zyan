@@ -94,17 +94,19 @@ namespace Zyan.Communication.Protocols
 			IClientChannelSinkProvider firstProvider = null;
 			IClientChannelSinkProvider lastProvider = null;
 
-			foreach (var clientProvider in _clientSinkChain)
+			foreach (var sinkProvider in _clientSinkChain)
 			{
+				sinkProvider.Next = null;
+
 				if (firstProvider == null)
-					firstProvider = clientProvider;
+					firstProvider = sinkProvider;
 
 				if (lastProvider == null)
-					lastProvider = clientProvider;
+					lastProvider = sinkProvider;
 				else
 				{
-					lastProvider.Next = clientProvider;
-					lastProvider = clientProvider;
+					lastProvider.Next = sinkProvider;
+					lastProvider = sinkProvider;
 				}
 			}
 			return firstProvider;
@@ -119,17 +121,19 @@ namespace Zyan.Communication.Protocols
 			IServerChannelSinkProvider firstProvider = null;
 			IServerChannelSinkProvider lastProvider = null;
 
-			foreach (var clientProvider in _serverSinkChain)
+			foreach (var sinkProvider in _serverSinkChain)
 			{
+				sinkProvider.Next = null;
+
 				if (firstProvider == null)
-					firstProvider = clientProvider;
+					firstProvider = sinkProvider;
 
 				if (lastProvider == null)
-					lastProvider = clientProvider;
+					lastProvider = sinkProvider;
 				else
 				{
-					lastProvider.Next = clientProvider;
-					lastProvider = clientProvider;
+					lastProvider.Next = sinkProvider;
+					lastProvider = sinkProvider;
 				}
 			}
 			return firstProvider;
@@ -159,7 +163,7 @@ namespace Zyan.Communication.Protocols
 				}
 				return channel;
 			}
-			return null;
+			return channel;
 		}
 
 		/// <summary>

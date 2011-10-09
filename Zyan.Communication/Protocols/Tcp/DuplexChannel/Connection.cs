@@ -497,6 +497,9 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				{
 					CheckSocket();
 
+					if (_socket == null)
+						throw new SocketException();
+
 					_stream = new NetworkStream(_socket, FileAccess.ReadWrite, false);
 				}
 				return _stream;

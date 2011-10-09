@@ -23,7 +23,7 @@ namespace Zyan.Communication.Protocols.Tcp
 		private bool _tcpKeepAliveEnabled = true;
 		private ulong _tcpKeepAliveTime = 30000;
 		private ulong _tcpKeepAliveInterval = 1000;
-
+		
 		/// <summary>
 		/// Enables or disables TCP KeepAlive.
 		/// </summary>
@@ -241,13 +241,20 @@ namespace Zyan.Communication.Protocols.Tcp
 			TcpKeepAliveInterval = KeepAliveInterval;
 		}
 
+		private bool _encryptionConfigured = false;
+
 		/// <summary>
-		/// Adds encryption sinks to client and server sink chains, if encryption is needed.
+		/// Configures encrpytion sinks, if encryption is enabled.
 		/// </summary>
 		private void ConfigureEncryption()
 		{
 			if (_encryption)
 			{
+				if (_encryptionConfigured)
+					return;
+
+				_encryptionConfigured = true;
+
 				this.AddClientSinkAfterFormatter(new CryptoClientChannelSinkProvider()
 				{
 					Algorithm = _algorithm,
@@ -256,8 +263,8 @@ namespace Zyan.Communication.Protocols.Tcp
 				this.AddServerSinkBeforeFormatter(new CryptoServerChannelSinkProvider()
 				{
 					Algorithm = _algorithm,
-					Oaep = _oaep,
-					RequireCryptoClient = true
+					RequireCryptoClient = true,
+					Oaep = _oaep
 				});
 			}
 		}
@@ -294,7 +301,7 @@ namespace Zyan.Communication.Protocols.Tcp
 				}
 				return channel;
 			}
-			return null;
+			return channel;
 		}
 
 		/// <summary>
