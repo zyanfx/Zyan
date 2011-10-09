@@ -101,7 +101,7 @@ namespace Zyan.Communication.Protocols.Ipc
 				}
 				return channel;
 			}
-			return null;
+			return channel;
 		}
 
 		/// <summary>

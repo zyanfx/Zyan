@@ -140,18 +140,38 @@ namespace Zyan.Communication
 			_remotingChannel = _protocolSetup.CreateChannel();
 
 			if (_remotingChannel != null)
-				ChannelServices.RegisterChannel(_remotingChannel, false);
+			{
+				var registeredChannel = ChannelServices.GetChannel(_remotingChannel.ChannelName);
+
+				if (registeredChannel == null)
+					ChannelServices.RegisterChannel(_remotingChannel, false);				
+			}
+			else
+				throw new ApplicationException(LanguageResource.ApplicationException_NoChannelCreated);
+
+			string channelName = _remotingChannel.ChannelName;
 
 			_subscriptions = new Dictionary<Guid, NotificationReceiver>();
 			
 			if (credentials != null && credentials.Count == 0)
 				credentials = null;
 
-			RemoteDispatcher.Logon(_sessionID, credentials);
+			try
+			{
+				RemoteDispatcher.Logon(_sessionID, credentials);
 
-			_registeredComponents = new List<ComponentInfo>(RemoteDispatcher.GetRegisteredComponents());
-			_sessionAgeLimit = RemoteDispatcher.SessionAgeLimit;
+				_registeredComponents = new List<ComponentInfo>(RemoteDispatcher.GetRegisteredComponents());
+				_sessionAgeLimit = RemoteDispatcher.SessionAgeLimit;
+			}
+			catch (Exception ex)
+			{
+				IChannel registeredChannel = ChannelServices.GetChannel(channelName);
 
+				if (registeredChannel != null)
+					ChannelServices.UnregisterChannel(registeredChannel);
+				
+				throw ex;
+			}
 			StartKeepSessionAliveTimer();
 
 			_connections.Add(this);
@@ -566,9 +586,13 @@ namespace Zyan.Communication
 				}
 				if (_remotingChannel != null)
 				{
-					if (ChannelServices.GetChannel(_remotingChannel.ChannelName)!=null)
-						ChannelServices.UnregisterChannel(_remotingChannel);
+					var registeredChannel = ChannelServices.GetChannel(_remotingChannel.ChannelName);
 
+					if (registeredChannel != null)
+					{ 
+						if (registeredChannel==_remotingChannel)
+							ChannelServices.UnregisterChannel(_remotingChannel);
+					}
 					_remotingChannel = null;
 				}
 				_remoteDispatcher = null;

@@ -126,7 +126,7 @@ namespace Zyan.Communication.Protocols.Tcp
 				}
 				return channel;
 			}
-			return null;
+			return channel;
 		}
 
 		/// <summary>
