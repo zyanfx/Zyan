@@ -502,12 +502,16 @@ namespace Zyan.Communication
 		/// </summary>
 		/// <param name="interfaceName">Name of the server component interface</param>
 		/// <param name="correlation">Correlation information</param>
-		public void AddEventHandler(string interfaceName, DelegateCorrelationInfo correlation)
+		/// <param name="uniqueName">Unique name of the server component instance (May left empty, if component isn´t registered with a unique name)</param>
+		public void AddEventHandler(string interfaceName, DelegateCorrelationInfo correlation, string uniqueName)
 		{
 			if (string.IsNullOrEmpty(interfaceName))
 				throw new ArgumentException(LanguageResource.ArgumentException_InterfaceNameMissing, "interfaceName");
 
-			if (!_host.ComponentRegistry.ContainsKey(interfaceName))
+			if (string.IsNullOrEmpty(uniqueName))
+				uniqueName = interfaceName;
+
+			if (!_host.ComponentRegistry.ContainsKey(uniqueName))
 				throw new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_CannotFindComponentForInterface, interfaceName));
 
 			var details = new InvocationDetails() 
@@ -516,8 +520,8 @@ namespace Zyan.Communication
 			};
 
 			Invoke_LoadCallContextData(details);
-			
-			details.Registration = _host.ComponentRegistry[interfaceName];
+
+			details.Registration = _host.ComponentRegistry[uniqueName];
 
 			if (details.Registration.ActivationType != ActivationType.Singleton)
 				return;
@@ -536,12 +540,16 @@ namespace Zyan.Communication
 		/// </summary>
 		/// <param name="interfaceName">Name of the server component interface</param>
 		/// <param name="correlation">Correlation information</param>
-		public void RemoveEventHandler(string interfaceName, DelegateCorrelationInfo correlation)
+		/// <param name="uniqueName">Unique name of the server component instance (May left empty, if component isn´t registered with a unique name)</param>
+		public void RemoveEventHandler(string interfaceName, DelegateCorrelationInfo correlation, string uniqueName)
 		{
 			if (string.IsNullOrEmpty(interfaceName))
 				throw new ArgumentException(LanguageResource.ArgumentException_InterfaceNameMissing, "interfaceName");
 
-			if (!_host.ComponentRegistry.ContainsKey(interfaceName))
+			if (string.IsNullOrEmpty(uniqueName))
+				uniqueName = interfaceName;
+
+			if (!_host.ComponentRegistry.ContainsKey(uniqueName))
 				throw new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_CannotFindComponentForInterface, interfaceName));
 
 			var details = new InvocationDetails()
@@ -551,7 +559,7 @@ namespace Zyan.Communication
 
 			Invoke_LoadCallContextData(details);
 
-			details.Registration = _host.ComponentRegistry[interfaceName];
+			details.Registration = _host.ComponentRegistry[uniqueName];
 
 			if (details.Registration.ActivationType != ActivationType.Singleton)
 				return;

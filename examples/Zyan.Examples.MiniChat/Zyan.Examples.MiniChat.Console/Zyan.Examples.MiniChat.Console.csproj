@@ -45,6 +45,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Zyan.Communication">
+      <HintPath>..\..\..\bin\Debug\Zyan.Communication.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -56,10 +59,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\source\Zyan.Communication\Zyan.Communication.csproj">
-      <Project>{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}</Project>
-      <Name>Zyan.Communication</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Zyan.Examples.MiniChat.Shared\Zyan.Examples.MiniChat.Shared.csproj">
       <Project>{D1D90775-1870-4E6A-AA81-759D28EA2A28}</Project>
       <Name>Zyan.Examples.MiniChat.Shared</Name>

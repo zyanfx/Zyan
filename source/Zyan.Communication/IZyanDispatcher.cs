@@ -77,14 +77,16 @@ namespace Zyan.Communication
 		/// </summary>
 		/// <param name="interfaceName">Name of the server component interface</param>
 		/// <param name="correlation">Correlation information</param>
-		void AddEventHandler(string interfaceName, DelegateCorrelationInfo correlation);
+		/// <param name="uniqueName">Unique name of the server component instance (May left empty, if component isn´t registered with a unique name)</param>
+		void AddEventHandler(string interfaceName, DelegateCorrelationInfo correlation, string uniqueName);
 
 		/// <summary>
 		/// Removes a handler from an event of a server component.
 		/// </summary>
 		/// <param name="interfaceName">Name of the server component interface</param>
 		/// <param name="correlation">Correlation information</param>
-		void RemoveEventHandler(string interfaceName, DelegateCorrelationInfo correlation);
+		/// <param name="uniqueName">Unique name of the server component instance (May left empty, if component isn´t registered with a unique name)</param>
+		void RemoveEventHandler(string interfaceName, DelegateCorrelationInfo correlation, string uniqueName);
 
 		/// <summary>
 		/// Event: Occours when a heartbeat signal is received from a client.
