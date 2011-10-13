@@ -167,7 +167,7 @@ namespace Zyan.Communication
 					if (_activationType == ActivationType.Singleton)
 					{
 						_connection.PrepareCallContext(false);
-						_connection.RemoteDispatcher.AddEventHandler(_interfaceType.FullName, correlationInfo);
+						_connection.RemoteDispatcher.AddEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
 					}
 					// Save delegate correlation info
 					_delegateCorrelationSet.Add(correlationInfo);
@@ -197,7 +197,7 @@ namespace Zyan.Communication
 							else
 							{
 								_connection.PrepareCallContext(false);
-								_connection.RemoteDispatcher.RemoveEventHandler(_interfaceType.FullName, found);
+								_connection.RemoteDispatcher.RemoveEventHandler(_interfaceType.FullName, found, _uniqueName);
 							}
 						}
 					}
@@ -547,7 +547,7 @@ namespace Zyan.Communication
 					else
 					{
 						_connection.PrepareCallContext(false);
-						_connection.RemoteDispatcher.RemoveEventHandler(_interfaceType.FullName, correlationInfo);
+						_connection.RemoteDispatcher.RemoveEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
 					}
 				}
 			}
