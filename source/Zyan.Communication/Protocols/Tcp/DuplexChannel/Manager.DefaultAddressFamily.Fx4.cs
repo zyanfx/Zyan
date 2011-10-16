@@ -13,6 +13,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 
@@ -20,20 +21,10 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
 	internal partial class Manager
 	{
-		static Lazy<List<string>> _addresses = new Lazy<List<string>>(() =>
+		private static AddressFamily DefaultAddressFamily
 		{
 			// prefer IPv4 address
-			var addressFamily = Socket.OSSupportsIPv4 ? AddressFamily.InterNetwork : AddressFamily.InterNetworkV6;
-
-			// GetAllNetworkInterfaces() may be slow, so execute it once and cache results
-			var query =
-				from nic in NetworkInterface.GetAllNetworkInterfaces()
-				from ua in nic.GetIPProperties().UnicastAddresses
-				where ua.Address.AddressFamily == addressFamily
-				select ua.Address.ToString();
-
-			return query.ToList();
-
-		}, true);
+			get { return Socket.OSSupportsIPv4 ? AddressFamily.InterNetwork : AddressFamily.InterNetworkV6; }
+		}
 	}
 }

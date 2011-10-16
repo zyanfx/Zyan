@@ -13,6 +13,7 @@
     <AssemblyOriginatorKeyFile>..\Zyan.Key\zyan.snk</AssemblyOriginatorKeyFile>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,28 +33,19 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System">
-    </Reference>
-    <Reference Include="System.ComponentModel.Composition">
-    </Reference>
-    <Reference Include="System.Core">
-    </Reference>
-    <Reference Include="System.Xml.Linq">
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-    </Reference>
-    <Reference Include="Microsoft.CSharp">
-    </Reference>
-    <Reference Include="System.Data">
-    </Reference>
-    <Reference Include="System.Xml">
-    </Reference>
-    <Reference Include="MemoDb, Version=0.1.1.0, Culture=neutral, PublicKeyToken=null">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\libraries\MemoDb\MemoDb.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.framework, Version=2.4.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
+    <Reference Include="System, Version=4.0.0.0" />
+    <Reference Include="System.ComponentModel.Composition, Version=4.0.0.0" />
+    <Reference Include="System.Core, Version=4.0.0.0" />
+    <Reference Include="System.Xml.Linq, Version=4.0.0.0" />
+    <Reference Include="System.Data.DataSetExtensions, Version=4.0.0.0" />
+    <Reference Include="Microsoft.CSharp, Version=4.0.0.0" />
+    <Reference Include="System.Data, Version=4.0.0.0" />
+    <Reference Include="System.Xml, Version=4.0.0.0" />
+    <Reference Include="nunit.framework, Version=2.4.8.0">
       <HintPath>..\..\libraries\NUnit\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="MemoDb">
+      <HintPath>..\..\libraries\MemoDb\MemoDb.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

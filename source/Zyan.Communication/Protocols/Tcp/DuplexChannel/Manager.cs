@@ -20,6 +20,8 @@ using System.Threading;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
+using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
@@ -78,6 +80,60 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				_addresses.Value.ForEach(addr => addresses.Add(String.Format("{0}:{1}", addr, port)));
 
 			return addresses.Distinct().ToArray();
+		}
+
+		private static Lazy<List<string>> _addresses = new Lazy<List<string>>(() =>
+		{
+			// get loopback address
+			var addressFamily = DefaultAddressFamily;
+			var loopback = addressFamily == AddressFamily.InterNetwork ? IPAddress.Loopback : IPAddress.IPv6Loopback;
+
+			// GetAllNetworkInterfaces() may be slow, so execute it once and cache results
+			var query =
+				from nic in NetworkInterface.GetAllNetworkInterfaces()
+				from ua in GetUnicastAddresses(nic.GetIPProperties())
+				where ua.AddressFamily == addressFamily
+				select ua;
+
+			// Mono framework doesn't include loopback address
+			var addresses = query.ToList();
+			if (!addresses.Contains(loopback))
+				addresses.Add(loopback);
+
+			return addresses.Select(a => a.ToString()).ToList();
+
+		}, true);
+
+		private static IEnumerable<IPAddress> GetUnicastAddresses(IPInterfaceProperties ipProps)
+		{
+			// straightforward version (may throw exceptions on Mono 2.10.x/Windows)
+			if (!MonoCheck.IsRunningOnMono || !MonoCheck.NoWindowsOS)
+			{
+				return ipProps.UnicastAddresses.Select(address => address.Address);
+			}
+
+			var result = new List<IPAddress>();
+
+			// catch exceptions to work around Mono 2.10.x bug with some virtual network adapter drivers
+			// http://bugzilla.xamarin.com/show_bug.cgi?id=1254
+			try
+			{
+				foreach (var address in ipProps.UnicastAddresses)
+				{
+					try
+					{
+						result.Add(address.Address);
+					}
+					catch // NullReferenceException
+					{
+					}
+				}
+			}
+			catch // NullReferenceException
+			{
+			}
+
+			return result;
 		}
 
 		public static string CreateUrl(Guid guid)
