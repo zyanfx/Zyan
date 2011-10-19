@@ -1,0 +1,4 @@
+
+ This source code is taken from the CodePlex article:
+ Remoting Compression Channel Sink
+ http://www.codeproject.com/KB/IP/remotingcompression.aspx
