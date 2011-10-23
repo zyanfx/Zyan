@@ -228,6 +228,9 @@
     <Compile Include="SessionMgmt\SessionManagerBase.cs" />
     <Compile Include="SessionMgmt\SessionVariableAdapter.cs" />
     <Compile Include="SessionMgmt\SqlSessionManager.cs" />
+    <Compile Include="Toolbox\Compression\CompressionHelper.cs" />
+    <Compile Include="Toolbox\Compression\CompressionMethod.cs" />
+    <Compile Include="Toolbox\Compression\LZF.cs" />
     <Compile Include="Toolbox\ConcurrentDictionaryFx3.cs" />
     <Compile Include="Toolbox\Extensions.cs" />
     <Compile Include="Toolbox\ExtensionsFx3.cs" />

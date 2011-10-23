@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Zyan.Tests
 {
 	/// <summary>
 	/// Sample entity class for Linq tests
 	/// </summary>
+	[Serializable]
 	public class SampleEntity
 	{
 		public SampleEntity()

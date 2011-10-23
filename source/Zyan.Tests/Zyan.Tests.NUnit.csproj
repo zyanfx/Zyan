@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CleanupTests.cs" />
+    <Compile Include="CompressionTests.cs" />
     <Compile Include="DuckTypingTests.cs" />
     <Compile Include="DynamicWireTests.cs" />
     <Compile Include="GenericMethodsTests.cs" />
