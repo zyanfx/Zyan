@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using Zyan.Communication.Toolbox.Compression;
+using Zyan.Communication.ChannelSinks.Compression;
 
 namespace Zyan.Tests
 {

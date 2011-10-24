@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Threading;
 using Zyan.Communication;
+using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp;
+using Zyan.Communication.ChannelSinks.Compression;
 
 namespace IntegrationTest_DistributedEvents
 {
@@ -60,6 +62,7 @@ namespace IntegrationTest_DistributedEvents
 		public static int RunTest()
 		{
 			TcpCustomClientProtocolSetup protocol = new TcpCustomClientProtocolSetup(true);
+			protocol.AddClientSinkAfterFormatter(new CompressionClientChannelSinkProvider(1));
 			_connection = new ZyanConnection("tcp://localhost:8083/EventTest", protocol);
 
 			_proxySingleton = _connection.CreateProxy<IEventComponentSingleton>();
