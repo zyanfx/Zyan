@@ -1,4 +1,4 @@
-﻿namespace Zyan.Communication.Toolbox.Compression
+﻿namespace Zyan.Communication.ChannelSinks.Compression
 {
 	/// <summary>
 	/// Compression levels.
@@ -21,8 +21,8 @@
 		Average,
 
 		/// <summary>
-		/// Default compression level is Fast.
+		/// Default compression level is Average.
 		/// </summary>
-		Default = Fast
+		Default = Average
 	}
 }

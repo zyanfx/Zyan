@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Threading;
 using Zyan.Communication;
+using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp;
+using Zyan.Communication.ChannelSinks.Compression;
 
 namespace IntegrationTest_DistributedEvents
 {

@@ -16,6 +16,7 @@
 using System;
 using System.IO;
 using System.IO.Compression;
+using Zyan.Communication.ChannelSinks.Compression;
 
 namespace Zyan.Communication.Toolbox.Compression
 {
@@ -33,7 +34,6 @@ namespace Zyan.Communication.Toolbox.Compression
 			{
 				// bypass compression
 				case CompressionMethod.None:
-					inputStream.Seek(0, SeekOrigin.Begin);
 					return inputStream;
 
 				// average compression using DeflateStream
@@ -87,7 +87,6 @@ namespace Zyan.Communication.Toolbox.Compression
 			{
 				// bypass decompression
 				case CompressionMethod.None:
-					inputStream.Seek(0, SeekOrigin.Begin);
 					return inputStream;
 
 				// decompress using DeflateStream
