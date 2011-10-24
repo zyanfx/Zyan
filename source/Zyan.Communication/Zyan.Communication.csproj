@@ -72,6 +72,18 @@
     <Compile Include="CallInterceptorHelper.cs" />
     <Compile Include="ChannelSinks\ClientAddress\ClientAddressServerChannelSink.cs" />
     <Compile Include="ChannelSinks\ClientAddress\ClientAddressServerChannelSinkProvider.cs" />
+    <Compile Include="ChannelSinks\Compression\CommonHeaders.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ChannelSinks\Compression\CompressionClientChannelSink.cs" />
+    <Compile Include="ChannelSinks\Compression\CompressionClientChannelSinkProvider.cs" />
+    <Compile Include="ChannelSinks\Compression\CompressionMethod.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ChannelSinks\Compression\CompressionServerChannelSink.cs" />
+    <Compile Include="ChannelSinks\Compression\CompressionServerChannelSinkProvider.cs" />
+    <Compile Include="ChannelSinks\Compression\ICompressible.cs" />
+    <Compile Include="ChannelSinks\Compression\NonCompressibleAttribute.cs" />
     <Compile Include="ClientHeartbeatEventArgs.cs" />
     <Compile Include="ComponentCatalog.cs" />
     <Compile Include="ComponentInfo.cs" />
@@ -250,7 +262,6 @@
     <Compile Include="SessionMgmt\SessionVariableAdapter.cs" />
     <Compile Include="SessionMgmt\SqlSessionManager.cs" />
     <Compile Include="Toolbox\Compression\CompressionHelper.cs" />
-    <Compile Include="Toolbox\Compression\CompressionMethod.cs" />
     <Compile Include="Toolbox\Compression\LZF.cs" />
     <Compile Include="Toolbox\Extensions.cs" />
     <Compile Include="Toolbox\MessageHelpers.cs" />

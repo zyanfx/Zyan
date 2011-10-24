@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Timers;
 using Zyan.Communication;
+using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp;
 using Zyan.Communication.Security;
+using Zyan.Communication.ChannelSinks.Compression;
 
 namespace IntegrationTest_DistributedEvents
 {
@@ -214,10 +216,11 @@ namespace IntegrationTest_DistributedEvents
 			_catalog.RegisterComponent<ITimerTriggeredEvent, TimerTriggeredEvent>(ActivationType.Singleton);
 			
 			TcpCustomServerProtocolSetup protocol = new TcpCustomServerProtocolSetup(8083, new NullAuthenticationProvider(), true);
-			_host = new ZyanComponentHost("EventTest", protocol, _catalog);            
+			protocol.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(1));
+			_host = new ZyanComponentHost("EventTest", protocol, _catalog);
 
 			TcpDuplexServerProtocolSetup protocol2 = new TcpDuplexServerProtocolSetup(8084, new NullAuthenticationProvider(), true);
-			_duplexHost = new ZyanComponentHost("DuplexEventTest", protocol2, _catalog);            
+			_duplexHost = new ZyanComponentHost("DuplexEventTest", protocol2, _catalog);
 		}
 
 		public void Dispose()
