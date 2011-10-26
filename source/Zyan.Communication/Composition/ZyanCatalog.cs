@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.ComponentModel.Composition.Primitives;
+using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication.Composition
 {
@@ -69,7 +70,7 @@ namespace Zyan.Communication.Composition
 							innerParts = new List<ZyanComposablePartDefinition>();
 							foreach (var component in Connection.RemoteDispatcher.GetRegisteredComponents())
 							{
-								var type = Type.GetType(component.InterfaceName);
+								var type = TypeHelper.GetType(component.InterfaceName, true);
 								var part = new ZyanComposablePartDefinition(Connection, type, component.UniqueName, ImplicitTransactionTransfer);
 								innerParts.Add(part);
 							}

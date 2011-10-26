@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Zyan.Communication.Toolbox;
 
 namespace Zyan.InterLinq.Types
 {
@@ -41,7 +42,7 @@ namespace Zyan.InterLinq.Types
 		/// </summary> 
 		public Type RepresentedType
 		{
-			get { return Type.GetType(representedType); }
+			get { return TypeHelper.GetType(representedType, true); }
 			set { representedType = value.AssemblyQualifiedName; }
 		}
 
