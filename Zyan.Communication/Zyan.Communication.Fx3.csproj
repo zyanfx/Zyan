@@ -239,6 +239,7 @@
     <Compile Include="Toolbox\Compression\CompressionHelper.cs" />
     <Compile Include="Toolbox\Compression\LZF.cs" />
     <Compile Include="Toolbox\ConcurrentDictionaryFx3.cs" />
+    <Compile Include="Toolbox\DynamicTypeBinder.cs" />
     <Compile Include="Toolbox\Extensions.cs" />
     <Compile Include="Toolbox\ExtensionsFx3.cs" />
     <Compile Include="Toolbox\LazyFx3.cs" />
@@ -246,6 +247,7 @@
     <Compile Include="Toolbox\MonoCheck.cs" />
     <Compile Include="Toolbox\SplitOrderedListFx3.cs" />
     <Compile Include="Toolbox\TypeComparer.cs" />
+    <Compile Include="Toolbox\TypeHelper.cs" />
     <Compile Include="Version.cs" />
     <Compile Include="ZyanComponentHost.cs" />
     <Compile Include="ZyanConnection.cs" />

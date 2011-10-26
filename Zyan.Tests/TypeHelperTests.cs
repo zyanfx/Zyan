@@ -3,6 +3,8 @@ using System.CodeDom.Compiler;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using Microsoft.CSharp;
 using Zyan.Communication;
 using Zyan.Communication.Toolbox;
@@ -42,7 +44,18 @@ namespace Zyan.Tests
 
 		private static Lazy<Assembly> SecretAssembly = new Lazy<Assembly>(() =>
 		{
-			var sourceCode = "internal class " + SecretClassName + " { }";
+			var sourceCode = @"
+				using System;
+
+				[Serializable]
+				internal class " + SecretClassName + @"
+				{
+					public override bool Equals(object obj)
+					{
+						return obj is " + SecretClassName + @";
+					}
+				}";
+
 			var compiler = new CSharpCodeProvider();
 			var options = new CompilerParameters
 			{
@@ -137,6 +150,43 @@ namespace Zyan.Tests
 
 			Assert.IsNotNull(type);
 			Assert.AreSame(type, SecretClass.Value);
+		}
+
+		[TestMethod, ExpectedException(typeof(SerializationException))]
+		public void BinaryFormatter_DeserializationProblems()
+		{
+			var obj = Activator.CreateInstance(SecretClass.Value);
+			var fmt = new BinaryFormatter();
+
+			using (var ms = new MemoryStream())
+			{
+				fmt.Serialize(ms, obj);
+
+				Assert.IsTrue(ms.Length > 0);
+				ms.Seek(0, SeekOrigin.Begin);
+
+				var newObj = fmt.Deserialize(ms);
+			}
+		}
+
+		[TestMethod]
+		public void BinaryFormatter_DynamicBinderAllowsDeserialization()
+		{
+			var obj = Activator.CreateInstance(SecretClass.Value);
+			var fmt = new BinaryFormatter();
+			fmt.Binder = new DynamicTypeBinder();
+
+			using (var ms = new MemoryStream())
+			{
+				fmt.Serialize(ms, obj);
+
+				Assert.IsTrue(ms.Length > 0);
+				ms.Seek(0, SeekOrigin.Begin);
+
+				var newObj = fmt.Deserialize(ms);
+				Assert.IsNotNull(newObj);
+				Assert.AreEqual(obj, newObj);
+			}
 		}
 	}
 }

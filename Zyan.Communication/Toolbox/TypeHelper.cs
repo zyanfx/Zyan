@@ -34,7 +34,7 @@ namespace Zyan.Communication.Toolbox
 		/// parameter specifies whether null is returned or an exception is thrown.</returns>
 		public static Type GetType(string fullName, bool throwOnError)
 		{
-			if (string.IsNullOrWhiteSpace(fullName))
+			if (string.IsNullOrEmpty(fullName))
 			{
 				throw new ArgumentNullException("fullName");
 			}
