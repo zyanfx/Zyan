@@ -11,7 +11,10 @@ namespace Zyan.Communication.Toolbox
 	/// </summary>
 	public static class TypeHelper
 	{
-		const char Comma = ',';
+		private const char OpenBracket = '[';
+		private const char ClosedBracket = ']';
+		private const char Comma = ',';
+		static string BracketWithComma = String.Empty + ClosedBracket + Comma;
 
 		/// <summary>
 		/// Gets the <see cref="Type"/> with the specified name, performing a case-sensitive search.
@@ -48,10 +51,22 @@ namespace Zyan.Communication.Toolbox
 			// try to find the loaded assembly in the current appication domain
 			if (fullName.Contains(Comma))
 			{
-				var commaIndex = fullName.IndexOf(Comma);
+				// extract assembly name
+				var bracketIndex = fullName.LastIndexOf(ClosedBracket);
+				var commaIndex = fullName.IndexOf(Comma, bracketIndex < 0 ? 0 : bracketIndex); // first comma after the last closed bracket
 				var typeName = fullName.Substring(0, commaIndex).Trim();
 				var fullAssemblyName = fullName.Substring(commaIndex + 1).Trim();
 				var asmName = fullAssemblyName.Split(Comma).FirstOrDefault();
+
+				// extract generic arguments recursively
+				Type[] genericArguments = null;
+				bracketIndex = fullName.IndexOf(OpenBracket);
+				if (bracketIndex > 0)
+				{
+					var genArgs = typeName.Substring(bracketIndex + 1, typeName.Length - bracketIndex - 2).Trim();
+					genericArguments = ExtractGenericArguments(genArgs, throwOnError).ToArray();
+					typeName = typeName.Substring(0, bracketIndex).Trim();
+				}
 
 				// index loaded assemblies by their names
 				var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToLookup(a => a.GetName().Name.ToLower());
@@ -70,6 +85,26 @@ namespace Zyan.Communication.Toolbox
 						result = assembly.GetType(typeName);
 					}
 				}
+
+				// try to load assembly using standard name resoluion policy
+				if (result == null)
+				{
+					try
+					{
+						var asm = Assembly.Load(fullAssemblyName);
+						result = asm.GetType(typeName);
+					}
+					catch // assembly or type cannot be loaded
+					{
+					}
+				}
+
+				// make generic type
+				if (result != null && result.IsGenericType && genericArguments != null && 
+					genericArguments.Length == result.GetGenericArguments().Length)
+				{
+					result = result.MakeGenericType(genericArguments);
+				}
 			}
 
 			// throw exception if type is not found
@@ -79,6 +114,39 @@ namespace Zyan.Communication.Toolbox
 			}
 
 			return result;
+		}
+
+		private static IEnumerable<Type> ExtractGenericArguments(string genericArguments, bool throwOnError)
+		{
+			var count = 0;
+			var argument = new StringBuilder();
+
+			foreach (char c in genericArguments)
+			{
+				argument.Append(c);
+
+				switch (c)
+				{
+					case OpenBracket:
+						count++;
+						break;
+
+					case ClosedBracket:
+						count--;
+						break;
+				}
+
+				if (count == 0)
+				{
+					var typeName = argument.ToString().Trim(OpenBracket, ClosedBracket, Comma);
+					if (typeName.Length > 0)
+					{
+						yield return GetType(typeName, throwOnError);
+					}
+
+					argument.Length = 0;
+				}
+			}
 		}
 	}
 }
