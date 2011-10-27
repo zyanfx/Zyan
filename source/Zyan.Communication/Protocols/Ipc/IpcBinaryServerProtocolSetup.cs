@@ -7,6 +7,7 @@ using System.Runtime.Serialization.Formatters;
 using System.Security.Principal;
 using Zyan.Communication.Security;
 using Zyan.Communication.Toolbox;
+using System.Collections;
 
 namespace Zyan.Communication.Protocols.Ipc
 {
@@ -56,18 +57,32 @@ namespace Zyan.Communication.Protocols.Ipc
 			set { _protectionLevel = value; }
 		}
 
+        /// <summary>
+        /// Creates a new instance of the IpcBinaryServerProtocolSetup class.
+        /// </summary>
+        /// <param name="portName">IPC port name</param>
+        public IpcBinaryServerProtocolSetup(string portName)
+            : this(portName, Versioning.Strict)
+        {}
+
 		/// <summary>
 		/// Creates a new instance of the IpcBinaryServerProtocolSetup class.
 		/// </summary>
 		/// <param name="portName">IPC port name</param>
-		public IpcBinaryServerProtocolSetup(string portName)
+        /// <param name="versioning">Versioning behavior</param>
+		public IpcBinaryServerProtocolSetup(string portName, Versioning versioning)
 			: base((settings, clientSinkChain, serverSinkChain) => new IpcChannel(settings, clientSinkChain, serverSinkChain))
 		{
 			_portName = portName;
 			_channelName = "IpcBinaryServerProtocolSetup_" + Guid.NewGuid().ToString();
+            _versioning = versioning;
 
-			ClientSinkChain.Add(new BinaryClientFormatterSinkProvider());
-			ServerSinkChain.Add(new BinaryServerFormatterSinkProvider() { TypeFilterLevel = TypeFilterLevel.Full });
+            Hashtable formatterSettings = new Hashtable();
+            formatterSettings.Add("includeVersions", _versioning == Versioning.Strict);
+            formatterSettings.Add("strictBinding", _versioning == Versioning.Strict);
+
+            ClientSinkChain.Add(new BinaryClientFormatterSinkProvider(formatterSettings, null));
+            ServerSinkChain.Add(new BinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
 		}
 
 		/// <summary>
@@ -121,5 +136,19 @@ namespace Zyan.Communication.Protocols.Ipc
 				throw new NotSupportedException();
 			}
 		}
+
+        #region Versioning settings
+
+        private Versioning _versioning = Versioning.Strict;
+
+        /// <summary>
+        /// Gets or sets the versioning behavior.
+        /// </summary>
+        private Versioning Versioning
+        {
+            get { return _versioning; }
+        }
+
+        #endregion
 	}
 }
