@@ -261,4 +261,7 @@
   <data name="ApplicationException_NoChannelFactorySpecified" xml:space="preserve">
     <value>Фабричный метод для канала не задан.</value>
   </data>
+  <data name="ApplicationException_NoChannelCreated" xml:space="preserve">
+    <value>Канал Remoting не был создан.</value>
+  </data>
 </root>
