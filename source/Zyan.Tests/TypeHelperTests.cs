@@ -1,5 +1,6 @@
 ﻿using System;
 using System.CodeDom.Compiler;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -150,6 +151,46 @@ namespace Zyan.Tests
 
 			Assert.IsNotNull(type);
 			Assert.AreSame(type, SecretClass.Value);
+		}
+
+		[TestMethod]
+		public void TypeHelper_ReturnsStaticallyLinkedOpenGenericType()
+		{
+			var type1 = typeof(Dictionary<,>);
+			var type2 = TypeHelper.GetType(type1.AssemblyQualifiedName);
+
+			Assert.IsNotNull(type2);
+			Assert.AreSame(type1, type2);
+		}
+
+		[TestMethod]
+		public void TypeHelper_ReturnsStaticallyLinkedGenericTypeWithArguments()
+		{
+			var type1 = typeof(Dictionary<Dictionary<string, List<int>>, Dictionary<List<string>, int>>);
+			var type2 = TypeHelper.GetType(type1.AssemblyQualifiedName);
+
+			Assert.IsNotNull(type2);
+			Assert.AreSame(type1, type2);
+		}
+
+		[TestMethod]
+		public void TypeHelper_ReturnsDynamicallyLinkedGenericTypeWithSingleArgument()
+		{
+			var type1 = typeof(List<>).MakeGenericType(SecretClass.Value);
+			var type2 = TypeHelper.GetType(type1.AssemblyQualifiedName);
+
+			Assert.IsNotNull(type2);
+			Assert.AreSame(type1, type2);
+		}
+
+		[TestMethod]
+		public void TypeHelper_ReturnsDynamicallyLinkedGenericTypeWithComplexArguments()
+		{
+			var type1 = typeof(Dictionary<,>).MakeGenericType(typeof(Dictionary<List<string>, int>), typeof(Dictionary<,>).MakeGenericType(typeof(List<string>), SecretClass.Value));
+			var type2 = TypeHelper.GetType(type1.AssemblyQualifiedName);
+
+			Assert.IsNotNull(type2);
+			Assert.AreSame(type1, type2);
 		}
 
 		[TestMethod, ExpectedException(typeof(SerializationException))]
