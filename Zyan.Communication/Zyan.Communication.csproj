@@ -248,6 +248,7 @@
     <Compile Include="Protocols\IServerProtocolSetup.cs" />
     <Compile Include="Protocols\Tcp\TcpDuplexClientProtocolSetup.cs" />
     <Compile Include="Protocols\Tcp\TcpDuplexServerProtocolSetup.cs" />
+    <Compile Include="Protocols\Versioning.cs" />
     <Compile Include="Security\BasicWindowsAuthProvider.cs" />
     <Compile Include="Security\Exceptions\AccountLockedException.cs" />
     <Compile Include="Security\Exceptions\AccountNotFoundException.cs" />

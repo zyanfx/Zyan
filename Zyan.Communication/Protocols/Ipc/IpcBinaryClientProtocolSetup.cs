@@ -5,6 +5,8 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Ipc;
 using System.Security.Principal;
 using Zyan.Communication.Toolbox;
+using System.Collections;
+using System.Runtime.Serialization.Formatters;
 
 namespace Zyan.Communication.Protocols.Ipc
 {
@@ -44,14 +46,29 @@ namespace Zyan.Communication.Protocols.Ipc
 			set { _protectionLevel = value; }
 		}
 
+        /// <summary>
+        /// Creates a new instance of the IpcBinaryClientProtocolSetup class.
+        /// </summary>
+        public IpcBinaryClientProtocolSetup()
+            : this(Versioning.Strict)
+        {}
+
 		/// <summary>
 		/// Creates a new instance of the IpcBinaryClientProtocolSetup class.
 		/// </summary>
-		public IpcBinaryClientProtocolSetup()
+        /// <param name="versioning">Versioning behavior</param>
+		public IpcBinaryClientProtocolSetup(Versioning versioning)
 			: base((settings, clientSinkChain, serverSinkChain) => new IpcChannel(settings, clientSinkChain, serverSinkChain))
 		{
-			// Zufälligen Kanalnamen vergeben
 			_channelName = "IpcBinaryClientProtocol_" + Guid.NewGuid().ToString();
+            _versioning = versioning;
+
+            Hashtable formatterSettings = new Hashtable();
+            formatterSettings.Add("includeVersions", _versioning == Versioning.Strict);
+            formatterSettings.Add("strictBinding", _versioning == Versioning.Strict);
+
+            ClientSinkChain.Add(new BinaryClientFormatterSinkProvider(formatterSettings, null));
+            ServerSinkChain.Add(new BinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
 		}
 
 		/// <summary>
@@ -87,5 +104,19 @@ namespace Zyan.Communication.Protocols.Ipc
 			}
 			return channel;
 		}
+
+        #region Versioning settings
+
+        private Versioning _versioning = Versioning.Strict;
+
+        /// <summary>
+        /// Gets or sets the versioning behavior.
+        /// </summary>
+        private Versioning Versioning
+        {
+            get { return _versioning; }
+        }
+
+        #endregion
 	}
 }
