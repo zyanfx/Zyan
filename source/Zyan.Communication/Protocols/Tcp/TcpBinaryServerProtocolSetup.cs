@@ -7,6 +7,7 @@ using System.Runtime.Serialization.Formatters;
 using System.Security.Principal;
 using Zyan.Communication.Security;
 using Zyan.Communication.Toolbox;
+using System.Collections;
 
 namespace Zyan.Communication.Protocols.Tcp
 {
@@ -71,17 +72,30 @@ namespace Zyan.Communication.Protocols.Tcp
 		public bool SocketCachingEnabled
 		{ get; set; }
 
+        /// <summary>
+        /// Creates a new instance of the TcpBinaryServerProtocolSetup class.
+        /// </summary>
+        public TcpBinaryServerProtocolSetup()
+            : this(Versioning.Strict)
+        {}
+
 		/// <summary>
 		/// Creates a new instance of the TcpBinaryServerProtocolSetup class.
 		/// </summary>
-		public TcpBinaryServerProtocolSetup()
+        /// <param name="versioning">Versioning behavior</param>
+		public TcpBinaryServerProtocolSetup(Versioning versioning)
 			: base((settings, clientSinkChain, serverSinkChain) => new TcpChannel(settings, clientSinkChain, serverSinkChain))
 		{
 			SocketCachingEnabled = true;
 			_channelName = "TcpBinaryServerProtocolSetup_" + Guid.NewGuid().ToString();
+            _versioning = versioning;
 
-			ClientSinkChain.Add(new BinaryClientFormatterSinkProvider());
-			ServerSinkChain.Add(new BinaryServerFormatterSinkProvider() { TypeFilterLevel = TypeFilterLevel.Full });
+            Hashtable formatterSettings = new Hashtable();
+            formatterSettings.Add("includeVersions", _versioning == Versioning.Strict);
+            formatterSettings.Add("strictBinding", _versioning == Versioning.Strict);
+
+            ClientSinkChain.Add(new BinaryClientFormatterSinkProvider(formatterSettings, null));
+            ServerSinkChain.Add(new BinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
 		}
 
 		/// <summary>
@@ -92,6 +106,17 @@ namespace Zyan.Communication.Protocols.Tcp
 		{
 			TcpPort = tcpPort;
 		}
+
+        /// <summary>
+        /// Creates a new instance of the TcpBinaryServerProtocolSetup class.
+        /// </summary>
+        /// <param name="versioning">Versioning behavior</param>
+        /// <param name="tcpPort">TCP port number</param>
+        public TcpBinaryServerProtocolSetup(Versioning versioning, int tcpPort)
+            : this(versioning)
+        {
+            TcpPort = tcpPort;
+        }
 
 		/// <summary>
 		/// Creates and configures a Remoting channel.
@@ -146,5 +171,19 @@ namespace Zyan.Communication.Protocols.Tcp
 				throw new NotSupportedException();
 			}
 		}
+
+        #region Versioning settings
+
+        private Versioning _versioning = Versioning.Strict;
+
+        /// <summary>
+        /// Gets or sets the versioning behavior.
+        /// </summary>
+        private Versioning Versioning
+        {
+            get { return _versioning; }
+        }
+
+        #endregion
 	}
 }

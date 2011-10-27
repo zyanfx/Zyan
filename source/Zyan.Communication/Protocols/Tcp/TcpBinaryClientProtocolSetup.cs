@@ -6,6 +6,7 @@ using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Serialization.Formatters;
 using System.Security.Principal;
 using Zyan.Communication.Toolbox;
+using System.Collections;
 
 namespace Zyan.Communication.Protocols.Tcp
 {
@@ -17,7 +18,7 @@ namespace Zyan.Communication.Protocols.Tcp
 		private bool _useWindowsSecurity = false;
 		private TokenImpersonationLevel _impersonationLevel = TokenImpersonationLevel.Identification;
 		private ProtectionLevel _protectionLevel = ProtectionLevel.EncryptAndSign;
-
+        
 		/// <summary>
 		/// Gets or sets, if Windows Security should be used.
 		/// </summary>
@@ -57,14 +58,27 @@ namespace Zyan.Communication.Protocols.Tcp
 		/// Creates a new instance of the TcpBinaryClientProtocolSetup class.
 		/// </summary>
 		public TcpBinaryClientProtocolSetup()
-			: base((settings, clientSinkChain, serverSinkChain) => new TcpChannel(settings, clientSinkChain, serverSinkChain))
-		{
-			SocketCachingEnabled = true;
-			_channelName = "TcpBinaryClientProtocol_" + Guid.NewGuid().ToString();
+			: this(Versioning.Strict)
+		{}
 
-			ClientSinkChain.Add(new BinaryClientFormatterSinkProvider());
-			ServerSinkChain.Add(new BinaryServerFormatterSinkProvider() { TypeFilterLevel = TypeFilterLevel.Full });
-		}
+        /// <summary>
+        /// Creates a new instance of the TcpBinaryClientProtocolSetup class.
+        /// </summary>
+        /// <param name="versioning">Versioning behavoir</param>
+        public TcpBinaryClientProtocolSetup(Versioning versioning)
+            : base((settings, clientSinkChain, serverSinkChain) => new TcpChannel(settings, clientSinkChain, serverSinkChain))
+        {
+            SocketCachingEnabled = true;
+            _channelName = "TcpBinaryClientProtocol_" + Guid.NewGuid().ToString();
+            _versioning = versioning;
+
+            Hashtable formatterSettings = new Hashtable();
+            formatterSettings.Add("includeVersions", _versioning == Versioning.Strict);
+            formatterSettings.Add("strictBinding", _versioning == Versioning.Strict);
+
+            ClientSinkChain.Add(new BinaryClientFormatterSinkProvider(formatterSettings, null));
+            ServerSinkChain.Add(new BinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
+        }
 
 		/// <summary>
 		/// Creates and configures a Remoting channel.
@@ -99,6 +113,20 @@ namespace Zyan.Communication.Protocols.Tcp
 				}				
 			}
 			return channel;
-		}
-	}
+        }
+
+        #region Versioning settings
+
+        private Versioning _versioning = Versioning.Strict;
+
+        /// <summary>
+        /// Gets or sets the versioning behavior.
+        /// </summary>
+        private Versioning Versioning
+        {
+            get { return _versioning; }
+        }
+
+        #endregion
+    }
 }
