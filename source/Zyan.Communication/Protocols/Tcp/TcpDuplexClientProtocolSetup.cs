@@ -76,9 +76,6 @@ namespace Zyan.Communication.Protocols.Tcp
 			: this(Versioning.Strict)
 		{
 			_channelName = "TcpDuplexClientProtocolSetup" + Guid.NewGuid().ToString();
-
-			ClientSinkChain.Add(new BinaryClientFormatterSinkProvider());
-			ServerSinkChain.Add(new BinaryServerFormatterSinkProvider() { TypeFilterLevel = TypeFilterLevel.Full });
 		}
 
 		/// <summary>
