@@ -14,7 +14,6 @@ namespace Zyan.Communication.Toolbox
 		private const char OpenBracket = '[';
 		private const char ClosedBracket = ']';
 		private const char Comma = ',';
-		static string BracketWithComma = String.Empty + ClosedBracket + Comma;
 
 		/// <summary>
 		/// Gets the <see cref="Type"/> with the specified name, performing a case-sensitive search.
