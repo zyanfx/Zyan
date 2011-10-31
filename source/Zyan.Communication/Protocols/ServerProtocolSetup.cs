@@ -52,7 +52,8 @@ namespace Zyan.Communication.Protocols
 		/// Creates a new instance of the ServerProtocolSetup class.
 		/// </summary>
 		/// <param name="channelFactory">Delegate to channel factory method</param>
-		public ServerProtocolSetup(Func<IDictionary, IClientChannelSinkProvider, IServerChannelSinkProvider, IChannel> channelFactory) : this()
+		public ServerProtocolSetup(Func<IDictionary, IClientChannelSinkProvider, IServerChannelSinkProvider, IChannel> channelFactory)
+			: this()
 		{
 			if (channelFactory == null)
 				throw new ArgumentNullException("channelFactory");

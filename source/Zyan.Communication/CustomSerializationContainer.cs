@@ -24,7 +24,7 @@ namespace Zyan.Communication
 		/// <param name="data">Rohdaten</param>
 		public CustomSerializationContainer(Type handledType, Type dataType, byte[] data)
 		{
-			// Eigenschaften füllen            
+			// Eigenschaften füllen
 			HandledType = handledType;
 			DataType = dataType;
 			Data = data;

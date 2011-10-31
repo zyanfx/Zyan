@@ -15,7 +15,7 @@ namespace Zyan.Communication
 
 		/// <summary>
 		/// Erstellt eine neue Instanz der CallInterceptionData-Klasse.
-		/// </summary>        
+		/// </summary>
 		/// <param name="parameters">Parameterwerte des abgefangenen Aufrufs</param>
 		/// <param name="remoteInvoker">Delegat für den Aufruf von InvokeRemoteMethod (bei Bedarf)</param>
 		/// <param name="remotingMessage">Remoting-nachricht</param>

@@ -80,7 +80,7 @@ namespace Zyan.Communication
 		/// Gibt den registrierten Serialisierungshandler für einen bestimmten Typ zurück.
 		/// </summary>
 		/// <param name="handledType">Behandelter Typ</param>
-		/// <returns>Serialisierungshandler</returns>        
+		/// <returns>Serialisierungshandler</returns>
 		public ISerializationHandler this[Type handledType]
 		{
 			get
@@ -107,7 +107,7 @@ namespace Zyan.Communication
 		/// </summary>
 		/// <param name="type">Typ</param>
 		/// <param name="handledType">Behandelter Typ</param>
-		/// <param name="handler">Serialisierungshandler</param>        
+		/// <param name="handler">Serialisierungshandler</param>
 		public void FindMatchingSerializationHandler(Type type, out Type handledType, out ISerializationHandler handler)
 		{
 			// Wenn kein Typ angegebe wurde ...

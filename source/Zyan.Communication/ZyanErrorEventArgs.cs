@@ -12,10 +12,12 @@ namespace Zyan.Communication
 		/// Throws the exception.
 		/// </summary>
 		ThrowException = 0,
+
 		/// <summary>
 		/// Retry the request.
-		/// </summary>        
+		/// </summary>
 		Retry,
+
 		/// <summary>
 		/// Ignore the error.
 		/// </summary>
