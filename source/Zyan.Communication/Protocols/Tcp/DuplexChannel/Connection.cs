@@ -40,7 +40,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 	}
 
 	/// <summary>
-	/// Encapsulates a connection, providing read/write locking for synchronisation.  
+	/// Encapsulates a connection, providing read/write locking for synchronisation.
 	/// Additionally, this should provide a useful position for adding reconnection abilities.
 	/// </summary>
 	public class Connection

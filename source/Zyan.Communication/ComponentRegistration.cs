@@ -22,7 +22,7 @@ namespace Zyan.Communication
 		/// Creates a new instance of the ComponentRegistration class.
 		/// </summary>
 		/// <param name="interfaceType">Interface type of the component</param>
-		/// <param name="implementationType">Implementation type of the component</param>                
+		/// <param name="implementationType">Implementation type of the component</param>
 		public ComponentRegistration(Type interfaceType, Type implementationType)
 			: this()
 		{
@@ -36,7 +36,7 @@ namespace Zyan.Communication
 		/// Creates a new instance of the ComponentRegistration class.
 		/// </summary>
 		/// <param name="interfaceType">Interface type of the component</param>
-		/// <param name="implementationType">Implementation type of the component</param>    
+		/// <param name="implementationType">Implementation type of the component</param>
 		/// <param name="cleanUpHandler">Delegate of clean up method</param>
 		public ComponentRegistration(Type interfaceType, Type implementationType, Action<object> cleanUpHandler)
 			: this()
@@ -52,7 +52,7 @@ namespace Zyan.Communication
 		/// Creates a new instance of the ComponentRegistration class.
 		/// </summary>
 		/// <param name="interfaceType">Interface type of the component</param>
-		/// <param name="implementationType">Implementation type of the component</param>                                
+		/// <param name="implementationType">Implementation type of the component</param>
 		/// <param name="activationType">Activation type (Singleton/SingleCall)</param>
 		public ComponentRegistration(Type interfaceType, Type implementationType, ActivationType activationType)
 			: this()
@@ -67,7 +67,7 @@ namespace Zyan.Communication
 		/// Creates a new instance of the ComponentRegistration class.
 		/// </summary>
 		/// <param name="interfaceType">Interface type of the component</param>
-		/// <param name="implementationType">Implementation type of the component</param>                                
+		/// <param name="implementationType">Implementation type of the component</param>
 		/// <param name="activationType">Activation type (Singleton/SingleCall)</param>
 		/// <param name="cleanUpHandler">Delegate of clean up method</param>
 		public ComponentRegistration(Type interfaceType, Type implementationType, ActivationType activationType, Action<object> cleanUpHandler)
@@ -84,7 +84,7 @@ namespace Zyan.Communication
 		/// Creates a new instance of the ComponentRegistration class.
 		/// </summary>
 		/// <param name="interfaceType">Interface type of the component</param>
-		/// <param name="intializationHandler">Delegate of initialization method</param>        
+		/// <param name="intializationHandler">Delegate of initialization method</param>
 		public ComponentRegistration(Type interfaceType, Func<object> intializationHandler)
 			: this()
 		{
@@ -98,7 +98,7 @@ namespace Zyan.Communication
 		/// Creates a new instance of the ComponentRegistration class.
 		/// </summary>
 		/// <param name="interfaceType">Interface type of the component</param>
-		/// <param name="intializationHandler">Delegate of initialization method</param>   
+		/// <param name="intializationHandler">Delegate of initialization method</param>
 		/// <param name="cleanUpHandler">Delegate of clean up method</param>
 		public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, Action<object> cleanUpHandler)
 			: this()
@@ -114,7 +114,7 @@ namespace Zyan.Communication
 		/// Creates a new instance of the ComponentRegistration class.
 		/// </summary>
 		/// <param name="interfaceType">Interface type of the component</param>
-		/// <param name="intializationHandler">Delegate of initialization method</param>        
+		/// <param name="intializationHandler">Delegate of initialization method</param>
 		/// <param name="activationType">Activation type (Singleton/SingleCall)</param>
 		public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, ActivationType activationType)
 			: this()
@@ -129,7 +129,7 @@ namespace Zyan.Communication
 		/// Creates a new instance of the ComponentRegistration class.
 		/// </summary>
 		/// <param name="interfaceType">Interface type of the component</param>
-		/// <param name="intializationHandler">Delegate of initialization method</param>        
+		/// <param name="intializationHandler">Delegate of initialization method</param>
 		/// <param name="activationType">Activation type (Singleton/SingleCall)</param>
 		/// <param name="cleanUpHandler">Delegate of clean up method</param>
 		public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, ActivationType activationType, Action<object> cleanUpHandler)
@@ -178,7 +178,7 @@ namespace Zyan.Communication
 		/// Creates a new instance of the ComponentRegistration class.
 		/// </summary>
 		/// <param name="interfaceType">Interface type of the component</param>
-		/// <param name="implementationType">Implementation type of the component</param>                        
+		/// <param name="implementationType">Implementation type of the component</param>
 		/// <param name="uniqueName">Unique component name</param>
 		public ComponentRegistration(Type interfaceType, Type implementationType, string uniqueName)
 			: this()
@@ -193,7 +193,7 @@ namespace Zyan.Communication
 		/// Creates a new instance of the ComponentRegistration class.
 		/// </summary>
 		/// <param name="interfaceType">Interface type of the component</param>
-		/// <param name="implementationType">Implementation type of the component</param>                        
+		/// <param name="implementationType">Implementation type of the component</param>
 		/// <param name="uniqueName">Unique component name</param>
 		/// <param name="cleanUpHandler">Delegate of clean up method</param>
 		public ComponentRegistration(Type interfaceType, Type implementationType, string uniqueName, Action<object> cleanUpHandler)
@@ -210,7 +210,7 @@ namespace Zyan.Communication
 		/// Creates a new instance of the ComponentRegistration class.
 		/// </summary>
 		/// <param name="interfaceType">Interface type of the component</param>
-		/// <param name="implementationType">Implementation type of the component</param>                        
+		/// <param name="implementationType">Implementation type of the component</param>
 		/// <param name="uniqueName">Unique component name</param>
 		/// <param name="activationType">Activation type (Singleton/SingleCall)</param>
 		public ComponentRegistration(Type interfaceType, Type implementationType, string uniqueName, ActivationType activationType)
@@ -226,7 +226,7 @@ namespace Zyan.Communication
 		/// Creates a new instance of the ComponentRegistration class.
 		/// </summary>
 		/// <param name="interfaceType">Interface type of the component</param>
-		/// <param name="implementationType">Implementation type of the component</param>                        
+		/// <param name="implementationType">Implementation type of the component</param>
 		/// <param name="uniqueName">Unique component name</param>
 		/// <param name="activationType">Activation type (Singleton/SingleCall)</param>
 		/// <param name="cleanUpHandler">Delegate of clean up method</param>
@@ -244,7 +244,7 @@ namespace Zyan.Communication
 		/// Creates a new instance of the ComponentRegistration class.
 		/// </summary>
 		/// <param name="interfaceType">Interface type of the component</param>
-		/// <param name="intializationHandler">Delegate of initialization method</param>        
+		/// <param name="intializationHandler">Delegate of initialization method</param>
 		/// <param name="uniqueName">Unique component name</param>
 		public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, string uniqueName)
 			: this()
@@ -259,7 +259,7 @@ namespace Zyan.Communication
 		/// Creates a new instance of the ComponentRegistration class.
 		/// </summary>
 		/// <param name="interfaceType">Interface type of the component</param>
-		/// <param name="intializationHandler">Delegate of initialization method</param>        
+		/// <param name="intializationHandler">Delegate of initialization method</param>
 		/// <param name="uniqueName">Unique component name</param>
 		/// <param name="cleanUpHandler">Delegate of clean up method</param>
 		public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, string uniqueName, Action<object> cleanUpHandler)
@@ -276,7 +276,7 @@ namespace Zyan.Communication
 		/// Creates a new instance of the ComponentRegistration class.
 		/// </summary>
 		/// <param name="interfaceType">Interface type of the component</param>
-		/// <param name="intializationHandler">Delegate of initialization method</param>        
+		/// <param name="intializationHandler">Delegate of initialization method</param>
 		/// <param name="uniqueName">Unique component name</param>
 		/// <param name="activationType">Activation type (Singleton/SingleCall)</param>
 		public ComponentRegistration(Type interfaceType, Func<object> intializationHandler, string uniqueName, ActivationType activationType)
@@ -292,7 +292,7 @@ namespace Zyan.Communication
 		/// Creates a new instance of the ComponentRegistration class.
 		/// </summary>
 		/// <param name="interfaceType">Interface type of the component</param>
-		/// <param name="intializationHandler">Delegate of initialization method</param>        
+		/// <param name="intializationHandler">Delegate of initialization method</param>
 		/// <param name="uniqueName">Unique component name</param>
 		/// <param name="activationType">Activation type (Singleton/SingleCall)</param>
 		/// <param name="cleanUpHandler">Delegate of clean up method</param>
@@ -365,7 +365,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Gets or sets the unqiue name of the component.        
+		/// Gets or sets the unqiue name of the component.
 		/// </summary>
 		public string UniqueName
 		{
