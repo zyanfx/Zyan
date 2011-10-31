@@ -53,15 +53,15 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System, Version=4.0.0.0" />
-    <Reference Include="System.Core, Version=4.0.0.0" />
-    <Reference Include="System.Data, Version=4.0.0.0" />
-    <Reference Include="System.Data.Linq, Version=4.0.0.0" />
-    <Reference Include="System.Drawing, Version=4.0.0.0" />
-    <Reference Include="System.Runtime.Remoting, Version=4.0.0.0" />
-    <Reference Include="System.ServiceModel, Version=4.0.0.0" />
-    <Reference Include="System.Windows.Forms, Version=4.0.0.0" />
-    <Reference Include="System.Xml, Version=4.0.0.0" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Remoting" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />

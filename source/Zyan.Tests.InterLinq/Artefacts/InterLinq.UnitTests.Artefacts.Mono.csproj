@@ -53,13 +53,13 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System, Version=4.0.0.0" />
-    <Reference Include="System.Core, Version=4.0.0.0" />
-    <Reference Include="System.Data, Version=4.0.0.0" />
-    <Reference Include="System.Data.Linq, Version=4.0.0.0" />
-    <Reference Include="System.Runtime.Serialization, Version=4.0.0.0" />
-    <Reference Include="System.Security, Version=4.0.0.0" />
-    <Reference Include="System.Xml, Version=4.0.0.0" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Objects\Company.cs" />

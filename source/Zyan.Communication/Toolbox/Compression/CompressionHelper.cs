@@ -122,7 +122,7 @@ namespace Zyan.Communication.Toolbox.Compression
 
 						// prepare output buffer
 						var output = new byte[outputLength];
-						var size = new LZF().Decompress(input, input.Length, output, output.Length);
+						new LZF().Decompress(input, input.Length, output, output.Length);
 						return new MemoryStream(output);
 					}
 			}
