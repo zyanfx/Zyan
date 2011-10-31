@@ -47,7 +47,7 @@ namespace Zyan.Communication
 		/// <param name="sessionID">Sitzungsschlüssel</param>
 		/// <param name="componentHostName">Name des entfernten Komponentenhosts</param>
 		/// <param name="autoLoginOnExpiredSession">Gibt an, ob sich der Proxy automatisch neu anmelden soll, wenn die Sitzung abgelaufen ist</param>
-		/// <param name="autoLogoninCredentials">Optional! Anmeldeinformationen, die nur benötigt werden, wenn autoLoginOnExpiredSession auf Wahr eingestellt ist</param>              
+		/// <param name="autoLogoninCredentials">Optional! Anmeldeinformationen, die nur benötigt werden, wenn autoLoginOnExpiredSession auf Wahr eingestellt ist</param>
 		/// <param name="activationType">Aktivierungsart</param>
 		public ZyanProxy(string uniqueName, Type type, ZyanConnection connection, bool implicitTransactionTransfer, Guid sessionID, string componentHostName, bool autoLoginOnExpiredSession, Hashtable autoLogoninCredentials, ActivationType activationType)
 			: base(type)
