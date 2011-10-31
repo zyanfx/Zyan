@@ -38,20 +38,20 @@
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System, Version=4.0.0.0" />
-    <Reference Include="System.Configuration, Version=4.0.0.0" />
-    <Reference Include="System.Core, Version=4.0.0.0" />
-    <Reference Include="System.Data, Version=4.0.0.0" />
-    <Reference Include="System.Data.DataSetExtensions, Version=4.0.0.0" />
-    <Reference Include="System.Data.Linq, Version=4.0.0.0" />
-    <Reference Include="System.Runtime.Remoting, Version=4.0.0.0" />
-    <Reference Include="System.Runtime.Serialization, Version=4.0.0.0" />
-    <Reference Include="System.ServiceModel, Version=4.0.0.0" />
-    <Reference Include="System.Transactions, Version=4.0.0.0" />
-    <Reference Include="System.Windows.Forms, Version=4.0.0.0" />
-    <Reference Include="System.Xml, Version=4.0.0.0" />
-    <Reference Include="System.Xml.Linq, Version=4.0.0.0" />
-    <Reference Include="System.ComponentModel.Composition, Version=4.0.0.0" />
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Runtime.Remoting" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.ComponentModel.Composition" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActivationType.cs" />
@@ -93,6 +93,14 @@
     <Compile Include="ZyanProxy.cs" />
     <Compile Include="ChannelSinks\ClientAddress\ClientAddressServerChannelSink.cs" />
     <Compile Include="ChannelSinks\ClientAddress\ClientAddressServerChannelSinkProvider.cs" />
+    <Compile Include="ChannelSinks\Compression\CommonHeaders.cs" />
+    <Compile Include="ChannelSinks\Compression\CompressionClientChannelSink.cs" />
+    <Compile Include="ChannelSinks\Compression\CompressionClientChannelSinkProvider.cs" />
+    <Compile Include="ChannelSinks\Compression\CompressionMethod.cs" />
+    <Compile Include="ChannelSinks\Compression\CompressionServerChannelSink.cs" />
+    <Compile Include="ChannelSinks\Compression\CompressionServerChannelSinkProvider.cs" />
+    <Compile Include="ChannelSinks\Compression\ICompressible.cs" />
+    <Compile Include="ChannelSinks\Compression\NonCompressibleAttribute.cs" />
     <Compile Include="ChannelSinks\Encryption\CryptoClientChannelSink.cs" />
     <Compile Include="ChannelSinks\Encryption\CryptoClientChannelSinkProvider.cs" />
     <Compile Include="ChannelSinks\Encryption\CryptoRemotingException.cs" />
@@ -229,7 +237,10 @@
     <Compile Include="SessionMgmt\SessionManagerBase.cs" />
     <Compile Include="SessionMgmt\SessionVariableAdapter.cs" />
     <Compile Include="SessionMgmt\SqlSessionManager.cs" />
+    <Compile Include="Toolbox\Compression\CompressionHelper.cs" />
+    <Compile Include="Toolbox\Compression\LZF.cs" />
     <Compile Include="Toolbox\Asynchronizer.cs" />
+    <Compile Include="Toolbox\DynamicTypeBinder.cs" />
     <Compile Include="Toolbox\Extensions.cs" />
     <Compile Include="Toolbox\ExtensionsFx3.cs" />
     <Compile Include="Toolbox\MessageHelpers.cs" />
@@ -237,6 +248,7 @@
     <Compile Include="Toolbox\SyncContextSwitcher.cs" />
     <Compile Include="Toolbox\TransactionStarter.cs" />
     <Compile Include="Toolbox\TypeComparer.cs" />
+    <Compile Include="Toolbox\TypeHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\InternalsVisibleTo.cs" />
     <Compile Include="LanguageResource.Designer.cs" />
