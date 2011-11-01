@@ -5,7 +5,7 @@ namespace Zyan.Communication.Toolbox
 {
 	/// <summary>
 	/// Führt die Verarbeitung einer Nachricht asynchron aus.
-	/// </summary>    
+	/// </summary>
 	public class Asynchronizer<T>
 	{
 		/// <summary>

@@ -57,36 +57,36 @@ namespace Zyan.Communication.Protocols.Ipc
 			set { _protectionLevel = value; }
 		}
 
-        /// <summary>
-        /// Creates a new instance of the IpcBinaryServerProtocolSetup class.
-        /// </summary>
-        /// <param name="portName">IPC port name</param>
-        public IpcBinaryServerProtocolSetup(string portName)
-            : this(portName, Versioning.Strict)
-        {}
+		/// <summary>
+		/// Creates a new instance of the IpcBinaryServerProtocolSetup class.
+		/// </summary>
+		/// <param name="portName">IPC port name</param>
+		public IpcBinaryServerProtocolSetup(string portName)
+			: this(portName, Versioning.Strict)
+		{ }
 
 		/// <summary>
 		/// Creates a new instance of the IpcBinaryServerProtocolSetup class.
 		/// </summary>
 		/// <param name="portName">IPC port name</param>
-        /// <param name="versioning">Versioning behavior</param>
+		/// <param name="versioning">Versioning behavior</param>
 		public IpcBinaryServerProtocolSetup(string portName, Versioning versioning)
 			: base((settings, clientSinkChain, serverSinkChain) => new IpcChannel(settings, clientSinkChain, serverSinkChain))
 		{
 			_portName = portName;
 			_channelName = "IpcBinaryServerProtocolSetup_" + Guid.NewGuid().ToString();
-            _versioning = versioning;
+			_versioning = versioning;
 
-            Hashtable formatterSettings = new Hashtable();
-            formatterSettings.Add("includeVersions", _versioning == Versioning.Strict);
-            formatterSettings.Add("strictBinding", _versioning == Versioning.Strict);
+			Hashtable formatterSettings = new Hashtable();
+			formatterSettings.Add("includeVersions", _versioning == Versioning.Strict);
+			formatterSettings.Add("strictBinding", _versioning == Versioning.Strict);
 
-            ClientSinkChain.Add(new BinaryClientFormatterSinkProvider(formatterSettings, null));
-            ServerSinkChain.Add(new BinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
+			ClientSinkChain.Add(new BinaryClientFormatterSinkProvider(formatterSettings, null));
+			ServerSinkChain.Add(new BinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
 		}
 
 		/// <summary>
-		/// Creates and configures a Remoting channel.        
+		/// Creates and configures a Remoting channel.
 		/// </summary>
 		/// <returns>Remoting channel</returns>
 		public override IChannel CreateChannel()
@@ -137,18 +137,18 @@ namespace Zyan.Communication.Protocols.Ipc
 			}
 		}
 
-        #region Versioning settings
+		#region Versioning settings
 
-        private Versioning _versioning = Versioning.Strict;
+		private Versioning _versioning = Versioning.Strict;
 
-        /// <summary>
-        /// Gets or sets the versioning behavior.
-        /// </summary>
-        private Versioning Versioning
-        {
-            get { return _versioning; }
-        }
+		/// <summary>
+		/// Gets or sets the versioning behavior.
+		/// </summary>
+		private Versioning Versioning
+		{
+			get { return _versioning; }
+		}
 
-        #endregion
+		#endregion
 	}
 }

@@ -71,9 +71,7 @@ namespace Zyan.Communication.Toolbox
 
 		}
 
-		public ConcurrentDictionary (int concurrencyLevel,
-		                             IEnumerable<KeyValuePair<TKey, TValue>> collection,
-		                             IEqualityComparer<TKey> comparer)
+		public ConcurrentDictionary (int concurrencyLevel, IEnumerable<KeyValuePair<TKey, TValue>> collection, IEqualityComparer<TKey> comparer)
 			: this (collection, comparer)
 		{
 
@@ -109,9 +107,9 @@ namespace Zyan.Communication.Toolbox
 		public TValue AddOrUpdate (TKey key, Func<TKey, TValue> addValueFactory, Func<TKey, TValue, TValue> updateValueFactory)
 		{
 			return internalDictionary.InsertOrUpdate (Hash (key),
-			                                          key,
-			                                          () => Make (key, addValueFactory (key)),
-			                                          (e) => Make (key, updateValueFactory (key, e.Value))).Value;
+				key,
+				() => Make (key, addValueFactory (key)),
+				(e) => Make (key, updateValueFactory (key, e.Value))).Value;
 		}
 
 		public TValue AddOrUpdate (TKey key, TValue addValue, Func<TKey, TValue, TValue> updateValueFactory)
@@ -122,9 +120,9 @@ namespace Zyan.Communication.Toolbox
 		TValue AddOrUpdate (TKey key, TValue addValue, TValue updateValue)
 		{
 			return internalDictionary.InsertOrUpdate (Hash (key),
-			                                          key,
-			                                          Make (key, addValue),
-			                                          Make (key, updateValue)).Value;
+				key,
+				Make (key, addValue),
+				Make (key, updateValue)).Value;
 		}
 
 		TValue GetValue (TKey key)

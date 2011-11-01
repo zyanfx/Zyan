@@ -46,29 +46,29 @@ namespace Zyan.Communication.Protocols.Ipc
 			set { _protectionLevel = value; }
 		}
 
-        /// <summary>
-        /// Creates a new instance of the IpcBinaryClientProtocolSetup class.
-        /// </summary>
-        public IpcBinaryClientProtocolSetup()
-            : this(Versioning.Strict)
-        {}
+		/// <summary>
+		/// Creates a new instance of the IpcBinaryClientProtocolSetup class.
+		/// </summary>
+		public IpcBinaryClientProtocolSetup()
+			: this(Versioning.Strict)
+		{ }
 
 		/// <summary>
 		/// Creates a new instance of the IpcBinaryClientProtocolSetup class.
 		/// </summary>
-        /// <param name="versioning">Versioning behavior</param>
+		/// <param name="versioning">Versioning behavior</param>
 		public IpcBinaryClientProtocolSetup(Versioning versioning)
 			: base((settings, clientSinkChain, serverSinkChain) => new IpcChannel(settings, clientSinkChain, serverSinkChain))
 		{
 			_channelName = "IpcBinaryClientProtocol_" + Guid.NewGuid().ToString();
-            _versioning = versioning;
+			_versioning = versioning;
 
-            Hashtable formatterSettings = new Hashtable();
-            formatterSettings.Add("includeVersions", _versioning == Versioning.Strict);
-            formatterSettings.Add("strictBinding", _versioning == Versioning.Strict);
+			Hashtable formatterSettings = new Hashtable();
+			formatterSettings.Add("includeVersions", _versioning == Versioning.Strict);
+			formatterSettings.Add("strictBinding", _versioning == Versioning.Strict);
 
-            ClientSinkChain.Add(new BinaryClientFormatterSinkProvider(formatterSettings, null));
-            ServerSinkChain.Add(new BinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
+			ClientSinkChain.Add(new BinaryClientFormatterSinkProvider(formatterSettings, null));
+			ServerSinkChain.Add(new BinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
 		}
 
 		/// <summary>
@@ -105,18 +105,18 @@ namespace Zyan.Communication.Protocols.Ipc
 			return channel;
 		}
 
-        #region Versioning settings
+		#region Versioning settings
 
-        private Versioning _versioning = Versioning.Strict;
+		private Versioning _versioning = Versioning.Strict;
 
-        /// <summary>
-        /// Gets or sets the versioning behavior.
-        /// </summary>
-        private Versioning Versioning
-        {
-            get { return _versioning; }
-        }
+		/// <summary>
+		/// Gets or sets the versioning behavior.
+		/// </summary>
+		private Versioning Versioning
+		{
+			get { return _versioning; }
+		}
 
-        #endregion
+		#endregion
 	}
 }

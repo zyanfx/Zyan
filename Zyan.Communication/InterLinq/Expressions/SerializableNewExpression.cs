@@ -110,12 +110,12 @@ namespace Zyan.InterLinq.Expressions
 				//BindingFlags bindingAttr = BindingFlags.NonPublic | BindingFlags.Public;
 				//bindingAttr |= method.IsStatic ? BindingFlags.Static : BindingFlags.Instance;
 				//foreach( PropertyInfo info in declaringType.GetProperties( bindingAttr ) ) {
-				//    if( info.CanRead && ( method == info.GetGetMethod( true ) ) ) {
-				//        return info;
-				//    }
-				//    if( info.CanWrite && ( method == info.GetSetMethod( true ) ) ) {
-				//        return info;
-				//    }
+				//	if( info.CanRead && ( method == info.GetGetMethod( true ) ) ) {
+				//		return info;
+				//	}
+				//	if( info.CanWrite && ( method == info.GetSetMethod( true ) ) ) {
+				//		return info;
+				//	}
 				//}
 			}
 			return null;
