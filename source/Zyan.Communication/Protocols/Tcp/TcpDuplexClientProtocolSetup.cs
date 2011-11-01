@@ -51,23 +51,23 @@ namespace Zyan.Communication.Protocols.Tcp
 			set { _tcpKeepAliveInterval = value; }
 		}
 
-        /// <summary>
-        /// Creates a new instance of the TcpDuplexClientProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        public TcpDuplexClientProtocolSetup(Versioning versioning)
-            : base((settings, clientSinkChain, serverSinkChain) => new TcpExChannel(settings, clientSinkChain, serverSinkChain))
-        {
-            _channelName = "TcpDuplexClientProtocolSetup" + Guid.NewGuid().ToString();
-            _versioning = versioning;
+		/// <summary>
+		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		public TcpDuplexClientProtocolSetup(Versioning versioning)
+			: base((settings, clientSinkChain, serverSinkChain) => new TcpExChannel(settings, clientSinkChain, serverSinkChain))
+		{
+			_channelName = "TcpDuplexClientProtocolSetup" + Guid.NewGuid().ToString();
+			_versioning = versioning;
 
-            Hashtable formatterSettings = new Hashtable();
-            formatterSettings.Add("includeVersions", _versioning == Versioning.Strict);
-            formatterSettings.Add("strictBinding", _versioning == Versioning.Strict);
+			Hashtable formatterSettings = new Hashtable();
+			formatterSettings.Add("includeVersions", _versioning == Versioning.Strict);
+			formatterSettings.Add("strictBinding", _versioning == Versioning.Strict);
 
-            ClientSinkChain.Add(new BinaryClientFormatterSinkProvider(formatterSettings, null));
-            ServerSinkChain.Add(new BinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
-        }
+			ClientSinkChain.Add(new BinaryClientFormatterSinkProvider(formatterSettings, null));
+			ServerSinkChain.Add(new BinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
+		}
 
 		/// <summary>
 		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
@@ -88,16 +88,16 @@ namespace Zyan.Communication.Protocols.Tcp
 			_encryption = encryption;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the TcpDuplexClientProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        public TcpDuplexClientProtocolSetup(Versioning versioning, bool encryption)
-            : this(versioning)
-        {
-            _encryption = encryption;
-        }
+		/// <summary>
+		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		public TcpDuplexClientProtocolSetup(Versioning versioning, bool encryption)
+			: this(versioning)
+		{
+			_encryption = encryption;
+		}
 
 		/// <summary>
 		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
@@ -115,22 +115,22 @@ namespace Zyan.Communication.Protocols.Tcp
 			TcpKeepAliveInterval = KeepAliveInterval;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the TcpDuplexClientProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
-        /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
-        /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
-        public TcpDuplexClientProtocolSetup(Versioning versioning, bool encryption, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
-            : this(versioning)
-        {
-            _encryption = encryption;
-            TcpKeepAliveEnabled = keepAlive;
-            TcpKeepAliveTime = keepAliveTime;
-            TcpKeepAliveInterval = KeepAliveInterval;
-        }
+		/// <summary>
+		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
+		/// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
+		/// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
+		public TcpDuplexClientProtocolSetup(Versioning versioning, bool encryption, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
+			: this(versioning)
+		{
+			_encryption = encryption;
+			TcpKeepAliveEnabled = keepAlive;
+			TcpKeepAliveTime = keepAliveTime;
+			TcpKeepAliveInterval = KeepAliveInterval;
+		}
 
 		/// <summary>
 		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
@@ -144,18 +144,18 @@ namespace Zyan.Communication.Protocols.Tcp
 			_algorithm = algorithm;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the TcpDuplexClientProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
-        public TcpDuplexClientProtocolSetup(Versioning versioning, bool encryption, string algorithm)
-            : this(versioning)
-        {
-            _encryption = encryption;
-            _algorithm = algorithm;
-        }
+		/// <summary>
+		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
+		public TcpDuplexClientProtocolSetup(Versioning versioning, bool encryption, string algorithm)
+			: this(versioning)
+		{
+			_encryption = encryption;
+			_algorithm = algorithm;
+		}
 
 		/// <summary>
 		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
@@ -175,24 +175,24 @@ namespace Zyan.Communication.Protocols.Tcp
 			TcpKeepAliveInterval = KeepAliveInterval;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the TcpDuplexClientProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
-        /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
-        /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
-        /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
-        public TcpDuplexClientProtocolSetup(Versioning versioning, bool encryption, string algorithm, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
-            : this(versioning)
-        {
-            _encryption = encryption;
-            _algorithm = algorithm;
-            TcpKeepAliveEnabled = keepAlive;
-            TcpKeepAliveTime = keepAliveTime;
-            TcpKeepAliveInterval = KeepAliveInterval;
-        }
+		/// <summary>
+		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
+		/// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
+		/// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
+		/// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
+		public TcpDuplexClientProtocolSetup(Versioning versioning, bool encryption, string algorithm, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
+			: this(versioning)
+		{
+			_encryption = encryption;
+			_algorithm = algorithm;
+			TcpKeepAliveEnabled = keepAlive;
+			TcpKeepAliveTime = keepAliveTime;
+			TcpKeepAliveInterval = KeepAliveInterval;
+		}
 
 		/// <summary>
 		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
@@ -208,20 +208,20 @@ namespace Zyan.Communication.Protocols.Tcp
 			_maxAttempts = maxAttempts;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the TcpDuplexClientProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
-        /// <param name="maxAttempts">Maximum number of connection attempts</param>
-        public TcpDuplexClientProtocolSetup(Versioning versioning, bool encryption, string algorithm, int maxAttempts)
-            : this(versioning)
-        {
-            _encryption = encryption;
-            _algorithm = algorithm;
-            _maxAttempts = maxAttempts;
-        }
+		/// <summary>
+		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
+		/// <param name="maxAttempts">Maximum number of connection attempts</param>
+		public TcpDuplexClientProtocolSetup(Versioning versioning, bool encryption, string algorithm, int maxAttempts)
+			: this(versioning)
+		{
+			_encryption = encryption;
+			_algorithm = algorithm;
+			_maxAttempts = maxAttempts;
+		}
 
 		/// <summary>
 		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
@@ -243,26 +243,26 @@ namespace Zyan.Communication.Protocols.Tcp
 			TcpKeepAliveInterval = KeepAliveInterval;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the TcpDuplexClientProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
-        /// <param name="maxAttempts">Maximum number of connection attempts</param>
-        /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
-        /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
-        /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
-        public TcpDuplexClientProtocolSetup(Versioning versioning, bool encryption, string algorithm, int maxAttempts, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
-            : this(versioning)
-        {
-            _encryption = encryption;
-            _algorithm = algorithm;
-            _maxAttempts = maxAttempts;
-            TcpKeepAliveEnabled = keepAlive;
-            TcpKeepAliveTime = keepAliveTime;
-            TcpKeepAliveInterval = KeepAliveInterval;
-        }
+		/// <summary>
+		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
+		/// <param name="maxAttempts">Maximum number of connection attempts</param>
+		/// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
+		/// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
+		/// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
+		public TcpDuplexClientProtocolSetup(Versioning versioning, bool encryption, string algorithm, int maxAttempts, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
+			: this(versioning)
+		{
+			_encryption = encryption;
+			_algorithm = algorithm;
+			_maxAttempts = maxAttempts;
+			TcpKeepAliveEnabled = keepAlive;
+			TcpKeepAliveTime = keepAliveTime;
+			TcpKeepAliveInterval = KeepAliveInterval;
+		}
 
 		/// <summary>
 		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
@@ -278,20 +278,20 @@ namespace Zyan.Communication.Protocols.Tcp
 			_oaep = oaep;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the TcpDuplexClientProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
-        /// <param name="oaep">Specifies if OAEP padding should be activated</param>
-        public TcpDuplexClientProtocolSetup(Versioning versioning, bool encryption, string algorithm, bool oaep)
-            : this(versioning)
-        {
-            _encryption = encryption;
-            _algorithm = algorithm;
-            _oaep = oaep;
-        }
+		/// <summary>
+		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
+		/// <param name="oaep">Specifies if OAEP padding should be activated</param>
+		public TcpDuplexClientProtocolSetup(Versioning versioning, bool encryption, string algorithm, bool oaep)
+			: this(versioning)
+		{
+			_encryption = encryption;
+			_algorithm = algorithm;
+			_oaep = oaep;
+		}
 
 		/// <summary>
 		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
@@ -313,26 +313,26 @@ namespace Zyan.Communication.Protocols.Tcp
 			TcpKeepAliveInterval = KeepAliveInterval;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the TcpDuplexClientProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
-        /// <param name="oaep">Specifies if OAEP padding should be activated</param>
-        /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
-        /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
-        /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
-        public TcpDuplexClientProtocolSetup(Versioning versioning, bool encryption, string algorithm, bool oaep, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
-            : this(versioning)
-        {
-            _encryption = encryption;
-            _algorithm = algorithm;
-            _oaep = oaep;
-            TcpKeepAliveEnabled = keepAlive;
-            TcpKeepAliveTime = keepAliveTime;
-            TcpKeepAliveInterval = KeepAliveInterval;
-        }
+		/// <summary>
+		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
+		/// <param name="oaep">Specifies if OAEP padding should be activated</param>
+		/// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
+		/// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
+		/// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
+		public TcpDuplexClientProtocolSetup(Versioning versioning, bool encryption, string algorithm, bool oaep, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
+			: this(versioning)
+		{
+			_encryption = encryption;
+			_algorithm = algorithm;
+			_oaep = oaep;
+			TcpKeepAliveEnabled = keepAlive;
+			TcpKeepAliveTime = keepAliveTime;
+			TcpKeepAliveInterval = KeepAliveInterval;
+		}
 
 		/// <summary>
 		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
@@ -350,22 +350,22 @@ namespace Zyan.Communication.Protocols.Tcp
 			_oaep = oaep;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the TcpDuplexClientProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
-        /// <param name="maxAttempts">Maximum number of connection attempts</param>
-        /// <param name="oaep">Specifies if OAEP padding should be activated</param>
-        public TcpDuplexClientProtocolSetup(Versioning versioning, bool encryption, string algorithm, int maxAttempts, bool oaep)
-            : this(versioning)
-        {
-            _encryption = encryption;
-            _algorithm = algorithm;
-            _maxAttempts = maxAttempts;
-            _oaep = oaep;
-        }
+		/// <summary>
+		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
+		/// <param name="maxAttempts">Maximum number of connection attempts</param>
+		/// <param name="oaep">Specifies if OAEP padding should be activated</param>
+		public TcpDuplexClientProtocolSetup(Versioning versioning, bool encryption, string algorithm, int maxAttempts, bool oaep)
+			: this(versioning)
+		{
+			_encryption = encryption;
+			_algorithm = algorithm;
+			_maxAttempts = maxAttempts;
+			_oaep = oaep;
+		}
 
 		/// <summary>
 		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
@@ -389,28 +389,28 @@ namespace Zyan.Communication.Protocols.Tcp
 			TcpKeepAliveInterval = KeepAliveInterval;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the TcpDuplexClientProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
-        /// <param name="maxAttempts">Maximum number of connection attempts</param>
-        /// <param name="oaep">Specifies if OAEP padding should be activated</param>
-        /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
-        /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
-        /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
-        public TcpDuplexClientProtocolSetup(Versioning versioning, bool encryption, string algorithm, int maxAttempts, bool oaep, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
-            : this(versioning)
-        {
-            _encryption = encryption;
-            _algorithm = algorithm;
-            _maxAttempts = maxAttempts;
-            _oaep = oaep;
-            TcpKeepAliveEnabled = keepAlive;
-            TcpKeepAliveTime = keepAliveTime;
-            TcpKeepAliveInterval = KeepAliveInterval;
-        }
+		/// <summary>
+		/// Creates a new instance of the TcpDuplexClientProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Symmetric encryption algorithm (e.G. "3DES")</param>
+		/// <param name="maxAttempts">Maximum number of connection attempts</param>
+		/// <param name="oaep">Specifies if OAEP padding should be activated</param>
+		/// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
+		/// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
+		/// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
+		public TcpDuplexClientProtocolSetup(Versioning versioning, bool encryption, string algorithm, int maxAttempts, bool oaep, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
+			: this(versioning)
+		{
+			_encryption = encryption;
+			_algorithm = algorithm;
+			_maxAttempts = maxAttempts;
+			_oaep = oaep;
+			TcpKeepAliveEnabled = keepAlive;
+			TcpKeepAliveTime = keepAliveTime;
+			TcpKeepAliveInterval = KeepAliveInterval;
+		}
 
 		/// <summary>
 		/// Gets or sets the name of the symmetric encryption algorithm.
@@ -469,7 +469,7 @@ namespace Zyan.Communication.Protocols.Tcp
 		}
 
 		/// <summary>
-		/// Creates and configures a Remoting channel.        
+		/// Creates and configures a Remoting channel.
 		/// </summary>
 		/// <returns>Remoting channel</returns>
 		public override IChannel CreateChannel()
@@ -503,18 +503,18 @@ namespace Zyan.Communication.Protocols.Tcp
 			return channel;
 		}
 
-        #region Versioning settings
+		#region Versioning settings
 
-        private Versioning _versioning = Versioning.Strict;
+		private Versioning _versioning = Versioning.Strict;
 
-        /// <summary>
-        /// Gets or sets the versioning behavior.
-        /// </summary>
-        private Versioning Versioning
-        {
-            get { return _versioning; }
-        }
+		/// <summary>
+		/// Gets or sets the versioning behavior.
+		/// </summary>
+		private Versioning Versioning
+		{
+			get { return _versioning; }
+		}
 
-        #endregion
+		#endregion
 	}
 }

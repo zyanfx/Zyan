@@ -254,10 +254,11 @@ namespace Zyan.Communication.Toolbox
 		// Reverse integer bits
 		static ulong ComputeDummyKey (uint key)
 		{
-			return ((ulong)(((uint)reverseTable[key & 0xff] << 24) |
-			                ((uint)reverseTable[(key >> 8) & 0xff] << 16) |
-			                ((uint)reverseTable[(key >> 16) & 0xff] << 8) |
-			                ((uint)reverseTable[(key >> 24) & 0xff]))) << 1;
+			return
+				((ulong)(((uint)reverseTable[key & 0xff] << 24) |
+				((uint)reverseTable[(key >> 8) & 0xff] << 16) |
+				((uint)reverseTable[(key >> 16) & 0xff] << 8) |
+				((uint)reverseTable[(key >> 24) & 0xff]))) << 1;
 		}
 
 		// Bucket storage is abstracted in a simple two-layer tree to avoid too much memory resize
@@ -454,8 +455,8 @@ namespace Zyan.Communication.Toolbox
 	internal struct SpinWait
 	{
 		// The number of step until SpinOnce yield on multicore machine
-		const           int  step = 10;
-		const           int  maxTime = 200;
+		const int step = 10;
+		const int maxTime = 200;
 		static readonly bool isSingleCpu = (Environment.ProcessorCount == 1);
 
 		int ntime;
