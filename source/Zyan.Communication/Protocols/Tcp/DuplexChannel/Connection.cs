@@ -112,8 +112,8 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			lock (_connectionsLockObject)
 			{
 				return from connection in _connections.Values
-					   where connection._channel.ChannelID.Equals(channel.ChannelID)
-					   select connection;
+					where connection._channel.ChannelID.Equals(channel.ChannelID)
+					select connection;
 			}
 		}
 
@@ -136,7 +136,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			if (channel == null)
 				throw new ArgumentNullException("channel");
 
-			return new Connection(socket, channel, keepAlive, keepAliveTime, KeepAliveInterval, maxRetries, retryDelay);            
+			return new Connection(socket, channel, keepAlive, keepAliveTime, KeepAliveInterval, maxRetries, retryDelay);
 		}
 
 		#endregion
@@ -672,7 +672,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				_tcpKeepAliveEnabled = value; 
 				
 				if (_socket!=null)
-					_tcpKeepAliveEnabled = SetTcpKeepAlive(_socket, _tcpKeepAliveEnabled ? TcpKeepAliveTime : 0, _tcpKeepAliveEnabled ? TcpKeepAliveInterval : 0);                
+					_tcpKeepAliveEnabled = SetTcpKeepAlive(_socket, _tcpKeepAliveEnabled ? TcpKeepAliveTime : 0, _tcpKeepAliveEnabled ? TcpKeepAliveInterval : 0);
 			}
 		}
 

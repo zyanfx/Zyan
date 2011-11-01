@@ -24,7 +24,7 @@ namespace Zyan.Communication.Protocols.Tcp
 		private bool _tcpKeepAliveEnabled = true;
 		private ulong _tcpKeepAliveTime = 30000;
 		private ulong _tcpKeepAliveInterval = 1000;
-		
+
 		/// <summary>
 		/// Enables or disables TCP KeepAlive.
 		/// </summary>
@@ -85,30 +85,30 @@ namespace Zyan.Communication.Protocols.Tcp
 			set { _oaep = value; }
 		}
 
-        /// <summary>
-        /// Creates a new instance of the TcpDuplexServerProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        public TcpDuplexServerProtocolSetup(Versioning versioning)
-            : base((settings, clientSinkChain, serverSinkChain) => new TcpExChannel(settings, clientSinkChain, serverSinkChain))
-        {
-            _versioning = versioning;
+		/// <summary>
+		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		public TcpDuplexServerProtocolSetup(Versioning versioning)
+			: base((settings, clientSinkChain, serverSinkChain) => new TcpExChannel(settings, clientSinkChain, serverSinkChain))
+		{
+			_versioning = versioning;
 
-            Hashtable formatterSettings = new Hashtable();
-            formatterSettings.Add("includeVersions", _versioning == Versioning.Strict);
-            formatterSettings.Add("strictBinding", _versioning == Versioning.Strict);
+			Hashtable formatterSettings = new Hashtable();
+			formatterSettings.Add("includeVersions", _versioning == Versioning.Strict);
+			formatterSettings.Add("strictBinding", _versioning == Versioning.Strict);
 
-            ClientSinkChain.Add(new BinaryClientFormatterSinkProvider(formatterSettings, null));
-            ServerSinkChain.Add(new BinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
-            ServerSinkChain.Add(new ClientAddressServerChannelSinkProvider());
-        }
+			ClientSinkChain.Add(new BinaryClientFormatterSinkProvider(formatterSettings, null));
+			ServerSinkChain.Add(new BinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
+			ServerSinkChain.Add(new ClientAddressServerChannelSinkProvider());
+		}
 
 		/// <summary>
 		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
 		/// </summary>
-        public TcpDuplexServerProtocolSetup()
-            : this(Versioning.Strict)
-        {}
+		public TcpDuplexServerProtocolSetup()
+			: this(Versioning.Strict)
+		{ }
 
 		/// <summary>
 		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
@@ -122,18 +122,18 @@ namespace Zyan.Communication.Protocols.Tcp
 			AuthenticationProvider = authProvider;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the TcpDuplexServerProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="tcpPort">TCP port number</param>
-        /// <param name="authProvider">Authentication provider</param>
-        public TcpDuplexServerProtocolSetup(Versioning versioning, int tcpPort, IAuthenticationProvider authProvider)
-            : this(versioning)
-        {
-            TcpPort = tcpPort;
-            AuthenticationProvider = authProvider;
-        }
+		/// <summary>
+		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="tcpPort">TCP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		public TcpDuplexServerProtocolSetup(Versioning versioning, int tcpPort, IAuthenticationProvider authProvider)
+			: this(versioning)
+		{
+			TcpPort = tcpPort;
+			AuthenticationProvider = authProvider;
+		}
 
 		/// <summary>
 		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
@@ -153,24 +153,24 @@ namespace Zyan.Communication.Protocols.Tcp
 			TcpKeepAliveInterval = KeepAliveInterval;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the TcpDuplexServerProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="tcpPort">TCP port number</param>
-        /// <param name="authProvider">Authentication provider</param>
-        /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
-        /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
-        /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
-        public TcpDuplexServerProtocolSetup(Versioning versioning, int tcpPort, IAuthenticationProvider authProvider, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
-            : this(versioning)
-        {
-            TcpPort = tcpPort;
-            AuthenticationProvider = authProvider;
-            TcpKeepAliveEnabled = keepAlive;
-            TcpKeepAliveTime = keepAliveTime;
-            TcpKeepAliveInterval = KeepAliveInterval;
-        }
+		/// <summary>
+		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="tcpPort">TCP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
+		/// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
+		/// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
+		public TcpDuplexServerProtocolSetup(Versioning versioning, int tcpPort, IAuthenticationProvider authProvider, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
+			: this(versioning)
+		{
+			TcpPort = tcpPort;
+			AuthenticationProvider = authProvider;
+			TcpKeepAliveEnabled = keepAlive;
+			TcpKeepAliveTime = keepAliveTime;
+			TcpKeepAliveInterval = KeepAliveInterval;
+		}
 
 		/// <summary>
 		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
@@ -186,20 +186,20 @@ namespace Zyan.Communication.Protocols.Tcp
 			_encryption = encryption;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the TcpDuplexServerProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="tcpPort">TCP port number</param>
-        /// <param name="authProvider">Authentication provider</param>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        public TcpDuplexServerProtocolSetup(Versioning versioning, int tcpPort, IAuthenticationProvider authProvider, bool encryption)
-            : this(versioning)
-        {
-            TcpPort = tcpPort;
-            AuthenticationProvider = authProvider;
-            _encryption = encryption;
-        }
+		/// <summary>
+		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="tcpPort">TCP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		public TcpDuplexServerProtocolSetup(Versioning versioning, int tcpPort, IAuthenticationProvider authProvider, bool encryption)
+			: this(versioning)
+		{
+			TcpPort = tcpPort;
+			AuthenticationProvider = authProvider;
+			_encryption = encryption;
+		}
 
 		/// <summary>
 		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
@@ -221,26 +221,26 @@ namespace Zyan.Communication.Protocols.Tcp
 			TcpKeepAliveInterval = KeepAliveInterval;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the TcpDuplexServerProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="tcpPort">TCP port number</param>
-        /// <param name="authProvider">Authentication provider</param>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
-        /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
-        /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
-        public TcpDuplexServerProtocolSetup(Versioning versioning, int tcpPort, IAuthenticationProvider authProvider, bool encryption, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
-            : this(versioning)
-        {
-            TcpPort = tcpPort;
-            AuthenticationProvider = authProvider;
-            _encryption = encryption;
-            TcpKeepAliveEnabled = keepAlive;
-            TcpKeepAliveTime = keepAliveTime;
-            TcpKeepAliveInterval = KeepAliveInterval;
-        }
+		/// <summary>
+		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="tcpPort">TCP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
+		/// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
+		/// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
+		public TcpDuplexServerProtocolSetup(Versioning versioning, int tcpPort, IAuthenticationProvider authProvider, bool encryption, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
+			: this(versioning)
+		{
+			TcpPort = tcpPort;
+			AuthenticationProvider = authProvider;
+			_encryption = encryption;
+			TcpKeepAliveEnabled = keepAlive;
+			TcpKeepAliveTime = keepAliveTime;
+			TcpKeepAliveInterval = KeepAliveInterval;
+		}
 
 		/// <summary>
 		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
@@ -258,22 +258,22 @@ namespace Zyan.Communication.Protocols.Tcp
 			_algorithm = algorithm;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the TcpDuplexServerProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="tcpPort">TCP port number</param>
-        /// <param name="authProvider">Authentication provider</param>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
-        public TcpDuplexServerProtocolSetup(Versioning versioning, int tcpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm)
-            : this(versioning)
-        {
-            TcpPort = tcpPort;
-            AuthenticationProvider = authProvider;
-            _encryption = encryption;
-            _algorithm = algorithm;
-        }
+		/// <summary>
+		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="tcpPort">TCP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+		public TcpDuplexServerProtocolSetup(Versioning versioning, int tcpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm)
+			: this(versioning)
+		{
+			TcpPort = tcpPort;
+			AuthenticationProvider = authProvider;
+			_encryption = encryption;
+			_algorithm = algorithm;
+		}
 
 		/// <summary>
 		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
@@ -297,28 +297,28 @@ namespace Zyan.Communication.Protocols.Tcp
 			TcpKeepAliveInterval = KeepAliveInterval;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the TcpDuplexServerProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="tcpPort">TCP port number</param>
-        /// <param name="authProvider">Authentication provider</param>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
-        /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
-        /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
-        /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
-        public TcpDuplexServerProtocolSetup(Versioning versioning, int tcpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
-            : this(versioning)
-        {
-            TcpPort = tcpPort;
-            AuthenticationProvider = authProvider;
-            _encryption = encryption;
-            _algorithm = algorithm;
-            TcpKeepAliveEnabled = keepAlive;
-            TcpKeepAliveTime = keepAliveTime;
-            TcpKeepAliveInterval = KeepAliveInterval;
-        }
+		/// <summary>
+		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="tcpPort">TCP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+		/// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
+		/// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
+		/// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
+		public TcpDuplexServerProtocolSetup(Versioning versioning, int tcpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
+			: this(versioning)
+		{
+			TcpPort = tcpPort;
+			AuthenticationProvider = authProvider;
+			_encryption = encryption;
+			_algorithm = algorithm;
+			TcpKeepAliveEnabled = keepAlive;
+			TcpKeepAliveTime = keepAliveTime;
+			TcpKeepAliveInterval = KeepAliveInterval;
+		}
 
 		/// <summary>
 		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
@@ -326,7 +326,7 @@ namespace Zyan.Communication.Protocols.Tcp
 		/// <param name="tcpPort">TCP port number</param>
 		/// <param name="authProvider">Authentication provider</param>
 		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
-		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>        
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
 		/// <param name="oaep">Specifies if OAEP padding should be activated</param>
 		public TcpDuplexServerProtocolSetup(int tcpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm, bool oaep)
 			: this()
@@ -338,24 +338,24 @@ namespace Zyan.Communication.Protocols.Tcp
 			_oaep = oaep;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the TcpDuplexServerProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="tcpPort">TCP port number</param>
-        /// <param name="authProvider">Authentication provider</param>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>        
-        /// <param name="oaep">Specifies if OAEP padding should be activated</param>
-        public TcpDuplexServerProtocolSetup(Versioning versioning, int tcpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm, bool oaep)
-            : this(versioning)
-        {
-            TcpPort = tcpPort;
-            AuthenticationProvider = authProvider;
-            _encryption = encryption;
-            _algorithm = algorithm;
-            _oaep = oaep;
-        }
+		/// <summary>
+		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="tcpPort">TCP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+		/// <param name="oaep">Specifies if OAEP padding should be activated</param>
+		public TcpDuplexServerProtocolSetup(Versioning versioning, int tcpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm, bool oaep)
+			: this(versioning)
+		{
+			TcpPort = tcpPort;
+			AuthenticationProvider = authProvider;
+			_encryption = encryption;
+			_algorithm = algorithm;
+			_oaep = oaep;
+		}
 
 		/// <summary>
 		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
@@ -363,12 +363,12 @@ namespace Zyan.Communication.Protocols.Tcp
 		/// <param name="tcpPort">TCP port number</param>
 		/// <param name="authProvider">Authentication provider</param>
 		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
-		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>        
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
 		/// <param name="oaep">Specifies if OAEP padding should be activated</param>
 		/// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
 		/// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
 		/// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
-        public TcpDuplexServerProtocolSetup(int tcpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm, bool oaep, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
+		public TcpDuplexServerProtocolSetup(int tcpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm, bool oaep, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
 			: this()
 		{
 			TcpPort = tcpPort;
@@ -381,30 +381,30 @@ namespace Zyan.Communication.Protocols.Tcp
 			TcpKeepAliveInterval = KeepAliveInterval;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the TcpDuplexServerProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="tcpPort">TCP port number</param>
-        /// <param name="authProvider">Authentication provider</param>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>        
-        /// <param name="oaep">Specifies if OAEP padding should be activated</param>
-        /// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
-        /// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
-        /// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
-        public TcpDuplexServerProtocolSetup(Versioning versioning, int tcpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm, bool oaep, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
-            : this(versioning)
-        {
-            TcpPort = tcpPort;
-            AuthenticationProvider = authProvider;
-            _encryption = encryption;
-            _algorithm = algorithm;
-            _oaep = oaep;
-            TcpKeepAliveEnabled = keepAlive;
-            TcpKeepAliveTime = keepAliveTime;
-            TcpKeepAliveInterval = KeepAliveInterval;
-        }
+		/// <summary>
+		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="tcpPort">TCP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+		/// <param name="oaep">Specifies if OAEP padding should be activated</param>
+		/// <param name="keepAlive">Enables or disables TCP KeepAlive for the new connection</param>
+		/// <param name="keepAliveTime">Time for TCP KeepAlive in Milliseconds</param>
+		/// <param name="KeepAliveInterval">Interval for TCP KeepAlive in Milliseconds</param>
+		public TcpDuplexServerProtocolSetup(Versioning versioning, int tcpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm, bool oaep, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval)
+			: this(versioning)
+		{
+			TcpPort = tcpPort;
+			AuthenticationProvider = authProvider;
+			_encryption = encryption;
+			_algorithm = algorithm;
+			_oaep = oaep;
+			TcpKeepAliveEnabled = keepAlive;
+			TcpKeepAliveTime = keepAliveTime;
+			TcpKeepAliveInterval = KeepAliveInterval;
+		}
 
 		private bool _encryptionConfigured = false;
 
@@ -435,7 +435,7 @@ namespace Zyan.Communication.Protocols.Tcp
 		}
 
 		/// <summary>
-		/// Creates and configures a Remoting channel.        
+		/// Creates and configures a Remoting channel.
 		/// </summary>
 		/// <returns>Remoting channel</returns>
 		public override IChannel CreateChannel()
@@ -487,18 +487,18 @@ namespace Zyan.Communication.Protocols.Tcp
 			}
 		}
 
-        #region Versioning settings
+		#region Versioning settings
 
-        private Versioning _versioning = Versioning.Strict;
+		private Versioning _versioning = Versioning.Strict;
 
-        /// <summary>
-        /// Gets or sets the versioning behavior.
-        /// </summary>
-        private Versioning Versioning
-        {
-            get { return _versioning; }
-        }
+		/// <summary>
+		/// Gets or sets the versioning behavior.
+		/// </summary>
+		private Versioning Versioning
+		{
+			get { return _versioning; }
+		}
 
-        #endregion
+		#endregion
 	}
 }

@@ -22,28 +22,28 @@ namespace Zyan.Communication.Protocols.Http
 		/// <summary>
 		/// Creates a new instance of the HttpCustomClientProtocolSetup class.
 		/// </summary>
-        public HttpCustomClientProtocolSetup()
-            : this(Versioning.Strict)
-        { }
-			
+		public HttpCustomClientProtocolSetup()
+			: this(Versioning.Strict)
+		{ }
 
-        /// <summary>
-        /// Creates a new instance of the HttpCustomClientProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        public HttpCustomClientProtocolSetup(Versioning versioning)
-            : base((settings, clientSinkChain, serverSinkChain) => new HttpChannel(settings, clientSinkChain, serverSinkChain))
-        {
-            _channelName = "HttpCustomClientProtocolSetup" + Guid.NewGuid().ToString();
-            _versioning = versioning;
-            
-            Hashtable formatterSettings = new Hashtable();
-            formatterSettings.Add("includeVersions", _versioning == Versioning.Strict);
-            formatterSettings.Add("strictBinding", _versioning == Versioning.Strict);
-            
-            ClientSinkChain.Add(new BinaryClientFormatterSinkProvider(formatterSettings, null));
-            ServerSinkChain.Add(new BinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
-        }
+
+		/// <summary>
+		/// Creates a new instance of the HttpCustomClientProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		public HttpCustomClientProtocolSetup(Versioning versioning)
+			: base((settings, clientSinkChain, serverSinkChain) => new HttpChannel(settings, clientSinkChain, serverSinkChain))
+		{
+			_channelName = "HttpCustomClientProtocolSetup" + Guid.NewGuid().ToString();
+			_versioning = versioning;
+
+			Hashtable formatterSettings = new Hashtable();
+			formatterSettings.Add("includeVersions", _versioning == Versioning.Strict);
+			formatterSettings.Add("strictBinding", _versioning == Versioning.Strict);
+
+			ClientSinkChain.Add(new BinaryClientFormatterSinkProvider(formatterSettings, null));
+			ServerSinkChain.Add(new BinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
+		}
 
 		/// <summary>
 		/// Creates a new instance of the HttpCustomClientProtocolSetup class.
@@ -55,16 +55,16 @@ namespace Zyan.Communication.Protocols.Http
 			_encryption = encryption;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the HttpCustomClientProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        public HttpCustomClientProtocolSetup(Versioning versioning, bool encryption)
-            : this(versioning)
-        {
-            _encryption = encryption;
-        }
+		/// <summary>
+		/// Creates a new instance of the HttpCustomClientProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		public HttpCustomClientProtocolSetup(Versioning versioning, bool encryption)
+			: this(versioning)
+		{
+			_encryption = encryption;
+		}
 
 		/// <summary>
 		/// Creates a new instance of the HttpCustomClientProtocolSetup class.
@@ -78,18 +78,18 @@ namespace Zyan.Communication.Protocols.Http
 			_algorithm = algorithm;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the HttpCustomClientProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
-        public HttpCustomClientProtocolSetup(Versioning versioning, bool encryption, string algorithm)
-            : this(versioning)
-        {
-            _encryption = encryption;
-            _algorithm = algorithm;
-        }
+		/// <summary>
+		/// Creates a new instance of the HttpCustomClientProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+		public HttpCustomClientProtocolSetup(Versioning versioning, bool encryption, string algorithm)
+			: this(versioning)
+		{
+			_encryption = encryption;
+			_algorithm = algorithm;
+		}
 
 		/// <summary>
 		/// Creates a new instance of the HttpCustomClientProtocolSetup class.
@@ -105,26 +105,26 @@ namespace Zyan.Communication.Protocols.Http
 			_maxAttempts = maxAttempts;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the HttpCustomClientProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
-        /// <param name="maxAttempts">Maximum number of connection attempts</param>
-        public HttpCustomClientProtocolSetup(Versioning versioning, bool encryption, string algorithm, int maxAttempts)
-            : this(versioning)
-        {
-            _encryption = encryption;
-            _algorithm = algorithm;
-            _maxAttempts = maxAttempts;
-        }
+		/// <summary>
+		/// Creates a new instance of the HttpCustomClientProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+		/// <param name="maxAttempts">Maximum number of connection attempts</param>
+		public HttpCustomClientProtocolSetup(Versioning versioning, bool encryption, string algorithm, int maxAttempts)
+			: this(versioning)
+		{
+			_encryption = encryption;
+			_algorithm = algorithm;
+			_maxAttempts = maxAttempts;
+		}
 
 		/// <summary>
 		/// Creates a new instance of the HttpCustomClientProtocolSetup class.
 		/// </summary>
 		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
-		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>        
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
 		/// <param name="oaep">Specifies if OAEP padding should be activated</param>
 		public HttpCustomClientProtocolSetup(bool encryption, string algorithm, bool oaep)
 			: this()
@@ -134,20 +134,20 @@ namespace Zyan.Communication.Protocols.Http
 			_oaep = oaep;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the HttpCustomClientProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>        
-        /// <param name="oaep">Specifies if OAEP padding should be activated</param>
-        public HttpCustomClientProtocolSetup(Versioning versioning, bool encryption, string algorithm, bool oaep)
-            : this(versioning)
-        {
-            _encryption = encryption;
-            _algorithm = algorithm;
-            _oaep = oaep;
-        }
+		/// <summary>
+		/// Creates a new instance of the HttpCustomClientProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+		/// <param name="oaep">Specifies if OAEP padding should be activated</param>
+		public HttpCustomClientProtocolSetup(Versioning versioning, bool encryption, string algorithm, bool oaep)
+			: this(versioning)
+		{
+			_encryption = encryption;
+			_algorithm = algorithm;
+			_oaep = oaep;
+		}
 
 		/// <summary>
 		/// Creates a new instance of the HttpCustomClientProtocolSetup class.
@@ -165,22 +165,22 @@ namespace Zyan.Communication.Protocols.Http
 			_oaep = oaep;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the HttpCustomClientProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
-        /// <param name="maxAttempts">Maximum number of connection attempts</param>
-        /// <param name="oaep">Specifies if OAEP padding should be activated</param>        
-        public HttpCustomClientProtocolSetup(Versioning versioning, bool encryption, string algorithm, int maxAttempts, bool oaep)
-            : this(versioning)
-        {
-            _encryption = encryption;
-            _algorithm = algorithm;
-            _maxAttempts = maxAttempts;
-            _oaep = oaep;
-        }
+		/// <summary>
+		/// Creates a new instance of the HttpCustomClientProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+		/// <param name="maxAttempts">Maximum number of connection attempts</param>
+		/// <param name="oaep">Specifies if OAEP padding should be activated</param>
+		public HttpCustomClientProtocolSetup(Versioning versioning, bool encryption, string algorithm, int maxAttempts, bool oaep)
+			: this(versioning)
+		{
+			_encryption = encryption;
+			_algorithm = algorithm;
+			_maxAttempts = maxAttempts;
+			_oaep = oaep;
+		}
 
 		/// <summary>
 		/// Gets or sets the name of the symmetric encryption algorithm.
@@ -268,18 +268,18 @@ namespace Zyan.Communication.Protocols.Http
 			return channel;
 		}
 
-        #region Versioning settings
+		#region Versioning settings
 
-        private Versioning _versioning = Versioning.Strict;
+		private Versioning _versioning = Versioning.Strict;
 
-        /// <summary>
-        /// Gets or sets the versioning behavior.
-        /// </summary>
-        private Versioning Versioning
-        {
-            get { return _versioning; }            
-        }
+		/// <summary>
+		/// Gets or sets the versioning behavior.
+		/// </summary>
+		private Versioning Versioning
+		{
+			get { return _versioning; }
+		}
 
-        #endregion
+		#endregion
 	}
 }

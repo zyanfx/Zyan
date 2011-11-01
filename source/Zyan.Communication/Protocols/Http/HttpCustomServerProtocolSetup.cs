@@ -55,28 +55,28 @@ namespace Zyan.Communication.Protocols.Http
 
 		/// <summary>
 		/// Creates a new instance of the HttpCustomServerProtocolSetup class.
-		/// </summary>        
+		/// </summary>
 		public HttpCustomServerProtocolSetup()
 			: this(Versioning.Strict)
-		{}
+		{ }
 
-        /// <summary>
-        /// Creates a new instance of the HttpCustomServerProtocolSetup class.
-        /// </summary>        
-        /// <param name="versioning">Versioning behavior</param>
-        public HttpCustomServerProtocolSetup(Versioning versioning)
-            : base((settings, clientSinkChain, serverSinkChain) => new HttpChannel(settings, clientSinkChain, serverSinkChain))
-        {
-            _channelName = "HttpCustomServerProtocolSetup_" + Guid.NewGuid().ToString();
-            _versioning = versioning;
+		/// <summary>
+		/// Creates a new instance of the HttpCustomServerProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		public HttpCustomServerProtocolSetup(Versioning versioning)
+			: base((settings, clientSinkChain, serverSinkChain) => new HttpChannel(settings, clientSinkChain, serverSinkChain))
+		{
+			_channelName = "HttpCustomServerProtocolSetup_" + Guid.NewGuid().ToString();
+			_versioning = versioning;
 
-            Hashtable formatterSettings = new Hashtable();
-            formatterSettings.Add("includeVersions", _versioning == Versioning.Strict);
-            formatterSettings.Add("strictBinding", _versioning == Versioning.Strict);
+			Hashtable formatterSettings = new Hashtable();
+			formatterSettings.Add("includeVersions", _versioning == Versioning.Strict);
+			formatterSettings.Add("strictBinding", _versioning == Versioning.Strict);
 
-            ClientSinkChain.Add(new BinaryClientFormatterSinkProvider(formatterSettings, null));
-            ServerSinkChain.Add(new BinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
-        }
+			ClientSinkChain.Add(new BinaryClientFormatterSinkProvider(formatterSettings, null));
+			ServerSinkChain.Add(new BinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
+		}
 
 		/// <summary>
 		/// Creates a new instance of the HttpCustomServerProtocolSetup class.
@@ -90,18 +90,18 @@ namespace Zyan.Communication.Protocols.Http
 			AuthenticationProvider = authProvider;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the HttpCustomServerProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="httpPort">HTTP port number</param>
-        /// <param name="authProvider">Authentication provider</param>
-        public HttpCustomServerProtocolSetup(Versioning versioning, int httpPort, IAuthenticationProvider authProvider)
-            : this(versioning)
-        {
-            HttpPort = httpPort;
-            AuthenticationProvider = authProvider;
-        }
+		/// <summary>
+		/// Creates a new instance of the HttpCustomServerProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="httpPort">HTTP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		public HttpCustomServerProtocolSetup(Versioning versioning, int httpPort, IAuthenticationProvider authProvider)
+			: this(versioning)
+		{
+			HttpPort = httpPort;
+			AuthenticationProvider = authProvider;
+		}
 
 		/// <summary>
 		/// Creates a new instance of the HttpCustomServerProtocolSetup class.
@@ -117,20 +117,20 @@ namespace Zyan.Communication.Protocols.Http
 			_encryption = encryption;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the HttpCustomServerProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="httpPort">HTTP port number</param>
-        /// <param name="authProvider">Authentication provider</param>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        public HttpCustomServerProtocolSetup(Versioning versioning, int httpPort, IAuthenticationProvider authProvider, bool encryption)
-            : this(versioning)
-        {
-            HttpPort = httpPort;
-            AuthenticationProvider = authProvider;
-            _encryption = encryption;
-        }
+		/// <summary>
+		/// Creates a new instance of the HttpCustomServerProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="httpPort">HTTP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		public HttpCustomServerProtocolSetup(Versioning versioning, int httpPort, IAuthenticationProvider authProvider, bool encryption)
+			: this(versioning)
+		{
+			HttpPort = httpPort;
+			AuthenticationProvider = authProvider;
+			_encryption = encryption;
+		}
 
 		/// <summary>
 		/// Creates a new instance of the HttpCustomServerProtocolSetup class.
@@ -148,22 +148,22 @@ namespace Zyan.Communication.Protocols.Http
 			_algorithm = algorithm;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the HttpCustomServerProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="httpPort">HTTP port number</param>
-        /// <param name="authProvider">Authentication provider</param>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
-        public HttpCustomServerProtocolSetup(Versioning versioning, int httpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm)
-            : this(versioning)
-        {
-            HttpPort = httpPort;
-            AuthenticationProvider = authProvider;
-            _encryption = encryption;
-            _algorithm = algorithm;
-        }
+		/// <summary>
+		/// Creates a new instance of the HttpCustomServerProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="httpPort">HTTP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+		public HttpCustomServerProtocolSetup(Versioning versioning, int httpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm)
+			: this(versioning)
+		{
+			HttpPort = httpPort;
+			AuthenticationProvider = authProvider;
+			_encryption = encryption;
+			_algorithm = algorithm;
+		}
 
 		/// <summary>
 		/// Creates a new instance of the HttpCustomServerProtocolSetup class.
@@ -171,7 +171,7 @@ namespace Zyan.Communication.Protocols.Http
 		/// <param name="httpPort">HTTP port number</param>
 		/// <param name="authProvider">Authentication provider</param>
 		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
-		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>        
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
 		/// <param name="oaep">Specifies if OAEP padding should be activated</param>
 		public HttpCustomServerProtocolSetup(int httpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm, bool oaep)
 			: this()
@@ -183,24 +183,24 @@ namespace Zyan.Communication.Protocols.Http
 			_oaep = oaep;
 		}
 
-        /// <summary>
-        /// Creates a new instance of the HttpCustomServerProtocolSetup class.
-        /// </summary>
-        /// <param name="versioning">Versioning behavior</param>
-        /// <param name="httpPort">HTTP port number</param>
-        /// <param name="authProvider">Authentication provider</param>
-        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
-        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>        
-        /// <param name="oaep">Specifies if OAEP padding should be activated</param>
-        public HttpCustomServerProtocolSetup(Versioning versioning, int httpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm, bool oaep)
-            : this(versioning)
-        {
-            HttpPort = httpPort;
-            AuthenticationProvider = authProvider;
-            _encryption = encryption;
-            _algorithm = algorithm;
-            _oaep = oaep;
-        }
+		/// <summary>
+		/// Creates a new instance of the HttpCustomServerProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="httpPort">HTTP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+		/// <param name="oaep">Specifies if OAEP padding should be activated</param>
+		public HttpCustomServerProtocolSetup(Versioning versioning, int httpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm, bool oaep)
+			: this(versioning)
+		{
+			HttpPort = httpPort;
+			AuthenticationProvider = authProvider;
+			_encryption = encryption;
+			_algorithm = algorithm;
+			_oaep = oaep;
+		}
 
 		private bool _encryptionConfigured = false;
 
@@ -279,18 +279,18 @@ namespace Zyan.Communication.Protocols.Http
 			}
 		}
 
-        #region Versioning settings
+		#region Versioning settings
 
-        private Versioning _versioning = Versioning.Strict;
+		private Versioning _versioning = Versioning.Strict;
 
-        /// <summary>
-        /// Gets or sets the versioning behavior.
-        /// </summary>
-        private Versioning Versioning
-        {
-            get { return _versioning; }
-        }
+		/// <summary>
+		/// Gets or sets the versioning behavior.
+		/// </summary>
+		private Versioning Versioning
+		{
+			get { return _versioning; }
+		}
 
-        #endregion
+		#endregion
 	}
 }
