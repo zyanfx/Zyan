@@ -39,7 +39,7 @@ namespace Zyan.InterLinq.Types
 
 		/// <summary>
 		/// Gets or sets the represented <see cref="Type"/>.
-		/// </summary> 
+		/// </summary>
 		public Type RepresentedType
 		{
 			get { return TypeHelper.GetType(representedType, true); }
@@ -169,7 +169,7 @@ namespace Zyan.InterLinq.Types
 		{
 			int num = -657803396;
 			num ^= EqualityComparer<bool>.Default.GetHashCode(IsGeneric);
-			num ^= EqualityComparer<Type>.Default.GetHashCode(RepresentedType);
+			num ^= EqualityComparer<string>.Default.GetHashCode(representedType);
 			GenericArguments.ForEach(o => num ^= EqualityComparer<InterLinqType>.Default.GetHashCode(o));
 			return num ^ base.GetHashCode();
 		}

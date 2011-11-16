@@ -514,8 +514,8 @@ namespace Zyan.Communication
 			if (!_host.ComponentRegistry.ContainsKey(uniqueName))
 				throw new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_CannotFindComponentForInterface, interfaceName));
 
-			var details = new InvocationDetails() 
-			{ 
+			var details = new InvocationDetails()
+			{
 				InterfaceName = interfaceName
 			};
 
