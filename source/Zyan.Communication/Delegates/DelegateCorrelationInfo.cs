@@ -39,6 +39,15 @@ namespace Zyan.Communication.Delegates
 		}
 
 		/// <summary>
+		/// Gets or sets the event filter.
+		/// </summary>
+		public IEventFilter EventFilter
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
 		/// Gibt den eindeutigen Korrelationsschlüssel zurück oder legt ihn fest.
 		/// </summary>
 		public Guid CorrelationID

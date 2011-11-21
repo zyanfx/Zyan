@@ -74,6 +74,10 @@
     <Compile Include="Delegates\DynamicWireBase.cs" />
     <Compile Include="Delegates\DynamicWireFactory.cs" />
     <Compile Include="Delegates\DynamicWireT.cs" />
+    <Compile Include="Delegates\EventFilterBase.cs" />
+    <Compile Include="Delegates\IEventFilter.cs" />
+    <Compile Include="Delegates\SessionEventArgs.cs" />
+    <Compile Include="Delegates\SessionEventFilter.cs" />
     <Compile Include="DisconnectedEventArgs.cs" />
     <Compile Include="IComponentCatalog.cs" />
     <Compile Include="IComponentCatalogExtensions.cs" />

@@ -145,7 +145,11 @@ namespace Zyan.Communication
 					(methodCallMessage.MethodName.StartsWith("set_") || methodCallMessage.MethodName.StartsWith("add_")))
 				{
 					// Get client delegate
-					object receiveMethodDelegate = methodCallMessage.GetArg(0);
+					var receiveMethodDelegate = methodCallMessage.GetArg(0) as Delegate;
+					var eventFilter = default(IEventFilter);
+
+					// Get event filter, if it is attached
+					ExtractEventHandlerDetails(ref receiveMethodDelegate, ref eventFilter);
 
 					// Trim "set_" or "add_" prefix
 					string propertyName = methodCallMessage.MethodName.Substring(4);
@@ -160,7 +164,8 @@ namespace Zyan.Communication
 					{
 						IsEvent = methodCallMessage.MethodName.StartsWith("add_"),
 						DelegateMemberName = propertyName,
-						ClientDelegateInterceptor = wiring
+						ClientDelegateInterceptor = wiring,
+						EventFilter = eventFilter
 					};
 
 					// If component is singleton, attach event handler
@@ -259,6 +264,29 @@ namespace Zyan.Communication
 
 				throw ex;
 			}
+		}
+
+		/// <summary>
+		/// Extracts the event handler details such as event filter.
+		/// </summary>
+		/// <param name="eventHandler">The event handler delegate.</param>
+		/// <param name="eventFilter">The event filter.</param>
+		private void ExtractEventHandlerDetails(ref Delegate eventHandler, ref IEventFilter eventFilter)
+		{
+			if (eventHandler == null || eventHandler.Method == null)
+			{
+				return;
+			}
+
+			// handle special case: session-bound events
+			var parameters = eventHandler.Method.GetParameters();
+			if (parameters.Length == 2 && typeof(SessionEventArgs).IsAssignableFrom(parameters[1].ParameterType))
+			{
+				eventFilter = new SessionEventFilter(_sessionID);
+				return;
+			}
+
+			// TODO: handle event filters, if any
 		}
 
 		/// <summary>
