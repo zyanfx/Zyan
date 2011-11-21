@@ -78,8 +78,14 @@ namespace Zyan.Communication.Toolbox
 		{
 			if (oneWay)
 			{
+				// save thread-static CurrentSession variable
+				var savedSession = ServerSession.CurrentSession;
+
 				ThreadPool.QueueUserWorkItem(t =>
 				{
+					// restore current session in a new worker thread
+					ServerSession.CurrentSession = savedSession;
+
 					try
 					{
 						// one-way method cannot throw any exceptions, so we ignore any
