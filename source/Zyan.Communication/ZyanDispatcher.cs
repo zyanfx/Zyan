@@ -119,6 +119,8 @@ namespace Zyan.Communication
 					PropertyInfo delegatePropInfo = type.GetProperty(correlationInfo.DelegateMemberName);
 					delegatePropInfo.SetValue(instance, null, null);
 				}
+
+				wiringList.Remove(correlationInfo.CorrelationID);
 			}
 		}
 

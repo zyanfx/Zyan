@@ -169,6 +169,7 @@ namespace Zyan.Communication
 						_connection.PrepareCallContext(false);
 						_connection.RemoteDispatcher.AddEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
 					}
+
 					// Save delegate correlation info
 					_delegateCorrelationSet.Add(correlationInfo);
 
@@ -192,13 +193,15 @@ namespace Zyan.Communication
 
 						if (found != null)
 						{
-							if (_activationType == ActivationType.SingleCall)
-								_delegateCorrelationSet.Remove(found);
-							else
+							// If component is singleton, detach event handler
+							if (_activationType == ActivationType.Singleton)
 							{
 								_connection.PrepareCallContext(false);
 								_connection.RemoteDispatcher.RemoveEventHandler(_interfaceType.FullName, found, _uniqueName);
 							}
+
+							// Remove delegate correlation info
+							_delegateCorrelationSet.Remove(found);
 						}
 					}
 					return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
@@ -213,7 +216,7 @@ namespace Zyan.Communication
 					var returnValue = clientHandler.Get(elementType);
 					return new ReturnMessage(returnValue, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
 				}
-				else if (methodInfo.GetParameters().Length == 0 && 
+				else if (methodInfo.GetParameters().Length == 0 &&
 					methodInfo.GetGenericArguments().Length == 1 &&
 					typeof(IQueryable).IsAssignableFrom(methodInfo.ReturnType))
 				{
