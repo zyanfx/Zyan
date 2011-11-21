@@ -72,6 +72,7 @@ namespace Zyan.Communication
 
 					dynamicEventWire.ServerEventInfo = eventInfo;
 					dynamicEventWire.Component = instance;
+					dynamicEventWire.EventFilter = correlationInfo.EventFilter;
 
 					// add session validation handler
 					var sessionId = ServerSession.CurrentSession.SessionID;

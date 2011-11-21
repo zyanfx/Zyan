@@ -26,6 +26,11 @@ namespace Zyan.Communication.Delegates
 		public Func<bool> ValidateSession { get; set; }
 
 		/// <summary>
+		/// Gets or sets the event filter.
+		/// </summary>
+		public IEventFilter EventFilter { get; set; }
+
+		/// <summary>
 		/// Invokes client event handler.
 		/// If the handler throws an exception, event subsription is cancelled.
 		/// </summary>
@@ -38,8 +43,11 @@ namespace Zyan.Communication.Delegates
 				if (ValidateSession != null && !ValidateSession())
 					throw new InvalidSessionException();
 
+				if (EventFilter != null && !EventFilter.AllowInvocation(args))
+					return null;
+
 				return Interceptor.InvokeClientDelegate(args);
-			} 
+			}
 			catch
 			{
 				// unsubscribe

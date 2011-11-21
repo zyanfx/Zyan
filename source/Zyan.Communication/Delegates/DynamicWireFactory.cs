@@ -97,7 +97,7 @@ namespace Zyan.Communication.Delegates
 			{
 				// create wire factory method
 				var methodInfo = CreateDynamicWireGenericMethodInfo.MakeGenericMethod(delegateType);
-				var dynamicWireFactoryMethod = methodInfo.CreateDelegate<Func<bool, DynamicWireBase>>(this);
+				var dynamicWireFactoryMethod = methodInfo.CreateDelegate<DynamicWireFactoryMethod>(this);
 				return dynamicWireFactoryMethod;
 			});
 		}
