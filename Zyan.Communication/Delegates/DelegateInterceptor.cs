@@ -33,7 +33,6 @@ namespace Zyan.Communication.Delegates
 			return clientDelegate.DynamicInvoke(args);
 		}
 
-
 		/// <summary>
 		/// Ensures unlimited Remoting lifetime.
 		/// </summary>

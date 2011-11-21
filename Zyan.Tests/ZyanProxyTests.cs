@@ -158,41 +158,5 @@ namespace Zyan.Tests
 
 			Assert.AreEqual("ipc://ZyanProxyTest/ZyanProxyServer/Zyan.Tests.ZyanProxyTests+ISampleServer", toString);
 		}
-
-		[TestMethod]
-		public void Subscription_Unsubscription()
-		{
-			var proxy = ZyanConnection.CreateProxy<ISampleServer>();
-			proxy.TestEvent += TestEventHandler;
-			EventHandled = false;
-
-			proxy.RaiseTestEvent();
-			Assert.IsTrue(EventHandled);
-
-			proxy.TestEvent -= TestEventHandler; // unsubscription #1
-			EventHandled = false;
-
-			proxy.RaiseTestEvent();
-			Assert.IsFalse(EventHandled);
-
-			proxy.TestEvent += TestEventHandler;
-			EventHandled = false;
-
-			proxy.RaiseTestEvent();
-			Assert.IsTrue(EventHandled);
-
-			proxy.TestEvent -= TestEventHandler; // unsubscription #2
-			EventHandled = false;
-
-			proxy.RaiseTestEvent();
-			Assert.IsFalse(EventHandled);
-		}
-
-		bool EventHandled { get; set; }
-
-		void TestEventHandler(object sender, EventArgs e)
-		{
-			EventHandled = true;
-		}
 	}
 }
