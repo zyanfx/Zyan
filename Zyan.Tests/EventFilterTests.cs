@@ -142,16 +142,16 @@ namespace Zyan.Tests
 		[Serializable]
 		public class SampleEventFilter : EventFilterBase<SampleEventArgs>
 		{
-			public SampleEventFilter(int value)
+			public SampleEventFilter(params int[] values)
 			{
-				Value = value;
+				Values = new HashSet<int>(values);
 			}
 
-			public int Value { get; private set; }
+			public HashSet<int> Values { get; private set; }
 
 			protected override bool AllowInvocation(object sender, SampleEventArgs args)
 			{
-				return args.Value == Value;
+				return Values.Contains(args.Value);
 			}
 		}
 
@@ -356,6 +356,31 @@ namespace Zyan.Tests
 		}
 
 		[TestMethod]
+		public void FilteredEventHandlerUsingCombinedFilter_FiltersEventsLocally()
+		{
+			// prepare event handler
+			var handledValue = 0;
+			var handler = new EventHandler<SampleEventArgs>((sender, args) => handledValue = args.Value);
+
+			// attach client-side event filter
+			var sample = new SampleServer();
+			sample.SampleEvent += handler
+				.AddFilter(new SampleEventFilter(321, 123, 111))
+				.AddFilter(new SampleEventFilter(333, 123, 222)); // 123 will pass both filters
+
+			// raise events, check results
+			sample.RaiseSampleEvent(321); // filtered out
+			Assert.AreEqual(0, handledValue);
+
+			sample.RaiseSampleEvent(123);
+			Assert.AreEqual(123, handledValue);
+
+			handledValue = 111;
+			sample.RaiseSampleEvent(456); // filtered out
+			Assert.AreEqual(111, handledValue);
+		}
+
+		[TestMethod]
 		public void FilteredEventHandlerOfTypeEventHandler_FiltersEventsLocally()
 		{
 			// prepare event handler
@@ -411,7 +436,7 @@ namespace Zyan.Tests
 		}
 
 		[TestMethod]
-		public void FilteredEventHandlerUsingCombinedFilter_FiltersEventsLocally()
+		public void FilteredCustomHandlerUsingCombinedFilter_FiltersEventsLocally()
 		{
 			// prepare event handler
 			var firstArgument = 0;
@@ -495,6 +520,33 @@ namespace Zyan.Tests
 		}
 
 		[TestMethod]
+		public void FilteredEventHandlerUsingCombinedFilter_FiltersEventsRemotely()
+		{
+			// prepare event handler
+			var handledValue = 0;
+			var handler = new EventHandler<SampleEventArgs>((sender, args) => handledValue = args.Value);
+
+			// attach server-side event filter
+			var proxy = ZyanConnection.CreateProxy<ISampleServer>();
+			proxy.SampleEvent += handler
+				.AddFilter(new SampleEventFilter(3, 5, 7))
+				.AddFilter(new SampleEventFilter(9, 6, 3))
+				.AddFilter(new SampleEventFilter(1, 2, 3))
+				.AddFilter(new SampleEventFilter(5, 4, 3)); // 3 will pass all filters
+
+			// raise events, check results
+			proxy.RaiseSampleEvent(321); // filtered out
+			Assert.AreEqual(0, handledValue);
+
+			proxy.RaiseSampleEvent(3);
+			Assert.AreEqual(3, handledValue);
+
+			handledValue = 111;
+			proxy.RaiseSampleEvent(456); // filtered out
+			Assert.AreEqual(111, handledValue);
+		}
+
+		[TestMethod]
 		public void FilteredEventHandlerOfTypeEventHandler_FiltersEventsRemotely()
 		{
 			// prepare event handler
@@ -550,7 +602,7 @@ namespace Zyan.Tests
 		}
 
 		[TestMethod]
-		public void FilteredEventHandlerUsingCombinedFilter_FiltersEventsRemotely()
+		public void FilteredCustomHandlerUsingCombinedFilter_FiltersEventsRemotely()
 		{
 			// prepare event handler
 			var firstArgument = 0;
