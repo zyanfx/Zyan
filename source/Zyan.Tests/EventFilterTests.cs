@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using Zyan.Communication;
@@ -33,7 +34,7 @@ namespace Zyan.Tests
 	{
 		#region Interfaces and components
 
-		public delegate void NonStandardEvent(int firstArgument, string secondArgument);
+		public delegate void CustomEventType(int firstArgument, string secondArgument);
 
 		/// <summary>
 		/// Sample server interface
@@ -56,9 +57,9 @@ namespace Zyan.Tests
 
 			void RaiseSampleEvent(int value);
 
-			event NonStandardEvent NonStandardEvent;
+			event CustomEventType CustomEvent;
 
-			void RaiseNonStandardEvent(int first = default(int), string second = default(string));
+			void RaiseCustomEvent(int first = default(int), string second = default(string));
 		}
 
 		/// <summary>
@@ -106,13 +107,13 @@ namespace Zyan.Tests
 				}
 			}
 
-			public event NonStandardEvent NonStandardEvent;
+			public event CustomEventType CustomEvent;
 
-			public void RaiseNonStandardEvent(int first = default(int), string second = default(string))
+			public void RaiseCustomEvent(int first = default(int), string second = default(string))
 			{
-				if (NonStandardEvent != null)
+				if (CustomEvent != null)
 				{
-					NonStandardEvent(first, second);
+					CustomEvent(first, second);
 				}
 			}
 		}
@@ -167,16 +168,22 @@ namespace Zyan.Tests
 		}
 
 		/// <summary>
-		/// Non-standard event filter.
+		/// Event filter for CustomEventType.
 		/// </summary>
 		[Serializable]
-		public class NonStandardEventFilter : IEventFilter
+		public class CustomEventFilter : IEventFilter
 		{
-			public string Template { get; set; }
+			public CustomEventFilter(params string[] templates)
+			{
+				Templates = new HashSet<string>(templates);
+			}
+
+			private ISet<string> Templates { get; set; }
 
 			public bool AllowInvocation(params object[] parameters)
 			{
-				return string.Format("{0}{1}", parameters) == Template;
+				var text = string.Format("{0}{1}", parameters);
+				return Templates.Contains(text);
 			}
 		}
 
@@ -372,13 +379,13 @@ namespace Zyan.Tests
 		}
 
 		[TestMethod]
-		public void FilteredEventHandlerOfNonStandardType_FiltersEventsLocally()
+		public void FilteredEventHandlerOfCustomType_FiltersEventsLocally()
 		{
 			// prepare event handler
 			var firstArgument = 0;
 			var secondArgument = string.Empty;
 			var handled = false;
-			var handler = new NonStandardEvent((first, second) =>
+			var handler = new CustomEventType((first, second) =>
 			{
 				firstArgument = first;
 				secondArgument = second;
@@ -387,19 +394,55 @@ namespace Zyan.Tests
 
 			// attach client-side event filter
 			var sample = new SampleServer();
-			sample.NonStandardEvent += FilteredEventHandler.Create(handler, new NonStandardEventFilter { Template = "3.14" });
+			sample.CustomEvent += FilteredEventHandler.Create(handler, new CustomEventFilter("3.14"));
 
 			// raise events, check results
-			sample.RaiseNonStandardEvent(1, string.Empty); // filtered out
+			sample.RaiseCustomEvent(1, string.Empty); // filtered out
 			Assert.IsFalse(handled);
 
-			sample.RaiseNonStandardEvent(3, ".14");
+			sample.RaiseCustomEvent(3, ".14");
 			Assert.IsTrue(handled);
 			Assert.AreEqual(3, firstArgument);
 			Assert.AreEqual(".14", secondArgument);
 
 			handled = false;
-			sample.RaiseNonStandardEvent(); // filtered out
+			sample.RaiseCustomEvent(); // filtered out
+			Assert.IsFalse(handled);
+		}
+
+		[TestMethod]
+		public void FilteredEventHandlerUsingCombinedFilter_FiltersEventsLocally()
+		{
+			// prepare event handler
+			var firstArgument = 0;
+			var secondArgument = string.Empty;
+			var handled = false;
+			var handler = new CustomEventType((first, second) =>
+			{
+				firstArgument = first;
+				secondArgument = second;
+				handled = true;
+			});
+
+			// initialize event filter
+			handler = FilteredEventHandler.Create(handler, new CustomEventFilter("2.718", "1.618"));
+			handler = FilteredEventHandler.Create(handler, new CustomEventFilter("3.14", "2.718"));
+
+			// attach client-side event filter
+			var sample = new SampleServer();
+			sample.CustomEvent += handler;
+
+			// raise events, check results
+			sample.RaiseCustomEvent(3, ".14"); // filtered out
+			Assert.IsFalse(handled);
+
+			sample.RaiseCustomEvent(2, ".718");
+			Assert.IsTrue(handled);
+			Assert.AreEqual(2, firstArgument);
+			Assert.AreEqual(".718", secondArgument);
+
+			handled = false;
+			sample.RaiseCustomEvent(1, ".618"); // filtered out
 			Assert.IsFalse(handled);
 		}
 
@@ -475,13 +518,13 @@ namespace Zyan.Tests
 		}
 
 		[TestMethod]
-		public void FilteredEventHandlerOfNonStandardType_FiltersEventsRemotely()
+		public void FilteredEventHandlerOfCustomType_FiltersEventsRemotely()
 		{
 			// prepare event handler
 			var firstArgument = 0;
 			var secondArgument = string.Empty;
 			var handled = false;
-			var handler = new NonStandardEvent((first, second) =>
+			var handler = new CustomEventType((first, second) =>
 			{
 				firstArgument = first;
 				secondArgument = second;
@@ -490,19 +533,55 @@ namespace Zyan.Tests
 
 			// attach server-side event filter
 			var proxy = ZyanConnection.CreateProxy<ISampleServer>();
-			proxy.NonStandardEvent += FilteredEventHandler.Create(handler, new NonStandardEventFilter { Template = "2.71828" });
+			proxy.CustomEvent += FilteredEventHandler.Create(handler, new CustomEventFilter("2.71828"));
 
 			// raise events, check results
-			proxy.RaiseNonStandardEvent(1, string.Empty); // filtered out
+			proxy.RaiseCustomEvent(1, string.Empty); // filtered out
 			Assert.IsFalse(handled);
 
-			proxy.RaiseNonStandardEvent(2, ".71828");
+			proxy.RaiseCustomEvent(2, ".71828");
 			Assert.IsTrue(handled);
 			Assert.AreEqual(2, firstArgument);
 			Assert.AreEqual(".71828", secondArgument);
 
 			handled = false;
-			proxy.RaiseNonStandardEvent(); // filtered out
+			proxy.RaiseCustomEvent(); // filtered out
+			Assert.IsFalse(handled);
+		}
+
+		[TestMethod]
+		public void FilteredEventHandlerUsingCombinedFilter_FiltersEventsRemotely()
+		{
+			// prepare event handler
+			var firstArgument = 0;
+			var secondArgument = string.Empty;
+			var handled = false;
+			var handler = new CustomEventType((first, second) =>
+			{
+				firstArgument = first;
+				secondArgument = second;
+				handled = true;
+			});
+
+			// initialize event filter
+			handler = FilteredEventHandler.Create(handler, new CustomEventFilter("2.718", "1.618"));
+			handler = FilteredEventHandler.Create(handler, new CustomEventFilter("3.14", "2.718"));
+
+			// attach client-side event filter
+			var proxy = ZyanConnection.CreateProxy<ISampleServer>();
+			proxy.CustomEvent += handler;
+
+			// raise events, check results
+			proxy.RaiseCustomEvent(3, ".14"); // filtered out
+			Assert.IsFalse(handled);
+
+			proxy.RaiseCustomEvent(2, ".718");
+			Assert.IsTrue(handled);
+			Assert.AreEqual(2, firstArgument);
+			Assert.AreEqual(".718", secondArgument);
+
+			handled = false;
+			proxy.RaiseCustomEvent(1, ".618"); // filtered out
 			Assert.IsFalse(handled);
 		}
 	}
