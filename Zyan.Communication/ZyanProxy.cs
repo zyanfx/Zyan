@@ -283,7 +283,6 @@ namespace Zyan.Communication
 			if (parameters.Length == 2 && typeof(SessionEventArgs).IsAssignableFrom(parameters[1].ParameterType))
 			{
 				eventFilter = new SessionEventFilter(_sessionID);
-				return;
 			}
 
 			// handle event filters, if any
@@ -291,7 +290,7 @@ namespace Zyan.Communication
 			{
 				var filtered = eventHandler.Target as IFilteredEventHandler;
 				eventHandler = filtered.EventHandler;
-				eventFilter = filtered.EventFilter;
+				eventFilter = filtered.EventFilter.Combine(eventFilter);
 			}
 		}
 
