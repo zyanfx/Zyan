@@ -22,7 +22,7 @@ namespace Zyan.Communication.Delegates
 			where TEventFilter : IEventFilter
 		{
 			// convert to EventHandler<TEventArgs> implicitly
-			return new FilteredEventHandler<TEventArgs, TEventFilter>(eventHandler, eventFilter);
+			return new FilteredEventHandler<TEventArgs>(eventHandler, eventFilter);
 		}
 
 		/// <summary>
@@ -35,7 +35,7 @@ namespace Zyan.Communication.Delegates
 			where TEventFilter : IEventFilter
 		{
 			// convert to EventHandler<EventArgs> implicitly
-			EventHandler<EventArgs> handler = new FilteredEventHandler<EventArgs, TEventFilter>(new EventHandler<EventArgs>(eventHandler), eventFilter);
+			EventHandler<EventArgs> handler = new FilteredEventHandler<EventArgs>(new EventHandler<EventArgs>(eventHandler), eventFilter);
 
 			// convert to EventHandler explicitly
 			return new EventHandler(handler);
@@ -49,7 +49,7 @@ namespace Zyan.Communication.Delegates
 		public static TDelegate Create<TDelegate>(TDelegate eventHandler, IEventFilter eventFilter)
 			where TDelegate : class
 		{
-			return new FilteredEventHandler<TDelegate>(eventHandler, eventFilter);
+			return new FilteredCustomHandler<TDelegate>(eventHandler, eventFilter);
 		}
 
 		/// <summary>

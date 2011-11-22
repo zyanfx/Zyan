@@ -31,6 +31,10 @@ namespace Zyan.Communication.Delegates
 			return new CombinedEventFilter(filters);
 		}
 
+		/// <summary>
+		/// Combines several event filters into one.
+		/// </summary>
+		[Serializable]
 		private class CombinedEventFilter : IEventFilter
 		{
 			public CombinedEventFilter(params IEventFilter[] filters)
@@ -44,7 +48,7 @@ namespace Zyan.Communication.Delegates
 			{
 				foreach (var filter in EventFilters)
 				{
-					if (!AllowInvocation(parameters))
+					if (!filter.AllowInvocation(parameters))
 					{
 						return false;
 					}
