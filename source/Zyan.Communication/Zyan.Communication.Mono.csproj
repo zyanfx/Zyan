@@ -76,9 +76,9 @@
     <Compile Include="Delegates\DynamicWireT.cs" />
     <Compile Include="Delegates\EventFilter.cs" />
     <Compile Include="Delegates\EventFilterBase.cs" />
+    <Compile Include="Delegates\FilteredCustomHandlerT.cs" />
     <Compile Include="Delegates\FilteredEventHandler.cs" />
     <Compile Include="Delegates\FilteredEventHandlerT.cs" />
-    <Compile Include="Delegates\FilteredEventHandlerTT.cs" />
     <Compile Include="Delegates\IEventFilter.cs" />
     <Compile Include="Delegates\IFilteredEventHandler.cs" />
     <Compile Include="Delegates\SessionEventArgs.cs" />
