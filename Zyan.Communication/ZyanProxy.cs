@@ -286,7 +286,13 @@ namespace Zyan.Communication
 				return;
 			}
 
-			// TODO: handle event filters, if any
+			// handle event filters, if any
+			if (eventHandler.Target is IFilteredEventHandler)
+			{
+				var filtered = eventHandler.Target as IFilteredEventHandler;
+				eventHandler = filtered.EventHandler;
+				eventFilter = filtered.EventFilter;
+			}
 		}
 
 		/// <summary>

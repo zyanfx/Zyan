@@ -17,6 +17,6 @@ namespace Zyan.Communication.Delegates
 		/// <returns>
 		///   <c>true</c> if invocation is allowed; otherwise, <c>false</c>.
 		/// </returns>
-		bool AllowInvocation(object[] parameters);
+		bool AllowInvocation(params object[] parameters);
 	}
 }
