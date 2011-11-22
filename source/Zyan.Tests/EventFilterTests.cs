@@ -33,6 +33,8 @@ namespace Zyan.Tests
 	{
 		#region Interfaces and components
 
+		public delegate void NonStandardEvent(int firstArgument, string secondArgument);
+
 		/// <summary>
 		/// Sample server interface
 		/// </summary>
@@ -53,6 +55,10 @@ namespace Zyan.Tests
 			event EventHandler<SampleEventArgs> SampleEvent;
 
 			void RaiseSampleEvent(int value);
+
+			event NonStandardEvent NonStandardEvent;
+
+			void RaiseNonStandardEvent(int first = default(int), string second = default(string));
 		}
 
 		/// <summary>
@@ -60,21 +66,6 @@ namespace Zyan.Tests
 		/// </summary>
 		public class SampleServer : ISampleServer
 		{
-			public override int GetHashCode()
-			{
-				throw new AssertFailedException("GetHashCode() method is called remotely.");
-			}
-
-			public override bool Equals(object obj)
-			{
-				throw new AssertFailedException("Equals() method is called remotely.");
-			}
-
-			public override string ToString()
-			{
-				throw new AssertFailedException("ToString() method is called remotely.");
-			}
-
 			public event EventHandler TestEvent;
 
 			public void RaiseTestEvent(EventArgs args)
@@ -112,6 +103,16 @@ namespace Zyan.Tests
 				if (SampleEvent != null)
 				{
 					SampleEvent(null, new SampleEventArgs { Value = value });
+				}
+			}
+
+			public event NonStandardEvent NonStandardEvent;
+
+			public void RaiseNonStandardEvent(int first = default(int), string second = default(string))
+			{
+				if (NonStandardEvent != null)
+				{
+					NonStandardEvent(first, second);
 				}
 			}
 		}
@@ -162,6 +163,20 @@ namespace Zyan.Tests
 			protected override bool AllowInvocation(object sender, EventArgs args)
 			{
 				return args == null;
+			}
+		}
+
+		/// <summary>
+		/// Non-standard event filter.
+		/// </summary>
+		[Serializable]
+		public class NonStandardEventFilter : IEventFilter
+		{
+			public string Template { get; set; }
+
+			public bool AllowInvocation(params object[] parameters)
+			{
+				return string.Format("{0}{1}", parameters) == Template;
 			}
 		}
 
@@ -234,6 +249,8 @@ namespace Zyan.Tests
 			Assert.IsFalse(handled);
 		}
 
+		/* Session-bound events */
+
 		[TestMethod]
 		public void SessionBoundEvents_AreBoundToSessions()
 		{
@@ -286,6 +303,8 @@ namespace Zyan.Tests
 			}
 		}
 
+		/* Client-side (local) event filters */
+
 		[TestMethod]
 		public void FilteredEventHandlerUsingFactorySyntax_FiltersEventsLocally()
 		{
@@ -311,7 +330,7 @@ namespace Zyan.Tests
 		{
 			// prepare event handler
 			var handledValue = 0;
-			var handler = new EventHandler<SampleEventArgs>((object sender, SampleEventArgs args) => handledValue = args.Value);
+			var handler = new EventHandler<SampleEventArgs>((sender, args) => handledValue = args.Value);
 
 			// attach client-side event filter
 			var sample = new SampleServer();
@@ -353,11 +372,45 @@ namespace Zyan.Tests
 		}
 
 		[TestMethod]
+		public void FilteredEventHandlerOfNonStandardType_FiltersEventsLocally()
+		{
+			// prepare event handler
+			var firstArgument = 0;
+			var secondArgument = string.Empty;
+			var handled = false;
+			var handler = new NonStandardEvent((first, second) =>
+			{
+				firstArgument = first;
+				secondArgument = second;
+				handled = true;
+			});
+
+			// attach client-side event filter
+			var sample = new SampleServer();
+			sample.NonStandardEvent += FilteredEventHandler.Create(handler, new NonStandardEventFilter { Template = "3.14" });
+
+			// raise events, check results
+			sample.RaiseNonStandardEvent(1, string.Empty); // filtered out
+			Assert.IsFalse(handled);
+
+			sample.RaiseNonStandardEvent(3, ".14");
+			Assert.IsTrue(handled);
+			Assert.AreEqual(3, firstArgument);
+			Assert.AreEqual(".14", secondArgument);
+
+			handled = false;
+			sample.RaiseNonStandardEvent(); // filtered out
+			Assert.IsFalse(handled);
+		}
+
+		/* Server-side (remote) event filters */
+
+		[TestMethod]
 		public void FilteredEventHandlerUsingFactorySyntax_FiltersEventsRemotely()
 		{
 			// prepare event handler
 			var handledValue = 0;
-			var handler = new EventHandler<SampleEventArgs>((object sender, SampleEventArgs args) => handledValue = args.Value);
+			var handler = new EventHandler<SampleEventArgs>((sender, args) => handledValue = args.Value);
 
 			// attach server-side event filter
 			var proxy = ZyanConnection.CreateProxy<ISampleServer>();
@@ -380,7 +433,7 @@ namespace Zyan.Tests
 		{
 			// prepare event handler
 			var handledValue = 0;
-			var handler = new EventHandler<SampleEventArgs>((object sender, SampleEventArgs args) => handledValue = args.Value);
+			var handler = new EventHandler<SampleEventArgs>((sender, args) => handledValue = args.Value);
 
 			// attach server-side event filter
 			var proxy = ZyanConnection.CreateProxy<ISampleServer>();
@@ -418,6 +471,38 @@ namespace Zyan.Tests
 
 			handled = false;
 			proxy.RaiseTestEvent(new EventArgs()); // filtered out
+			Assert.IsFalse(handled);
+		}
+
+		[TestMethod]
+		public void FilteredEventHandlerOfNonStandardType_FiltersEventsRemotely()
+		{
+			// prepare event handler
+			var firstArgument = 0;
+			var secondArgument = string.Empty;
+			var handled = false;
+			var handler = new NonStandardEvent((first, second) =>
+			{
+				firstArgument = first;
+				secondArgument = second;
+				handled = true;
+			});
+
+			// attach server-side event filter
+			var proxy = ZyanConnection.CreateProxy<ISampleServer>();
+			proxy.NonStandardEvent += FilteredEventHandler.Create(handler, new NonStandardEventFilter { Template = "2.71828" });
+
+			// raise events, check results
+			proxy.RaiseNonStandardEvent(1, string.Empty); // filtered out
+			Assert.IsFalse(handled);
+
+			proxy.RaiseNonStandardEvent(2, ".71828");
+			Assert.IsTrue(handled);
+			Assert.AreEqual(2, firstArgument);
+			Assert.AreEqual(".71828", secondArgument);
+
+			handled = false;
+			proxy.RaiseNonStandardEvent(); // filtered out
 			Assert.IsFalse(handled);
 		}
 	}
