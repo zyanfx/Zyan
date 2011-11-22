@@ -10,7 +10,7 @@ namespace Zyan.Communication.Delegates
 	/// </summary>
 	/// <typeparam name="TEventArgs">The type of the event args.</typeparam>
 	/// <typeparam name="TEventFilter">The type of the event filter.</typeparam>
-	public class FilteredEventHandler<TEventArgs, TEventFilter> : IFilteredEventHandler
+	internal class FilteredEventHandler<TEventArgs, TEventFilter> : IFilteredEventHandler
 		where TEventArgs : EventArgs
 		where TEventFilter : IEventFilter
 	{

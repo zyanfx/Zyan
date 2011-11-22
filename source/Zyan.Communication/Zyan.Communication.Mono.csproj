@@ -74,6 +74,7 @@
     <Compile Include="Delegates\DynamicWireBase.cs" />
     <Compile Include="Delegates\DynamicWireFactory.cs" />
     <Compile Include="Delegates\DynamicWireT.cs" />
+    <Compile Include="Delegates\EventFilter.cs" />
     <Compile Include="Delegates\EventFilterBase.cs" />
     <Compile Include="Delegates\FilteredEventHandler.cs" />
     <Compile Include="Delegates\FilteredEventHandlerT.cs" />

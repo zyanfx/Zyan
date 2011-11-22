@@ -10,7 +10,7 @@ namespace Zyan.Communication.Delegates
 	/// Represents filtered event handler of a non-standard type.
 	/// </summary>
 	/// <typeparam name="TDelegate">The type of the event handler delegate.</typeparam>
-	public class FilteredEventHandler<TDelegate> : IFilteredEventHandler
+	internal class FilteredEventHandler<TDelegate> : IFilteredEventHandler
 		where TDelegate : class
 	{
 		/// <summary>
