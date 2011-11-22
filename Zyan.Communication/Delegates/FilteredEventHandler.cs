@@ -42,6 +42,17 @@ namespace Zyan.Communication.Delegates
 		}
 
 		/// <summary>
+		/// Creates non-standard filtered event handler of type TDelegate.
+		/// </summary>
+		/// <param name="eventHandler">The event handler.</param>
+		/// <param name="eventFilter">The event filter.</param>
+		public static TDelegate Create<TDelegate>(TDelegate eventHandler, IEventFilter eventFilter)
+			where TDelegate : class
+		{
+			return new FilteredEventHandler<TDelegate>(eventHandler, eventFilter);
+		}
+
+		/// <summary>
 		/// Creates filtered event handler of type EventHandler{TEventArgs}.
 		/// </summary>
 		/// <typeparam name="TEventArgs">The type of the event args.</typeparam>

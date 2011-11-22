@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using Zyan.Communication.Toolbox;
@@ -161,6 +163,50 @@ namespace Zyan.Communication.Delegates
 		public static DynamicWireBase CreateDynamicWire(Type componentType, Type delegateType)
 		{
 			return Instance.Value.CreateWire(componentType, delegateType);
+		}
+
+		/// <summary>
+		/// Builds the strong-typed delegate for the dynamicInvoke: object DynamicInvoke(object[] args);
+		/// </summary>
+		/// <typeparam name="T">Delegate type.</typeparam>
+		/// <param name="dynamicInvoke"><see cref="MethodInfo"/> for the DynamicInvoke(object[] args) method.</param>
+		/// <param name="target">Target instance.</param>
+		/// <returns>Strong-typed delegate.</returns>
+		public static T BuildDelegate<T>(MethodInfo dynamicInvoke, object target = null)
+		{
+			// validate generic argument
+			if (!typeof(Delegate).IsAssignableFrom(typeof(T)))
+			{
+				throw new ApplicationException("Type is not delegate: " + typeof(T).FullName);
+			}
+
+			// get delegate MethodInfo
+			var delegateType = typeof(T);
+			var delegateInvokeMethod = delegateType.GetMethod("Invoke");
+
+			// var parameters = new object[] { (object)arg1, (object)arg2, ... };
+			var parameters = delegateInvokeMethod.GetParameters().Select(p => Expression.Parameter(p.ParameterType, p.Name)).ToArray();
+			var objectParameters = parameters.Select(p => Expression.Convert(p, typeof(object)));
+			var parametersArray = Expression.NewArrayInit(typeof(object), objectParameters.OfType<Expression>().ToArray());
+
+			// invokeClientDelegate(parameters);
+			var callExpression = Expression.Call
+			(
+				Expression.Constant(target),
+				dynamicInvoke,
+				new Expression[] { parametersArray }
+			);
+
+			// convert return value, if any
+			var resultExpression = callExpression as Expression;
+			if (delegateInvokeMethod.ReturnType != typeof(void))
+			{
+				resultExpression = Expression.Convert(callExpression, delegateInvokeMethod.ReturnType);
+			}
+
+			// create expression and compile delegate
+			var expression = Expression.Lambda<T>(resultExpression, parameters);
+			return expression.Compile();
 		}
 	}
 }
