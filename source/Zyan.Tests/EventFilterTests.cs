@@ -168,6 +168,25 @@ namespace Zyan.Tests
 		}
 
 		/// <summary>
+		/// Event filter for custom session-bound event.
+		/// </summary>
+		[Serializable]
+		public class CustomSessionBoundEventFilter : EventFilterBase<CustomEventArgs>
+		{
+			public CustomSessionBoundEventFilter(params int[] values)
+			{
+				Values = new HashSet<int>(values);
+			}
+
+			private ISet<int> Values { get; set; }
+
+			protected override bool AllowInvocation(object sender, CustomEventArgs args)
+			{
+				return Values.Contains(args.Value);
+			}
+		}
+
+		/// <summary>
 		/// Event filter for CustomEventType.
 		/// </summary>
 		[Serializable]
@@ -310,6 +329,35 @@ namespace Zyan.Tests
 			}
 		}
 
+		[TestMethod]
+		public void EventsWithArgumentsDerivedFromSessionBoundEvents_AreBoundToSessionsAndCanBeFiltered()
+		{
+			// start a new session
+			using (var conn = new ZyanConnection(ZyanConnection.ServerUrl, new IpcBinaryClientProtocolSetup()))
+			{
+				var proxy1 = ZyanConnection.CreateProxy<ISampleServer>();
+				var proxy2 = conn.CreateProxy<ISampleServer>();
+
+				var handled1 = 0;
+				var handled2 = 0;
+
+				proxy1.CustomSessionBoundEvent += FilteredEventHandler.Create((object s, CustomEventArgs args) => handled1 = args.Value, new CustomSessionBoundEventFilter(123, 321));
+				proxy2.CustomSessionBoundEvent += (s, args) => handled2 = args.Value;
+
+				proxy1.RaiseCustomSessionBoundEvent(123);
+				Assert.AreEqual(123, handled1);
+				Assert.AreEqual(0, handled2);
+
+				proxy2.RaiseCustomSessionBoundEvent(321);
+				Assert.AreEqual(123, handled1);
+				Assert.AreEqual(321, handled2);
+
+				proxy1.RaiseCustomSessionBoundEvent(111); // filtered out
+				Assert.AreEqual(123, handled1);
+				Assert.AreEqual(321, handled2);
+			}
+		}
+
 		/* Client-side (local) event filters */
 
 		[TestMethod]
@@ -367,6 +415,29 @@ namespace Zyan.Tests
 			sample.SampleEvent += handler
 				.AddFilter(new SampleEventFilter(321, 123, 111))
 				.AddFilter(new SampleEventFilter(333, 123, 222)); // 123 will pass both filters
+
+			// raise events, check results
+			sample.RaiseSampleEvent(321); // filtered out
+			Assert.AreEqual(0, handledValue);
+
+			sample.RaiseSampleEvent(123);
+			Assert.AreEqual(123, handledValue);
+
+			handledValue = 111;
+			sample.RaiseSampleEvent(456); // filtered out
+			Assert.AreEqual(111, handledValue);
+		}
+
+		[TestMethod]
+		public void FilteredEventHandlerUsingFlexibleFilter_FiltersEventsLocally()
+		{
+			// prepare event handler
+			var handledValue = 0;
+			var handler = new EventHandler<SampleEventArgs>((sender, args) => handledValue = args.Value);
+
+			// attach client-side event filter
+			var sample = new SampleServer();
+			sample.SampleEvent += handler.AddFilter((f, args) => args.Value == 123);
 
 			// raise events, check results
 			sample.RaiseSampleEvent(321); // filtered out
@@ -482,7 +553,7 @@ namespace Zyan.Tests
 
 			// attach server-side event filter
 			var proxy = ZyanConnection.CreateProxy<ISampleServer>();
-			proxy.SampleEvent += FilteredEventHandler.Create(handler, new SampleEventFilter(123));
+			proxy.SampleEvent += FilteredEventHandler.Create(handler, new SampleEventFilter(123), false);
 
 			// raise events
 			proxy.RaiseSampleEvent(111); // filtered out
@@ -505,7 +576,7 @@ namespace Zyan.Tests
 
 			// attach server-side event filter
 			var proxy = ZyanConnection.CreateProxy<ISampleServer>();
-			proxy.SampleEvent += handler.AddFilter(new SampleEventFilter(123));
+			proxy.SampleEvent += handler.AddFilter(new SampleEventFilter(123), false);
 
 			// raise events
 			proxy.RaiseSampleEvent(111); // filtered out
@@ -529,10 +600,10 @@ namespace Zyan.Tests
 			// attach server-side event filter
 			var proxy = ZyanConnection.CreateProxy<ISampleServer>();
 			proxy.SampleEvent += handler
-				.AddFilter(new SampleEventFilter(3, 5, 7))
-				.AddFilter(new SampleEventFilter(9, 6, 3))
-				.AddFilter(new SampleEventFilter(1, 2, 3))
-				.AddFilter(new SampleEventFilter(5, 4, 3)); // 3 will pass all filters
+				.AddFilter(new SampleEventFilter(3, 5, 7), false)
+				.AddFilter(new SampleEventFilter(9, 6, 3), false)
+				.AddFilter(new SampleEventFilter(1, 2, 3), false)
+				.AddFilter(new SampleEventFilter(5, 4, 3), false); // 3 will pass all filters
 
 			// raise events, check results
 			proxy.RaiseSampleEvent(321); // filtered out
@@ -540,6 +611,29 @@ namespace Zyan.Tests
 
 			proxy.RaiseSampleEvent(3);
 			Assert.AreEqual(3, handledValue);
+
+			handledValue = 111;
+			proxy.RaiseSampleEvent(456); // filtered out
+			Assert.AreEqual(111, handledValue);
+		}
+
+		[TestMethod]
+		public void FilteredEventHandlerUsingFlexibleFilter_FiltersEventsRemotely()
+		{
+			// prepare event handler
+			var handledValue = 0;
+			var handler = new EventHandler<SampleEventArgs>((sender, args) => handledValue = args.Value);
+
+			// attach client-side event filter
+			var proxy = ZyanConnection.CreateProxy<ISampleServer>();
+			proxy.SampleEvent += handler.AddFilter((sender, args) => args.Value == 123, false);
+
+			// raise events, check results
+			proxy.RaiseSampleEvent(321); // filtered out
+			Assert.AreEqual(0, handledValue);
+
+			proxy.RaiseSampleEvent(123);
+			Assert.AreEqual(123, handledValue);
 
 			handledValue = 111;
 			proxy.RaiseSampleEvent(456); // filtered out
@@ -555,7 +649,7 @@ namespace Zyan.Tests
 
 			// attach server-side event filter
 			var proxy = ZyanConnection.CreateProxy<ISampleServer>();
-			proxy.TestEvent += handler.AddFilter(new TestEventFilter());
+			proxy.TestEvent += handler.AddFilter(new TestEventFilter(), false);
 
 			// raise events, check results
 			proxy.RaiseTestEvent(EventArgs.Empty); // filtered out
@@ -585,7 +679,7 @@ namespace Zyan.Tests
 
 			// attach server-side event filter
 			var proxy = ZyanConnection.CreateProxy<ISampleServer>();
-			proxy.CustomEvent += FilteredEventHandler.Create(handler, new CustomEventFilter("2.71828"));
+			proxy.CustomEvent += FilteredEventHandler.Create(handler, new CustomEventFilter("2.71828"), false);
 
 			// raise events, check results
 			proxy.RaiseCustomEvent(1, string.Empty); // filtered out
@@ -616,8 +710,8 @@ namespace Zyan.Tests
 			});
 
 			// initialize event filter
-			handler = FilteredEventHandler.Create(handler, new CustomEventFilter("2.718", "1.618"));
-			handler = FilteredEventHandler.Create(handler, new CustomEventFilter("3.14", "2.718"));
+			handler = FilteredEventHandler.Create(handler, new CustomEventFilter("2.718", "1.618"), false);
+			handler = FilteredEventHandler.Create(handler, new CustomEventFilter("3.14", "2.718"), false);
 
 			// attach client-side event filter
 			var proxy = ZyanConnection.CreateProxy<ISampleServer>();

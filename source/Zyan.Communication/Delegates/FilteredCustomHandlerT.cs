@@ -18,7 +18,8 @@ namespace Zyan.Communication.Delegates
 		/// </summary>
 		/// <param name="eventHandler">The event handler.</param>
 		/// <param name="eventFilter">The event filter.</param>
-		public FilteredCustomHandler(TDelegate eventHandler, IEventFilter eventFilter)
+		/// <param name="filterLocally">Whether the filter should also work when used locally.</param>
+		public FilteredCustomHandler(TDelegate eventHandler, IEventFilter eventFilter, bool filterLocally)
 		{
 			if (!(eventHandler is Delegate))
 			{
@@ -33,6 +34,7 @@ namespace Zyan.Communication.Delegates
 
 			// create strong-typed invoke method
 			TypedInvoke = BuildDynamicInvoke(InvokeMethodInfo);
+			FilterLocally = filterLocally;
 		}
 
 		private TDelegate BuildDynamicInvoke(MethodInfo invokeMethodInfo)
@@ -120,10 +122,13 @@ namespace Zyan.Communication.Delegates
 		/// </summary>
 		private object Invoke(params object[] args)
 		{
-			// filter event at the client-side, if invoked locally
-			if (EventFilter != null && !EventFilter.AllowInvocation(args))
+			if (FilterLocally)
 			{
-				return null;
+				// filter event at the client-side, if invoked locally
+				if (EventFilter != null && !EventFilter.AllowInvocation(args))
+				{
+					return null;
+				}
 			}
 
 			// invoke client handler
@@ -170,6 +175,11 @@ namespace Zyan.Communication.Delegates
 		{
 			return filteredEventHandler.TypedInvoke;
 		}
+
+		/// <summary>
+		/// Gets or sets a value indicating whether this event filter should also work locally.
+		/// </summary>
+		public bool FilterLocally { get; set; }
 
 		Delegate IFilteredEventHandler.EventHandler
 		{
