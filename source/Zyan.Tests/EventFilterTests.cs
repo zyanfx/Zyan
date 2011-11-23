@@ -275,6 +275,72 @@ namespace Zyan.Tests
 			Assert.IsFalse(handled);
 		}
 
+		[TestMethod]
+		public void SubscriptionUnsubscriptionWithEventFilters_RegressionTest1()
+		{
+			var handled = false;
+			var sampleEventHandler = new EventHandler<SampleEventArgs>((s, e) => handled = true);
+			var filteredEventHandler = sampleEventHandler.AddFilter(new SampleEventFilter(1, 2, 3));
+
+			var proxy = ZyanConnection.CreateProxy<ISampleServer>();
+			proxy.SampleEvent += filteredEventHandler;
+			handled = false;
+
+			proxy.RaiseSampleEvent(1);
+			Assert.IsTrue(handled);
+
+			proxy.SampleEvent -= sampleEventHandler; // unsubscription without filter
+			handled = false;
+
+			proxy.RaiseSampleEvent(2);
+			Assert.IsFalse(handled);
+
+			proxy.SampleEvent += filteredEventHandler;
+			handled = false;
+
+			proxy.RaiseSampleEvent(3);
+			Assert.IsTrue(handled);
+
+			proxy.SampleEvent -= filteredEventHandler; // unsubscription with filter
+			handled = false;
+
+			proxy.RaiseSampleEvent(2);
+			Assert.IsFalse(handled);
+		}
+
+		[TestMethod]
+		public void SubscriptionUnsubscriptionWithEventFilters_RegressionTest2()
+		{
+			var handled = false;
+			var testEventHandler = new EventHandler((s, e) => handled = true);
+			var filteredEventHandler = testEventHandler.AddFilter(new TestEventFilter());
+
+			var proxy = ZyanConnection.CreateProxy<ISampleServer>();
+			proxy.TestEvent += filteredEventHandler;
+			handled = false;
+
+			proxy.RaiseTestEvent();
+			Assert.IsTrue(handled);
+
+			proxy.TestEvent -= filteredEventHandler; // unsubscription with filter
+			handled = false;
+
+			proxy.RaiseTestEvent();
+			Assert.IsFalse(handled);
+
+			proxy.TestEvent += filteredEventHandler;
+			handled = false;
+
+			proxy.RaiseTestEvent();
+			Assert.IsTrue(handled);
+
+			proxy.TestEvent -= testEventHandler; // unsubscription without filter
+			handled = false;
+
+			proxy.RaiseTestEvent();
+			Assert.IsFalse(handled);
+		}
+
 		/* Session-bound events */
 
 		[TestMethod]
@@ -729,6 +795,48 @@ namespace Zyan.Tests
 			handled = false;
 			proxy.RaiseCustomEvent(1, ".618"); // filtered out
 			Assert.IsFalse(handled);
+		}
+
+		/* Syntax checks */
+
+		private void SyntaxChecks()
+		{
+			var proxy = ZyanConnection.CreateProxy<ISampleServer>();
+
+			// Create for EventHandler type — no generic parameters
+			proxy.TestEvent += FilteredEventHandler.Create(TestEventHandler, new TestEventFilter());
+
+			// Create for EventHandler<TEventArgs> type — single generic parameter for EventArgs type
+			proxy.SampleEvent += FilteredEventHandler.Create<SampleEventArgs>(SampleEventHandler, new SampleEventFilter());
+
+			// Create for custom event type — single generic parameter for delegate type
+			proxy.CustomEvent += FilteredEventHandler.Create<CustomEventType>(CustomEventHandler, new CustomEventFilter());
+
+			// AddFilter for EventHandler type — no generic parameters
+			var testEventHandler = new EventHandler(TestEventHandler);
+			testEventHandler = testEventHandler.AddFilter(new TestEventFilter());
+
+			// AddFilter for EventHandler<TEventArgs> type — no generic parameters
+			var sampleEventHandler = new EventHandler<SampleEventArgs>(SampleEventHandler);
+			sampleEventHandler = sampleEventHandler.AddFilter(new SampleEventFilter());
+
+			// AddFilter for EventHandler<TEventArgs> using Linq expression — no generic parameters
+			sampleEventHandler = sampleEventHandler.AddFilter((sender, args) => args.Value != 1);
+		}
+
+		private void CustomEventHandler(int a, string b)
+		{
+			throw new NotImplementedException();
+		}
+
+		private void SampleEventHandler(object sender, SampleEventArgs args)
+		{
+			throw new NotImplementedException();
+		}
+
+		private void TestEventHandler(object sender, EventArgs args)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }
