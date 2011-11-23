@@ -19,5 +19,10 @@ namespace Zyan.Communication.Delegates
 		/// Gets the event filter.
 		/// </summary>
 		IEventFilter EventFilter { get; }
+
+		/// <summary>
+		/// Gets or sets a value indicating whether this event filter should also work locally.
+		/// </summary>
+		bool FilterLocally { get; set; }
 	}
 }

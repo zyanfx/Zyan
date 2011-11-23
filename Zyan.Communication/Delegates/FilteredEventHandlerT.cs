@@ -16,13 +16,15 @@ namespace Zyan.Communication.Delegates
 		/// </summary>
 		/// <param name="eventHandler">The event handler.</param>
 		/// <param name="eventFilter">The event filter.</param>
-		public FilteredEventHandler(EventHandler<TEventArgs> eventHandler, IEventFilter eventFilter)
+		/// <param name="filterLocally">Whether the filter should also work when used locally.</param>
+		public FilteredEventHandler(EventHandler<TEventArgs> eventHandler, IEventFilter eventFilter, bool filterLocally)
 		{
 			IEventFilter sourceFilter;
 			ExtractSourceHandler(eventHandler, out eventHandler, out sourceFilter);
 
 			EventHandler = eventHandler;
 			EventFilter = eventFilter.Combine(sourceFilter);
+			FilterLocally = filterLocally;
 		}
 
 		private void ExtractSourceHandler(EventHandler<TEventArgs> eventHandler, out EventHandler<TEventArgs> sourceHandler, out IEventFilter sourceFilter)
@@ -38,12 +40,15 @@ namespace Zyan.Communication.Delegates
 			}
 		}
 
-		private void Invoke(object sender, TEventArgs args)
+		internal void Invoke(object sender, TEventArgs args)
 		{
-			// filter event at the client-side, if invoked locally
-			if (EventFilter != null && !EventFilter.AllowInvocation(sender, args))
+			if (FilterLocally)
 			{
-				return;
+				// filter event at the client-side, if invoked locally
+				if (EventFilter != null && !EventFilter.AllowInvocation(sender, args))
+				{
+					return;
+				}
 			}
 
 			// invoke client handler
@@ -75,6 +80,11 @@ namespace Zyan.Communication.Delegates
 		{
 			return filteredEventHandler.Invoke;
 		}
+
+		/// <summary>
+		/// Gets or sets a value indicating whether this event filter should also work locally.
+		/// </summary>
+		public bool FilterLocally { get; set; }
 
 		Delegate IFilteredEventHandler.EventHandler
 		{
