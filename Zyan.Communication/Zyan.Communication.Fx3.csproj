@@ -95,7 +95,8 @@
     <Compile Include="Delegates\EventFilterBase.cs" />
     <Compile Include="Delegates\FilteredCustomHandlerT.cs" />
     <Compile Include="Delegates\FilteredEventHandler.cs" />
-    <Compile Include="Delegates\FilteredEventHandlerT.cs" />
+    <Compile Include="Delegates\FilteredSystemEventHandler.cs" />
+    <Compile Include="Delegates\FilteredSystemEventHandlerT.cs" />
     <Compile Include="Delegates\FlexibleEventFilter.cs" />
     <Compile Include="Delegates\IEventFilter.cs" />
     <Compile Include="Delegates\IFilteredEventHandler.cs" />

@@ -15,34 +15,26 @@ namespace Zyan.Communication.Delegates
 		/// Creates filtered event handler of type EventHandler{TEventArgs}.
 		/// </summary>
 		/// <typeparam name="TEventArgs">The type of the event args.</typeparam>
-		/// <typeparam name="TEventFilter">The type of the event filter.</typeparam>
 		/// <param name="eventHandler">The event handler.</param>
 		/// <param name="eventFilter">The event filter.</param>
 		/// <param name="filterLocally">Whether the filter should also work when used locally.</param>
-		public static EventHandler<TEventArgs> Create<TEventArgs, TEventFilter>(EventHandler<TEventArgs> eventHandler, TEventFilter eventFilter, bool filterLocally = true)
+		public static EventHandler<TEventArgs> Create<TEventArgs>(EventHandler<TEventArgs> eventHandler, IEventFilter eventFilter, bool filterLocally = true)
 			where TEventArgs : EventArgs
-			where TEventFilter : IEventFilter
 		{
 			// convert to EventHandler<TEventArgs> implicitly
-			return new FilteredEventHandler<TEventArgs>(eventHandler, eventFilter, filterLocally);
+			return new FilteredSystemEventHandler<TEventArgs>(eventHandler, eventFilter, filterLocally);
 		}
 
 		/// <summary>
 		/// Creates filtered event handler of type EventHandler.
 		/// </summary>
-		/// <typeparam name="TEventFilter">The type of the event filter.</typeparam>
 		/// <param name="eventHandler">The event handler.</param>
 		/// <param name="eventFilter">The event filter.</param>
 		/// <param name="filterLocally">Whether the filter should also work when used locally.</param>
-		public static EventHandler Create<TEventFilter>(EventHandler eventHandler, TEventFilter eventFilter, bool filterLocally = true)
-			where TEventFilter : IEventFilter
+		public static EventHandler Create(EventHandler eventHandler, IEventFilter eventFilter, bool filterLocally = true)
 		{
-			// convert to EventHandler<EventArgs> explicitly
-			var typedEventHandler = Delegate.CreateDelegate(typeof(EventHandler<EventArgs>), eventHandler.Target, eventHandler.Method) as EventHandler<EventArgs>;
-			var filteredEventHandler = new FilteredEventHandler<EventArgs>(typedEventHandler, eventFilter, filterLocally);
-
-			// convert back to EventHandler
-			return new EventHandler(filteredEventHandler.Invoke);
+			// convert to EventHandler implicitly
+			return new FilteredSystemEventHandler(eventHandler, eventFilter, filterLocally);
 		}
 
 		/// <summary>
@@ -67,20 +59,18 @@ namespace Zyan.Communication.Delegates
 		public static EventHandler<TEventArgs> Create<TEventArgs>(EventHandler<TEventArgs> eventHandler, Expression<Func<object, TEventArgs, bool>> expression, bool filterLocally)
 			where TEventArgs : EventArgs
 		{
-			return new FilteredEventHandler<TEventArgs>(eventHandler, new FlexibleEventFilter<TEventArgs>(expression), filterLocally);
+			return new FilteredSystemEventHandler<TEventArgs>(eventHandler, new FlexibleEventFilter<TEventArgs>(expression), filterLocally);
 		}
 
 		/// <summary>
 		/// Creates filtered event handler of type EventHandler{TEventArgs}.
 		/// </summary>
 		/// <typeparam name="TEventArgs">The type of the event arguments.</typeparam>
-		/// <typeparam name="TEventFilter">The type of the event filter.</typeparam>
 		/// <param name="eventHandler">The event handler.</param>
 		/// <param name="eventFilter">The event filter.</param>
 		/// <param name="filterLocally">Whether the filter should also work when used locally.</param>
-		public static EventHandler<TEventArgs> AddFilter<TEventArgs, TEventFilter>(this EventHandler<TEventArgs> eventHandler, TEventFilter eventFilter, bool filterLocally = true)
+		public static EventHandler<TEventArgs> AddFilter<TEventArgs>(this EventHandler<TEventArgs> eventHandler, IEventFilter eventFilter, bool filterLocally = true)
 			where TEventArgs : EventArgs
-			where TEventFilter : IEventFilter
 		{
 			return Create(eventHandler, eventFilter, filterLocally);
 		}
@@ -88,12 +78,10 @@ namespace Zyan.Communication.Delegates
 		/// <summary>
 		/// Creates filtered event handler of type EventHandler.
 		/// </summary>
-		/// <typeparam name="TEventFilter">The type of the event filter.</typeparam>
 		/// <param name="eventHandler">The event handler.</param>
 		/// <param name="eventFilter">The event filter.</param>
 		/// <param name="filterLocally">Whether the filter should also work when used locally.</param>
-		public static EventHandler AddFilter<TEventFilter>(this EventHandler eventHandler, TEventFilter eventFilter, bool filterLocally = true)
-			where TEventFilter : IEventFilter
+		public static EventHandler AddFilter(this EventHandler eventHandler, IEventFilter eventFilter, bool filterLocally = true)
 		{
 			return Create(eventHandler, eventFilter, filterLocally);
 		}
