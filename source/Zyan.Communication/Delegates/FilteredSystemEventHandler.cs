@@ -6,18 +6,17 @@ using System.Text;
 namespace Zyan.Communication.Delegates
 {
 	/// <summary>
-	/// Represents filtered event handler of type EventHandler{TEventArgs}.
+	/// Represents filtered event handler of type System.EventHandler.
 	/// </summary>
-	/// <typeparam name="TEventArgs">The type of the event args.</typeparam>
-	internal class FilteredEventHandler<TEventArgs> : IFilteredEventHandler where TEventArgs : EventArgs
+	internal class FilteredSystemEventHandler : IFilteredEventHandler
 	{
 		/// <summary>
-		/// Initializes a new instance of the <see cref="FilteredEventHandler&lt;TEventArgs&gt;"/> class.
+		/// Initializes a new instance of the <see cref="FilteredSystemEventHandler"/> class.
 		/// </summary>
 		/// <param name="eventHandler">The event handler.</param>
 		/// <param name="eventFilter">The event filter.</param>
 		/// <param name="filterLocally">Whether the filter should also work when used locally.</param>
-		public FilteredEventHandler(EventHandler<TEventArgs> eventHandler, IEventFilter eventFilter, bool filterLocally)
+		public FilteredSystemEventHandler(EventHandler eventHandler, IEventFilter eventFilter, bool filterLocally)
 		{
 			IEventFilter sourceFilter;
 			ExtractSourceHandler(eventHandler, out eventHandler, out sourceFilter);
@@ -27,7 +26,7 @@ namespace Zyan.Communication.Delegates
 			FilterLocally = filterLocally;
 		}
 
-		private void ExtractSourceHandler(EventHandler<TEventArgs> eventHandler, out EventHandler<TEventArgs> sourceHandler, out IEventFilter sourceFilter)
+		private void ExtractSourceHandler(EventHandler eventHandler, out EventHandler sourceHandler, out IEventFilter sourceFilter)
 		{
 			sourceHandler = eventHandler;
 			sourceFilter = default(IEventFilter);
@@ -35,12 +34,12 @@ namespace Zyan.Communication.Delegates
 			while (sourceHandler.Target is IFilteredEventHandler)
 			{
 				var filtered = sourceHandler.Target as IFilteredEventHandler;
-				sourceHandler = filtered.EventHandler as EventHandler<TEventArgs>;
+				sourceHandler = filtered.EventHandler as EventHandler;
 				sourceFilter = filtered.EventFilter.Combine(sourceFilter);
 			}
 		}
 
-		internal void Invoke(object sender, TEventArgs args)
+		private void Invoke(object sender, EventArgs args)
 		{
 			if (FilterLocally)
 			{
@@ -61,7 +60,7 @@ namespace Zyan.Communication.Delegates
 		/// <summary>
 		/// Gets the event handler.
 		/// </summary>
-		public EventHandler<TEventArgs> EventHandler { get; private set; }
+		public EventHandler EventHandler { get; private set; }
 
 		/// <summary>
 		/// Gets the event filter.
@@ -69,14 +68,14 @@ namespace Zyan.Communication.Delegates
 		public IEventFilter EventFilter { get; private set; }
 
 		/// <summary>
-		/// Performs an implicit conversion from <see cref="Zyan.Communication.Delegates.FilteredEventHandler&lt;TEventArgs&gt;"/>
-		/// to <see cref="System.EventHandler&lt;TEventArgs&gt;"/>.
+		/// Performs an implicit conversion from <see cref="Zyan.Communication.Delegates.FilteredSystemEventHandler"/>
+		/// to <see cref="System.EventHandler"/>.
 		/// </summary>
 		/// <param name="filteredEventHandler">The filtered event handler.</param>
 		/// <returns>
 		/// The result of the conversion.
 		/// </returns>
-		public static implicit operator EventHandler<TEventArgs>(FilteredEventHandler<TEventArgs> filteredEventHandler)
+		public static implicit operator EventHandler(FilteredSystemEventHandler filteredEventHandler)
 		{
 			return filteredEventHandler.Invoke;
 		}

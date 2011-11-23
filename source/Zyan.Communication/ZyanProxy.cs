@@ -187,8 +187,12 @@ namespace Zyan.Communication
 					typeof(Delegate).IsAssignableFrom(methodCallMessage.Args[0].GetType()) &&
 					(methodCallMessage.MethodName.StartsWith("remove_")))
 				{
-					object inputMessage = methodCallMessage.GetArg(0);
 					string propertyName = methodCallMessage.MethodName.Substring(7);
+					var inputMessage = methodCallMessage.GetArg(0) as Delegate;
+					var eventFilter = default(IEventFilter);
+
+					// Detach event filter, if it is attached
+					ExtractEventHandlerDetails(ref inputMessage, ref eventFilter);
 
 					if (_delegateCorrelationSet.Count > 0)
 					{
