@@ -282,19 +282,24 @@ namespace Zyan.Communication
 				return;
 			}
 
-			// handle special case: session-bound events
-			var parameters = eventHandler.Method.GetParameters();
-			if (parameters.Length == 2 && typeof(SessionEventArgs).IsAssignableFrom(parameters[1].ParameterType))
-			{
-				eventFilter = new SessionEventFilter(_sessionID);
-			}
-
-			// handle event filters, if any
+			// handle attached event filters, if any
 			if (eventHandler.Target is IFilteredEventHandler)
 			{
 				var filtered = eventHandler.Target as IFilteredEventHandler;
 				eventHandler = filtered.EventHandler;
-				eventFilter = filtered.EventFilter.Combine(eventFilter);
+				eventFilter = filtered.EventFilter;
+			}
+
+			// handle special case: session-bound events
+			var parameters = eventHandler.Method.GetParameters();
+			if (parameters.Length == 2 && typeof(SessionEventArgs).IsAssignableFrom(parameters[1].ParameterType))
+			{
+				// if SessionEventFilter is already attached, do not create a new filter
+				if (eventFilter == null || !eventFilter.Contains<SessionEventFilter>())
+				{
+					var sessionFilter = new SessionEventFilter(_sessionID);
+					eventFilter = sessionFilter.Combine(eventFilter);
+				}
 			}
 		}
 

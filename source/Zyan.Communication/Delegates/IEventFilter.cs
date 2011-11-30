@@ -18,5 +18,11 @@ namespace Zyan.Communication.Delegates
 		///   <c>true</c> if invocation is allowed; otherwise, <c>false</c>.
 		/// </returns>
 		bool AllowInvocation(params object[] parameters);
+
+		/// <summary>
+		/// Determines whether this filter contains nested event filter of the given type.
+		/// </summary>
+		/// <typeparam name="TEventFilter">Event filter type.</typeparam>
+		bool Contains<TEventFilter>() where TEventFilter : IEventFilter;
 	}
 }
