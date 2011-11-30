@@ -204,6 +204,11 @@ namespace Zyan.Tests
 				var text = string.Format("{0}{1}", parameters);
 				return Templates.Contains(text);
 			}
+
+			public bool Contains<TEventFilter>() where TEventFilter : IEventFilter
+			{
+				return this is TEventFilter;
+			}
 		}
 
 		#endregion
@@ -392,6 +397,45 @@ namespace Zyan.Tests
 				proxy2.RaiseCustomSessionBoundEvent(321);
 				Assert.AreEqual(123, handled1);
 				Assert.AreEqual(321, handled2);
+			}
+		}
+
+		[TestMethod]
+		public void EventsWithArgumentsDerivedFromSessionBoundEvents_CanListenToOtherSessions()
+		{
+			var ipcProtocol = new IpcBinaryClientProtocolSetup();
+
+			// start two new sessions
+			using (var conn2 = new ZyanConnection(ZyanConnection.ServerUrl, ipcProtocol))
+			using (var conn3 = new ZyanConnection(ZyanConnection.ServerUrl, ipcProtocol))
+			{
+				var proxy1 = ZyanConnection.CreateProxy<ISampleServer>();
+				var proxy2 = conn2.CreateProxy<ISampleServer>();
+				var proxy3 = conn3.CreateProxy<ISampleServer>();
+				var sessions13 = new[] { ZyanConnection.SessionID, conn3.SessionID }; // session2 is not included
+
+				var handled1 = 0;
+				var handled2 = 0;
+				var handled3 = 0;
+
+				proxy1.CustomSessionBoundEvent += (s, args) => handled1 = args.Value;
+				proxy2.CustomSessionBoundEvent += FilteredEventHandler.Create<CustomEventArgs>((s, args) => handled2 = args.Value, new SessionEventFilter(sessions13));
+				proxy3.CustomSessionBoundEvent += (s, args) => handled3 = args.Value;
+
+				proxy1.RaiseCustomSessionBoundEvent(123);
+				Assert.AreEqual(123, handled1);
+				Assert.AreEqual(123, handled2); // proxy2 receives event from session1
+				Assert.AreEqual(0, handled3);
+
+				proxy2.RaiseCustomSessionBoundEvent(321);
+				Assert.AreEqual(123, handled1);
+				Assert.AreEqual(123, handled2); // proxy2 doesn't receive events from session2
+				Assert.AreEqual(0, handled3);
+
+				proxy3.RaiseCustomSessionBoundEvent(111);
+				Assert.AreEqual(123, handled1);
+				Assert.AreEqual(111, handled2); // proxy2 receives event from session3
+				Assert.AreEqual(111, handled3);
 			}
 		}
 
