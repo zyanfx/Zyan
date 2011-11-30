@@ -37,7 +37,7 @@ namespace Zyan.Communication
 		private IChannel _remotingChannel = null;
 
 		// List of created proxies
-		private List<WeakReference> _proxies; 
+		private List<WeakReference> _proxies;
 
 		/// <summary>
 		/// Gets the URL of the remote server.
@@ -260,6 +260,11 @@ namespace Zyan.Communication
 			{ }
 		}
 
+		/// <summary>
+		/// Gets the session ID.
+		/// </summary>
+		public Guid SessionID { get { return _sessionID; } }
+
 		#endregion
 
 		#region Accessing remote components
@@ -430,7 +435,7 @@ namespace Zyan.Communication
 
 		#endregion
 
-		#region Notification (old NotificationService feature) 
+		#region Notification (old NotificationService feature)
 
 		// Repository for event subscriptions (NotficationService)
 		private volatile Dictionary<Guid, NotificationReceiver> _subscriptions = null;
@@ -589,7 +594,7 @@ namespace Zyan.Communication
 					var registeredChannel = ChannelServices.GetChannel(_remotingChannel.ChannelName);
 
 					if (registeredChannel != null)
-					{ 
+					{
 						if (registeredChannel==_remotingChannel)
 							ChannelServices.UnregisterChannel(_remotingChannel);
 					}
@@ -678,7 +683,7 @@ namespace Zyan.Communication
 		public bool PollingEnabled
 		{
 			get { return _pollingEnabled; }
-			set 
+			set
 			{
 				if (value != _pollingEnabled)
 				{
@@ -698,7 +703,7 @@ namespace Zyan.Communication
 		{
 			get { return _pollingInterval; }
 			set
-			{ 
+			{
 				_pollingInterval=value;
 				StartPollingTimer();
 			}
@@ -737,8 +742,8 @@ namespace Zyan.Communication
 				PollingEnabled = false;
 				bool problemSolved = false;
 
-				DisconnectedEventArgs e = new DisconnectedEventArgs() 
-				{ 
+				DisconnectedEventArgs e = new DisconnectedEventArgs()
+				{
 					Exception=ex,
 					RetryCount=0,
 					Retry=false

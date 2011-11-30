@@ -14,19 +14,19 @@ namespace Zyan.Communication.Delegates
 		/// <summary>
 		/// Initializes a new instance of the <see cref="SessionEventFilter"/> class.
 		/// </summary>
-		/// <param name="sessionId">Session identity.</param>
-		public SessionEventFilter(Guid sessionId)
+		/// <param name="sessions">Allowed session identities.</param>
+		public SessionEventFilter(params Guid[] sessions)
 		{
-			SessionID = sessionId;
+			Sessions = new HashSet<Guid>(sessions ?? Enumerable.Empty<Guid>());
 		}
 
 		/// <summary>
-		/// Gets the session identity for this event filter.
+		/// Gets the session identity set for this event filter.
 		/// </summary>
-		public Guid SessionID { get; private set; }
+		public ISet<Guid> Sessions { get; private set; }
 
 		/// <summary>
-		/// Returns true if <see cref="SessionEventArgs"/> has the same session identity as the current server session.
+		/// Returns true if <see cref="SessionEventArgs"/> is allowed to pass through the filter.
 		/// </summary>
 		/// <param name="sender">Event sender.</param>
 		/// <param name="args">The <see cref="Zyan.Communication.Delegates.SessionEventArgs"/> instance containing the event data.</param>
@@ -41,8 +41,8 @@ namespace Zyan.Communication.Delegates
 				return true;
 			}
 
-			// compare session id
-			return args.SessionID == SessionID;
+			// validate session id
+			return Sessions.Contains(args.SessionID);
 		}
 	}
 }

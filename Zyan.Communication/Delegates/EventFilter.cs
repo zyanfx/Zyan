@@ -56,6 +56,11 @@ namespace Zyan.Communication.Delegates
 
 				return true;
 			}
+
+			public bool Contains<TEventFilter>() where TEventFilter : IEventFilter
+			{
+				return EventFilters.Any(ef => ef.Contains<TEventFilter>());
+			}
 		}
 	}
 }
