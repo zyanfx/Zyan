@@ -194,6 +194,7 @@
       <DependentUpon>LanguageResource.resx</DependentUpon>
     </Compile>
     <Compile Include="LoginEventArgs.cs" />
+    <Compile Include="NewLogonNeededEventArgs.cs" />
     <Compile Include="Notification\NotificationEventArgs.cs" />
     <Compile Include="Notification\NotificationReceiver.cs" />
     <Compile Include="Notification\NotificationSender.cs" />
