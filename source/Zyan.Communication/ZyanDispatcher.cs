@@ -481,10 +481,10 @@ namespace Zyan.Communication
 
 				Invoke_ApplyCustomSerializationOnReturnValue(details);
 			}
-			catch (Exception ex)
-			{
-				Invoke_FireInvokeCanceledEvent(details, ex);
-			}
+            catch (Exception ex)
+            {
+                Invoke_FireInvokeCanceledEvent(details, ex);
+            }
 			finally
 			{
 				Invoke_CompleteTransactionScope(details);
@@ -624,6 +624,19 @@ namespace Zyan.Communication
 				_host.OnClientLoggedOn(new LoginEventArgs(LoginEventType.Logon, session.Identity, session.ClientAddress, session.Timestamp));
 			}
 		}
+
+        /// <summary>
+        /// Returns true, if a specified Session ID is valid, otherwis false.
+        /// </summary>
+        /// <param name="sessionID">Session ID to check</param>
+        /// <returns>Session check result</returns>
+        public bool ExistSession(Guid sessionID)
+        {
+            if (sessionID == Guid.Empty)
+                throw new ArgumentException(LanguageResource.ArgumentException_EmptySessionIDIsNotAllowed, "sessionID");
+
+            return _host.SessionManager.ExistSession(sessionID);
+        }
 
 		/// <summary>
 		/// Process logoff.

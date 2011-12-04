@@ -44,6 +44,13 @@ namespace Zyan.Communication
 		/// <param name="sessionID">Unique session key</param>
 		void Logoff(Guid sessionID);
 
+        /// <summary>
+        /// Returns true, if a specified Session ID is valid, otherwis false.
+        /// </summary>
+        /// <param name="sessionID">Session ID to check</param>
+        /// <returns>Session check result</returns>
+        bool ExistSession(Guid sessionID);
+
 		/// <summary>
 		/// Subscribe to a specified NotificationService event.
 		/// </summary>
