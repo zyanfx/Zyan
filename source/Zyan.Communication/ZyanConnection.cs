@@ -666,7 +666,7 @@ namespace Zyan.Communication
 		/// Event: Fired when disconnected.
 		/// </summary>
 		public event EventHandler<DisconnectedEventArgs> Disconnected;
-
+        
 		/// <summary>
 		/// Fires the Disconnected event.
 		/// </summary>
@@ -676,6 +676,26 @@ namespace Zyan.Communication
 			if (Disconnected!=null)
 				Disconnected(this,e);
 		}
+
+        /// <summary>
+        /// Event: Fired when a new logon is needed, after a detected diconnection.
+        /// </summary>
+        public event EventHandler<NewLogonNeededEventArgs> NewLogonNeeded;
+
+        /// <summary>
+        /// Fires the NewLogonNeeded event.
+        /// </summary>
+        /// <param name="e">Event arguments</param>
+        /// <returns>True, if the event is handled, otherwis false</returns>
+        protected virtual bool OnNewLogonNeeded(NewLogonNeededEventArgs e)
+        {
+            if (NewLogonNeeded != null)
+            {
+                NewLogonNeeded(this, e);
+                return true;
+            }
+            return false;
+        }
 
 		/// <summary>
 		/// Gets whether polling is enabled.
@@ -731,7 +751,7 @@ namespace Zyan.Communication
 		/// Will be called from polling timer on ervery interval.
 		/// </summary>
 		/// <param name="state">State (not used)</param>
-		private void SendHeartbeat(object state)
+		internal void SendHeartbeat(object state)
 		{
 			try
 			{
@@ -759,8 +779,7 @@ namespace Zyan.Communication
 
 					try
 					{
-						RemoteDispatcher.ReceiveClientHeartbeat(_sessionID);
-						problemSolved = true;
+                        problemSolved = InternalReconnect();
 					}
 					catch (Exception retryEx)
 					{
@@ -775,6 +794,109 @@ namespace Zyan.Communication
 					Dispose();
 			}
 		}
+
+        /// <summary>
+        /// Reestablish connection to server.
+        /// </summary>        
+        /// <remarks>
+        /// This method checks if the session is valid. If not, a new logon in perfomed automatically.
+        /// Handle the NewLogonNeeded event to provide credentials.
+        /// </remarks>
+        /// <returns>True, if reconnecting was successfull, otherwis false </returns>
+        public bool Reconnect()
+        {
+            try
+            {
+                return InternalReconnect();
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Reestablish connection to server.
+        /// </summary>        
+        /// <remarks>
+        /// This method checks if the session is valid. If not, a new logon in perfomed automatically.
+        /// Handle the NewLogonNeeded event to provide credentials.
+        /// </remarks>
+        /// <returns>True, if reconnecting was successfull, otherwis false </returns>
+        internal bool InternalReconnect()
+        {   
+            // When the session isn´t valid, the server process must have been restarted
+            if (!RemoteDispatcher.ExistSession(_sessionID))
+            {
+                Hashtable credentials = null;
+                bool performNewLogon = true;
+
+                // If cached auto login credentials are present
+                if (_autoLoginOnExpiredSession)
+                    credentials = _autoLoginCredentials;
+                else
+                {
+                    var newLogonNeededEventArgs = new NewLogonNeededEventArgs();
+                    if (OnNewLogonNeeded(newLogonNeededEventArgs))
+                    {
+                        performNewLogon = !newLogonNeededEventArgs.Cancel;
+                        credentials = newLogonNeededEventArgs.Credentials;
+                    }
+                    else
+                        performNewLogon = false;
+                }
+                if (performNewLogon)
+                {
+                    RemoteDispatcher.Logon(_sessionID, credentials);
+                    ReconnectRemoteEvents();
+
+                    RemoteDispatcher.ReceiveClientHeartbeat(_sessionID);
+                    return true;
+                }
+            }
+            else
+            {
+                RemoteDispatcher.ReceiveClientHeartbeat(_sessionID);
+                return true;
+            }                     
+            return false;
+        }
+
+        /// <summary>
+        /// Reconnects to all remote events or delegates of any know proxy for this connection, after a server restart.
+        /// <remarks>
+        /// Caution! This method does not check, if the event handler registrations are truly lost (caused by a server restart).
+        /// </remarks>
+        /// </summary>
+        private void ReconnectRemoteEvents()
+        {
+            foreach (var proxyRef in _proxies)
+            {
+                if (proxyRef.IsAlive)
+                {
+                    var proxy = proxyRef.Target as ZyanProxy;
+                    proxy.ReconnectRemoteEvents();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets true, if the session on server is valid, otherwise false.
+        /// </summary>
+        public bool IsSessionValid
+        {
+            get
+            {
+                try
+                {
+                    return RemoteDispatcher.ExistSession(_sessionID);
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
 
 		#endregion
 	}
