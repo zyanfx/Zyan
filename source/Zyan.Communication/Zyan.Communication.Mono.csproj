@@ -94,6 +94,7 @@
     <Compile Include="ISerializationHandler.cs" />
     <Compile Include="IZyanDispatcher.cs" />
     <Compile Include="LoginEventArgs.cs" />
+    <Compile Include="NewLogonNeededEventArgs.cs" />
     <Compile Include="Protocols\Versioning.cs" />
     <Compile Include="SerializationHandlerRepository.cs" />
     <Compile Include="ServerSession.cs" />

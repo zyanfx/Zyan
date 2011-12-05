@@ -22,6 +22,9 @@ namespace Zyan.Examples.MiniChat.Server
             
             using (ZyanComponentHost host = new ZyanComponentHost("MiniChat",protocol))
             {
+                host.PollingEventTracingEnabled = true;
+                host.ClientHeartbeatReceived += new EventHandler<ClientHeartbeatEventArgs>(host_ClientHeartbeatReceived);
+
                 host.RegisterComponent<IMiniChat, MiniChat>(ActivationType.Singleton);
 
                 host.ClientLoggedOn += new EventHandler<LoginEventArgs>((sender, e) => 
@@ -38,6 +41,11 @@ namespace Zyan.Examples.MiniChat.Server
                 Console.WriteLine("Chat server started. Press Enter to exit.");
                 Console.ReadLine();
             }
+        }
+
+        static void host_ClientHeartbeatReceived(object sender, ClientHeartbeatEventArgs e)
+        {
+            Console.WriteLine(string.Format("{0}: Received heartbeat from session {1}.", e.HeartbeatReceiveTime.ToString(), e.SessionID.ToString()));
         }
     }
 }
