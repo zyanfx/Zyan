@@ -8,7 +8,7 @@ using Zyan.Communication.Delegates;
 namespace Zyan.Communication
 {
 	/// <summary>
-	/// Schnittstelle für Fabriken zur Produktion verteilbarer Komponenten. 
+	/// Schnittstelle für Fabriken zur Produktion verteilbarer Komponenten.
 	/// </summary>
 	public interface IZyanDispatcher
 	{
@@ -44,12 +44,12 @@ namespace Zyan.Communication
 		/// <param name="sessionID">Unique session key</param>
 		void Logoff(Guid sessionID);
 
-        /// <summary>
-        /// Returns true, if a specified Session ID is valid, otherwis false.
-        /// </summary>
-        /// <param name="sessionID">Session ID to check</param>
-        /// <returns>Session check result</returns>
-        bool ExistSession(Guid sessionID);
+		/// <summary>
+		/// Returns true, if a specified Session ID is valid, otherwis false.
+		/// </summary>
+		/// <param name="sessionID">Session ID to check</param>
+		/// <returns>Session check result</returns>
+		bool ExistSession(Guid sessionID);
 
 		/// <summary>
 		/// Subscribe to a specified NotificationService event.

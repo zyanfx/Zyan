@@ -23,7 +23,7 @@ namespace Zyan.Communication.Delegates
 		/// <summary>
 		/// Gets the session identity set for this event filter.
 		/// </summary>
-		public ISet<Guid> Sessions { get; private set; }
+		public HashSet<Guid> Sessions { get; private set; }
 
 		/// <summary>
 		/// Returns true if <see cref="SessionEventArgs"/> is allowed to pass through the filter.

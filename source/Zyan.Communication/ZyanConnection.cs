@@ -144,7 +144,7 @@ namespace Zyan.Communication
 				var registeredChannel = ChannelServices.GetChannel(_remotingChannel.ChannelName);
 
 				if (registeredChannel == null)
-					ChannelServices.RegisterChannel(_remotingChannel, false);				
+					ChannelServices.RegisterChannel(_remotingChannel, false);
 			}
 			else
 				throw new ApplicationException(LanguageResource.ApplicationException_NoChannelCreated);
@@ -152,7 +152,7 @@ namespace Zyan.Communication
 			string channelName = _remotingChannel.ChannelName;
 
 			_subscriptions = new Dictionary<Guid, NotificationReceiver>();
-			
+
 			if (credentials != null && credentials.Count == 0)
 				credentials = null;
 
@@ -169,7 +169,7 @@ namespace Zyan.Communication
 
 				if (registeredChannel != null)
 					ChannelServices.UnregisterChannel(registeredChannel);
-				
+
 				throw ex;
 			}
 			StartKeepSessionAliveTimer();
@@ -329,10 +329,10 @@ namespace Zyan.Communication
 				throw new ApplicationException(string.Format("Für Schnittstelle '{0}' ist auf dem Server '{1}' keine Komponente registriert.", interfaceType.FullName, _serverUrl));
 
 			ZyanProxy proxy = new ZyanProxy(info.UniqueName, typeof(T), this, implicitTransactionTransfer, _sessionID, _componentHostName, _autoLoginOnExpiredSession, _autoLoginCredentials, info.ActivationType);
-			
+
 			WeakReference proxyReference = new WeakReference(proxy);
 			_proxies.Add(proxyReference);
-			
+
 			return (T)proxy.GetTransparentProxy();
 		}
 
@@ -348,7 +348,7 @@ namespace Zyan.Communication
 			{
 				if (_remoteDispatcher == null)
 					_remoteDispatcher = (IZyanDispatcher)Activator.GetObject(typeof(IZyanDispatcher), _serverUrl);
-				
+
 				return _remoteDispatcher;
 			}
 		}
@@ -449,7 +449,7 @@ namespace Zyan.Communication
 		/// <param name="eventName">Event name</param>
 		/// <param name="handler">Client side event handler</param>
 		/// <returns>Unique subscription ID</returns>
-		[Obsolete("The NotificationService feature may not be supported in future Zyan versions. Please use remote delegates to create your notification system.",false)]
+		[Obsolete("The NotificationService feature may not be supported in future Zyan versions. Please use remote delegates to create your notification system.", false)]
 		public Guid SubscribeEvent(string eventName, EventHandler<NotificationEventArgs> handler)
 		{
 			NotificationReceiver receiver = new NotificationReceiver(eventName, handler);
@@ -558,7 +558,7 @@ namespace Zyan.Communication
 					_pollingTimer = null;
 				}
 				_pollingEnabled = false;
-				
+
 				if (_keepSessionAliveTimer != null)
 				{
 					_keepSessionAliveTimer.Dispose();
@@ -595,7 +595,7 @@ namespace Zyan.Communication
 
 					if (registeredChannel != null)
 					{
-						if (registeredChannel==_remotingChannel)
+						if (registeredChannel == _remotingChannel)
 							ChannelServices.UnregisterChannel(_remotingChannel);
 					}
 					_remotingChannel = null;
@@ -666,36 +666,36 @@ namespace Zyan.Communication
 		/// Event: Fired when disconnected.
 		/// </summary>
 		public event EventHandler<DisconnectedEventArgs> Disconnected;
-        
+
 		/// <summary>
 		/// Fires the Disconnected event.
 		/// </summary>
 		/// <param name="e">Event arguments</param>
 		protected virtual void OnDisconnected(DisconnectedEventArgs e)
 		{
-			if (Disconnected!=null)
-				Disconnected(this,e);
+			if (Disconnected != null)
+				Disconnected(this, e);
 		}
 
-        /// <summary>
-        /// Event: Fired when a new logon is needed, after a detected diconnection.
-        /// </summary>
-        public event EventHandler<NewLogonNeededEventArgs> NewLogonNeeded;
+		/// <summary>
+		/// Event: Fired when a new logon is needed, after a detected diconnection.
+		/// </summary>
+		public event EventHandler<NewLogonNeededEventArgs> NewLogonNeeded;
 
-        /// <summary>
-        /// Fires the NewLogonNeeded event.
-        /// </summary>
-        /// <param name="e">Event arguments</param>
-        /// <returns>True, if the event is handled, otherwis false</returns>
-        protected virtual bool OnNewLogonNeeded(NewLogonNeededEventArgs e)
-        {
-            if (NewLogonNeeded != null)
-            {
-                NewLogonNeeded(this, e);
-                return true;
-            }
-            return false;
-        }
+		/// <summary>
+		/// Fires the NewLogonNeeded event.
+		/// </summary>
+		/// <param name="e">Event arguments</param>
+		/// <returns>True, if the event is handled, otherwis false</returns>
+		protected virtual bool OnNewLogonNeeded(NewLogonNeededEventArgs e)
+		{
+			if (NewLogonNeeded != null)
+			{
+				NewLogonNeeded(this, e);
+				return true;
+			}
+			return false;
+		}
 
 		/// <summary>
 		/// Gets whether polling is enabled.
@@ -724,7 +724,7 @@ namespace Zyan.Communication
 			get { return _pollingInterval; }
 			set
 			{
-				_pollingInterval=value;
+				_pollingInterval = value;
 				StartPollingTimer();
 			}
 		}
@@ -755,7 +755,7 @@ namespace Zyan.Communication
 		{
 			try
 			{
-				RemoteDispatcher.ReceiveClientHeartbeat(_sessionID);	
+				RemoteDispatcher.ReceiveClientHeartbeat(_sessionID);
 			}
 			catch (Exception ex)
 			{
@@ -764,9 +764,9 @@ namespace Zyan.Communication
 
 				DisconnectedEventArgs e = new DisconnectedEventArgs()
 				{
-					Exception=ex,
-					RetryCount=0,
-					Retry=false
+					Exception = ex,
+					RetryCount = 0,
+					Retry = false
 				};
 
 				OnDisconnected(e);
@@ -779,7 +779,7 @@ namespace Zyan.Communication
 
 					try
 					{
-                        problemSolved = InternalReconnect();
+						problemSolved = InternalReconnect();
 					}
 					catch (Exception retryEx)
 					{
@@ -795,108 +795,108 @@ namespace Zyan.Communication
 			}
 		}
 
-        /// <summary>
-        /// Reestablish connection to server.
-        /// </summary>        
-        /// <remarks>
-        /// This method checks if the session is valid. If not, a new logon in perfomed automatically.
-        /// Handle the NewLogonNeeded event to provide credentials.
-        /// </remarks>
-        /// <returns>True, if reconnecting was successfull, otherwis false </returns>
-        public bool Reconnect()
-        {
-            try
-            {
-                return InternalReconnect();
-            }
-            catch
-            {
-                return false;
-            }
-        }
+		/// <summary>
+		/// Reestablish connection to server.
+		/// </summary>
+		/// <remarks>
+		/// This method checks if the session is valid. If not, a new logon in perfomed automatically.
+		/// Handle the NewLogonNeeded event to provide credentials.
+		/// </remarks>
+		/// <returns>True, if reconnecting was successfull, otherwis false </returns>
+		public bool Reconnect()
+		{
+			try
+			{
+				return InternalReconnect();
+			}
+			catch
+			{
+				return false;
+			}
+		}
 
-        /// <summary>
-        /// Reestablish connection to server.
-        /// </summary>        
-        /// <remarks>
-        /// This method checks if the session is valid. If not, a new logon in perfomed automatically.
-        /// Handle the NewLogonNeeded event to provide credentials.
-        /// </remarks>
-        /// <returns>True, if reconnecting was successfull, otherwis false </returns>
-        internal bool InternalReconnect()
-        {   
-            // When the session isn´t valid, the server process must have been restarted
-            if (!RemoteDispatcher.ExistSession(_sessionID))
-            {
-                Hashtable credentials = null;
-                bool performNewLogon = true;
+		/// <summary>
+		/// Reestablish connection to server.
+		/// </summary>
+		/// <remarks>
+		/// This method checks if the session is valid. If not, a new logon in perfomed automatically.
+		/// Handle the NewLogonNeeded event to provide credentials.
+		/// </remarks>
+		/// <returns>True, if reconnecting was successfull, otherwis false </returns>
+		internal bool InternalReconnect()
+		{
+			// When the session isn´t valid, the server process must have been restarted
+			if (!RemoteDispatcher.ExistSession(_sessionID))
+			{
+				Hashtable credentials = null;
+				bool performNewLogon = true;
 
-                // If cached auto login credentials are present
-                if (_autoLoginOnExpiredSession)
-                    credentials = _autoLoginCredentials;
-                else
-                {
-                    var newLogonNeededEventArgs = new NewLogonNeededEventArgs();
-                    if (OnNewLogonNeeded(newLogonNeededEventArgs))
-                    {
-                        performNewLogon = !newLogonNeededEventArgs.Cancel;
-                        credentials = newLogonNeededEventArgs.Credentials;
-                    }
-                    else
-                        performNewLogon = false;
-                }
-                if (performNewLogon)
-                {
-                    RemoteDispatcher.Logon(_sessionID, credentials);
-                    ReconnectRemoteEvents();
+				// If cached auto login credentials are present
+				if (_autoLoginOnExpiredSession)
+					credentials = _autoLoginCredentials;
+				else
+				{
+					var newLogonNeededEventArgs = new NewLogonNeededEventArgs();
+					if (OnNewLogonNeeded(newLogonNeededEventArgs))
+					{
+						performNewLogon = !newLogonNeededEventArgs.Cancel;
+						credentials = newLogonNeededEventArgs.Credentials;
+					}
+					else
+						performNewLogon = false;
+				}
+				if (performNewLogon)
+				{
+					RemoteDispatcher.Logon(_sessionID, credentials);
+					ReconnectRemoteEvents();
 
-                    RemoteDispatcher.ReceiveClientHeartbeat(_sessionID);
-                    return true;
-                }
-            }
-            else
-            {
-                RemoteDispatcher.ReceiveClientHeartbeat(_sessionID);
-                return true;
-            }                     
-            return false;
-        }
+					RemoteDispatcher.ReceiveClientHeartbeat(_sessionID);
+					return true;
+				}
+			}
+			else
+			{
+				RemoteDispatcher.ReceiveClientHeartbeat(_sessionID);
+				return true;
+			}
+			return false;
+		}
 
-        /// <summary>
-        /// Reconnects to all remote events or delegates of any know proxy for this connection, after a server restart.
-        /// <remarks>
-        /// Caution! This method does not check, if the event handler registrations are truly lost (caused by a server restart).
-        /// </remarks>
-        /// </summary>
-        private void ReconnectRemoteEvents()
-        {
-            foreach (var proxyRef in _proxies)
-            {
-                if (proxyRef.IsAlive)
-                {
-                    var proxy = proxyRef.Target as ZyanProxy;
-                    proxy.ReconnectRemoteEvents();
-                }
-            }
-        }
+		/// <summary>
+		/// Reconnects to all remote events or delegates of any know proxy for this connection, after a server restart.
+		/// <remarks>
+		/// Caution! This method does not check, if the event handler registrations are truly lost (caused by a server restart).
+		/// </remarks>
+		/// </summary>
+		private void ReconnectRemoteEvents()
+		{
+			foreach (var proxyRef in _proxies)
+			{
+				if (proxyRef.IsAlive)
+				{
+					var proxy = proxyRef.Target as ZyanProxy;
+					proxy.ReconnectRemoteEvents();
+				}
+			}
+		}
 
-        /// <summary>
-        /// Gets true, if the session on server is valid, otherwise false.
-        /// </summary>
-        public bool IsSessionValid
-        {
-            get
-            {
-                try
-                {
-                    return RemoteDispatcher.ExistSession(_sessionID);
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-        }
+		/// <summary>
+		/// Gets true, if the session on server is valid, otherwise false.
+		/// </summary>
+		public bool IsSessionValid
+		{
+			get
+			{
+				try
+				{
+					return RemoteDispatcher.ExistSession(_sessionID);
+				}
+				catch
+				{
+					return false;
+				}
+			}
+		}
 
 		#endregion
 	}
