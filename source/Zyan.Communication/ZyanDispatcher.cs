@@ -137,7 +137,7 @@ namespace Zyan.Communication
 				{
 					TrackingID = details.TrackingID,
 					InterfaceName = details.InterfaceName,
-					DelegateCorrelationSet =  details.DelegateCorrelationSet,
+					DelegateCorrelationSet = details.DelegateCorrelationSet,
 					MethodName = details.MethodName,
 					Arguments = details.Args,
 					Cancel = false
@@ -175,7 +175,7 @@ namespace Zyan.Communication
 				{
 					TrackingID = details.TrackingID,
 					InterfaceName = details.InterfaceName,
-					DelegateCorrelationSet =  details.DelegateCorrelationSet,
+					DelegateCorrelationSet = details.DelegateCorrelationSet,
 					MethodName = details.MethodName,
 					Arguments = details.Args,
 					ReturnValue = details.ReturnValue
@@ -422,10 +422,10 @@ namespace Zyan.Communication
 		{
 			if (details.Registration.ActivationType == ActivationType.SingleCall)
 			{
-				if (details.WiringList!=null)
+				if (details.WiringList != null)
 					RemoveClientServerWires(details.Type, details.Instance, details.DelegateCorrelationSet, details.WiringList);
 
-				if (details.Instance!=null)
+				if (details.Instance != null)
 					_host.ComponentCatalog.CleanUpComponentInstance(details.Registration, details.Instance);
 			}
 		}
@@ -481,10 +481,10 @@ namespace Zyan.Communication
 
 				Invoke_ApplyCustomSerializationOnReturnValue(details);
 			}
-            catch (Exception ex)
-            {
-                Invoke_FireInvokeCanceledEvent(details, ex);
-            }
+			catch (Exception ex)
+			{
+				Invoke_FireInvokeCanceledEvent(details, ex);
+			}
 			finally
 			{
 				Invoke_CompleteTransactionScope(details);
@@ -531,7 +531,7 @@ namespace Zyan.Communication
 
 			Invoke_SetSession(details);
 			Invoke_ResolveComponentInstance(details);
-			
+
 			var correlationSet = new List<DelegateCorrelationInfo>();
 			correlationSet.Add(correlation);
 
@@ -625,18 +625,18 @@ namespace Zyan.Communication
 			}
 		}
 
-        /// <summary>
-        /// Returns true, if a specified Session ID is valid, otherwis false.
-        /// </summary>
-        /// <param name="sessionID">Session ID to check</param>
-        /// <returns>Session check result</returns>
-        public bool ExistSession(Guid sessionID)
-        {
-            if (sessionID == Guid.Empty)
-                throw new ArgumentException(LanguageResource.ArgumentException_EmptySessionIDIsNotAllowed, "sessionID");
+		/// <summary>
+		/// Returns true, if a specified Session ID is valid, otherwis false.
+		/// </summary>
+		/// <param name="sessionID">Session ID to check</param>
+		/// <returns>Session check result</returns>
+		public bool ExistSession(Guid sessionID)
+		{
+			if (sessionID == Guid.Empty)
+				throw new ArgumentException(LanguageResource.ArgumentException_EmptySessionIDIsNotAllowed, "sessionID");
 
-            return _host.SessionManager.ExistSession(sessionID);
-        }
+			return _host.SessionManager.ExistSession(sessionID);
+		}
 
 		/// <summary>
 		/// Process logoff.
@@ -658,8 +658,8 @@ namespace Zyan.Communication
 			string clientIP = string.Empty;
 			IPAddress clientAddress = GetCallingClientIPAddress();
 
-			if (clientAddress!=null)
-				clientIP=clientAddress.ToString();
+			if (clientAddress != null)
+				clientIP = clientAddress.ToString();
 
 			try
 			{
@@ -783,8 +783,8 @@ namespace Zyan.Communication
 		/// <param name="e">Event arguments</param>
 		protected virtual void OnClientHeartbeatReceived(ClientHeartbeatEventArgs e)
 		{
-			if (ClientHeartbeatReceived!=null)
-				ThreadPool.QueueUserWorkItem(state  => ClientHeartbeatReceived(this,e));
+			if (ClientHeartbeatReceived != null)
+				ThreadPool.QueueUserWorkItem(state => ClientHeartbeatReceived(this, e));
 		}
 
 		/// <summary>
