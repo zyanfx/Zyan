@@ -132,178 +132,178 @@ namespace Zyan.Communication
 				{
 					return returnMessage;
 				}
-			}            
-            try
-            {
-                // Check for delegate parameters in properties and events
-                if (methodInfo.ReturnType.Equals(typeof(void)) &&
-                    methodCallMessage.InArgCount == 1 &&
-                    methodCallMessage.ArgCount == 1 &&
-                    methodCallMessage.Args[0] != null &&
-                    typeof(Delegate).IsAssignableFrom(methodCallMessage.Args[0].GetType()) &&
-                    (methodCallMessage.MethodName.StartsWith("set_") || methodCallMessage.MethodName.StartsWith("add_")))
-                {
-                    // Get client delegate
-                    var receiveMethodDelegate = methodCallMessage.GetArg(0) as Delegate;
-                    var eventFilter = default(IEventFilter);
+			}
+			try
+			{
+				// Check for delegate parameters in properties and events
+				if (methodInfo.ReturnType.Equals(typeof(void)) &&
+					methodCallMessage.InArgCount == 1 &&
+					methodCallMessage.ArgCount == 1 &&
+					methodCallMessage.Args[0] != null &&
+					typeof(Delegate).IsAssignableFrom(methodCallMessage.Args[0].GetType()) &&
+					(methodCallMessage.MethodName.StartsWith("set_") || methodCallMessage.MethodName.StartsWith("add_")))
+				{
+					// Get client delegate
+					var receiveMethodDelegate = methodCallMessage.GetArg(0) as Delegate;
+					var eventFilter = default(IEventFilter);
 
-                    // Get event filter, if it is attached
-                    ExtractEventHandlerDetails(ref receiveMethodDelegate, ref eventFilter);
+					// Get event filter, if it is attached
+					ExtractEventHandlerDetails(ref receiveMethodDelegate, ref eventFilter);
 
-                    // Trim "set_" or "add_" prefix
-                    string propertyName = methodCallMessage.MethodName.Substring(4);
+					// Trim "set_" or "add_" prefix
+					string propertyName = methodCallMessage.MethodName.Substring(4);
 
-                    // Create delegate correlation info
-                    DelegateInterceptor wiring = new DelegateInterceptor()
-                    {
-                        ClientDelegate = receiveMethodDelegate
-                    };
+					// Create delegate correlation info
+					DelegateInterceptor wiring = new DelegateInterceptor()
+					{
+						ClientDelegate = receiveMethodDelegate
+					};
 
-                    DelegateCorrelationInfo correlationInfo = new DelegateCorrelationInfo()
-                    {
-                        IsEvent = methodCallMessage.MethodName.StartsWith("add_"),
-                        DelegateMemberName = propertyName,
-                        ClientDelegateInterceptor = wiring,
-                        EventFilter = eventFilter
-                    };
+					DelegateCorrelationInfo correlationInfo = new DelegateCorrelationInfo()
+					{
+						IsEvent = methodCallMessage.MethodName.StartsWith("add_"),
+						DelegateMemberName = propertyName,
+						ClientDelegateInterceptor = wiring,
+						EventFilter = eventFilter
+					};
 
-                    AddRemoteEventHandler(correlationInfo);
+					AddRemoteEventHandler(correlationInfo);
 
-                    // Save delegate correlation info
-                    _delegateCorrelationSet.Add(correlationInfo);
+					// Save delegate correlation info
+					_delegateCorrelationSet.Add(correlationInfo);
 
-                    return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
-                }
-                else if (methodInfo.ReturnType.Equals(typeof(void)) &&
-                    methodCallMessage.InArgCount == 1 &&
-                    methodCallMessage.ArgCount == 1 &&
-                    methodCallMessage.Args[0] != null &&
-                    typeof(Delegate).IsAssignableFrom(methodCallMessage.Args[0].GetType()) &&
-                    (methodCallMessage.MethodName.StartsWith("remove_")))
-                {
-                    string propertyName = methodCallMessage.MethodName.Substring(7);
-                    var inputMessage = methodCallMessage.GetArg(0) as Delegate;
-                    var eventFilter = default(IEventFilter);
+					return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
+				}
+				else if (methodInfo.ReturnType.Equals(typeof(void)) &&
+					methodCallMessage.InArgCount == 1 &&
+					methodCallMessage.ArgCount == 1 &&
+					methodCallMessage.Args[0] != null &&
+					typeof(Delegate).IsAssignableFrom(methodCallMessage.Args[0].GetType()) &&
+					(methodCallMessage.MethodName.StartsWith("remove_")))
+				{
+					string propertyName = methodCallMessage.MethodName.Substring(7);
+					var inputMessage = methodCallMessage.GetArg(0) as Delegate;
+					var eventFilter = default(IEventFilter);
 
-                    // Detach event filter, if it is attached
-                    ExtractEventHandlerDetails(ref inputMessage, ref eventFilter);
+					// Detach event filter, if it is attached
+					ExtractEventHandlerDetails(ref inputMessage, ref eventFilter);
 
-                    if (_delegateCorrelationSet.Count > 0)
-                    {
-                        DelegateCorrelationInfo found = (from correlationInfo in _delegateCorrelationSet.ToArray()
-                                                            where correlationInfo.DelegateMemberName.Equals(propertyName) && correlationInfo.ClientDelegateInterceptor.ClientDelegate.Equals(inputMessage)
-                                                            select correlationInfo).FirstOrDefault();
+					if (_delegateCorrelationSet.Count > 0)
+					{
+						DelegateCorrelationInfo found = (from correlationInfo in _delegateCorrelationSet.ToArray()
+														 where correlationInfo.DelegateMemberName.Equals(propertyName) && correlationInfo.ClientDelegateInterceptor.ClientDelegate.Equals(inputMessage)
+														 select correlationInfo).FirstOrDefault();
 
-                        if (found != null)
-                        {
-                            RemoveRemoteEventHandler(found);
+						if (found != null)
+						{
+							RemoveRemoteEventHandler(found);
 
-                            // Remove delegate correlation info
-                            _delegateCorrelationSet.Remove(found);
-                        }
-                    }
-                    return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
-                }
-                else if (methodInfo.GetParameters().Length == 0 &&
-                    methodInfo.GetGenericArguments().Length == 1 &&
-                    typeof(IEnumerable).IsAssignableFrom(methodInfo.ReturnType))
-                {
-                    var elementType = methodInfo.GetGenericArguments().First();
-                    var serverHandlerName = ZyanMethodQueryHandler.GetMethodQueryHandlerName(_uniqueName, methodInfo);
-                    var clientHandler = new ZyanClientQueryHandler(_connection, serverHandlerName);
-                    var returnValue = clientHandler.Get(elementType);
-                    return new ReturnMessage(returnValue, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
-                }
-                else if (methodInfo.GetParameters().Length == 0 &&
-                    methodInfo.GetGenericArguments().Length == 1 &&
-                    typeof(IQueryable).IsAssignableFrom(methodInfo.ReturnType))
-                {
-                    var elementType = methodInfo.GetGenericArguments().First();
-                    var serverHandlerName = ZyanMethodQueryHandler.GetMethodQueryHandlerName(_uniqueName, methodInfo);
-                    var clientHandler = new ZyanClientQueryHandler(_connection, serverHandlerName);
-                    var returnValue = clientHandler.Get(elementType);
-                    return new ReturnMessage(returnValue, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
-                }
-                else
-                {
-                    _connection.PrepareCallContext(_implicitTransactionTransfer);
-                    return InvokeRemoteMethod(methodCallMessage, true);
-                }
-            }
-            catch (Exception ex)
-            {
-                if (_connection.ErrorHandlingEnabled)
-                {                           
-                    ZyanErrorEventArgs e = new ZyanErrorEventArgs()
-                    {
-                        Exception = ex,
-                        RemotingMessage = methodCallMessage,
-                        ServerComponentType = _interfaceType,
-                        RemoteMemberName = methodCallMessage.MethodName                        
-                    };
-                    _connection.OnError(e);
+							// Remove delegate correlation info
+							_delegateCorrelationSet.Remove(found);
+						}
+					}
+					return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
+				}
+				else if (methodInfo.GetParameters().Length == 0 &&
+					methodInfo.GetGenericArguments().Length == 1 &&
+					typeof(IEnumerable).IsAssignableFrom(methodInfo.ReturnType))
+				{
+					var elementType = methodInfo.GetGenericArguments().First();
+					var serverHandlerName = ZyanMethodQueryHandler.GetMethodQueryHandlerName(_uniqueName, methodInfo);
+					var clientHandler = new ZyanClientQueryHandler(_connection, serverHandlerName);
+					var returnValue = clientHandler.Get(elementType);
+					return new ReturnMessage(returnValue, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
+				}
+				else if (methodInfo.GetParameters().Length == 0 &&
+					methodInfo.GetGenericArguments().Length == 1 &&
+					typeof(IQueryable).IsAssignableFrom(methodInfo.ReturnType))
+				{
+					var elementType = methodInfo.GetGenericArguments().First();
+					var serverHandlerName = ZyanMethodQueryHandler.GetMethodQueryHandlerName(_uniqueName, methodInfo);
+					var clientHandler = new ZyanClientQueryHandler(_connection, serverHandlerName);
+					var returnValue = clientHandler.Get(elementType);
+					return new ReturnMessage(returnValue, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
+				}
+				else
+				{
+					_connection.PrepareCallContext(_implicitTransactionTransfer);
+					return InvokeRemoteMethod(methodCallMessage, true);
+				}
+			}
+			catch (Exception ex)
+			{
+				if (_connection.ErrorHandlingEnabled)
+				{
+					ZyanErrorEventArgs e = new ZyanErrorEventArgs()
+					{
+						Exception = ex,
+						RemotingMessage = methodCallMessage,
+						ServerComponentType = _interfaceType,
+						RemoteMemberName = methodCallMessage.MethodName
+					};
+					_connection.OnError(e);
 
-                    switch (e.Action)
-                    {
-                        case ZyanErrorAction.ThrowException:                                
-                            throw;
-                        case ZyanErrorAction.Retry:
-                            return Invoke(message);
-                        case ZyanErrorAction.Ignore:
-                            return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
-                    }                    
-                }
-                throw;
-            }
+					switch (e.Action)
+					{
+						case ZyanErrorAction.ThrowException:
+							throw;
+						case ZyanErrorAction.Retry:
+							return Invoke(message);
+						case ZyanErrorAction.Ignore:
+							return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
+					}
+				}
+				throw;
+			}
 		}
 
-        /// <summary>
-        /// Adds a handler to a remote event or delegate.
-        /// </summary>
-        /// <param name="correlationInfo">Correlation data</param>
-        private void AddRemoteEventHandler(DelegateCorrelationInfo correlationInfo)
-        {
-            if (correlationInfo == null)
-                throw new ArgumentNullException("correlationInfo");
+		/// <summary>
+		/// Adds a handler to a remote event or delegate.
+		/// </summary>
+		/// <param name="correlationInfo">Correlation data</param>
+		private void AddRemoteEventHandler(DelegateCorrelationInfo correlationInfo)
+		{
+			if (correlationInfo == null)
+				throw new ArgumentNullException("correlationInfo");
 
-            // If component is singleton, attach event handler
-            if (_activationType == ActivationType.Singleton)
-            {
-                _connection.PrepareCallContext(false);
-                _connection.RemoteDispatcher.AddEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
-            }
-        }
+			// If component is singleton, attach event handler
+			if (_activationType == ActivationType.Singleton)
+			{
+				_connection.PrepareCallContext(false);
+				_connection.RemoteDispatcher.AddEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
+			}
+		}
 
-        /// <summary>
-        /// Removes a handler from a remote event or delegate.
-        /// </summary>
-        /// <param name="correlationInfo">Correlation data</param>
-        private void RemoveRemoteEventHandler(DelegateCorrelationInfo correlationInfo)
-        {
-            if (correlationInfo == null)
-                throw new ArgumentNullException("correlationInfo");
+		/// <summary>
+		/// Removes a handler from a remote event or delegate.
+		/// </summary>
+		/// <param name="correlationInfo">Correlation data</param>
+		private void RemoveRemoteEventHandler(DelegateCorrelationInfo correlationInfo)
+		{
+			if (correlationInfo == null)
+				throw new ArgumentNullException("correlationInfo");
 
-            // If component is singleton, detach event handler
-            if (_activationType == ActivationType.Singleton)
-            {
-                _connection.PrepareCallContext(false);
-                _connection.RemoteDispatcher.RemoveEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
-            }
-        }
+			// If component is singleton, detach event handler
+			if (_activationType == ActivationType.Singleton)
+			{
+				_connection.PrepareCallContext(false);
+				_connection.RemoteDispatcher.RemoveEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
+			}
+		}
 
-        /// <summary>
-        /// Reconnects to all remote events or delegates after a server restart.
-        /// <remarks>
-        /// Caution! This method does not check, if the event handler registrations are truly lost (caused by a server restart).
-        /// </remarks>
-        /// </summary>
-        internal void ReconnectRemoteEvents()
-        {
-            foreach (var correlationInfo in _delegateCorrelationSet)
-            {
-                AddRemoteEventHandler(correlationInfo);
-            }
-        }
+		/// <summary>
+		/// Reconnects to all remote events or delegates after a server restart.
+		/// <remarks>
+		/// Caution! This method does not check, if the event handler registrations are truly lost (caused by a server restart).
+		/// </remarks>
+		/// </summary>
+		internal void ReconnectRemoteEvents()
+		{
+			foreach (var correlationInfo in _delegateCorrelationSet)
+			{
+				AddRemoteEventHandler(correlationInfo);
+			}
+		}
 
 		/// <summary>
 		/// Extracts the event handler details such as event filter.
@@ -483,8 +483,8 @@ namespace Zyan.Communication
 				// Wenn der Aufruf nicht abgefangen wurde ...
 				if (!callInterception)
 				{
-                    try
-                    {
+					try
+					{
 						// Ggf. Delegaten-Parameter abfangen
 						object[] checkedArgs = InterceptDelegateParameters(methodCallMessage);
 
@@ -503,24 +503,24 @@ namespace Zyan.Communication
 						};
 						// AfterInvoke-Ereignis feuern
 						_connection.OnAfterInvoke(afterInvokeArgs);
-                    }
-                    catch (InvalidSessionException)
-                    {
-                        // Wenn automatisches Anmelden bei abgelaufener Sitzung aktiviert ist ...
-                        if (_autoLoginOnExpiredSession)
-                        {
-                            // Reconnects, if session lost
-                            if (_connection.Reconnect())
-                                // Entfernten Methodenaufruf erneut versuchen
-                                returnValue = _remoteDispatcher.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, genericArgs, paramTypes, methodCallMessage.Args);
-                            else
-                                throw;
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                    }
+					}
+					catch (InvalidSessionException)
+					{
+						// Wenn automatisches Anmelden bei abgelaufener Sitzung aktiviert ist ...
+						if (_autoLoginOnExpiredSession)
+						{
+							// Reconnects, if session lost
+							if (_connection.Reconnect())
+								// Entfernten Methodenaufruf erneut versuchen
+								returnValue = _remoteDispatcher.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, genericArgs, paramTypes, methodCallMessage.Args);
+							else
+								throw;
+						}
+						else
+						{
+							throw;
+						}
+					}
 				}
 				// Versuchen den Rückgabewert in einen Serialisierungscontainer zu casten
 				CustomSerializationContainer container = returnValue as CustomSerializationContainer;
@@ -619,7 +619,7 @@ namespace Zyan.Communication
 
 			if (_delegateCorrelationSet.Count > 0)
 			{
-				for(int i=_delegateCorrelationSet.Count-1; i>=0;i--)
+				for (int i = _delegateCorrelationSet.Count - 1; i >= 0; i--)
 				{
 					var correlationInfo = _delegateCorrelationSet[i];
 
