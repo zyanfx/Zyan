@@ -479,6 +479,8 @@ namespace Zyan.Communication
 							// Schalter für Aufrufabfangverarbeitung zurücksetzen
 							callInterception = false;
 					}
+					else
+						callInterception = false;
 				}
 				// Wenn der Aufruf nicht abgefangen wurde ...
 				if (!callInterception)

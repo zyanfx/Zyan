@@ -23,10 +23,10 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Creates new CallInterceptor for the given method and adds it to the interceptors collection
+		/// Creates new CallInterceptor for the given method and adds it to the interceptors collection.
 		/// </summary>
-		/// <param name="expression">LINQ expression</param>
-		/// <param name="handler">Interception handler</param>
+		/// <param name="expression">LINQ expression of the method to intercept.</param>
+		/// <param name="handler">Interception handler.</param>
 		public CallInterceptorHelper<T> Add(Expression<Action<T>> expression, CallInterceptionDelegate handler)
 		{
 			CheckNotNull(handler);
@@ -42,10 +42,10 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Creates new CallInterceptor for the given method and adds it to the interceptors collection
+		/// Creates new CallInterceptor for the given method and adds it to the interceptors collection.
 		/// </summary>
-		/// <param name="expression">LINQ expression</param>
-		/// <param name="handler">Interception handler</param>
+		/// <param name="expression">LINQ expression of the method to intercept.</param>
+		/// <param name="handler">Interception handler.</param>
 		public CallInterceptorHelper<T> Add<T1>(Expression<Func<T, T1>> expression, Func<CallInterceptionData, T1> handler)
 		{
 			CheckNotNull(handler);
@@ -56,20 +56,17 @@ namespace Zyan.Communication
 
 			Interceptors.Add(new CallInterceptor(typeof(T),
 				memberType, memberName, new Type[0],
-				data =>
-				{
-					data.ReturnValue = handler(data);
-					data.Intercepted = true;
-				}));
+				data => data.ReturnValue = handler(data)
+			));
 
 			return this;
 		}
 
 		/// <summary>
-		/// Creates new CallInterceptor for the given method and adds it to the interceptors collection
+		/// Creates new CallInterceptor for the given method and adds it to the interceptors collection.
 		/// </summary>
-		/// <param name="expression">LINQ expression</param>
-		/// <param name="handler">Interception handler</param>
+		/// <param name="expression">LINQ expression of the method to intercept.</param>
+		/// <param name="handler">Interception handler.</param>
 		public CallInterceptorHelper<T> Add<T1>(Expression<Action<T, T1>> expression, Action<CallInterceptionData, T1> handler)
 		{
 			CheckNotNull(handler);
@@ -87,10 +84,10 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Creates new CallInterceptor for the given method and adds it to the interceptors collection
+		/// Creates new CallInterceptor for the given method and adds it to the interceptors collection.
 		/// </summary>
-		/// <param name="expression">LINQ expression</param>
-		/// <param name="handler">Interception handler</param>
+		/// <param name="expression">LINQ expression of the method to intercept.</param>
+		/// <param name="handler">Interception handler.</param>
 		public CallInterceptorHelper<T> Add<T1, T2>(Expression<Func<T, T1, T2>> expression, Func<CallInterceptionData, T1, T2> handler)
 		{
 			CheckNotNull(handler);
@@ -101,20 +98,17 @@ namespace Zyan.Communication
 
 			Interceptors.Add(new CallInterceptor(typeof(T),
 				memberType, memberName, new[] { typeof(T1) },
-				data =>
-				{
-					data.ReturnValue = handler(data, (T1)data.Parameters[0]);
-					data.Intercepted = true;
-				}));
+				data => data.ReturnValue = handler(data, (T1)data.Parameters[0])
+			));
 
 			return this;
 		}
 
 		/// <summary>
-		/// Creates new CallInterceptor for the given method and adds it to the interceptors collection
+		/// Creates new CallInterceptor for the given method and adds it to the interceptors collection.
 		/// </summary>
-		/// <param name="expression">LINQ expression</param>
-		/// <param name="handler">Interception handler</param>
+		/// <param name="expression">LINQ expression of the method to intercept.</param>
+		/// <param name="handler">Interception handler.</param>
 		public CallInterceptorHelper<T> Add<T1, T2>(Expression<Action<T, T1, T2>> expression, Action<CallInterceptionData, T1, T2> handler)
 		{
 			CheckNotNull(handler);
@@ -132,10 +126,10 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Creates new CallInterceptor for the given method and adds it to the interceptors collection
+		/// Creates new CallInterceptor for the given method and adds it to the interceptors collection.
 		/// </summary>
-		/// <param name="expression">LINQ expression</param>
-		/// <param name="handler">Interception handler</param>
+		/// <param name="expression">LINQ expression of the method to intercept.</param>
+		/// <param name="handler">Interception handler.</param>
 		public CallInterceptorHelper<T> Add<T1, T2, T3>(Expression<Func<T, T1, T2, T3>> expression, Func<CallInterceptionData, T1, T2, T3> handler)
 		{
 			CheckNotNull(handler);
@@ -146,20 +140,17 @@ namespace Zyan.Communication
 
 			Interceptors.Add(new CallInterceptor(typeof(T),
 				memberType, memberName, new[] { typeof(T1), typeof(T2) },
-				data =>
-				{
-					data.ReturnValue = handler(data, (T1)data.Parameters[0], (T2)data.Parameters[1]);
-					data.Intercepted = true;
-				}));
+				data => data.ReturnValue = handler(data, (T1)data.Parameters[0], (T2)data.Parameters[1])
+			));
 
 			return this;
 		}
 
 		/// <summary>
-		/// Creates new CallInterceptor for the given method and adds it to the interceptors collection
+		/// Creates new CallInterceptor for the given method and adds it to the interceptors collection.
 		/// </summary>
-		/// <param name="expression">LINQ expression</param>
-		/// <param name="handler">Interception handler</param>
+		/// <param name="expression">LINQ expression of the method to intercept.</param>
+		/// <param name="handler">Interception handler.</param>
 		public CallInterceptorHelper<T> Add<T1, T2, T3>(Expression<Action<T, T1, T2, T3>> expression, Action<CallInterceptionData, T1, T2, T3> handler)
 		{
 			CheckNotNull(handler);
@@ -177,10 +168,10 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Creates new CallInterceptor for the given method and adds it to the interceptors collection
+		/// Creates new CallInterceptor for the given method and adds it to the interceptors collection.
 		/// </summary>
-		/// <param name="expression">LINQ expression</param>
-		/// <param name="handler">Interception handler</param>
+		/// <param name="expression">LINQ expression of the method to intercept.</param>
+		/// <param name="handler">Interception handler.</param>
 		public CallInterceptorHelper<T> Add<T1, T2, T3, T4>(Expression<Func<T, T1, T2, T3, T4>> expression, Func<CallInterceptionData, T1, T2, T3, T4> handler)
 		{
 			CheckNotNull(handler);
@@ -191,11 +182,8 @@ namespace Zyan.Communication
 
 			Interceptors.Add(new CallInterceptor(typeof(T),
 				memberType, memberName, new[] { typeof(T1), typeof(T2), typeof(T3) },
-				data =>
-				{
-					data.ReturnValue = handler(data, (T1)data.Parameters[0], (T2)data.Parameters[1], (T3)data.Parameters[2]);
-					data.Intercepted = true;
-				}));
+				data => data.ReturnValue = handler(data, (T1)data.Parameters[0], (T2)data.Parameters[1], (T3)data.Parameters[2])
+			));
 
 			return this;
 		}
