@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 
 namespace Zyan.Communication
@@ -70,12 +72,40 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
+		/// Adds call interceptors to the collection.
+		/// </summary>
+		/// <param name="interceptors">The interceptors to add.</param>
+		public void AddRange(IEnumerable<CallInterceptor> interceptors)
+		{
+			lock (_lockObject)
+			{
+				foreach (var interceptor in interceptors)
+				{
+					base.InsertItem(base.Count, interceptor);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Adds call interceptors to the collection.
+		/// </summary>
+		/// <param name="interceptors">The interceptors to add.</param>
+		public void AddRange(params CallInterceptor[] interceptors)
+		{
+			if (interceptors != null)
+			{
+				AddRange(interceptors.AsEnumerable());
+			}
+		}
+
+		/// <summary>
 		/// Sucht eine passende Aufrufabfangvorrichtung für ein bestimmten Methodenaufruf.
 		/// </summary>
 		/// <param name="interfaceType">Typ der Dienstschnittstelle</param>
+		/// <param name="uniqueName">Unique name of the intercepted component.</param>
 		/// <param name="remotingMessage">Remoting-Nachricht des Methodenaufrufs vom Proxy</param>
 		/// <returns>Aufrufabfangvorrichtung oder null</returns>
-		public CallInterceptor FindMatchingInterceptor(Type interfaceType, IMethodCallMessage remotingMessage)
+		public CallInterceptor FindMatchingInterceptor(Type interfaceType, string uniqueName, IMethodCallMessage remotingMessage)
 		{
 			// Wenn keine Abfangvorrichtungen registriert sind ...
 			if (Count == 0)
@@ -83,12 +113,28 @@ namespace Zyan.Communication
 				return null;
 
 			// Passende Aufrufabfangvorrichtung suchen und zurückgeben
-			return (from interceptor in this
-					where interceptor.InterfaceType.Equals(interfaceType) &&
-						  interceptor.MemberType == remotingMessage.MethodBase.MemberType &&
-						  interceptor.MemberName == remotingMessage.MethodName &&
-						  string.Join("|", (from paramType in interceptor.ParameterTypes select paramType.FullName).ToArray()) == string.Join("|", (from paramType2 in remotingMessage.MethodBase.GetParameters() select paramType2.ParameterType.FullName).ToArray())
-					select interceptor).FirstOrDefault();
+			var matchingInterceptors =
+				from interceptor in this
+				where
+					interceptor.Enabled &&
+					interceptor.InterfaceType.Equals(interfaceType) &&
+					interceptor.UniqueName == uniqueName &&
+					interceptor.MemberType == remotingMessage.MethodBase.MemberType &&
+					interceptor.MemberName == remotingMessage.MethodName &&
+					GetTypeList(interceptor.ParameterTypes) == GetTypeList(remotingMessage.MethodBase.GetParameters())
+				select interceptor;
+
+			return matchingInterceptors.FirstOrDefault();
+		}
+
+		private string GetTypeList(Type[] types)
+		{
+			return string.Join("|", types.Select(type => type.FullName).ToArray());
+		}
+
+		private string GetTypeList(ParameterInfo[] parameters)
+		{
+			return string.Join("|", parameters.Select(p => p.ParameterType.FullName).ToArray());
 		}
 
 		/// <summary>
