@@ -189,9 +189,9 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Checks whether argument is not null
+		/// Checks whether argument is not null.
 		/// </summary>
-		private static void CheckNotNull<THandler>(THandler handler)
+		internal static void CheckNotNull<THandler>(THandler handler)
 		{
 			if (handler == null)
 			{
@@ -200,9 +200,9 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Parse lambda expression and extract memberType and memberName
+		/// Parse lambda expression and extract memberType and memberName.
 		/// </summary>
-		private static void Parse(LambdaExpression lambda, out MemberTypes memberType, out string memberName)
+		internal static void Parse(LambdaExpression lambda, out MemberTypes memberType, out string memberName)
 		{
 			var mx = ExtractMemberExpression(lambda);
 			if (mx != null)
@@ -224,7 +224,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Try to extract MethodCallExpression from lambda expression
+		/// Try to extract MethodCallExpression from lambda expression.
 		/// </summary>
 		private static MethodCallExpression ExtractMethodCallExpression(LambdaExpression lambda)
 		{
@@ -238,7 +238,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Try to extract MemberExpression from lambda expression
+		/// Try to extract MemberExpression from lambda expression.
 		/// </summary>
 		private static MemberExpression ExtractMemberExpression(LambdaExpression lambda)
 		{
@@ -252,7 +252,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Returns call interceptors for the given interface
+		/// Returns call interceptors for the given interface.
 		/// </summary>
 		public IEnumerator<CallInterceptor> GetEnumerator()
 		{
@@ -260,7 +260,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Returns call interceptors for the given interface
+		/// Returns call interceptors for the given interface.
 		/// </summary>
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 		{

@@ -83,5 +83,24 @@ namespace Zyan.Communication
 		/// </summary>
 		/// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
 		public bool Enabled { get; set; }
+
+		/// <summary>
+		/// Returns strong-typed call interceptor builder for the component with the specified interface.
+		/// </summary>
+		/// <typeparam name="TInterface">Component interface.</typeparam>
+		public CallInterceptorBuilder<TInterface> For<TInterface>()
+		{
+			return new CallInterceptorBuilder<TInterface>();
+		}
+
+		/// <summary>
+		/// Returns strong-typed call interceptor builder for the component with the specified interface.
+		/// </summary>
+		/// <typeparam name="TInterface">Component interface.</typeparam>
+		/// <param name="uniqueName">Unique name of the component.</param>
+		public CallInterceptorBuilder<TInterface> For<TInterface>(string uniqueName)
+		{
+			return new CallInterceptorBuilder<TInterface>(uniqueName);
+		}
 	}
 }
