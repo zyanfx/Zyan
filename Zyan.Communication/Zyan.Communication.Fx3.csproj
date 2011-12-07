@@ -67,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActivationType.cs" />
+    <Compile Include="CallInterceptorBuilder.cs" />
     <Compile Include="CallInterceptorCollection.cs" />
     <Compile Include="CallInterceptorHelper.cs" />
     <Compile Include="ChannelSinks\ClientAddress\ClientAddressServerChannelSink.cs" />
