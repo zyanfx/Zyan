@@ -60,6 +60,7 @@
     <Compile Include="CallContextData.cs" />
     <Compile Include="CallInterceptionData.cs" />
     <Compile Include="CallInterceptor.cs" />
+    <Compile Include="CallInterceptorBuilder.cs" />
     <Compile Include="CallInterceptorCollection.cs" />
     <Compile Include="CallInterceptorHelper.cs" />
     <Compile Include="ClientHeartbeatEventArgs.cs" />
