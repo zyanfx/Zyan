@@ -458,7 +458,7 @@ namespace Zyan.Communication
 				if (callInterception)
 				{
 					// Passende Aufrufabfangvorrichtung suchen
-					CallInterceptor interceptor = _connection.CallInterceptors.FindMatchingInterceptor(_interfaceType, methodCallMessage);
+					CallInterceptor interceptor = _connection.CallInterceptors.FindMatchingInterceptor(_interfaceType, _uniqueName, methodCallMessage);
 
 					// Wenn eine passende Aufrufabfangvorrichtung gefunden wurde ...
 					if (interceptor != null)
