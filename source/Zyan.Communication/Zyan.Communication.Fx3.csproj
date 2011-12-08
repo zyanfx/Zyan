@@ -254,6 +254,7 @@
     <Compile Include="Toolbox\Compression\CompressionHelper.cs" />
     <Compile Include="Toolbox\Compression\LZF.cs" />
     <Compile Include="Toolbox\ConcurrentDictionaryFx3.cs" />
+    <Compile Include="Toolbox\ActionFuncDelegatesFx3.cs" />
     <Compile Include="Toolbox\DynamicTypeBinder.cs" />
     <Compile Include="Toolbox\Extensions.cs" />
     <Compile Include="Toolbox\ExtensionsFx3.cs" />
