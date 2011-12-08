@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CallInterceptorBuilderTests.cs" />
     <Compile Include="CleanupTests.cs" />
     <Compile Include="CompressionTests.cs" />
     <Compile Include="DuckTypingTests.cs" />

@@ -88,7 +88,7 @@ namespace Zyan.Communication
 		/// Returns strong-typed call interceptor builder for the component with the specified interface.
 		/// </summary>
 		/// <typeparam name="TInterface">Component interface.</typeparam>
-		public CallInterceptorBuilder<TInterface> For<TInterface>()
+		public static CallInterceptorBuilder<TInterface> For<TInterface>()
 		{
 			return new CallInterceptorBuilder<TInterface>();
 		}
@@ -98,7 +98,7 @@ namespace Zyan.Communication
 		/// </summary>
 		/// <typeparam name="TInterface">Component interface.</typeparam>
 		/// <param name="uniqueName">Unique name of the component.</param>
-		public CallInterceptorBuilder<TInterface> For<TInterface>(string uniqueName)
+		public static CallInterceptorBuilder<TInterface> For<TInterface>(string uniqueName)
 		{
 			return new CallInterceptorBuilder<TInterface>(uniqueName);
 		}
