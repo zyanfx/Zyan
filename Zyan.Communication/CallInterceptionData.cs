@@ -36,15 +36,19 @@ namespace Zyan.Communication
 		public object MakeRemoteCall()
 		{
 			// Entfernte Methode aufrufen
-			IMessage result = _remoteInvoker(_remotingMessage, false);
-
-			// Rückgabenachricht casten
-			ReturnMessage returnMessage = result as ReturnMessage;
+			var returnMessage = _remoteInvoker(_remotingMessage, false) as ReturnMessage;
 
 			// Wenn eine gültige Rückgabenachricht zurückgegeben wurde ...
 			if (returnMessage != null)
+			{
+				if (returnMessage.Exception != null)
+				{
+					throw returnMessage.Exception;
+				}
+
 				// Rückgabewert zurückgeben
 				return returnMessage.ReturnValue;
+			}
 
 			// null zurückgeben
 			return null;
