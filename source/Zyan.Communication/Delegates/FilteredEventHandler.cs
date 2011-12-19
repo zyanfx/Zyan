@@ -56,7 +56,7 @@ namespace Zyan.Communication.Delegates
 		/// <param name="eventHandler">The event handler.</param>
 		/// <param name="expression">The predicate expression.</param>
 		/// <param name="filterLocally">Whether the filter should also work when used locally.</param>
-		public static EventHandler<TEventArgs> Create<TEventArgs>(EventHandler<TEventArgs> eventHandler, Expression<Func<object, TEventArgs, bool>> expression, bool filterLocally)
+		public static EventHandler<TEventArgs> Create<TEventArgs>(EventHandler<TEventArgs> eventHandler, Expression<Func<object, TEventArgs, bool>> expression, bool filterLocally = true)
 			where TEventArgs : EventArgs
 		{
 			return new FilteredSystemEventHandler<TEventArgs>(eventHandler, new FlexibleEventFilter<TEventArgs>(expression), filterLocally);
