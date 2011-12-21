@@ -255,6 +255,7 @@
     <Compile Include="Toolbox\Compression\CompressionHelper.cs" />
     <Compile Include="Toolbox\Compression\LZF.cs" />
     <Compile Include="Toolbox\Asynchronizer.cs" />
+    <Compile Include="Toolbox\Disposable.cs" />
     <Compile Include="Toolbox\DynamicTypeBinder.cs" />
     <Compile Include="Toolbox\Extensions.cs" />
     <Compile Include="Toolbox\ExtensionsFx3.cs" />

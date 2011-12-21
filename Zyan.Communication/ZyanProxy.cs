@@ -227,7 +227,7 @@ namespace Zyan.Communication
 				else
 				{
 					_connection.PrepareCallContext(_implicitTransactionTransfer);
-					return InvokeRemoteMethod(methodCallMessage, true);
+					return InvokeRemoteMethod(methodCallMessage, _connection.CallInterceptionEnabled);
 				}
 			}
 			catch (Exception ex)
@@ -452,7 +452,7 @@ namespace Zyan.Communication
 				var paramTypes = paramDefs.Select(p => p.ParameterType).ToArray();
 
 				// Abfragen, ob Abfangvorrichtungen verarbeitet werden sollen
-				bool callInterception = _connection.CallInterceptionEnabled && allowCallInterception;
+				bool callInterception = allowCallInterception && !CallInterceptor.IsPaused;
 
 				// Wenn Aufrufabfangvorrichtungen verarbeitet werden sollen ...
 				if (callInterception)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication
 {
@@ -83,6 +84,25 @@ namespace Zyan.Communication
 		/// </summary>
 		/// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
 		public bool Enabled { get; set; }
+
+		/// <summary>
+		/// Pauses call interception for the current thread.
+		/// </summary>
+		public static IDisposable PauseInterception()
+		{
+			var oldValue = isPaused;
+			var disposable = new Disposable(() => isPaused = oldValue);
+			isPaused = true;
+			return disposable;
+		}
+
+		[ThreadStatic]
+		internal static bool isPaused;
+
+		/// <summary>
+		/// Gets or sets a value indicating whether call interception is paused for the current thread.
+		/// </summary>
+		public static bool IsPaused { get { return isPaused; } }
 
 		/// <summary>
 		/// Returns strong-typed call interceptor builder for the component with the specified interface.
