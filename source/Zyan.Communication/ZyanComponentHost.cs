@@ -649,13 +649,19 @@ namespace Zyan.Communication
 		public event EventHandler<ClientHeartbeatEventArgs> ClientHeartbeatReceived;
 
 		/// <summary>
-		/// Fires the ClientHeartbeatReceived event.		
+		/// Fires the ClientHeartbeatReceived event.
 		/// </summary>
 		/// <param name="e">Event arguments</param>
 		protected virtual void OnClientHeartbeatReceived(ClientHeartbeatEventArgs e)
 		{
-			if (ClientHeartbeatReceived != null)
-				ClientHeartbeatReceived(this, e);
+			if (SessionManager.ExistSession(e.SessionID))
+			{
+				var session = SessionManager.GetSessionBySessionID(e.SessionID);
+				session.Timestamp = DateTime.Now;
+
+				if (ClientHeartbeatReceived != null)
+					ClientHeartbeatReceived(this, e);
+			}
 		}
 
 		/// <summary>
@@ -671,9 +677,9 @@ namespace Zyan.Communication
 					_pollingEventTacingEnabled = value;
 
 					if (_pollingEventTacingEnabled)
-						_dispatcher.ClientHeartbeatReceived += new EventHandler<ClientHeartbeatEventArgs>(_dispatcher_ClientHeartbeatReceived);
+						_dispatcher.ClientHeartbeatReceived += _dispatcher_ClientHeartbeatReceived;
 					else
-						_dispatcher.ClientHeartbeatReceived -= new EventHandler<ClientHeartbeatEventArgs>(_dispatcher_ClientHeartbeatReceived);
+						_dispatcher.ClientHeartbeatReceived -= _dispatcher_ClientHeartbeatReceived;
 				}
 			}
 		}
