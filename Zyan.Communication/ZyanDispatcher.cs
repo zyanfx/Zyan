@@ -420,7 +420,7 @@ namespace Zyan.Communication
 		/// <param name="details">Invocation details</param>
 		private void Invoke_CleanUp(InvocationDetails details)
 		{
-			if (details.Registration.ActivationType == ActivationType.SingleCall)
+			if (details.Registration != null && details.Registration.ActivationType == ActivationType.SingleCall)
 			{
 				if (details.WiringList != null)
 					RemoveClientServerWires(details.Type, details.Instance, details.DelegateCorrelationSet, details.WiringList);
