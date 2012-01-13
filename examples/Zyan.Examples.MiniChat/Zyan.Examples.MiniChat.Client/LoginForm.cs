@@ -9,25 +9,37 @@ using System.Windows.Forms;
 
 namespace Zyan.Examples.MiniChat.Client
 {
-    public partial class LoginForm : Form
-    {
-        public LoginForm()
-        {
-            InitializeComponent();
-            _textNickname.DataBindings.Add("Text", this, "Nickname");
-            _comboServerUrl.DataBindings.Add("Text", this, "ServerUrl");
-        }
+	public partial class LoginForm : Form
+	{
+		public LoginForm()
+		{
+			InitializeComponent();
 
-        public string Nickname
-        {
-            get;
-            set;
-        }
+			_textNickname.DataBindings.Add("Text", this, "Nickname", false, DataSourceUpdateMode.OnPropertyChanged);
+			_comboServerUrl.DataBindings.Add("Text", this, "ServerUrl", false, DataSourceUpdateMode.OnPropertyChanged);
+		}
 
-        public string ServerUrl
-        {
-            get;
-            set;
-        }
-    }
+		public string Nickname
+		{
+			get;
+			set;
+		}
+
+		public string ServerUrl
+		{
+			get;
+			set;
+		}
+
+		protected override void OnLoad(EventArgs args)
+		{
+			base.OnLoad(args);
+
+			// select the first address from the list automatically
+			if (_comboServerUrl.Items.Count > 0)
+			{
+				_comboServerUrl.SelectedIndex = 0;
+			}
+		}
+	}
 }
