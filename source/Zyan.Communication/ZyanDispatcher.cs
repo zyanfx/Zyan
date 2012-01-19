@@ -449,6 +449,9 @@ namespace Zyan.Communication
 			if (string.IsNullOrEmpty(methodName))
 				throw new ArgumentException(LanguageResource.ArgumentException_MethodNameMissing, "methodName");
 
+            // Reset session variable (May point to wrong session, if threadpool thread is reused)
+            ServerSession.CurrentSession = null;
+
 			var details = new InvocationDetails()
 			{
 				TrackingID = trackingID,
@@ -460,15 +463,16 @@ namespace Zyan.Communication
 				Args = args
 			};
 
-			ProcessBeforeInvoke(details);
-
 			try
 			{
 				Invoke_CheckInterfaceName(details);
 				Invoke_LoadCallContextData(details);
 				Invoke_SetSession(details);
 				Invoke_SetTransaction(details);
-				Invoke_ConvertMethodArguments(details);
+
+                ProcessBeforeInvoke(details);
+                
+                Invoke_ConvertMethodArguments(details);
 
 				details.Registration = _host.ComponentRegistry[details.InterfaceName];
 
