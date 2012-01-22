@@ -149,17 +149,13 @@ namespace Zyan.Communication
 					if (cancelArgs.CancelException == null)
 						cancelArgs.CancelException = new InvokeCanceledException();
 
-					_host.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = details.TrackingID, CancelException = cancelArgs.CancelException });
-
 					throw cancelArgs.CancelException;
 				}
-				else
-				{
-					details.InterfaceName = cancelArgs.InterfaceName;
-					details.DelegateCorrelationSet = cancelArgs.DelegateCorrelationSet;
-					details.MethodName = cancelArgs.MethodName;
-					details.Args = cancelArgs.Arguments;
-				}
+
+				details.InterfaceName = cancelArgs.InterfaceName;
+				details.DelegateCorrelationSet = cancelArgs.DelegateCorrelationSet;
+				details.MethodName = cancelArgs.MethodName;
+				details.Args = cancelArgs.Arguments;
 			}
 		}
 
@@ -326,6 +322,7 @@ namespace Zyan.Communication
 		private void Invoke_ResolveComponentInstance(InvocationDetails details)
 		{
 			// get component instance
+			details.Registration = _host.ComponentRegistry[details.InterfaceName];
 			details.Instance = _host.GetComponentInstance(details.Registration);
 			details.Type = details.Instance.GetType();
 		}
@@ -449,8 +446,8 @@ namespace Zyan.Communication
 			if (string.IsNullOrEmpty(methodName))
 				throw new ArgumentException(LanguageResource.ArgumentException_MethodNameMissing, "methodName");
 
-            // Reset session variable (May point to wrong session, if threadpool thread is reused)
-            ServerSession.CurrentSession = null;
+			// Reset session variable (May point to wrong session, if threadpool thread is reused)
+			ServerSession.CurrentSession = null;
 
 			var details = new InvocationDetails()
 			{
@@ -465,17 +462,14 @@ namespace Zyan.Communication
 
 			try
 			{
-				Invoke_CheckInterfaceName(details);
 				Invoke_LoadCallContextData(details);
 				Invoke_SetSession(details);
 				Invoke_SetTransaction(details);
 
-                ProcessBeforeInvoke(details);
-                
-                Invoke_ConvertMethodArguments(details);
+				ProcessBeforeInvoke(details);
 
-				details.Registration = _host.ComponentRegistry[details.InterfaceName];
-
+				Invoke_CheckInterfaceName(details);
+				Invoke_ConvertMethodArguments(details);
 				Invoke_ResolveComponentInstance(details);
 				Invoke_WireUpEventHandlers(details);
 				Invoke_ObtainMethodMetadata(details);
