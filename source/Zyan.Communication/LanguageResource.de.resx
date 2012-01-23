@@ -264,4 +264,13 @@
   <data name="ApplicationException_NoChannelCreated" xml:space="preserve">
     <value>Es wurde kein Remotingkanal erzeugt.</value>
   </data>
+  <data name="RemotingException_MessageSinkNotSet" xml:space="preserve">
+    <value>Keine Nachrichtensenke festgelegt.</value>
+  </data>
+  <data name="RemotingException_ErrorReceivingChannelInfo" xml:space="preserve">
+    <value>Fehler beim Empfangen der Kanalbeschreibung vom entfernten Computer.</value>
+  </data>
+  <data name="RemotingException_ErrorSendingChannelInfo" xml:space="preserve">
+    <value>Fehler beim Senden der Kanalbeschreibung an den entfernten Computer.</value>
+  </data>
 </root>

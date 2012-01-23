@@ -264,4 +264,13 @@
   <data name="ApplicationException_NoChannelCreated" xml:space="preserve">
     <value>No Remoting Channel was created.</value>
   </data>
+  <data name="RemotingException_MessageSinkNotSet" xml:space="preserve">
+    <value>No message sink set.</value>
+  </data>
+  <data name="RemotingException_ErrorReceivingChannelInfo" xml:space="preserve">
+    <value>Error receiving channel information from remote host.</value>
+  </data>
+  <data name="RemotingException_ErrorSendingChannelInfo" xml:space="preserve">
+    <value>Error sending channel information to remote host.</value>
+  </data>
 </root>

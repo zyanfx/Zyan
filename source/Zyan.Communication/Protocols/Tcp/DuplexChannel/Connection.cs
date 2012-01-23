@@ -1,12 +1,12 @@
 /*
  THIS CODE IS BASED ON:
- -------------------------------------------------------------------------------------------------------------- 
+ --------------------------------------------------------------------------------------------------------------
  TcpEx Remoting Channel
  Version 1.2 - 18 November, 2003
  Richard Mason - r.mason@qut.edu.au
  Originally published at GotDotNet:
  http://www.gotdotnet.com/Community/UserSamples/Details.aspx?SampleGuid=3F46C102-9970-48B1-9225-8758C38905B1
- Copyright © 2003 Richard Mason. All Rights Reserved. 
+ Copyright © 2003 Richard Mason. All Rights Reserved.
  --------------------------------------------------------------------------------------------------------------
 */
 using System;
@@ -105,7 +105,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// <param name="channel">TcpEx Channel</param>
 		/// <returns>Running connections</returns>
 		public static IEnumerable<Connection> GetRunningConnectionsOfChannel(TcpExChannel channel)
-		{ 
+		{
 			if (channel == null)
 				throw new ArgumentNullException("channel");
 
@@ -178,8 +178,13 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 			_socket.Connect(new IPEndPoint(remoteIPAddress, _socketRemotePort));
 
-			SendChannelInfo();
-			ReceiveChannelInfo();
+            CheckSocket();
+
+            if (!SendChannelInfo())
+                throw new RemotingException(LanguageResource.RemotingException_ErrorSendingChannelInfo);
+
+            if (!ReceiveChannelInfo())
+                throw new RemotingException(LanguageResource.RemotingException_ErrorReceivingChannelInfo);
 
 			if (_connections.ContainsKey(_remoteChannelData.ChannelID.ToString()))
 			{
@@ -221,8 +226,13 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			_socketRemoteAddress = remoteEndPoint.Address.ToString();
 			_socketRemotePort = remoteEndPoint.Port;
 
-			ReceiveChannelInfo();
-			SendChannelInfo();
+            CheckSocket();
+
+            if (!ReceiveChannelInfo())
+                throw new RemotingException(LanguageResource.RemotingException_ErrorReceivingChannelInfo);
+
+            if (!SendChannelInfo())
+                throw new RemotingException(LanguageResource.RemotingException_ErrorSendingChannelInfo);
 
 			if (_connections.ContainsKey(_remoteChannelData.ChannelID.ToString()))
 			{
@@ -296,7 +306,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		protected short _maxRetries = 10;
 
 		/// <summary>
-		/// Delay after retry attempt in milliseconds. 
+		/// Delay after retry attempt in milliseconds.
 		/// </summary>
 		protected int _retryDelay = 1000;
 
@@ -312,6 +322,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				throw new RemotingException(LanguageResource.RemotingException_NoAddressForReconnect);
 
 			short retryCount = 0;
+            bool success = false;
 
 			while (_socket == null)
 			{
@@ -328,9 +339,14 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 							_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 							_socket.Connect(new IPEndPoint(remoteAddress, _socketRemotePort));
 
-							SendChannelInfo();
-							ReceiveChannelInfo();
-
+                            try
+                            {
+                                success = SendChannelInfo() && ReceiveChannelInfo();
+                            }
+                            catch (SocketException)
+                            {
+                                success = false;
+                            }
 							break;
 
 						case ConnectionRole.ActAsServer:
@@ -339,9 +355,11 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 							break;
 					}
-					if (_retryDelay > 0)
-						Thread.Sleep(_retryDelay);
-
+                    if (!success)
+                    {
+                        if (_retryDelay > 0)
+                            Thread.Sleep(_retryDelay);
+                    }
 					continue;
 				}
 				else
@@ -352,19 +370,37 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// <summary>
 		/// Sends channel data.
 		/// </summary>
-		private void SendChannelInfo()
+        /// <returns>True, if sending was successfully, otherwise false</returns>
+		private bool SendChannelInfo()
 		{
-			BinaryFormatter formatter = new BinaryFormatter();
-			formatter.Serialize(Stream, _channel.ChannelData);
+            Stream stream = this.Stream;
+
+            if (stream != null)
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                formatter.Serialize(stream, _channel.ChannelData);
+
+                return true;
+            }
+            return false;
 		}
 
 		/// <summary>
 		/// Receives channel data.
 		/// </summary>
-		private void ReceiveChannelInfo()
+        /// <returns>True, if receiving was successfully, otherwise false</returns>
+		private bool ReceiveChannelInfo()
 		{
-			BinaryFormatter formatter = new BinaryFormatter();
-			_remoteChannelData = (TcpExChannelData)formatter.Deserialize(Stream);
+            Stream stream = this.Stream;
+
+            if (stream != null)
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                _remoteChannelData = (TcpExChannelData)formatter.Deserialize(stream);
+
+                return true;
+            }
+            return false;
 		}
 
 		/// <summary>
@@ -495,12 +531,8 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			{
 				if (_stream == null)
 				{
-					CheckSocket();
-
-					if (_socket == null)
-						throw new SocketException();
-
-					_stream = new NetworkStream(_socket, FileAccess.ReadWrite, false);
+					if (_socket != null)					
+					    _stream = new NetworkStream(_socket, FileAccess.ReadWrite, false);
 				}
 				return _stream;
 			}
@@ -513,9 +545,15 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		{
 			get
 			{
-				if (_reader == null)
-					_reader = new BinaryReader(Stream);
-				
+                if (_reader == null)
+                {
+                    CheckSocket();
+
+                    Stream stream = this.Stream;
+
+                    if (stream!=null)
+                        _reader = new BinaryReader(stream);
+                }				
 				return _reader;
 			}
 		}
@@ -527,9 +565,15 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		{
 			get
 			{
-				if (_writer == null)
-					_writer = new BinaryWriter(new BufferedStream(Stream, BufferSize));
-				
+                if (_writer == null)
+                {
+                    CheckSocket();
+
+                    Stream stream = this.Stream;
+
+                    if (stream != null)
+                        _writer = new BinaryWriter(new BufferedStream(stream, BufferSize));
+                }
 				return _writer;
 			}
 		}
@@ -658,7 +702,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		private ulong _tcpKeepAliveTime = 30000;
 		private ulong _tcpKeepAliveInterval = 1000;
 
-		const int BYTES_PER_LONG = 4; 
+		const int BYTES_PER_LONG = 4;
 		const int BITS_PER_BYTE = 8;
 
 		/// <summary>
@@ -669,7 +713,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			get { return _tcpKeepAliveEnabled; }
 			set
 			{
-				_tcpKeepAliveEnabled = value; 
+				_tcpKeepAliveEnabled = value;
 				
 				if (_socket!=null)
 					_tcpKeepAliveEnabled = SetTcpKeepAlive(_socket, _tcpKeepAliveEnabled ? TcpKeepAliveTime : 0, _tcpKeepAliveEnabled ? TcpKeepAliveInterval : 0);
