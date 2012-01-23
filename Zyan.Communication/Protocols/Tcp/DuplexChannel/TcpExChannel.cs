@@ -1,12 +1,12 @@
 /*
  THIS CODE IS BASED ON:
- -------------------------------------------------------------------------------------------------------------- 
+ --------------------------------------------------------------------------------------------------------------
  TcpEx Remoting Channel
  Version 1.2 - 18 November, 2003
  Richard Mason - r.mason@qut.edu.au
  Originally published at GotDotNet:
  http://www.gotdotnet.com/Community/UserSamples/Details.aspx?SampleGuid=3F46C102-9970-48B1-9225-8758C38905B1
- Copyright © 2003 Richard Mason. All Rights Reserved. 
+ Copyright © 2003 Richard Mason. All Rights Reserved.
  --------------------------------------------------------------------------------------------------------------
 */
 using System;
@@ -15,6 +15,7 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Messaging;
 using System.Runtime.Serialization.Formatters;
 using Zyan.Communication.Protocols.Tcp.DuplexChannel.Diagnostics;
+using System.Runtime.Remoting;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
@@ -322,22 +323,28 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// <exception cref="T:System.Security.SecurityException">The immediate caller does not have infrastructure permission. </exception>
 		public IMessageSink CreateMessageSink(string url, object remoteChannelData, out string objectURI)
 		{
+            objectURI = null;
+
 			if (url == null)
 			{
 				TcpExChannelData channelData = remoteChannelData as TcpExChannelData;
 				if (channelData != null)
 					url = Manager.CreateUrl(channelData.ChannelID);
 				else
-				{
-					objectURI = null;
-					return null;
-				}
+				    return null;				
 			}
+            if (Manager.Parse(url, out objectURI) != null)
+            {
+                IClientChannelSink clientChannelSink = clientSinkProvider.CreateSink(this, url, remoteChannelData);
+                IMessageSink messageSink = clientChannelSink as IMessageSink;
 
-			if (Manager.Parse(url, out objectURI) != null)
-				return (IMessageSink)clientSinkProvider.CreateSink(this, url, remoteChannelData);
-			else
-				return null;
+                if (clientChannelSink != null && messageSink == null)
+                    throw new RemotingException(LanguageResource.RemotingException_MessageSinkNotSet);
+
+                return messageSink;
+            }
+            else
+                return null;
 		}
 
 		#endregion
