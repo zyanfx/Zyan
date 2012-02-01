@@ -67,43 +67,6 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		}
 
 		/// <summary>
-		/// Sends the message over a specified connection.
-		/// </summary>
-		/// <param name="connection">Duplex Channel Connection</param>
-		public void Send(Connection connection)
-		{
-			try
-			{
-				connection.LockWrite();
-
-				BinaryWriter writer = connection.Writer;
-				writer.Write(Guid.ToByteArray());
-
-				var headerStream = TransportHeaderWrapper.Serialize(Headers);
-				writer.Write((int)headerStream.Length);
-				writer.Write(headerStream.GetBuffer(), 0, (int)headerStream.Length);
-				
-				writer.Write((int)MessageBody.Length);
-				MemoryStream ms = MessageBody as MemoryStream;
-				
-				if (ms == null)
-				{
-					byte[] msgBuffer = new byte[MessageBody.Length];
-					MessageBody.Read(msgBuffer, 0, (int)MessageBody.Length);
-					writer.Write(msgBuffer);
-				}
-				else
-					writer.Write(ms.GetBuffer(), 0, (int)MessageBody.Length);
-				
-				writer.Flush();
-			}
-			finally
-			{
-				connection.ReleaseWrite();
-			}
-		}
-
-		/// <summary>
 		/// Sends a specified message over a specified connection.
 		/// </summary>
 		/// <param name="connection">Duplex Channel Connection</param>
@@ -112,42 +75,61 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// <param name="message">Stream with raw data of the message</param>
 		public static void Send(Connection connection, Guid guid, ITransportHeaders headers, Stream message)
 		{
-			try
-			{
-				connection.LockWrite();
-				BinaryWriter writer = connection.Writer;
-				writer.Write(guid.ToByteArray());
+            try
+            {
+                connection.LockWrite();
+                BinaryWriter writer = connection.Writer;
 
-				var headerStream = TransportHeaderWrapper.Serialize(headers);
-				writer.Write((int)headerStream.Length);
-				writer.Write(headerStream.GetBuffer(), 0, (int)headerStream.Length);
+                if (writer == null)
+                {
+                    // Unexpected connection loss. Connection isn´t working anymore, so close it.
+                    connection.ReleaseWrite();
+                    connection.Close();
+                    connection = null;
+                }
+                else
+                {
+                    writer.Write(guid.ToByteArray());
 
-				writer.Write((int)message.Length);
-				MemoryStream ms = message as MemoryStream;
-				if (ms == null)
-				{
-					byte[] msgBuffer = new byte[message.Length];
-					message.Read(msgBuffer, 0, (int)message.Length);
-					writer.Write(msgBuffer, 0, (int)message.Length);
-				}
-				else
-					writer.Write(ms.GetBuffer(), 0, (int)message.Length);
-				writer.Flush();
-			}
-			catch (ObjectDisposedException)
-			{
-				// Socket may be closed meanwhile. Connection isn´t working anymore, so close it.
-				connection.ReleaseWrite();
-				connection.Close();
-				connection = null;
-			}
-			catch (IOException)
-			{
-				// Unexpected connection loss. Connection isn´t working anymore, so close it.
-				connection.ReleaseWrite();
-				connection.Close();
-				connection = null;
-			}
+                    var headerStream = TransportHeaderWrapper.Serialize(headers);
+                    writer.Write((int)headerStream.Length);
+                    writer.Write(headerStream.GetBuffer(), 0, (int)headerStream.Length);
+
+                    writer.Write((int)message.Length);
+                    MemoryStream ms = message as MemoryStream;
+                    if (ms == null)
+                    {
+                        byte[] msgBuffer = new byte[message.Length];
+                        message.Read(msgBuffer, 0, (int)message.Length);
+                        writer.Write(msgBuffer, 0, (int)message.Length);
+                    }
+                    else
+                        writer.Write(ms.GetBuffer(), 0, (int)message.Length);
+
+                    writer.Flush();
+                }
+            }
+            catch (ObjectDisposedException)
+            {
+                // Socket may be closed meanwhile. Connection isn´t working anymore, so close it.
+                connection.ReleaseWrite();
+                connection.Close();
+                connection = null;
+            }
+            catch (IOException)
+            {
+                // Unexpected connection loss. Connection isn´t working anymore, so close it.
+                connection.ReleaseWrite();
+                connection.Close();
+                connection = null;
+            }
+            catch (SocketException)
+            {
+                // Unexpected connection loss. Connection isn´t working anymore, so close it.
+                connection.ReleaseWrite();
+                connection.Close();
+                connection = null;
+            }
 			finally
 			{
 				if (connection!=null)
