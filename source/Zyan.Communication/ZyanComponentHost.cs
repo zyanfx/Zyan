@@ -171,7 +171,7 @@ namespace Zyan.Communication
 		{
 			get { return _catalog; }
 			set
-			{ 
+			{
 				if (value == null)
 					throw new ArgumentNullException();
 
@@ -186,7 +186,7 @@ namespace Zyan.Communication
 		/// </remarks>
 		/// </summary>
 		internal Dictionary<string, ComponentRegistration> ComponentRegistry
-		{ 
+		{
 			get
 			{
 				return _catalog.ComponentRegistry;
@@ -227,7 +227,7 @@ namespace Zyan.Communication
 		/// </summary>
 		/// <returns>List with component information</returns>
 		public List<ComponentInfo> GetRegisteredComponents()
-		{ 
+		{
 			return _catalog.GetRegisteredComponents();
 		}
 
@@ -331,7 +331,7 @@ namespace Zyan.Communication
 		/// Schließt den Kanal, falls dieser geöffent ist.
 		/// </summary>
 		private void CloseChannel()
-		{ 
+		{
 			// Kanal suchen
 			IChannel channel = ChannelServices.GetChannel(_channelName);
 
@@ -346,81 +346,99 @@ namespace Zyan.Communication
 		#region Policy Injection
 
 		/// <summary>
-		/// Ereignis: Bevor ein Komponentenaufruf durchgeführt wird.
+		/// Occurs before the component call is initiated.
 		/// </summary>
 		public event EventHandler<BeforeInvokeEventArgs> BeforeInvoke;
 
 		/// <summary>
-		/// Ereignis: Nachdem ein Komponentenaufruf durchgeführt wurde.
+		/// Occurs after the component call is completed.
 		/// </summary>
 		public event EventHandler<AfterInvokeEventArgs> AfterInvoke;
 
 		/// <summary>
-		/// Ereignis: Wenn ein Komponentenaufruf abgebrochen wurde.
+		/// Occurs when the component call is canceled due to exception.
 		/// </summary>
 		public event EventHandler<InvokeCanceledEventArgs> InvokeCanceled;
 
 		/// <summary>
-		/// Gibt zurück, ob für das BeforeInvoke-Ereignis Abos registriert wurden.
+		/// Occurs when the component call is rejected due to security reasons.
 		/// </summary>
-		/// <returns>Wahr, wenn Abos vorhanden, ansonsten Falsch</returns>
+		public event EventHandler<InvokeCanceledEventArgs> InvokeRejected;
+
+		/// <summary>
+		/// Checks whether the BeforeInvoke event has subscriptions.
+		/// </summary>
+		/// <returns>True, if subsciptions exist, otherwise, false.</returns>
 		protected internal bool HasBeforeInvokeSubscriptions()
-		{ 
+		{
 			return (BeforeInvoke != null);
 		}
 
 		/// <summary>
-		/// Gibt zurück, ob für das AfterInvoke-Ereignis Abos registriert wurden.
+		/// Checks whether the AfterInvoke event has subscriptions.
 		/// </summary>
-		/// <returns>Wahr, wenn Abos vorhanden, ansonsten Falsch</returns>
+		/// <returns>True, if subsciptions exist, otherwise, false.</returns>
 		protected internal bool HasAfterInvokeSubscriptions()
 		{
 			return (AfterInvoke != null);
 		}
 
 		/// <summary>
-		/// Gibt zurück, ob für das InvokeCanceled-Ereignis Abos registriert wurden.
+		/// Checks whether the InvokeCanceled event has subscriptions.
 		/// </summary>
-		/// <returns>Wahr, wenn Abos vorhanden, ansonsten Falsch</returns>
+		/// <returns>True, if subsciptions exist, otherwise, false.</returns>
 		protected internal bool HasInvokeCanceledSubscriptions()
 		{
 			return (InvokeCanceled != null);
 		}
 
 		/// <summary>
-		/// Feuert das BeforeInvoke-Ereignis.
+		/// Checks whether the InvokeRejected event has subscriptions.
 		/// </summary>
-		/// <param name="e">Ereignisargumente</param>
+		/// <returns>True, if subsciptions exist, otherwise, false.</returns>
+		protected internal bool HasInvokeRejectedSubscriptions()
+		{
+			return (InvokeRejected != null);
+		}
+
+		/// <summary>
+		/// Fires the BeforeInvoke event.
+		/// </summary>
+		/// <param name="e">Event arguments.</param>
 		protected internal virtual void OnBeforeInvoke(BeforeInvokeEventArgs e)
 		{
-			// Wenn für BeforeInvoke Ereignisprozeduren registriert sind ...
 			if (BeforeInvoke != null)
-				// Ereignis feuern
 				BeforeInvoke(this, e);
 		}
 
 		/// <summary>
-		/// Feuert das AfterInvoke-Ereignis.
+		/// Fires the AfterInvoke event.
 		/// </summary>
-		/// <param name="e">Ereignisargumente</param>
+		/// <param name="e">Event arguments.</param>
 		protected internal virtual void OnAfterInvoke(AfterInvokeEventArgs e)
 		{
-			// Wenn für AfterInvoke Ereignisprozeduren registriert sind ...
 			if (AfterInvoke != null)
-				// Ereignis feuern
 				AfterInvoke(this, e);
 		}
 
 		/// <summary>
-		/// Feuert das InvokeCanceled-Ereignis.
+		/// Fires the InvokeCanceled event.
 		/// </summary>
-		/// <param name="e">Ereignisargumente</param>
+		/// <param name="e">Event arguments.</param>
 		protected internal virtual void OnInvokeCanceled(InvokeCanceledEventArgs e)
 		{
-			// Wenn für AfterInvoke Ereignisprozeduren registriert sind ...
 			if (InvokeCanceled != null)
-				// Ereignis feuern
 				InvokeCanceled(this, e);
+		}
+
+		/// <summary>
+		/// Fires the InvokeRejected event.
+		/// </summary>
+		/// <param name="e">Event arguments</param>
+		protected internal virtual void OnInvokeRejected(InvokeCanceledEventArgs e)
+		{
+			if (InvokeRejected != null)
+				InvokeRejected(this, e);
 		}
 
 		#endregion
@@ -430,7 +448,7 @@ namespace Zyan.Communication
 		// Benachrichtigungsdienst
 		private volatile NotificationService _notificationService = null;
 
-		// Sperrobjekt für Instanzerstellung des Benachrichtigungsdienstes 
+		// Sperrobjekt für Instanzerstellung des Benachrichtigungsdienstes
 		private object _notificationServiceLockObject = new object();
 
 		/// <summary>
@@ -454,10 +472,10 @@ namespace Zyan.Communication
 		public void StartNotificationService()
 		{
 			lock (_notificationServiceLockObject)
-			{ 
+			{
 				// Wenn der Dienst nicht bereits läuft ...
 				if (_notificationService == null)
-				{ 
+				{
 					// Instanz erzeugen
 					_notificationService = new NotificationService();
 				}

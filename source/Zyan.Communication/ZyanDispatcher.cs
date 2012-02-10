@@ -271,13 +271,35 @@ namespace Zyan.Communication
 		{
 			details.ExceptionThrown = true;
 
-			_host.OnInvokeCanceled(new InvokeCanceledEventArgs
+			var args = new InvokeCanceledEventArgs
 			{
 				TrackingID = details.TrackingID,
 				CancelException = ex
-			});
+			};
 
-			throw ex;
+			_host.OnInvokeCanceled(args);
+
+			throw args.CancelException ?? new InvokeCanceledException();
+		}
+
+		/// <summary>
+		/// Fires the InvokeRejected event.
+		/// </summary>
+		/// <param name="details">Invocation details</param>
+		/// <param name="ex">Exception</param>
+		private void Invoke_FireInvokeRejectedEvent(InvocationDetails details, Exception ex)
+		{
+			details.ExceptionThrown = true;
+
+			var args = new InvokeCanceledEventArgs
+			{
+				TrackingID = details.TrackingID,
+				CancelException = ex
+			};
+
+			_host.OnInvokeRejected(args);
+
+			throw args.CancelException ?? new InvokeCanceledException();
 		}
 
 		/// <summary>
@@ -460,12 +482,15 @@ namespace Zyan.Communication
 				Args = args
 			};
 
+			var beforeInvokeOccured = false;
+
 			try
 			{
 				Invoke_LoadCallContextData(details);
 				Invoke_SetSession(details);
 				Invoke_SetTransaction(details);
 
+				beforeInvokeOccured = true;
 				ProcessBeforeInvoke(details);
 
 				Invoke_CheckInterfaceName(details);
@@ -481,7 +506,10 @@ namespace Zyan.Communication
 			}
 			catch (Exception ex)
 			{
-				Invoke_FireInvokeCanceledEvent(details, ex);
+				if (beforeInvokeOccured)
+					Invoke_FireInvokeCanceledEvent(details, ex);
+				else
+					Invoke_FireInvokeRejectedEvent(details, ex);
 			}
 			finally
 			{
