@@ -39,6 +39,12 @@ namespace Zyan.Examples.MiniChat.Server
 					ActiveNicknames.Remove(e.Identity.Name);
 				});
 
+				host.ClientSessionTerminated += new EventHandler<LoginEventArgs>((sender, e) =>
+				{
+					Console.WriteLine(string.Format("{0}: User '{1}' with IP {2} was kicked due to inactivity.", e.Timestamp.ToString(), e.Identity.Name, e.ClientAddress));
+					ActiveNicknames.Remove(e.Identity.Name);
+				});
+
 				Console.WriteLine("Chat server started. Press Enter to exit.");
 				Console.ReadLine();
 			}

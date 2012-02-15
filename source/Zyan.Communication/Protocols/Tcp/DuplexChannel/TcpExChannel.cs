@@ -323,7 +323,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// <exception cref="T:System.Security.SecurityException">The immediate caller does not have infrastructure permission. </exception>
 		public IMessageSink CreateMessageSink(string url, object remoteChannelData, out string objectURI)
 		{
-            objectURI = null;
+			objectURI = null;
 
 			if (url == null)
 			{
@@ -331,20 +331,20 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				if (channelData != null)
 					url = Manager.CreateUrl(channelData.ChannelID);
 				else
-				    return null;				
+					return null;
 			}
-            if (Manager.Parse(url, out objectURI) != null)
-            {
-                IClientChannelSink clientChannelSink = clientSinkProvider.CreateSink(this, url, remoteChannelData);
-                IMessageSink messageSink = clientChannelSink as IMessageSink;
+			if (Manager.Parse(url, out objectURI) != null)
+			{
+				IClientChannelSink clientChannelSink = clientSinkProvider.CreateSink(this, url, remoteChannelData);
+				IMessageSink messageSink = clientChannelSink as IMessageSink;
 
-                if (clientChannelSink != null && messageSink == null)
-                    throw new RemotingException(LanguageResource.RemotingException_MessageSinkNotSet);
+				if (clientChannelSink != null && messageSink == null)
+					throw new RemotingException(LanguageResource.RemotingException_MessageSinkNotSet);
 
-                return messageSink;
-            }
-            else
-                return null;
+				return messageSink;
+			}
+			else
+				return null;
 		}
 
 		#endregion

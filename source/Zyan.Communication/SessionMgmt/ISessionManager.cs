@@ -52,6 +52,17 @@ namespace Zyan.Communication.SessionMgmt
 		void RemoveSession(Guid sessionID);
 
 		/// <summary>
+		/// Removes the given session and raises the ClientSessionTerminated event.
+		/// </summary>
+		/// <param name="sessionID">Session unique identifier.</param>
+		void TerminateSession(Guid sessionID);
+
+		/// <summary>
+		/// Occurs when the client session is terminated abnormally.
+		/// </summary>
+		event EventHandler<LoginEventArgs> ClientSessionTerminated;
+
+		/// <summary>
 		/// Returns the value of the session variable.
 		/// </summary>
 		/// <param name="sessionID">Session unique identifier.</param>
