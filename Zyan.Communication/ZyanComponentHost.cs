@@ -101,6 +101,7 @@ namespace Zyan.Communication
 			_name = name;
 			_protocolSetup = protocolSetup;
 			_sessionManager = sessionManager;
+			_sessionManager.ClientSessionTerminated += (s, e) => OnClientSessionTerminated(e);
 			_catalog = catalog;
 			
 			// Verwaltung für Serialisierungshandling erzeugen
@@ -635,6 +636,11 @@ namespace Zyan.Communication
 		public event EventHandler<LoginEventArgs> ClientLoggedOff;
 
 		/// <summary>
+		/// Occurs when the client session is terminated abnormally.
+		/// </summary>
+		public event EventHandler<LoginEventArgs> ClientSessionTerminated;
+
+		/// <summary>
 		/// Fires "ClientLoggedOn" event.
 		/// </summary>
 		/// <param name="e">Arguments</param>
@@ -652,6 +658,16 @@ namespace Zyan.Communication
 		{
 			if (ClientLoggedOff != null)
 				ClientLoggedOff(this, e);
+		}
+
+		/// <summary>
+		/// Fires "ClientSessionTerminated" event.
+		/// </summary>
+		/// <param name="e">Arguments</param>
+		protected internal void OnClientSessionTerminated(LoginEventArgs e)
+		{
+			if (ClientSessionTerminated != null)
+				ClientSessionTerminated(this, e);
 		}
 
 		#endregion

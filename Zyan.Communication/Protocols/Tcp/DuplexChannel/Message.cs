@@ -1,15 +1,15 @@
 /*
  THIS CODE IS BASED ON:
- -------------------------------------------------------------------------------------------------------------- 
+ --------------------------------------------------------------------------------------------------------------
  TcpEx Remoting Channel
 
  Version 1.2 - 18 November, 2003
  Richard Mason - r.mason@qut.edu.au
-  
+
  Originally published at GotDotNet:
  http://www.gotdotnet.com/Community/UserSamples/Details.aspx?SampleGuid=3F46C102-9970-48B1-9225-8758C38905B1
 
- Copyright © 2003 Richard Mason. All Rights Reserved. 
+ Copyright © 2003 Richard Mason. All Rights Reserved.
  --------------------------------------------------------------------------------------------------------------
 */
 using System;
@@ -75,64 +75,64 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// <param name="message">Stream with raw data of the message</param>
 		public static void Send(Connection connection, Guid guid, ITransportHeaders headers, Stream message)
 		{
-            try
-            {
-                connection.LockWrite();
-                BinaryWriter writer = connection.Writer;
+			try
+			{
+				connection.LockWrite();
+				BinaryWriter writer = connection.Writer;
 
-                if (writer == null)
-                {
-                    // Unexpected connection loss. Connection isn´t working anymore, so close it.
-                    connection.ReleaseWrite();
-                    connection.Close();
-                    connection = null;
-                }
-                else
-                {
-                    writer.Write(guid.ToByteArray());
+				if (writer == null)
+				{
+					// Unexpected connection loss. Connection isn´t working anymore, so close it.
+					connection.ReleaseWrite();
+					connection.Close();
+					connection = null;
+				}
+				else
+				{
+					writer.Write(guid.ToByteArray());
 
-                    var headerStream = TransportHeaderWrapper.Serialize(headers);
-                    writer.Write((int)headerStream.Length);
-                    writer.Write(headerStream.GetBuffer(), 0, (int)headerStream.Length);
+					var headerStream = TransportHeaderWrapper.Serialize(headers);
+					writer.Write((int)headerStream.Length);
+					writer.Write(headerStream.GetBuffer(), 0, (int)headerStream.Length);
 
-                    writer.Write((int)message.Length);
-                    MemoryStream ms = message as MemoryStream;
-                    if (ms == null)
-                    {
-                        byte[] msgBuffer = new byte[message.Length];
-                        message.Read(msgBuffer, 0, (int)message.Length);
-                        writer.Write(msgBuffer, 0, (int)message.Length);
-                    }
-                    else
-                        writer.Write(ms.GetBuffer(), 0, (int)message.Length);
+					writer.Write((int)message.Length);
+					MemoryStream ms = message as MemoryStream;
+					if (ms == null)
+					{
+						byte[] msgBuffer = new byte[message.Length];
+						message.Read(msgBuffer, 0, (int)message.Length);
+						writer.Write(msgBuffer, 0, (int)message.Length);
+					}
+					else
+						writer.Write(ms.GetBuffer(), 0, (int)message.Length);
 
-                    writer.Flush();
-                }
-            }
-            catch (ObjectDisposedException)
-            {
-                // Socket may be closed meanwhile. Connection isn´t working anymore, so close it.
-                connection.ReleaseWrite();
-                connection.Close();
-                connection = null;
-            }
-            catch (IOException)
-            {
-                // Unexpected connection loss. Connection isn´t working anymore, so close it.
-                connection.ReleaseWrite();
-                connection.Close();
-                connection = null;
-            }
-            catch (SocketException)
-            {
-                // Unexpected connection loss. Connection isn´t working anymore, so close it.
-                connection.ReleaseWrite();
-                connection.Close();
-                connection = null;
-            }
+					writer.Flush();
+				}
+			}
+			catch (ObjectDisposedException)
+			{
+				// Socket may be closed meanwhile. Connection isn´t working anymore, so close it.
+				connection.ReleaseWrite();
+				connection.Close();
+				connection = null;
+			}
+			catch (IOException)
+			{
+				// Unexpected connection loss. Connection isn´t working anymore, so close it.
+				connection.ReleaseWrite();
+				connection.Close();
+				connection = null;
+			}
+			catch (SocketException)
+			{
+				// Unexpected connection loss. Connection isn´t working anymore, so close it.
+				connection.ReleaseWrite();
+				connection.Close();
+				connection = null;
+			}
 			finally
 			{
-				if (connection!=null)
+				if (connection != null)
 					connection.ReleaseWrite();
 			}
 		}
@@ -189,7 +189,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 						
 						System.Diagnostics.Debug.Assert(retVal.MessageBody.CanRead);
 					}
-					
+
 					Message.BeginReceive(connection, myAr.Callback, myAr.AsyncState);
 					
 					return retVal;
@@ -299,17 +299,17 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			public IAsyncResult InternalAsyncResult
 			{
 				get { return internalAsyncResult; }
-				set 
-				{   
-					lock (_internalAsyncResultLockObject) 
+				set
+				{
+					lock (_internalAsyncResultLockObject)
 					{
 						internalAsyncResult = value;
 					}
 				}
 			}
-		
+
 			#region Implementation of IAsyncResult
-			
+
 			/// <summary>
 			/// Gets the pass through state object.
 			/// </summary>
