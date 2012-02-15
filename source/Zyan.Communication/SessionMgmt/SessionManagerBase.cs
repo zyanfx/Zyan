@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
 using System.Timers;
+using System.Diagnostics;
+using System.Net;
+using ThreadPool = System.Threading.ThreadPool;
 
 namespace Zyan.Communication.SessionMgmt
 {
 	/// <summary>
 	/// Abstract base class for <see cref="ISessionManager"/> implementations.
-	/// Contains session sweeping logic, <see cref="CreateServerSession"/> utility method and implements <see cref="IDisposable"/> pattern. 
+	/// Contains session sweeping logic, <see cref="CreateServerSession"/> utility method and implements <see cref="IDisposable"/> pattern.
 	/// </summary>
 	public abstract class SessionManagerBase : ISessionManager
 	{
@@ -62,7 +65,7 @@ namespace Zyan.Communication.SessionMgmt
 		}
 
 		/// <summary>
-		/// Release allocated resources. 
+		/// Release allocated resources.
 		/// </summary>
 		public void Dispose()
 		{
@@ -147,9 +150,11 @@ namespace Zyan.Communication.SessionMgmt
 		/// </summary>
 		protected virtual void SweepExpiredSessions()
 		{
-			foreach (var id in ExpiredSessions)
+			var sessions = ExpiredSessions.ToArray();
+
+			foreach (var id in sessions)
 			{
-				RemoveSession(id);
+				TerminateSession(id);
 			}
 		}
 
@@ -202,6 +207,60 @@ namespace Zyan.Communication.SessionMgmt
 		/// </summary>
 		/// <param name="sessionID">Session unique identifier.</param>
 		public abstract void RemoveSession(Guid sessionID);
+
+		/// <summary>
+		/// Removes the given session and raises the ClientSessionTerminated event.
+		/// </summary>
+		/// <param name="sessionID">Session unique identifier.</param>
+		public void TerminateSession(Guid sessionID)
+		{
+			var timestamp = DateTime.MinValue;
+			var clientAddress = string.Empty;
+			IIdentity identity = null;
+
+			var session = GetSessionBySessionID(sessionID);
+			if (session != null)
+			{
+				timestamp = session.Timestamp;
+				clientAddress = session.ClientAddress;
+				identity = session.Identity;
+			}
+
+			RemoveSession(sessionID);
+
+			OnClientSessionTerminated(new LoginEventArgs(LoginEventType.Logoff, identity, clientAddress, timestamp));
+		}
+
+		/// <summary>
+		/// Occurs when the client session is terminated abnormally.
+		/// </summary>
+		public event EventHandler<LoginEventArgs> ClientSessionTerminated;
+
+		/// <summary>
+		/// Raises the <see cref="E:ClientSessionTerminated"/> event.
+		/// </summary>
+		/// <param name="args">The <see cref="Zyan.Communication.LoginEventArgs"/> instance containing the event data.</param>
+		protected void OnClientSessionTerminated(LoginEventArgs args)
+		{
+			if (ClientSessionTerminated != null)
+			{
+				// fire event handlers asynchronously
+				ThreadPool.QueueUserWorkItem(_ =>
+				{
+					try
+					{
+						if (ClientSessionTerminated != null)
+							ClientSessionTerminated(this, args);
+					}
+					catch (Exception ex)
+					{
+						var logMessage = string.Format("Warning: ClientSessionTerminated event handler has thrown" +
+							" an exception of type {0}: {1} {2}", ex.GetType(), ex.Message, ex.StackTrace);
+						Trace.WriteLine(logMessage, "Zyan");
+					}
+				});
+			}
+		}
 
 		/// <summary>
 		/// Returns the value of the session variable.
