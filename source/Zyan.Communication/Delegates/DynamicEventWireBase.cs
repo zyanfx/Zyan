@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using Zyan.Communication.SessionMgmt;
-using System.Diagnostics;
+using Zyan.Communication.Toolbox.Diagnostics;
 
 namespace Zyan.Communication.Delegates
 {
@@ -55,8 +55,7 @@ namespace Zyan.Communication.Delegates
 				ServerEventInfo.RemoveEventHandler(Component, InDelegate);
 
 				// log diagnostic message
-				var logMessage = string.Format("Warning! Event subscription is canceled due to exception: {0}", ex);
-				Trace.WriteLine(logMessage, "Zyan");
+				Trace.WriteLine("Warning! Event subscription is canceled due to exception: {0}", ex);
 				return null;
 			}
 		}

@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Runtime.Remoting.Channels;
-using System.IO;
 using System.Collections;
-using Zyan.Communication.Protocols.Tcp.DuplexChannel.Diagnostics;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Remoting.Channels;
 using System.Runtime.Serialization.Formatters;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
