@@ -115,6 +115,11 @@
     <Compile Include="ChannelSinks\Compression\CompressionServerChannelSinkProvider.cs" />
     <Compile Include="ChannelSinks\Compression\ICompressible.cs" />
     <Compile Include="ChannelSinks\Compression\NonCompressibleAttribute.cs" />
+    <Compile Include="ChannelSinks\Counter\CounterClientChannelSink.cs" />
+    <Compile Include="ChannelSinks\Counter\CounterClientChannelSinkProvider.cs" />
+    <Compile Include="ChannelSinks\Counter\CounterRemotingException.cs" />
+    <Compile Include="ChannelSinks\Counter\CounterServerChannelSink.cs" />
+    <Compile Include="ChannelSinks\Counter\CounterServerChannelSinkProvider.cs" />
     <Compile Include="ChannelSinks\Encryption\CryptoClientChannelSink.cs" />
     <Compile Include="ChannelSinks\Encryption\CryptoClientChannelSinkProvider.cs" />
     <Compile Include="ChannelSinks\Encryption\CryptoRemotingException.cs" />
@@ -234,7 +239,6 @@
     <Compile Include="Protocols\Tcp\DuplexChannel\TcpExChannel.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\TcpExChannelData.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\TransportHeaderWrapper.cs" />
-    <Compile Include="Protocols\Tcp\DuplexChannel\Diagnostics\Trace.cs" />
     <Compile Include="Security\AuthRequestMessage.cs" />
     <Compile Include="Security\AuthResponseMessage.cs" />
     <Compile Include="Security\BasicWindowsAuthProvider.cs" />
@@ -255,6 +259,7 @@
     <Compile Include="Toolbox\Compression\CompressionHelper.cs" />
     <Compile Include="Toolbox\Compression\LZF.cs" />
     <Compile Include="Toolbox\Asynchronizer.cs" />
+    <Compile Include="Toolbox\Diagnostics\Trace.cs" />
     <Compile Include="Toolbox\Disposable.cs" />
     <Compile Include="Toolbox\DynamicTypeBinder.cs" />
     <Compile Include="Toolbox\Extensions.cs" />
