@@ -6,6 +6,7 @@ using System.Runtime.Serialization.Formatters;
 using Zyan.Communication.ChannelSinks.Encryption;
 using Zyan.Communication.Toolbox;
 using System.Collections;
+using System.Net;
 
 namespace Zyan.Communication.Protocols.Http
 {
@@ -26,24 +27,42 @@ namespace Zyan.Communication.Protocols.Http
 			: this(Versioning.Strict)
 		{ }
 
+        /// <summary>
+        /// Creates a new instance of the HttpCustomClientProtocolSetup class.
+        /// </summary>
+        /// <param name="webProxy">Defines HTTP proxy settings</param>
+        public HttpCustomClientProtocolSetup(IWebProxy webProxy)
+            : this(Versioning.Strict, webProxy)
+        { }
 
 		/// <summary>
 		/// Creates a new instance of the HttpCustomClientProtocolSetup class.
 		/// </summary>
 		/// <param name="versioning">Versioning behavior</param>
 		public HttpCustomClientProtocolSetup(Versioning versioning)
-			: base((settings, clientSinkChain, serverSinkChain) => new HttpChannel(settings, clientSinkChain, serverSinkChain))
-		{
-			_channelName = "HttpCustomClientProtocolSetup" + Guid.NewGuid().ToString();
-			_versioning = versioning;
+            : this(versioning, WebRequest.DefaultWebProxy)
+		{ }
 
-			Hashtable formatterSettings = new Hashtable();
-			formatterSettings.Add("includeVersions", _versioning == Versioning.Strict);
-			formatterSettings.Add("strictBinding", _versioning == Versioning.Strict);
+        /// <summary>
+        /// Creates a new instance of the HttpCustomClientProtocolSetup class.
+        /// </summary>
+        /// <param name="versioning">Versioning behavior</param>
+        /// <param name="webProxy">Defines HTTP proxy settings</param>
+        public HttpCustomClientProtocolSetup(Versioning versioning, IWebProxy webProxy)
+            : base((settings, clientSinkChain, serverSinkChain) => new HttpChannel(settings, clientSinkChain, serverSinkChain))
+        {
+            _channelName = "HttpCustomClientProtocolSetup" + Guid.NewGuid().ToString();
+            _versioning = versioning;
 
-			ClientSinkChain.Add(new BinaryClientFormatterSinkProvider(formatterSettings, null));
-			ServerSinkChain.Add(new BinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
-		}
+            Hashtable formatterSettings = new Hashtable();
+            formatterSettings.Add("includeVersions", _versioning == Versioning.Strict);
+            formatterSettings.Add("strictBinding", _versioning == Versioning.Strict);
+
+            WebRequest.DefaultWebProxy = webProxy;
+
+            ClientSinkChain.Add(new BinaryClientFormatterSinkProvider(formatterSettings, null));
+            ServerSinkChain.Add(new BinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
+        }
 
 		/// <summary>
 		/// Creates a new instance of the HttpCustomClientProtocolSetup class.
@@ -55,6 +74,17 @@ namespace Zyan.Communication.Protocols.Http
 			_encryption = encryption;
 		}
 
+        /// <summary>
+        /// Creates a new instance of the HttpCustomClientProtocolSetup class.
+        /// </summary>
+        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
+        /// <param name="webProxy">Defines HTTP proxy settings</param>
+        public HttpCustomClientProtocolSetup(bool encryption, IWebProxy webProxy)
+            : this(webProxy)
+        {
+            _encryption = encryption;
+        }
+
 		/// <summary>
 		/// Creates a new instance of the HttpCustomClientProtocolSetup class.
 		/// </summary>
@@ -65,6 +95,18 @@ namespace Zyan.Communication.Protocols.Http
 		{
 			_encryption = encryption;
 		}
+
+        /// <summary>
+        /// Creates a new instance of the HttpCustomClientProtocolSetup class.
+        /// </summary>
+        /// <param name="versioning">Versioning behavior</param>
+        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
+        /// <param name="webProxy">Defines HTTP proxy settings</param>
+        public HttpCustomClientProtocolSetup(Versioning versioning, bool encryption, IWebProxy webProxy)
+            : this(versioning, webProxy)
+        {
+            _encryption = encryption;
+        }
 
 		/// <summary>
 		/// Creates a new instance of the HttpCustomClientProtocolSetup class.
@@ -78,18 +120,45 @@ namespace Zyan.Communication.Protocols.Http
 			_algorithm = algorithm;
 		}
 
+        /// <summary>
+        /// Creates a new instance of the HttpCustomClientProtocolSetup class.
+        /// </summary>
+        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
+        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+        /// <param name="webProxy">Defines HTTP proxy settings</param>
+        public HttpCustomClientProtocolSetup(bool encryption, string algorithm, IWebProxy webProxy)
+            : this(webProxy)
+        {
+            _encryption = encryption;
+            _algorithm = algorithm;
+        }
+
 		/// <summary>
 		/// Creates a new instance of the HttpCustomClientProtocolSetup class.
 		/// </summary>
 		/// <param name="versioning">Versioning behavior</param>
 		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
 		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
-		public HttpCustomClientProtocolSetup(Versioning versioning, bool encryption, string algorithm)
-			: this(versioning)
+        /// <param name="webProxy">Defines HTTP proxy settings</param>
+        public HttpCustomClientProtocolSetup(Versioning versioning, bool encryption, string algorithm, IWebProxy webProxy)
+			: this(versioning, webProxy)
 		{
 			_encryption = encryption;
 			_algorithm = algorithm;
 		}
+
+        /// <summary>
+        /// Creates a new instance of the HttpCustomClientProtocolSetup class.
+        /// </summary>
+        /// <param name="versioning">Versioning behavior</param>
+        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
+        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+        public HttpCustomClientProtocolSetup(Versioning versioning, bool encryption, string algorithm)
+            : this(versioning)
+        {
+            _encryption = encryption;
+            _algorithm = algorithm;
+        }
 
 		/// <summary>
 		/// Creates a new instance of the HttpCustomClientProtocolSetup class.
@@ -104,6 +173,21 @@ namespace Zyan.Communication.Protocols.Http
 			_algorithm = algorithm;
 			_maxAttempts = maxAttempts;
 		}
+
+        /// <summary>
+        /// Creates a new instance of the HttpCustomClientProtocolSetup class.
+        /// </summary>
+        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
+        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+        /// <param name="maxAttempts">Maximum number of connection attempts</param>
+        /// <param name="webProxy">Defines HTTP proxy settings</param>
+        public HttpCustomClientProtocolSetup(bool encryption, string algorithm, int maxAttempts, IWebProxy webProxy)
+            : this(webProxy)
+        {
+            _encryption = encryption;
+            _algorithm = algorithm;
+            _maxAttempts = maxAttempts;
+        }
 
 		/// <summary>
 		/// Creates a new instance of the HttpCustomClientProtocolSetup class.
@@ -120,6 +204,22 @@ namespace Zyan.Communication.Protocols.Http
 			_maxAttempts = maxAttempts;
 		}
 
+        /// <summary>
+        /// Creates a new instance of the HttpCustomClientProtocolSetup class.
+        /// </summary>
+        /// <param name="versioning">Versioning behavior</param>
+        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
+        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+        /// <param name="maxAttempts">Maximum number of connection attempts</param>
+        /// <param name="webProxy">Defines HTTP proxy settings</param>
+        public HttpCustomClientProtocolSetup(Versioning versioning, bool encryption, string algorithm, int maxAttempts, IWebProxy webProxy)
+            : this(versioning, webProxy)
+        {
+            _encryption = encryption;
+            _algorithm = algorithm;
+            _maxAttempts = maxAttempts;
+        }
+
 		/// <summary>
 		/// Creates a new instance of the HttpCustomClientProtocolSetup class.
 		/// </summary>
@@ -133,6 +233,21 @@ namespace Zyan.Communication.Protocols.Http
 			_algorithm = algorithm;
 			_oaep = oaep;
 		}
+
+        /// <summary>
+        /// Creates a new instance of the HttpCustomClientProtocolSetup class.
+        /// </summary>
+        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
+        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+        /// <param name="oaep">Specifies if OAEP padding should be activated</param>
+        /// <param name="webProxy">Defines HTTP proxy settings</param>
+        public HttpCustomClientProtocolSetup(bool encryption, string algorithm, bool oaep, IWebProxy webProxy)
+            : this(webProxy)
+        {
+            _encryption = encryption;
+            _algorithm = algorithm;
+            _oaep = oaep;
+        }
 
 		/// <summary>
 		/// Creates a new instance of the HttpCustomClientProtocolSetup class.
@@ -148,6 +263,22 @@ namespace Zyan.Communication.Protocols.Http
 			_algorithm = algorithm;
 			_oaep = oaep;
 		}
+
+        /// <summary>
+        /// Creates a new instance of the HttpCustomClientProtocolSetup class.
+        /// </summary>
+        /// <param name="versioning">Versioning behavior</param>
+        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
+        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+        /// <param name="oaep">Specifies if OAEP padding should be activated</param>
+        /// <param name="webProxy">Defines HTTP proxy settings</param>
+        public HttpCustomClientProtocolSetup(Versioning versioning, bool encryption, string algorithm, bool oaep, IWebProxy webProxy)
+            : this(versioning, webProxy)
+        {
+            _encryption = encryption;
+            _algorithm = algorithm;
+            _oaep = oaep;
+        }
 
 		/// <summary>
 		/// Creates a new instance of the HttpCustomClientProtocolSetup class.
@@ -165,6 +296,23 @@ namespace Zyan.Communication.Protocols.Http
 			_oaep = oaep;
 		}
 
+        /// <summary>
+        /// Creates a new instance of the HttpCustomClientProtocolSetup class.
+        /// </summary>
+        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
+        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+        /// <param name="maxAttempts">Maximum number of connection attempts</param>
+        /// <param name="oaep">Specifies if OAEP padding should be activated</param>
+        /// <param name="webProxy">Defines HTTP proxy settings</param>
+        public HttpCustomClientProtocolSetup(bool encryption, string algorithm, int maxAttempts, bool oaep, IWebProxy webProxy)
+            : this(webProxy)
+        {
+            _encryption = encryption;
+            _algorithm = algorithm;
+            _maxAttempts = maxAttempts;
+            _oaep = oaep;
+        }
+
 		/// <summary>
 		/// Creates a new instance of the HttpCustomClientProtocolSetup class.
 		/// </summary>
@@ -181,6 +329,24 @@ namespace Zyan.Communication.Protocols.Http
 			_maxAttempts = maxAttempts;
 			_oaep = oaep;
 		}
+
+        /// <summary>
+        /// Creates a new instance of the HttpCustomClientProtocolSetup class.
+        /// </summary>
+        /// <param name="versioning">Versioning behavior</param>
+        /// <param name="encryption">Specifies if the communication sould be encrypted</param>
+        /// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+        /// <param name="maxAttempts">Maximum number of connection attempts</param>
+        /// <param name="oaep">Specifies if OAEP padding should be activated</param>
+        /// <param name="webProxy">Defines HTTP proxy settings</param>
+        public HttpCustomClientProtocolSetup(Versioning versioning, bool encryption, string algorithm, int maxAttempts, bool oaep, IWebProxy webProxy)
+            : this(versioning, webProxy)
+        {
+            _encryption = encryption;
+            _algorithm = algorithm;
+            _maxAttempts = maxAttempts;
+            _oaep = oaep;
+        }
 
 		/// <summary>
 		/// Gets or sets the name of the symmetric encryption algorithm.
