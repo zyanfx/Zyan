@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
 using System.Timers;
-using System.Diagnostics;
 using System.Net;
+using Zyan.Communication.Toolbox.Diagnostics;
 using ThreadPool = System.Threading.ThreadPool;
 
 namespace Zyan.Communication.SessionMgmt
@@ -254,9 +254,8 @@ namespace Zyan.Communication.SessionMgmt
 					}
 					catch (Exception ex)
 					{
-						var logMessage = string.Format("Warning: ClientSessionTerminated event handler has thrown" +
+						Trace.WriteLine("Warning: ClientSessionTerminated event handler has thrown" +
 							" an exception of type {0}: {1} {2}", ex.GetType(), ex.Message, ex.StackTrace);
-						Trace.WriteLine(logMessage, "Zyan");
 					}
 				});
 			}
