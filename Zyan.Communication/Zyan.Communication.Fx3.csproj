@@ -80,6 +80,11 @@
     <Compile Include="ChannelSinks\Compression\CompressionServerChannelSinkProvider.cs" />
     <Compile Include="ChannelSinks\Compression\ICompressible.cs" />
     <Compile Include="ChannelSinks\Compression\NonCompressibleAttribute.cs" />
+    <Compile Include="ChannelSinks\Counter\CounterClientChannelSink.cs" />
+    <Compile Include="ChannelSinks\Counter\CounterClientChannelSinkProvider.cs" />
+    <Compile Include="ChannelSinks\Counter\CounterRemotingException.cs" />
+    <Compile Include="ChannelSinks\Counter\CounterServerChannelSink.cs" />
+    <Compile Include="ChannelSinks\Counter\CounterServerChannelSinkProvider.cs" />
     <Compile Include="ClientHeartbeatEventArgs.cs" />
     <Compile Include="ComponentCatalog.cs" />
     <Compile Include="ComponentInfo.cs" />
@@ -210,7 +215,6 @@
     <Compile Include="Protocols\ServerProtocolSetupExtensions.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\ClientTransportSink.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\Connection.cs" />
-    <Compile Include="Protocols\Tcp\DuplexChannel\Diagnostics\Trace.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\DuplicateConnectionException.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\Manager.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\Manager.DefaultAddressFamily.Fx3.cs" />
@@ -255,6 +259,7 @@
     <Compile Include="Toolbox\Compression\LZF.cs" />
     <Compile Include="Toolbox\ConcurrentDictionaryFx3.cs" />
     <Compile Include="Toolbox\ActionFuncDelegatesFx3.cs" />
+    <Compile Include="Toolbox\Diagnostics\Trace.cs" />
     <Compile Include="Toolbox\Disposable.cs" />
     <Compile Include="Toolbox\DynamicTypeBinder.cs" />
     <Compile Include="Toolbox\Extensions.cs" />

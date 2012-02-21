@@ -11,11 +11,11 @@
 */
 using System;
 using System.Collections;
+using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Messaging;
 using System.Runtime.Serialization.Formatters;
-using Zyan.Communication.Protocols.Tcp.DuplexChannel.Diagnostics;
-using System.Runtime.Remoting;
+using Zyan.Communication.Toolbox.Diagnostics;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
