@@ -84,6 +84,7 @@
     <Compile Include="Misc\SampleObjectSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="OneWayTests.cs" />
+    <Compile Include="StreamTests.cs" />
     <Compile Include="TypeHelperTests.cs" />
     <Compile Include="ZyanProxyTests.cs" />
   </ItemGroup>
