@@ -20,11 +20,10 @@ namespace Zyan.Communication
 	public delegate IMessage InvokeRemoteMethodDelegate(IMethodCallMessage methodCallMessage, bool allowCallInterception);
 
 	/// <summary>
-	/// Stellvertreterobjekt für den Zugriff auf eine entfernte Komponente.
+	/// Proxy to access a remote Zyan component.
 	/// </summary>
 	public class ZyanProxy : RealProxy
-	{
-		// Felder
+	{	
 		private Type _interfaceType = null;
 		private IZyanDispatcher _remoteDispatcher = null;
 		private List<DelegateCorrelationInfo> _delegateCorrelationSet = null;
