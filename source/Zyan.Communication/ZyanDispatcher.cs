@@ -343,8 +343,11 @@ namespace Zyan.Communication
 		/// <param name="details">Invocation details</param>
 		private void Invoke_ResolveComponentInstance(InvocationDetails details)
 		{
-			// get component instance
-			details.Registration = _host.ComponentRegistry[details.InterfaceName];
+            // Skip resolving registration, if already done
+            if (details.Registration == null)
+                details.Registration = _host.ComponentRegistry[details.InterfaceName];
+
+			// get component instance			
 			details.Instance = _host.GetComponentInstance(details.Registration);
 			details.Type = details.Instance.GetType();
 		}
