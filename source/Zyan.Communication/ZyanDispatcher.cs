@@ -343,11 +343,11 @@ namespace Zyan.Communication
 		/// <param name="details">Invocation details</param>
 		private void Invoke_ResolveComponentInstance(InvocationDetails details)
 		{
-            // Skip resolving registration, if already done
-            if (details.Registration == null)
-                details.Registration = _host.ComponentRegistry[details.InterfaceName];
+			// Skip resolving registration, if already done
+			if (details.Registration == null)
+				details.Registration = _host.ComponentRegistry[details.InterfaceName];
 
-			// get component instance			
+			// get component instance
 			details.Instance = _host.GetComponentInstance(details.Registration);
 			details.Type = details.Instance.GetType();
 		}
@@ -812,8 +812,9 @@ namespace Zyan.Communication
 		/// <param name="e">Event arguments</param>
 		protected virtual void OnClientHeartbeatReceived(ClientHeartbeatEventArgs e)
 		{
-			if (ClientHeartbeatReceived != null)
-				ThreadPool.QueueUserWorkItem(state => ClientHeartbeatReceived(this, e));
+			var eventHandler = ClientHeartbeatReceived;
+			if (eventHandler != null)
+				ThreadPool.QueueUserWorkItem(state => eventHandler(this, e));
 		}
 
 		/// <summary>

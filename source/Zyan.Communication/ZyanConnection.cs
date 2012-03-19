@@ -663,18 +663,33 @@ namespace Zyan.Communication
 		private bool _pollingEnabled = false;
 
 		/// <summary>
-		/// Event: Fired when disconnected.
+		/// Occurs when disconnection is detected.
 		/// </summary>
 		public event EventHandler<DisconnectedEventArgs> Disconnected;
 
 		/// <summary>
 		/// Fires the Disconnected event.
 		/// </summary>
-		/// <param name="e">Event arguments</param>
+		/// <param name="e">Event arguments.</param>
 		protected virtual void OnDisconnected(DisconnectedEventArgs e)
 		{
 			if (Disconnected != null)
 				Disconnected(this, e);
+		}
+
+		/// <summary>
+		/// Occurs when connection is restored.
+		/// </summary>
+		public event EventHandler Reconnected;
+
+		/// <summary>
+		/// Fires the Reconnected event.
+		/// </summary>
+		/// <param name="e">Event arguments.</param>
+		protected virtual void OnReconnected(EventArgs e)
+		{
+			if (Reconnected != null)
+				Reconnected(this, e);
 		}
 
 		/// <summary>
@@ -685,8 +700,8 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Fires the NewLogonNeeded event.
 		/// </summary>
-		/// <param name="e">Event arguments</param>
-		/// <returns>True, if the event is handled, otherwis false</returns>
+		/// <param name="e">Event arguments.</param>
+		/// <returns>True, if the event is handled, otherwise, false.</returns>
 		protected virtual bool OnNewLogonNeeded(NewLogonNeededEventArgs e)
 		{
 			if (NewLogonNeeded != null)
@@ -694,6 +709,7 @@ namespace Zyan.Communication
 				NewLogonNeeded(this, e);
 				return true;
 			}
+
 			return false;
 		}
 
@@ -748,7 +764,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Will be called from polling timer on ervery interval.
+		/// Will be called from polling timer on every interval.
 		/// </summary>
 		/// <param name="state">State (not used)</param>
 		internal void SendHeartbeat(object state)
@@ -788,8 +804,12 @@ namespace Zyan.Communication
 						OnDisconnected(e);
 					}
 				}
+
 				if (problemSolved)
+				{
 					PollingEnabled = true;
+					OnReconnected(EventArgs.Empty);
+				}
 				else
 					Dispose();
 			}
