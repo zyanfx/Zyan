@@ -564,6 +564,21 @@ namespace Zyan.Communication
 
 		private bool _isDisposed = false;
 
+        /// <summary>
+        /// Occurs when this instance is disposed.
+        /// </summary>
+        public event EventHandler Disposing;
+
+        /// <summary>
+        /// Fires the Disposing event.
+        /// </summary>
+        /// <param name="e">Event arguments</param>
+        protected virtual void OnDisposing(EventArgs e)
+        {
+            if (Disposing != null)
+                Disposing(this, e);
+        }
+
 		/// <summary>
 		/// Releases all managed resources.
 		/// </summary>
@@ -580,6 +595,8 @@ namespace Zyan.Communication
 		{
 			if (!_isDisposed)
 			{
+                OnDisposing(new EventArgs());
+
 				_isDisposed = true;
 
 				_hosts.Remove(this);
