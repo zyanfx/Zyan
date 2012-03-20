@@ -28,7 +28,7 @@ namespace Zyan.Communication.Composition
 
 		public ZyanConnection Connection { get { return Definition.Connection; } }
 
-		public Type ComponentInterface { get { return Definition.ComponentInterface; } }
+		public Lazy<Type> ComponentInterface { get { return Definition.ComponentInterface; } }
 
 		public string ComponentUniqueName { get { return Definition.ComponentUniqueName; } }
 
@@ -72,7 +72,7 @@ namespace Zyan.Communication.Composition
 				{
 					if (CreateProxyMethodInfo == null)
 					{
-						CreateProxyMethodInfo = CreateProxyGenericMethodInfo.MakeGenericMethod(new[] { ComponentInterface });
+						CreateProxyMethodInfo = CreateProxyGenericMethodInfo.MakeGenericMethod(new[] { ComponentInterface.Value });
 					}
 				}
 			}
