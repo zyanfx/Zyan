@@ -80,7 +80,7 @@ namespace Zyan.Communication
 			// Wenn kein Name angegeben wurde ...
 			if (string.IsNullOrEmpty(name))
 				// Ausnahme werfen
-				throw new ArgumentException(LanguageResource.ArgumentException_ComponentHostNameMissing,"name");
+				throw new ArgumentException(LanguageResource.ArgumentException_ComponentHostNameMissing, "name");
 
 			// Wenn keine Protokoll-Einstellungen angegeben wurde ...
 			if (protocolSetup == null)
@@ -103,10 +103,10 @@ namespace Zyan.Communication
 			_sessionManager = sessionManager;
 			_sessionManager.ClientSessionTerminated += (s, e) => OnClientSessionTerminated(e);
 			_catalog = catalog;
-			
+
 			// Verwaltung für Serialisierungshandling erzeugen
 			_serializationHandling = new SerializationHandlerRepository();
-			
+
 			// Komponentenaufrufer erzeugen
 			_dispatcher = new ZyanDispatcher(this);
 
@@ -125,7 +125,7 @@ namespace Zyan.Communication
 		}
 
 		#endregion
-		
+
 		#region Authentication
 
 		private IAuthenticationProvider _authProvider = null;
@@ -140,7 +140,7 @@ namespace Zyan.Communication
 		#region Session Management
 
 		private ISessionManager _sessionManager = null;
-		
+
 		/// <summary>
 		/// Returns the session manager used by this host.
 		/// </summary>
@@ -482,7 +482,7 @@ namespace Zyan.Communication
 				}
 			}
 		}
-		
+
 		/// <summary>
 		/// Beendet den Benachrichtigungsdienst.
 		/// </summary>
@@ -564,20 +564,20 @@ namespace Zyan.Communication
 
 		private bool _isDisposed = false;
 
-        /// <summary>
-        /// Occurs when this instance is disposed.
-        /// </summary>
-        public event EventHandler Disposing;
+		/// <summary>
+		/// Occurs when this instance is disposed.
+		/// </summary>
+		public event EventHandler Disposing;
 
-        /// <summary>
-        /// Fires the Disposing event.
-        /// </summary>
-        /// <param name="e">Event arguments</param>
-        protected virtual void OnDisposing(EventArgs e)
-        {
-            if (Disposing != null)
-                Disposing(this, e);
-        }
+		/// <summary>
+		/// Fires the Disposing event.
+		/// </summary>
+		/// <param name="e">Event arguments</param>
+		protected virtual void OnDisposing(EventArgs e)
+		{
+			if (Disposing != null)
+				Disposing(this, e);
+		}
 
 		/// <summary>
 		/// Releases all managed resources.
@@ -595,7 +595,7 @@ namespace Zyan.Communication
 		{
 			if (!_isDisposed)
 			{
-                OnDisposing(new EventArgs());
+				OnDisposing(new EventArgs());
 
 				_isDisposed = true;
 
@@ -663,8 +663,8 @@ namespace Zyan.Communication
 		/// <param name="e">Arguments</param>
 		protected internal void OnClientLoggedOn(LoginEventArgs e)
 		{
-			if (ClientLoggedOn!=null)
-				ClientLoggedOn(this,e);
+			if (ClientLoggedOn != null)
+				ClientLoggedOn(this, e);
 		}
 
 		/// <summary>

@@ -70,8 +70,7 @@ namespace Zyan.Communication.Composition
 							innerParts = new List<ZyanComposablePartDefinition>();
 							foreach (var component in Connection.RemoteDispatcher.GetRegisteredComponents())
 							{
-								var type = TypeHelper.GetType(component.InterfaceName, true);
-								var part = new ZyanComposablePartDefinition(Connection, type, component.UniqueName, ImplicitTransactionTransfer);
+								var part = new ZyanComposablePartDefinition(Connection, component.InterfaceName, component.UniqueName, ImplicitTransactionTransfer);
 								innerParts.Add(part);
 							}
 						}
