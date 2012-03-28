@@ -96,7 +96,6 @@
     <Compile Include="IZyanDispatcher.cs" />
     <Compile Include="LoginEventArgs.cs" />
     <Compile Include="NewLogonNeededEventArgs.cs" />
-    <Compile Include="Protocols\Versioning.cs" />
     <Compile Include="SerializationHandlerRepository.cs" />
     <Compile Include="ServerSession.cs" />
     <Compile Include="ZyanComponentHost.cs" />
@@ -239,6 +238,9 @@
     <Compile Include="Protocols\Tcp\DuplexChannel\TcpExChannel.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\TcpExChannelData.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\TransportHeaderWrapper.cs" />
+    <Compile Include="Protocols\Versioning.cs" />
+    <Compile Include="Protocols\Wrapper\ChannelWrapper.cs" />
+    <Compile Include="Protocols\Wrapper\MessageSinkWrapper.cs" />
     <Compile Include="Security\AuthRequestMessage.cs" />
     <Compile Include="Security\AuthResponseMessage.cs" />
     <Compile Include="Security\BasicWindowsAuthProvider.cs" />

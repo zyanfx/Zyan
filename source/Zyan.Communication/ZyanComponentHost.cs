@@ -333,12 +333,9 @@ namespace Zyan.Communication
 		/// </summary>
 		private void CloseChannel()
 		{
-			// Kanal suchen
-			IChannel channel = ChannelServices.GetChannel(_channelName);
-
-			// Wenn der Kanal gefunden wurde ...
+			// unregister remoting channel
+			var channel = ChannelServices.GetChannel(_channelName);
 			if (channel != null)
-				// Kanalregistrierung aufheben
 				ChannelServices.UnregisterChannel(channel);
 		}
 
