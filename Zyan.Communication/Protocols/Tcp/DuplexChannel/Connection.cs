@@ -73,16 +73,17 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 			lock (_connectionsLockObject)
 			{
-                if (_connections.ContainsKey(address))
-                {
-                    var foundConnection = _connections[address];
+				if (_connections.ContainsKey(address))
+				{
+					var foundConnection = _connections[address];
 
-                    if (foundConnection.IsClosed)
-                        _connections.Remove(address);
-                    else
-                        return foundConnection;
-                }
-				Connection connection=null;
+					if (foundConnection.IsClosed)
+						_connections.Remove(address);
+					else
+						return foundConnection;
+				}
+
+				Connection connection = null;
 
 				try
 				{
@@ -101,6 +102,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				{
 					throw new RemotingException(string.Format(LanguageResource.RemotingException_ConnectionError, formatEx.Message), formatEx);
 				}
+
 				return connection;
 			}
 		}
@@ -337,8 +339,8 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 					{
 						case ConnectionRole.ActAsClient:
 
-                            if (string.IsNullOrEmpty(_socketRemoteAddress))
-                                throw new RemotingException(LanguageResource.RemotingException_NoAddressForReconnect);
+							if (string.IsNullOrEmpty(_socketRemoteAddress))
+								throw new RemotingException(LanguageResource.RemotingException_NoAddressForReconnect);
 
 							IPAddress remoteAddress = IPAddress.Parse(_socketRemoteAddress);
 
@@ -428,18 +430,18 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			}
 		}
 
-        private bool _isClosed = false;
+		private bool _isClosed = false;
 
-        /// <summary>
-        /// Returns if the connection is already closed or not.
-        /// </summary>
-        public bool IsClosed
-        {
-            get
-            {
-                return _isClosed;
-            }
-        }
+		/// <summary>
+		/// Returns if the connection is already closed or not.
+		/// </summary>
+		public bool IsClosed
+		{
+			get
+			{
+				return _isClosed;
+			}
+		}
 
 		/// <summary>
 		/// Closes the connection.
@@ -528,7 +530,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			ReleaseRead();
 			ReleaseWrite();
 
-            _isClosed = true;
+			_isClosed = true;
 		}
 
 		#endregion

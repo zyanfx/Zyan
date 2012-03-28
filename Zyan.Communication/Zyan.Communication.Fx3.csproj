@@ -24,16 +24,18 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\bin\Debug3\</OutputPath>
+    <BaseIntermediateOutputPath>obj.fx3</BaseIntermediateOutputPath>
     <DefineConstants>TRACE;DEBUG;FX3</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>Zyan.Communication.xml</DocumentationFile>
+    <DocumentationFile>..\..\bin\Debug3\Zyan.Communication.xml</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\bin\Release3\</OutputPath>
+    <BaseIntermediateOutputPath>obj.fx3</BaseIntermediateOutputPath>
     <DefineConstants>TRACE;FX3</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -228,6 +230,8 @@
     <Compile Include="Protocols\Tcp\TcpCustomServerProtocolSetup.cs" />
     <Compile Include="Protocols\Tcp\TcpBinaryClientProtocolSetup.cs" />
     <Compile Include="Protocols\Tcp\TcpBinaryServerProtocolSetup.cs" />
+    <Compile Include="Protocols\Wrapper\ChannelWrapper.cs" />
+    <Compile Include="Protocols\Wrapper\MessageSinkWrapper.cs" />
     <Compile Include="CallContextData.cs" />
     <Compile Include="ChannelSinks\Encryption\CryptoTools.cs" />
     <Compile Include="ChannelSinks\Encryption\MiscStuff.cs" />
