@@ -29,7 +29,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 	/// <item><term>priority</term><description>The priority of the channel.</description></item>
 	/// </list>
 	/// </summary>
-	public class TcpExChannel : IChannel, IChannelSender, IChannelReceiver
+	public class TcpExChannel : IChannel, IChannelSender, IChannelReceiver, IDisposable
 	{
 		private int port = 0;
 		private int priority;
@@ -72,7 +72,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 		#endregion
 
-		#region Constructors
+		#region Constructors, initialization
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TcpExChannel"/> class with default settings (client mode).
@@ -210,13 +210,21 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 			Manager.BeginReadMessage(_channelID, null, new AsyncCallback(messageSink.ReceiveMessage), _channelID);
 		}
-		
-		#endregion
+
+		/// <summary>
+		/// Unregisters all running connections of the current <see cref="TcpExChannel"/> instance.
+		/// </summary>
+		public void Dispose()
+		{
+			Connection.UnregisterConnectionsOfChannel(this);
+		}
 
 		internal string[] GetAddresses()
 		{
 			return Manager.GetAddresses(port, _channelID);
 		}
+
+		#endregion
 
 		#region Properties
 

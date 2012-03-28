@@ -337,6 +337,11 @@ namespace Zyan.Communication
 			var channel = ChannelServices.GetChannel(_channelName);
 			if (channel != null)
 				ChannelServices.UnregisterChannel(channel);
+
+			// dispose channel if it's disposable
+			var disposableChannel = channel as IDisposable;
+			if (disposableChannel != null)
+				disposableChannel.Dispose();
 		}
 
 		#endregion

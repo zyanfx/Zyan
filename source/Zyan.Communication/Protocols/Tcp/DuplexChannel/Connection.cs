@@ -20,6 +20,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Zyan.Communication.Toolbox;
+using Zyan.Communication.Toolbox.Diagnostics;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
@@ -71,11 +72,14 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			if (channel == null)
 				throw new ArgumentNullException("channel");
 
+			Trace.WriteLine("TcpEx.Connection.GetConnection: {0}", address);
+
 			lock (_connectionsLockObject)
 			{
 				if (_connections.ContainsKey(address))
 				{
 					var foundConnection = _connections[address];
+					Trace.WriteLine("TcpEx.Connection found. ChannelID: {0}", foundConnection._channel.ChannelID);
 
 					if (foundConnection.IsClosed)
 						_connections.Remove(address);
@@ -87,6 +91,8 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 				try
 				{
+					Trace.WriteLine("TcpEx.Connection is created...");
+
 					connection = new Connection(address, channel, keepAlive, keepAliveTime, KeepAliveInterval, maxRetries, retryDelay);
 					if (!_connections.ContainsKey(address))
 						_connections.Add(address, connection); // This most often happens when using the loopback address
@@ -112,7 +118,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// </summary>
 		/// <param name="channel">TcpEx Channel</param>
 		/// <returns>Running connections</returns>
-		public static IEnumerable<Connection> GetRunningConnectionsOfChannel(TcpExChannel channel)
+		internal static IEnumerable<Connection> GetRunningConnectionsOfChannel(TcpExChannel channel)
 		{
 			if (channel == null)
 				throw new ArgumentNullException("channel");
@@ -122,6 +128,29 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				return from connection in _connections.Values
 					where connection._channel.ChannelID.Equals(channel.ChannelID)
 					select connection;
+			}
+		}
+
+		/// <summary>
+		/// Unregisters all running connections of the specified <see cref="TcpExChannel"/>.
+		/// </summary>
+		/// <param name="channel">TcpEx Channel</param>
+		internal static void UnregisterConnectionsOfChannel(TcpExChannel channel)
+		{
+			if (channel == null)
+				throw new ArgumentNullException("channel");
+
+			lock (_connectionsLockObject)
+			{
+				var toBeDeleted =
+					from pair in _connections
+					where pair.Value._channel.ChannelID.Equals(channel.ChannelID)
+					select pair.Key;
+
+				foreach (string key in toBeDeleted.ToArray())
+				{
+					_connections.Remove(key);
+				}
 			}
 		}
 
@@ -388,6 +417,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				BinaryFormatter formatter = new BinaryFormatter();
 				formatter.Serialize(stream, _channel.ChannelData);
 
+				Trace.WriteLine("TcpEx.Connection sends ChannelInfo, this ChannelID: {0}", _channel.ChannelID);
 				return true;
 			}
 			return false;
@@ -405,6 +435,8 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			{
 				BinaryFormatter formatter = new BinaryFormatter();
 				_remoteChannelData = (TcpExChannelData)formatter.Deserialize(stream);
+
+				Trace.WriteLine("TcpEx.Connection received remote ChannelInfo, ChannelID: {0}", _remoteChannelData.ChannelID);
 
 				return true;
 			}
