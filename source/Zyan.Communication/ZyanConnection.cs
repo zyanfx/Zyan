@@ -13,6 +13,8 @@ using System.Transactions;
 using Zyan.Communication.Notification;
 using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp;
+using Zyan.Communication.Protocols.Wrapper;
+using Zyan.Communication.Toolbox.Diagnostics;
 using Zyan.InterLinq.Expressions;
 
 namespace Zyan.Communication
@@ -23,6 +25,16 @@ namespace Zyan.Communication
 	public class ZyanConnection : IDisposable
 	{
 		#region Configuration
+
+		static ZyanConnection()
+		{
+			AllowUrlRandomization = true;
+		}
+
+		/// <summary>
+		/// Enables or disables URL randomization to work around Remoting Identity caching.
+		/// </summary>
+		public static bool AllowUrlRandomization { get; set; }
 
 		// URL of server
 		private string _serverUrl = string.Empty;
@@ -138,6 +150,10 @@ namespace Zyan.Communication
 			_componentHostName = addressParts[addressParts.Length - 1];
 
 			_remotingChannel = _protocolSetup.CreateChannel();
+			if (AllowUrlRandomization)
+			{
+				_remotingChannel = ChannelWrapper.WrapChannel(_remotingChannel);
+			}
 
 			if (_remotingChannel != null)
 			{
@@ -165,8 +181,8 @@ namespace Zyan.Communication
 			}
 			catch (Exception ex)
 			{
-				IChannel registeredChannel = ChannelServices.GetChannel(channelName);
-
+				// unregister remoting channel
+				var registeredChannel = ChannelServices.GetChannel(channelName);
 				if (registeredChannel != null)
 					ChannelServices.UnregisterChannel(registeredChannel);
 
@@ -347,7 +363,13 @@ namespace Zyan.Communication
 			get
 			{
 				if (_remoteDispatcher == null)
-					_remoteDispatcher = (IZyanDispatcher)Activator.GetObject(typeof(IZyanDispatcher), _serverUrl);
+				{
+					var serverUrl = _serverUrl;
+					if (AllowUrlRandomization)
+						serverUrl = ChannelWrapper.RandomizeUrl(_serverUrl);
+
+					_remoteDispatcher = (IZyanDispatcher)Activator.GetObject(typeof(IZyanDispatcher), serverUrl);
+				}
 
 				return _remoteDispatcher;
 			}
@@ -591,8 +613,8 @@ namespace Zyan.Communication
 				}
 				if (_remotingChannel != null)
 				{
+					// unregister remoting channel
 					var registeredChannel = ChannelServices.GetChannel(_remotingChannel.ChannelName);
-
 					if (registeredChannel != null)
 					{
 						if (registeredChannel == _remotingChannel)

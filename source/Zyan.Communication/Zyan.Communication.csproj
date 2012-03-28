@@ -27,7 +27,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>Zyan.Communication.xml</DocumentationFile>
+    <DocumentationFile>..\..\bin\Debug\Zyan.Communication.xml</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -266,6 +266,8 @@
     <Compile Include="Protocols\Tcp\TcpDuplexClientProtocolSetup.cs" />
     <Compile Include="Protocols\Tcp\TcpDuplexServerProtocolSetup.cs" />
     <Compile Include="Protocols\Versioning.cs" />
+    <Compile Include="Protocols\Wrapper\ChannelWrapper.cs" />
+    <Compile Include="Protocols\Wrapper\MessageSinkWrapper.cs" />
     <Compile Include="Security\BasicWindowsAuthProvider.cs" />
     <Compile Include="Security\Exceptions\AccountLockedException.cs" />
     <Compile Include="Security\Exceptions\AccountNotFoundException.cs" />
