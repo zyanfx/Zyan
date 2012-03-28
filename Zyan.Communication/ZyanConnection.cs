@@ -13,6 +13,7 @@ using System.Transactions;
 using Zyan.Communication.Notification;
 using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp;
+using Zyan.Communication.Protocols.Tcp.DuplexChannel;
 using Zyan.Communication.Protocols.Wrapper;
 using Zyan.Communication.Toolbox.Diagnostics;
 using Zyan.InterLinq.Expressions;
@@ -185,6 +186,11 @@ namespace Zyan.Communication
 				var registeredChannel = ChannelServices.GetChannel(channelName);
 				if (registeredChannel != null)
 					ChannelServices.UnregisterChannel(registeredChannel);
+
+				// dispose channel if it's disposable
+				var disposableChannel = registeredChannel as IDisposable;
+				if (disposableChannel != null)
+					disposableChannel.Dispose();
 
 				throw ex;
 			}
@@ -607,6 +613,12 @@ namespace Zyan.Communication
 				{ }
 				catch (WebException)
 				{ }
+				catch (MessageException)
+				{ }
+				catch (Exception ex)
+				{
+					Trace.WriteLine("Unexpected exception of type {0} caught while disposing ZyanConnection: {1}", ex.GetType(), ex.Message);
+				}
 				finally
 				{
 					_connections.Remove(this);
@@ -615,11 +627,14 @@ namespace Zyan.Communication
 				{
 					// unregister remoting channel
 					var registeredChannel = ChannelServices.GetChannel(_remotingChannel.ChannelName);
-					if (registeredChannel != null)
-					{
-						if (registeredChannel == _remotingChannel)
-							ChannelServices.UnregisterChannel(_remotingChannel);
-					}
+					if (registeredChannel != null && registeredChannel == _remotingChannel)
+						ChannelServices.UnregisterChannel(_remotingChannel);
+
+					// dispose remoting channel, if it's disposable
+					var disposableChannel = _remotingChannel as IDisposable;
+					if (disposableChannel != null)
+						disposableChannel.Dispose();
+
 					_remotingChannel = null;
 				}
 				_remoteDispatcher = null;

@@ -5,13 +5,14 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading;
+using Zyan.Communication.Toolbox.Diagnostics;
 
 namespace Zyan.Communication.Protocols.Wrapper
 {
 	/// <summary>
 	/// Wraps up IChannel instance to implement custom URI processing.
 	/// </summary>
-	internal class ChannelWrapper : IChannel, IChannelSender, IChannelReceiver
+	internal class ChannelWrapper : IChannel, IChannelSender, IChannelReceiver, IDisposable
 	{
 		/// <summary>
 		/// Creates channel wrapper aroung the given remoting channel.
@@ -110,6 +111,22 @@ namespace Zyan.Communication.Protocols.Wrapper
 		public void StopListening(object data)
 		{
 			InnerChannelReceiver.StopListening(data);
+		}
+
+		public void Dispose()
+		{
+			try
+			{
+				var disposable = InnerChannel as IDisposable;
+				if (disposable != null)
+				{
+					disposable.Dispose();
+				}
+			}
+			catch (Exception ex)
+			{
+				Trace.WriteLine("Unexpected exception of type {0} while disposing ChannelWrapper: {1}", ex.GetType(), ex.Message);
+			}
 		}
 	}
 }
