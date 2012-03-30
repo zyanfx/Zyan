@@ -5,62 +5,57 @@ using Zyan.Communication.Protocols;
 namespace Zyan.Communication
 {
 	/// <summary>
-	/// Beschreibt Konfigurationseinstellungen für eine einzelne Zyan-Verbindung.
+	/// Describes configuration settings for setup a single Zyan Connection.
 	/// </summary>
 	[Serializable]
 	public class ZyanConnectionSetup
 	{
 		/// <summary>
-		/// Ersellt eine neue Instanz von ZyanConnectionSetup.
+		/// Creates a new instance of the ZyanConnectionSetup class.
 		/// </summary>
 		public ZyanConnectionSetup()
 		{
-			// Auflistung für Anmeldeinformationen erzeugen
 			Credentials = new Hashtable();
 
-			// Standardwerte festlegen
 			AutoLoginOnExpiredSession = false;
 			KeepSessionAlive = true;
 		}
 
 		/// <summary>
-		/// Gibt den Server-URL (z.B. "tcp://server1:46123/host1") zurück oder legt ihn fest.
+		/// Get or sets the server URL (e.G. "tcp://server1:46123/host1") 
 		/// </summary>
 		public string ServerUrl { get; set; }
 
 		/// <summary>
-		/// Gibt die Protokollkonfiguration zurück oder legt sie fest.
+		/// Gets or sets the protocol setup to be used.
 		/// </summary>
 		public IClientProtocolSetup ProtocolSetup { get; set; }
 
 		/// <summary>
-		/// Gibt die Anmeldeinformationen zurück, oder legt sie fest.
+		/// Gets or sets the login credentials.
 		/// </summary>
 		public Hashtable Credentials { get; set; }
 
 		/// <summary>
-		/// Gibt zurück, ob sich die Verbindung automatisch neu anmelden soll, wenn die Sitzung abgelaufen ist, oder legt diest fest.
+		/// Gets or sets wether Zyan should login automatically with cached credentials after the session is expired.
 		/// </summary>
 		public bool AutoLoginOnExpiredSession { get; set; }
 
 		/// <summary>
-		/// Gibt zurück, ob die Sitzung automatisch turnusgemäß verlängert werden soll, oder legt dies fest.
+		/// Gets or sets wether the session should be kept alive.
 		/// </summary>
 		public bool KeepSessionAlive { get; set; }
 
 		/// <summary>
-		/// Fügt ein neue Anmeldeinformation hinzu.
+		/// Adds a new credential.
 		/// </summary>
 		/// <param name="name">Name</param>
-		/// <param name="value">Wert</param>
+		/// <param name="value">Value</param>
 		public void AddCredential(string name, string value)
 		{
-			// Wenn noch keine Auflistung für Anmeldeinformationen existiert ...
 			if (Credentials == null)
-				// Neue Auflistung erzeugen
 				Credentials = new Hashtable();
 
-			// Name-Wert-Paar hinzufügen
 			Credentials.Add(name, value);
 		}
 	}

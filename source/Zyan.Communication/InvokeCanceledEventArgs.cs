@@ -3,18 +3,18 @@
 namespace Zyan.Communication
 {
 	/// <summary>
-	/// Beschreibt Ereignisargumente für Aufrufabbruch-Ereignisse.
+	/// Arguments for the InvokeCanceled event.
 	/// </summary>
 	public class InvokeCanceledEventArgs : EventArgs
 	{
 		/// <summary>
-		/// Gibt den Nachverfolgungsschlüssel des Methodenaufrufs zurück, oder legt ihn fest.
+        /// Gets or sets a unique ID for call tracking.
 		/// </summary>
 		public Guid TrackingID { get; set; }
 
-		/// <summary>
-		/// Gibt die Ausnahme für den Abbruch zurück, oder legt sie fest.
-		/// </summary>
-		public Exception CancelException { get; set; }
+        /// <summary>
+        /// Gets or sets the exception in case of cancellation.
+        /// </summary>
+        public Exception CancelException { get; set; }
 	}
 }
