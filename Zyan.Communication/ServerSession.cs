@@ -5,36 +5,35 @@ using Zyan.Communication.SessionMgmt;
 namespace Zyan.Communication
 {
 	/// <summary>
-	/// Beschreibt eine Sitzung auf dem Server.
+	/// Describes a server session.
 	/// </summary>
 	[Serializable]
 	public class ServerSession
 	{
-		// Felder
 		private Guid _sessionID;
 		private IIdentity _identity;
 		private DateTime _timestamp;
 		private string _clientAddress;
 
-		// Adapter für den Zugriff auf Sitzungsvariablen
+		// Adapter for accessing session variables.
 		[NonSerialized]
 		private SessionVariableAdapter _sessionVariableAdapter = null;
 
 		/// <summary>
-		/// Erzeugt eine neue Instanz von ServerSession.
+		/// Creates a new instance of the ServerSession class.
 		/// </summary>
-		/// <param name="sessionID">Sitzungsschlüssel</param>
-		/// <param name="identity">Identität</param>
-		/// <param name="sessionVariableAdapter">Adapter für den Zugriff auf Sitzungsvariablen</param>
+		/// <param name="sessionID">Session ID</param>
+		/// <param name="identity">Client identity</param>
+        /// <param name="sessionVariableAdapter">Adapter for accessing session variables</param>
 		internal ServerSession(Guid sessionID, IIdentity identity, SessionVariableAdapter sessionVariableAdapter) : this(sessionID, DateTime.Now, identity, sessionVariableAdapter) { }
 
 		/// <summary>
-		/// Erzeugt eine neue Instanz von ServerSession.
+        /// Creates a new instance of the ServerSession class.
 		/// </summary>
-		/// <param name="sessionID">Sitzungsschlüssel</param>
+        /// <param name="sessionID">Session ID</param>
 		/// <param name="timestamp">Zeitstempel der Sitzung</param>
-		/// <param name="identity">Identität</param>
-		/// <param name="sessionVariableAdapter">Adapter für den Zugriff auf Sitzungsvariablen</param>
+        /// <param name="identity">Client identity</param>
+        /// <param name="sessionVariableAdapter">Adapter for accessing session variables</param>
 		internal ServerSession(Guid sessionID, DateTime timestamp, IIdentity identity, SessionVariableAdapter sessionVariableAdapter)
 		{
 			_timestamp = timestamp;
@@ -44,7 +43,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Gibt den Sitzungsschlüssel zurück.
+		/// Gets the session ID.
 		/// </summary>
 		public Guid SessionID
 		{
@@ -52,7 +51,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Gibt die Identität des Beutzers der Sitzung zurück.
+		/// Gets the identity of the client.
 		/// </summary>
 		public IIdentity Identity
 		{
@@ -60,7 +59,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Gibt den Zeitstempel der Sitzung zurück.
+		/// Gets or sets the timestamp of the session.
 		/// </summary>
 		public DateTime Timestamp
 		{
@@ -69,7 +68,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Gibt ein Adapter-Objekt für den Zugriff auf Sitzungsvariablen zurück.
+        /// Gets the adapter for accessing session variables.
 		/// </summary>
 		public ISessionVariableAdapter SessionVariables
 		{
@@ -86,7 +85,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Gibt die Sitzung des aktuellen Threads zurück.
+		/// Gets the session of the current thread.
 		/// </summary>
 		[ThreadStatic]
 		public static ServerSession CurrentSession;

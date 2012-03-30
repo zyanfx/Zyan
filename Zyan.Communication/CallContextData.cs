@@ -5,25 +5,24 @@ using System.Runtime.Remoting.Messaging;
 namespace Zyan.Communication
 {
 	/// <summary>
-	/// Speichert Daten, die über Prozessgrenzen hinweg implizit im Aufrufkontext übertragen werden können.
+    /// Stores data that travels with the call context from client to server and back.
 	/// </summary>
 	[Serializable]
 	public class LogicalCallContextData : ILogicalThreadAffinative
 	{
-		// Datenspeicher
+		// Data store
 		private Hashtable _store = null;
 
 		/// <summary>
-		/// Erstellt eine neue Instanz von LogicalCallContextData.
+		/// Creates a new instance of LogicalCallContextData.
 		/// </summary>
 		public LogicalCallContextData()
 		{
-			// Neuen Datenspeicher erzeugen
 			_store = new Hashtable();
 		}
 
 		/// <summary>
-		/// Gibt den Datenspeicher zurück.
+		/// Gets the data store.
 		/// </summary>
 		public Hashtable Store
 		{

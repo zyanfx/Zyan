@@ -5,73 +5,63 @@ using Zyan.Communication.Delegates;
 namespace Zyan.Communication
 {
 	/// <summary>
-	/// Beschreibt Ereignisargumente für Aufrufereignisse.
+	/// Describes arguments for events raised after remote method invocation.
 	/// </summary>
 	public class AfterInvokeEventArgs : EventArgs
 	{
 		/// <summary>
-		/// Gibt den Nachverfolgungsschlüssel des Methodenaufrufs zurück, oder legt ihn fest.
+		/// Gets or sets a unique ID for call tracking.
 		/// </summary>
 		public Guid TrackingID { get; set; }
 
 		/// <summary>
-		/// Gibt den Namen der Komponentenschnittstelle zurück, oder legt ihn fest.
+		/// Gets or sets the interface name of the remote component.
 		/// </summary>
 		public string InterfaceName { get; set; }
 
 		/// <summary>
-		/// Gibt den Korrelationssatz für Delegaten zurück, oder legt ihn fest.
+		/// Gets or sets the correlation set for wiring remote delegates.
 		/// </summary>
 		public List<DelegateCorrelationInfo> DelegateCorrelationSet { get; set; }
 
 		/// <summary>
-		/// Gibt den Methodennamen zurück, oder legt ihn fest.
+		/// Gets or sets the name of the remote method to be invoked.
 		/// </summary>
 		public string MethodName { get; set; }
 
 		/// <summary>
-		/// Gibt die Methodenargumente zurück, oder legt sie fest.
+		/// Gets or sets method arguments (parameters).
 		/// </summary>
 		public object[] Arguments { get; set; }
 
 		/// <summary>
-		/// Gibt den Rückgabewert der Methode zurück, oder legt ihn fest.
+		/// Gets or sets the return value of the invoked method.
 		/// </summary>
 		public object ReturnValue { get; set; }
 
 		/// <summary>
-		/// Gibt den Inhalt des Objekts als Zeichenkette ausgedrückt zurück.
+		/// Returns a string representation of this event arguments.
 		/// </summary>
-		/// <returns>Zeichenkette</returns>
+		/// <returns>String representation of data</returns>
 		public override string ToString()
 		{
-			// Auflistung für String-Repräsentation der Argumente erzeugen
 			List<string> argsAsString = new List<string>();
 
-			// Wenn Argumente vorhanden sind ...
 			if (Arguments != null)
 			{
-				// Alle Argumente durchlaufen
 				foreach (object arg in Arguments)
 				{
-					// Wenn das aktuelle Argument null ist ...
 					if (arg == null)
-						// "null" in Auflistung schreiben
 						argsAsString.Add("null");
 					else
-						// ToString-Ausgabe in Auflistung schreiben
 						argsAsString.Add(arg.ToString());
 				}
 			}
-			// Argumentkette aufbauen
 			string argChain = string.Join(", ", argsAsString.ToArray());
 
-			// Wenn der Rückgabewert nicht null ist ...
 			if (ReturnValue != null)
-				// Aufruf als Zeichenkette formatieren und zurückgeben
 				return string.Format("{0}.{1}({2}) = {3}", InterfaceName, MethodName, argChain, ReturnValue.ToString());
 			else
-				// Aufruf als Zeichenkette formatieren und zurückgeben
 				return string.Format("{0}.{1}({2}) = null", InterfaceName, MethodName, argChain);
 		}
 	}

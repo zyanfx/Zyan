@@ -5,28 +5,27 @@ using Zyan.Communication.Toolbox;
 namespace Zyan.Communication
 {
 	/// <summary>
-	/// Delegat für benutzerdefinierte Aufrufabfanglogik.
+	/// Delegate to call custom call intercaption logic.
 	/// </summary>
-	/// <param name="action">Aufrufabfang-Aktion</param>
+	/// <param name="action">Interception action details</param>
 	public delegate void CallInterceptionDelegate(CallInterceptionData action);
 
 	/// <summary>
-	/// Allgemeine Implementierung einer Aufrufabfangvorrichtung.
+	/// General implementation of a call interception device.
 	/// </summary>
 	public class CallInterceptor
 	{
 		/// <summary>
-		/// Erzeugt eine neue Instanz der CallInterceptor-Klasse.
+		/// Creates a new instance of the CallInterceptor class.
 		/// </summary>
-		/// <param name="interfaceType">Schnittstellentyp der Komponente, deren Aufrufe abgefangen werden sollen</param>
-		/// <param name="uniqueName">Unique name of the intercepted component.</param>
-		/// <param name="memberType">Art des Members, dessen Aufrufe abgefangen werden sollen</param>
-		/// <param name="memberName">Name des Members, dessen Aufrufe abgefangen werden sollen</param>
-		/// <param name="parameterTypes">Array mit den Typen der Parameter des abzufangenden Members</param>
-		/// <param name="onInterception">Delegat, der beim Abfangen aufgerufen wird</param>
+		/// <param name="interfaceType">Interface type of the intercepted component</param>
+		/// <param name="uniqueName">Unique name of the intercepted component</param>
+		/// <param name="memberType">Type of the intercepted member</param>
+		/// <param name="memberName">Name of the intercepted member</param>
+		/// <param name="parameterTypes">Types of parameters for the intercepted member</param>
+		/// <param name="onInterception">Callback for custom call interception logic</param>
 		public CallInterceptor(Type interfaceType, string uniqueName, MemberTypes memberType, string memberName, Type[] parameterTypes, CallInterceptionDelegate onInterception)
 		{
-			// Eigenschaften füllen
 			InterfaceType = interfaceType;
 			UniqueName = string.IsNullOrEmpty(uniqueName) ? interfaceType.FullName : uniqueName;
 			MemberType = memberType;
@@ -37,20 +36,20 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Erzeugt eine neue Instanz der CallInterceptor-Klasse.
+        /// Creates a new instance of the CallInterceptor class.
 		/// </summary>
-		/// <param name="interfaceType">Schnittstellentyp der Komponente, deren Aufrufe abgefangen werden sollen</param>
-		/// <param name="memberType">Art des Members, dessen Aufrufe abgefangen werden sollen</param>
-		/// <param name="memberName">Name des Members, dessen Aufrufe abgefangen werden sollen</param>
-		/// <param name="parameterTypes">Array mit den Typen der Parameter des abzufangenden Members</param>
-		/// <param name="onInterception">Delegat, der beim Abfangen aufgerufen wird</param>
+        /// <param name="interfaceType">Interface type of the intercepted component</param>
+        /// <param name="memberType">Type of the intercepted member</param>
+        /// <param name="memberName">Name of the intercepted member</param>
+        /// <param name="parameterTypes">Types of parameters for the intercepted member</param>
+        /// <param name="onInterception">Callback for custom call interception logic</param>
 		public CallInterceptor(Type interfaceType, MemberTypes memberType, string memberName, Type[] parameterTypes, CallInterceptionDelegate onInterception)
 			: this(interfaceType, null, memberType, memberName, parameterTypes, onInterception)
 		{
 		}
 
 		/// <summary>
-		/// Gibt die Schnittstelle der Komponenten zurück, deren Aufruf abgefangen werden soll, oder legt sie fest.
+        /// Gets the interface type of the intercepted component.
 		/// </summary>
 		public Type InterfaceType { get; private set; }
 
@@ -60,22 +59,25 @@ namespace Zyan.Communication
 		public string UniqueName { get; private set; }
 
 		/// <summary>
-		/// Gibt die Art des abzufangenden Members zurück, oder legt ihn fest.
+        /// Gets the Type of the intercepted member.
 		/// </summary>
 		public MemberTypes MemberType { get; private set; }
 
 		/// <summary>
-		/// Gibt den Namen der abzufangenden Methode zurück, oder legt ihn fest.
+        /// Gets the name of the intercepted member.
 		/// </summary>
 		public string MemberName { get; private set; }
 
 		/// <summary>
-		/// Gibt ein Array der als Parameter erwarteten Typen der aubzufangenden Methode zurück, oder legt sie fest.
+        /// Gets the types of parameters for the intercepted member.
+        /// <remarks>
+        /// CAUTION! Order is relevant.
+        /// </remarks>
 		/// </summary>
 		public Type[] ParameterTypes { get; private set; }
 
 		/// <summary>
-		/// Gibt den Delegaten zurück, der beim Abfangen des Aufrufs anstelle dessen aufgerufen wird, oder legt ihn fest.
+        /// Get a callback for custom call interception logic
 		/// </summary>
 		public CallInterceptionDelegate OnInterception { get; private set; }
 

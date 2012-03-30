@@ -1,18 +1,18 @@
 ﻿namespace Zyan.Communication
 {
 	/// <summary>
-	/// Aufzählung der verfügbaren Aktivierungsarten.
+	/// Enumeration of supported activation types.
 	/// </summary>
 	public enum ActivationType : short
 	{
 		/// <summary>
-		/// Komponenteninstanz lebt nur einen Aufruf lang. Für jeden Aufruf wird eine separate Instanz erzeugt.
-		/// <remarks>SingleCallaktivierte Komponenten müssen nicht threadsicher sein.</remarks>
+		/// Component instance lives only for a single call.
+        /// <remarks>Single call activated components need not be thread-safe</remarks>
 		/// </summary>
 		SingleCall = 1,
 		/// <summary>
-		/// Komponenteninstanz wird bei erstem Aufruf erzeugt und wird für alle weiteren Aufrufe wiederverwendet.
-		/// <remarks>Singltonaktivierte Komponenten müssen threadsicher sein.</remarks>
+		/// Component instance is created on first call and reused for all subsequent calls.
+		/// <remarks>Singleton activated components must be thread-safe</remarks>
 		/// </summary>
 		Singleton
 	}
