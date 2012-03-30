@@ -3,23 +3,23 @@
 namespace Zyan.Communication
 {
 	/// <summary>
-	/// Implementieren Sie diese Schnittstelle, um eine benutzerdefinierte Serialisierung für einen bestimmten Typen zu erstellen.
+	/// Interface for custom serialization handling.
 	/// </summary>
 	public interface ISerializationHandler
 	{
 		/// <summary>
-		/// Serailisiert ein Objekt.
+		/// Serializes an object.
 		/// </summary>
-		/// <param name="data">Objekt</param>
-		/// <returns>Rohdaten</returns>
+		/// <param name="data">Object</param>
+		/// <returns>Serialized raw data</returns>
 		byte[] Serialize(object data);
 
 		/// <summary>
-		/// Deserialisiert Rohdaten in ein Objekt eines bestimmten Typs.
+		/// Deserializes raw data back into an object of a specified type.
 		/// </summary>
-		/// <param name="dataType">Typ der Daten</param>
-		/// <param name="data">Rohdaten</param>
-		/// <returns>Objekt</returns>
+		/// <param name="dataType">Type for deserialization</param>
+        /// <param name="data">Serialized raw data</param>
+		/// <returns>Object</returns>
 		object Deserialize(Type dataType, byte[] data);
 	}
 }

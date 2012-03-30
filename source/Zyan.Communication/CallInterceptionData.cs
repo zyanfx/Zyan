@@ -3,25 +3,24 @@
 namespace Zyan.Communication
 {
 	/// <summary>
-	/// Beschreibt eine konkretee Aufrufabfangaktion.
+	/// Describes a single call interception action.
 	/// </summary>
 	public class CallInterceptionData
 	{
-		// Delegat für den Aufruf von InvokeRemoteMethod (bei Bedarf)
+		// Delegate for remote invocation
 		InvokeRemoteMethodDelegate _remoteInvoker = null;
 
-		// Remoting-Nachricht
+		// Remoting message
 		IMethodCallMessage _remotingMessage = null;
 
 		/// <summary>
-		/// Erstellt eine neue Instanz der CallInterceptionData-Klasse.
+		/// Creates a new instance of the CallInterceptionData class.
 		/// </summary>
-		/// <param name="parameters">Parameterwerte des abgefangenen Aufrufs</param>
-		/// <param name="remoteInvoker">Delegat für den Aufruf von InvokeRemoteMethod (bei Bedarf)</param>
-		/// <param name="remotingMessage">Remoting-nachricht</param>
+		/// <param name="parameters">Parameter values of the intercepted call</param>
+		/// <param name="remoteInvoker">Delegate for remote invocation</param>
+		/// <param name="remotingMessage">Remoting message</param>
 		public CallInterceptionData(object[] parameters, InvokeRemoteMethodDelegate remoteInvoker, IMethodCallMessage remotingMessage)
 		{
-			// Felder füllen
 			Intercepted = false;
 			ReturnValue = null;
 			Parameters = parameters;
@@ -30,32 +29,25 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Führt den entfernten Methodenaufruf aus.
+		/// Makes a remote call.
 		/// </summary>
-		/// <returns>Rückgabewert</returns>
+		/// <returns>Return value of the remotly called method</returns>
 		public object MakeRemoteCall()
 		{
-			// Entfernte Methode aufrufen
 			var returnMessage = _remoteInvoker(_remotingMessage, false) as ReturnMessage;
 
-			// Wenn eine gültige Rückgabenachricht zurückgegeben wurde ...
 			if (returnMessage != null)
 			{
 				if (returnMessage.Exception != null)
-				{
 					throw returnMessage.Exception;
-				}
 
-				// Rückgabewert zurückgeben
 				return returnMessage.ReturnValue;
 			}
-
-			// null zurückgeben
 			return null;
 		}
 
 		/// <summary>
-		/// Gibt zurück, ob der Aufruf abgefangen wurde, oder legt dies fest.
+        /// Gets or sets wether the call was intercepted.
 		/// </summary>
 		public bool Intercepted
 		{
@@ -64,7 +56,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Gibt den zu verwendenden Rückgabewert zurück, oder legt ihn fest.
+		/// Gets or sets the return value to be used.
 		/// </summary>
 		public object ReturnValue
 		{
@@ -73,7 +65,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Gibt ein Array der Parameterwerten zurück, mit welchen die abzufangende Methode aufgerufen wurde, oder legt sie fest.
+		/// Gets or sets the parameters which are passed to the call.
 		/// </summary>
 		public object[] Parameters
 		{

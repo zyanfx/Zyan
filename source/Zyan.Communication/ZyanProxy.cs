@@ -12,11 +12,11 @@ using Zyan.InterLinq;
 namespace Zyan.Communication
 {
 	/// <summary>
-	/// Delegat für den Aufruf von InvokeRemoteMethod.
+	/// Delegate for remote method invocation.
 	/// </summary>
-	/// <param name="methodCallMessage">Remoting-Nachricht</param>
-	/// <param name="allowCallInterception">Gibt an, ob das Abfangen von Aufrufen zugelassen wird, oder nicht</param>
-	/// <returns>Antwortnachricht</returns>
+	/// <param name="methodCallMessage">Remoting message</param>
+    /// <param name="allowCallInterception">Specifies whether the interception of calls will be allowed, or not</param>
+	/// <returns>Response Remoting message</returns>
 	public delegate IMessage InvokeRemoteMethodDelegate(IMethodCallMessage methodCallMessage, bool allowCallInterception);
 
 	/// <summary>
@@ -39,65 +39,41 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Konstruktor.
 		/// </summary>
-		/// <param name="uniqueName">Eindeutiger Komponentenname</param>
-		/// <param name="type">Schnittstelle der entfernten Komponente</param>
+		/// <param name="uniqueName">Unique component name</param>
+		/// <param name="type">Component interface type</param>
 		/// <param name="connection">Verbindungsobjekt</param>
-		/// <param name="implicitTransactionTransfer">Implizite Transaktionsübertragung</param>
-		/// <param name="sessionID">Sitzungsschlüssel</param>
-		/// <param name="componentHostName">Name des entfernten Komponentenhosts</param>
-		/// <param name="autoLoginOnExpiredSession">Gibt an, ob sich der Proxy automatisch neu anmelden soll, wenn die Sitzung abgelaufen ist</param>
-		/// <param name="autoLogoninCredentials">Optional! Anmeldeinformationen, die nur benötigt werden, wenn autoLoginOnExpiredSession auf Wahr eingestellt ist</param>
-		/// <param name="activationType">Aktivierungsart</param>
+		/// <param name="implicitTransactionTransfer">Specifies whether transactions should be passed implicitly</param>
+		/// <param name="sessionID">Session ID</param>
+		/// <param name="componentHostName">Name of the remote component host</param>
+        /// <param name="autoLoginOnExpiredSession">Specifies whether Zyan should login automatically with cached credentials after the session is expired.</param>
+		/// <param name="autoLogoninCredentials">Optional credentials to be used for automatic logon after session is expired</param>
+		/// <param name="activationType">Component activation type</param>
 		public ZyanProxy(string uniqueName, Type type, ZyanConnection connection, bool implicitTransactionTransfer, Guid sessionID, string componentHostName, bool autoLoginOnExpiredSession, Hashtable autoLogoninCredentials, ActivationType activationType)
 			: base(type)
 		{
-			// Wenn kein Typ angegeben wurde ...
 			if (type.Equals(null))
-				// Ausnahme werfen
 				throw new ArgumentNullException("type");
 
-			// Wenn kein Verbindungsobjekt angegeben wurde ...
 			if (connection == null)
-				// Ausnahme werfen
 				throw new ArgumentNullException("connection");
 
-			// Wenn kein eindeutiger Name angegeben wurde ...
 			if (string.IsNullOrEmpty(uniqueName))
-				// Name der Schnittstelle verwenden
 				_uniqueName = type.FullName;
 			else
 				_uniqueName = uniqueName;
 
-			// Sitzungsschlüssel übernehmen
 			_sessionID = sessionID;
-
-			// Verbindungsobjekt übernehmen
 			_connection = connection;
-
-			// Name des Komponentenhosts übernehmen
 			_componentHostName = componentHostName;
-
-			// Schnittstellentyp übernehmen
 			_interfaceType = type;
-
-			// Aktivierungsart übernehmen
 			_activationType = activationType;
-
-			// Aufrufer von Verbindung übernehmen
 			_remoteDispatcher = _connection.RemoteDispatcher;
-
-			// Schalter für implizite Transaktionsübertragung übernehmen
 			_implicitTransactionTransfer = implicitTransactionTransfer;
-
-			// Schalter für automatische Anmeldung bei abgelaufender Sitzung übernehmen
 			_autoLoginOnExpiredSession = autoLoginOnExpiredSession;
 
-			// Wenn automatische Anmeldung aktiv ist ...
 			if (_autoLoginOnExpiredSession)
-				// Anmeldeinformationen speichern
 				_autoLoginCredentials = autoLogoninCredentials;
 
-			// Sammlung für Korrelationssatz erzeugen
 			_delegateCorrelationSet = new List<DelegateCorrelationInfo>();
 		}
 
@@ -388,30 +364,24 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Führt einen entfernten Methodenaufruf aus.
+		/// Invokes a remote method.
 		/// </summary>
-		/// <param name="methodCallMessage">Remoting-Nachricht mit Details für den entfernten Methodenaufruf</param>
-		/// <param name="allowCallInterception">Gibt an, ob das Abfangen von Aufrufen zugelassen wird, oder nicht</param>
-		/// <returns>Remoting Antwortnachricht</returns>
+		/// <param name="methodCallMessage">Remoting message</param>
+		/// <param name="allowCallInterception">Specifies whether call interception is allowed</param>
+		/// <returns>Remoting response message</returns>
 		internal IMessage InvokeRemoteMethod(IMethodCallMessage methodCallMessage, bool allowCallInterception)
 		{
-			// Aufrufschlüssel vergeben
 			Guid trackingID = Guid.NewGuid();
 
 			try
 			{
-				// Variable für Rückgabewert
 				object returnValue = null;
 
-				// Variable für Verdrahtungskorrelationssatz
 				List<DelegateCorrelationInfo> correlationSet = null;
 
-				// Wenn die Komponente SingleCallaktiviert ist ...
 				if (_activationType == ActivationType.SingleCall)
-					// Korrelationssatz übernehmen (wird mit übertragen)
 					correlationSet = _delegateCorrelationSet;
 
-				// Ereignisargumente für BeforeInvoke erstellen
 				BeforeInvokeEventArgs cancelArgs = new BeforeInvokeEventArgs()
 				{
 					TrackingID = trackingID,
@@ -421,21 +391,15 @@ namespace Zyan.Communication
 					Arguments = methodCallMessage.Args,
 					Cancel = false
 				};
-				// BeforeInvoke-Ereignis feuern
 				_connection.OnBeforeInvoke(cancelArgs);
 
-				// Wenn der Aufruf abgebrochen werden soll ...
 				if (cancelArgs.Cancel)
 				{
-					// Wenn keine Abbruchausnahme definiert ist ...
 					if (cancelArgs.CancelException == null)
-						// Standard-Abbruchausnahme erstellen
 						cancelArgs.CancelException = new InvokeCanceledException();
 
-					// InvokeCanceled-Ereignis feuern
 					_connection.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = cancelArgs.CancelException });
 
-					// Abbruchausnahme werfen
 					throw cancelArgs.CancelException;
 				}
 
@@ -446,53 +410,38 @@ namespace Zyan.Communication
 					genericArgs = methodCallMessage.MethodBase.GetGenericArguments();
 				}
 
-				// Parametertypen ermitteln
 				var paramDefs = methodCallMessage.MethodBase.GetParameters();
 				var paramTypes = paramDefs.Select(p => p.ParameterType).ToArray();
 
-				// Abfragen, ob Abfangvorrichtungen verarbeitet werden sollen
 				bool callInterception = allowCallInterception && !CallInterceptor.IsPaused;
 
-				// Wenn Aufrufabfangvorrichtungen verarbeitet werden sollen ...
 				if (callInterception)
 				{
-					// Passende Aufrufabfangvorrichtung suchen
 					CallInterceptor interceptor = _connection.CallInterceptors.FindMatchingInterceptor(_interfaceType, _uniqueName, methodCallMessage);
 
-					// Wenn eine passende Aufrufabfangvorrichtung gefunden wurde ...
 					if (interceptor != null)
 					{
-						// Aufrufdaten zusammenstellen
 						CallInterceptionData interceptionData = new CallInterceptionData(methodCallMessage.Args, new InvokeRemoteMethodDelegate(this.InvokeRemoteMethod), methodCallMessage);
 
-						// Wenn ein Delegat für die Behandlung der Abfangaktion hinterlegt ist ...
 						if (interceptor.OnInterception != null)
-							// Aufruf abfangen
 							interceptor.OnInterception(interceptionData);
 
-						// Wenn der Aufruf abgefangen wurde ...
 						if (interceptionData.Intercepted)
-							// Rückgabewert übernehmen
 							returnValue = interceptionData.ReturnValue;
 						else
-							// Schalter für Aufrufabfangverarbeitung zurücksetzen
 							callInterception = false;
 					}
 					else
 						callInterception = false;
 				}
-				// Wenn der Aufruf nicht abgefangen wurde ...
 				if (!callInterception)
 				{
 					try
 					{
-						// Ggf. Delegaten-Parameter abfangen
 						object[] checkedArgs = InterceptDelegateParameters(methodCallMessage);
 
-						// Entfernten Methodenaufruf durchführen
 						returnValue = _remoteDispatcher.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, genericArgs, paramTypes, checkedArgs);
 
-						// Ereignisargumente für AfterInvoke erstellen
 						AfterInvokeEventArgs afterInvokeArgs = new AfterInvokeEventArgs()
 						{
 							TrackingID = trackingID,
@@ -502,17 +451,13 @@ namespace Zyan.Communication
 							Arguments = methodCallMessage.Args,
 							ReturnValue = returnValue
 						};
-						// AfterInvoke-Ereignis feuern
 						_connection.OnAfterInvoke(afterInvokeArgs);
 					}
 					catch (InvalidSessionException)
 					{
-						// Wenn automatisches Anmelden bei abgelaufener Sitzung aktiviert ist ...
 						if (_autoLoginOnExpiredSession)
 						{
-							// Reconnects, if session lost
 							if (_connection.Reconnect())
-								// Entfernten Methodenaufruf erneut versuchen
 								returnValue = _remoteDispatcher.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, genericArgs, paramTypes, methodCallMessage.Args);
 							else
 								throw;
@@ -523,24 +468,17 @@ namespace Zyan.Communication
 						}
 					}
 				}
-				// Versuchen den Rückgabewert in einen Serialisierungscontainer zu casten
 				CustomSerializationContainer container = returnValue as CustomSerializationContainer;
 
-				// Wenn der aktuelle Parameter ein Serialisierungscontainer ist ...
 				if (container != null)
 				{
-					// Passenden Serialisierungshandler suchen
 					ISerializationHandler serializationHandler = _connection.SerializationHandling[container.HandledType];
 
-					// Wenn kein passender Serialisierungshandler registriert ist ...
 					if (serializationHandler == null)
-						// Ausnahme werfen
 						throw new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_SerializationHandlerNotFound, container.HandledType.FullName));
 
-					// Deserialisierung durchführen
 					returnValue = serializationHandler.Deserialize(container.DataType, container.Data);
 				}
-				// Remoting-Antwortnachricht erstellen und zurückgeben
 				return new ReturnMessage(returnValue, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
 			}
 			catch (Exception ex)
@@ -553,52 +491,39 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Ersetzt Delegaten-Parameter einer Remoting-Nachricht durch eine entsprechende Delegaten-Abfangvorrichtung.
+		/// Replaces delegate parameters with call interceptors.
 		/// </summary>
-		/// <param name="message">Remoting-Nachricht</param>
-		/// <returns>argumentliste</returns>
+		/// <param name="message">Remoting message</param>
+		/// <returns>Parameters</returns>
 		private object[] InterceptDelegateParameters(IMethodCallMessage message)
 		{
-			// Argument-Array erzeugen
 			object[] result = new object[message.ArgCount];
 
-			// Parametertypen ermitteln
 			ParameterInfo[] paramDefs = message.MethodBase.GetParameters();
 
-			// Alle Parameter durchlaufen
 			for (int i = 0; i < message.ArgCount; i++)
 			{
-				// Parameter abrufen
 				object arg = message.Args[i];
 
-				// Wenn der aktuelle Parameter ein Delegat ist ...
 				if (arg != null && typeof(Delegate).IsAssignableFrom(arg.GetType()))
 				{
-					// Abfangvorrichtung erzeugen
 					DelegateInterceptor interceptor = new DelegateInterceptor()
 					{
 						ClientDelegate = arg
 					};
-					// Original-Parameter durch Abfangvorrichting in der Remoting-Nachricht ersetzen
 					result[i] = interceptor;
 				}
 				else
 				{
-					// Typ des Parameters abfragen
 					Type argType = paramDefs[i].ParameterType;
 
-					// Passenden Serialisierungshandler suchen
 					Type handledType;
 					ISerializationHandler handler;
 					_connection.SerializationHandling.FindMatchingSerializationHandler(argType, out handledType, out handler);
 
-					// Wenn für diesen Typ ein passender Serialisierungshandler registriert ist ...
 					if (handler != null)
 					{
-						// Serialisierung durchführen
 						byte[] raw = handler.Serialize(arg);
-
-						// Parameter durch Serialisierungscontainer ersetzen
 						result[i] = new CustomSerializationContainer(handledType, argType, raw);
 					}
 					else
@@ -606,7 +531,6 @@ namespace Zyan.Communication
 						result[i] = arg;
 				}
 			}
-			// Arument-Array zurückgeben
 			return result;
 		}
 

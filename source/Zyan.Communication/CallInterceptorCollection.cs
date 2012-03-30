@@ -8,25 +8,25 @@ using System.Runtime.Remoting.Messaging;
 namespace Zyan.Communication
 {
 	/// <summary>
-	/// Auflistung von Aufrufabfangvorrichtungen.
+	/// Collection of call interception devices.
 	/// </summary>
 	public class CallInterceptorCollection : Collection<CallInterceptor>
 	{
-		// Sperrobjekt (für Threadsync.)
+		// Lock objekt for thread synchronization.
 		private object _lockObject = new object();
 
 		/// <summary>
-		/// Erzeugt eine neue Instanz der CallInterceptorCollection-Klasse.
+		/// Creates a new instance of the CallInterceptorCollection class.
 		/// </summary>
 		internal CallInterceptorCollection()
 			: base()
 		{ }
 
 		/// <summary>
-		/// Wird aufgerufen, wenn ein neuer Eintrag eingefügt wird.
+		/// Is called when a new item is added.
 		/// </summary>
 		/// <param name="index">Index</param>
-		/// <param name="item">Objekt</param>
+		/// <param name="item">Added item</param>
 		protected override void InsertItem(int index, CallInterceptor item)
 		{
 			lock (_lockObject)
@@ -36,7 +36,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Wird aufgerufen, wenn ein Eintrag entfernt wird.
+		/// Is called when a item is removed.
 		/// </summary>
 		/// <param name="index">Index</param>
 		protected override void RemoveItem(int index)
@@ -48,10 +48,10 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Wird aufgerufen, wenn ein Eintrag neu zugewiesen wird.
+		/// Is called when a item is set.
 		/// </summary>
 		/// <param name="index">Index</param>
-		/// <param name="item">Objekt</param>
+		/// <param name="item">Item</param>
 		protected override void SetItem(int index, CallInterceptor item)
 		{
 			lock (_lockObject)
@@ -61,7 +61,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Wird aufgerufen, wenn alle Einträge entfernt werden sollen.
+		/// Is called when the collection should be cleared.
 		/// </summary>
 		protected override void ClearItems()
 		{
@@ -99,20 +99,17 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Sucht eine passende Aufrufabfangvorrichtung für ein bestimmten Methodenaufruf.
+		/// Finds a matching call interceptor for a specified method call.
 		/// </summary>
-		/// <param name="interfaceType">Typ der Dienstschnittstelle</param>
+		/// <param name="interfaceType">Componenet interface type</param>
 		/// <param name="uniqueName">Unique name of the intercepted component.</param>
-		/// <param name="remotingMessage">Remoting-Nachricht des Methodenaufrufs vom Proxy</param>
-		/// <returns>Aufrufabfangvorrichtung oder null</returns>
+		/// <param name="remotingMessage">Remoting message from proxy</param>
+		/// <returns>Call interceptor or null</returns>
 		public CallInterceptor FindMatchingInterceptor(Type interfaceType, string uniqueName, IMethodCallMessage remotingMessage)
 		{
-			// Wenn keine Abfangvorrichtungen registriert sind ...
 			if (Count == 0)
-				// null zurückgeben
 				return null;
 
-			// Passende Aufrufabfangvorrichtung suchen und zurückgeben
 			var matchingInterceptors =
 				from interceptor in this
 				where
@@ -138,7 +135,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Creates call interceptor helper for the given interface
+		/// Creates call interceptor helper for the given interface.
 		/// </summary>
 		public CallInterceptorHelper<T> For<T>()
 		{

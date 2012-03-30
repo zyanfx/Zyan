@@ -8,7 +8,7 @@ using Zyan.Communication.Delegates;
 namespace Zyan.Communication
 {
 	/// <summary>
-	/// Schnittstelle für Fabriken zur Produktion verteilbarer Komponenten.
+	/// General interface for dispatch component.
 	/// </summary>
 	public interface IZyanDispatcher
 	{

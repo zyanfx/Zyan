@@ -3,13 +3,13 @@
 namespace Zyan.Communication
 {
 	/// <summary>
-	/// Schreibt eine veröffentlichte Komponente.
+	/// Describes a published component.
 	/// </summary>
 	[Serializable]
 	public class ComponentInfo
 	{
 		/// <summary>
-		/// Gibt den Schnittstellennamen zurück, oder legt ihn fest.
+		/// Get or sets the interface name of the component.
 		/// </summary>
 		public string InterfaceName
 		{
@@ -18,7 +18,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Gibt den eindeutigen Namen der Komponente zurück, oder legt ihn fest.
+		/// Gets or sets the unique name of the component.
 		/// </summary>
 		public string UniqueName
 		{
@@ -27,7 +27,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Gibt den Aktivierungstyp zurück, oder legt ihn fest.
+		/// Gets or sets the activation type of the component.
 		/// </summary>
 		public ActivationType ActivationType
 		{

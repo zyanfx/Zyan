@@ -3,13 +3,13 @@
 namespace Zyan.Communication
 {
 	/// <summary>
-	/// Container für Objekte die mit benutzerdefinierter Serialisierung verarbeitet werden.
+	/// Container for custom serialized objects.
 	/// </summary>
 	[Serializable]
 	public class CustomSerializationContainer
 	{
 		/// <summary>
-		/// Erstellt eine neue Instanz der CustomSerializationContainer-Klasse.
+		/// Creates a new instance of the CustomSerializationContainer class.
 		/// </summary>
 		public CustomSerializationContainer()
 		{
@@ -17,21 +17,20 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Erstellt eine neue Instanz der CustomSerializationContainer-Klasse.
+        /// Creates a new instance of the CustomSerializationContainer class.
 		/// </summary>
-		/// <param name="handledType">Behandelter Typ</param>
-		/// <param name="dataType">Tatsächlicher der Daten</param>
-		/// <param name="data">Rohdaten</param>
+		/// <param name="handledType">Handled type</param>
+		/// <param name="dataType">Actual type</param>
+		/// <param name="data">Raw data</param>
 		public CustomSerializationContainer(Type handledType, Type dataType, byte[] data)
 		{
-			// Eigenschaften füllen
 			HandledType = handledType;
 			DataType = dataType;
 			Data = data;
 		}
 
 		/// <summary>
-		/// Gibt den behandelten Typ zurück, oder legt ih nfest.
+		/// Gets or sets the handled type.
 		/// </summary>
 		public Type HandledType
 		{
@@ -40,7 +39,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Gibt den tatsächlichen Typ der Daten zurück, oder legt ihn fest.
+		/// Gets or sets the actual type.
 		/// </summary>
 		public Type DataType
 		{
@@ -49,7 +48,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Gibt die Rohdaten zurück, oder legt sie fest.
+		/// Gets or sets the serialized raw data.
 		/// </summary>
 		public byte[] Data
 		{
