@@ -96,7 +96,7 @@ namespace Zyan.Tests
 
             private TcpDuplexServerHostEnvironment()
             {
-                var protocol = new TcpDuplexServerProtocolSetup(8084, new NullAuthenticationProvider(), false);
+                var protocol = new TcpDuplexServerProtocolSetup(8084, new NullAuthenticationProvider(), true);
                 _host = new ZyanComponentHost("RecreateClientConnectionTestHost_TcpDuplex", protocol);
                 _host.RegisterComponent<ISampleServer, SampleServer>("SampleServer", ActivationType.SingleCall);
             }
@@ -155,7 +155,7 @@ namespace Zyan.Tests
 
             private TcpSimplexServerHostEnvironment()
             {
-                var protocol = new TcpCustomServerProtocolSetup(8085,new NullAuthenticationProvider(),false);
+                var protocol = new TcpCustomServerProtocolSetup(8085,new NullAuthenticationProvider(),true);
                 _host = new ZyanComponentHost("RecreateClientConnectionTestHost_TcpSimplex", protocol);
                 _host.RegisterComponent<ISampleServer, SampleServer>("SampleServer", ActivationType.SingleCall);
             }
@@ -319,7 +319,7 @@ namespace Zyan.Tests
         {
             string url = "tcp://localhost:8085/RecreateClientConnectionTestHost_TcpSimplex";
 
-            var protocol = new TcpCustomClientProtocolSetup(false);
+            var protocol = new TcpCustomClientProtocolSetup(true);
             ZyanConnection connection = new ZyanConnection(url, protocol);
 
             var proxy1 = connection.CreateProxy<ISampleServer>("SampleServer");
