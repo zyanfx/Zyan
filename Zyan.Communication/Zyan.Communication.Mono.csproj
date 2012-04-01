@@ -219,6 +219,10 @@
     <Compile Include="Protocols\Http\HttpCustomServerProtocolSetup.cs" />
     <Compile Include="Protocols\Ipc\IpcBinaryClientProtocolSetup.cs" />
     <Compile Include="Protocols\Ipc\IpcBinaryServerProtocolSetup.cs" />
+    <Compile Include="Protocols\Null\NullChannel.cs" />
+    <Compile Include="Protocols\Null\NullClientChannelSink.cs" />
+    <Compile Include="Protocols\Null\NullMessages.cs" />
+    <Compile Include="Protocols\Null\NullServerChannelSink.cs" />
     <Compile Include="Protocols\ServerProtocolSetup.cs" />
     <Compile Include="Protocols\ServerProtocolSetupExtensions.cs" />
     <Compile Include="Protocols\Tcp\TcpBinaryClientProtocolSetup.cs" />
