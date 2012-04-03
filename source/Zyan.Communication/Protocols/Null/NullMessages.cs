@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Remoting.Channels;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -108,13 +109,21 @@ namespace Zyan.Communication.Protocols.Null
 			public int Identity { get; set; }
 
 			/// <summary>
+			/// Gets or sets request <see cref="IMessage"/>.
+			/// </summary>
+			/// <remarks>Used in fast processing mode (serialization bypassed).</remarks>
+			public IMessage Message { get; set; }
+ 
+			/// <summary>
 			/// Gets or sets message headers.
 			/// </summary>
+			/// <remarks>Used in full processing mode (serialization enabled).</remarks>
 			public ITransportHeaders RequestHeaders { get; set; }
 
 			/// <summary>
 			/// Gets or sets request <see cref="Stream"/>.
 			/// </summary>
+			/// <remarks>Used in full processing mode (serialization enabled).</remarks>
 			public Stream RequestStream { get; set; }
 
 			/// <summary>
@@ -129,13 +138,21 @@ namespace Zyan.Communication.Protocols.Null
 		public class ResponseMessage
 		{
 			/// <summary>
+			/// Gets or sets response <see cref="IMessage"/>.
+			/// </summary>
+			/// <remarks>Used in fast processing mode (serialization bypassed).</remarks>
+			public IMessage Message { get; set; }
+
+			/// <summary>
 			/// Gets or sets the <see cref="ITransportHeaders"/> for the response message.
 			/// </summary>
+			/// <remarks>Used in full processing mode (serialization enabled).</remarks>
 			public ITransportHeaders ResponseHeaders { get; set; }
 
 			/// <summary>
 			/// Gets or sets the response <see cref="Stream"/>.
 			/// </summary>
+			/// <remarks>Used in full processing mode (serialization enabled).</remarks>
 			public Stream ResponseStream { get; set; }
 		}
 	}
