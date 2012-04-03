@@ -3,7 +3,7 @@ using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using Zyan.Communication;
-using Zyan.Communication.Protocols.Ipc;
+using Zyan.Communication.Protocols.Null;
 using System.Diagnostics;
 
 namespace Zyan.Tests
@@ -129,12 +129,12 @@ namespace Zyan.Tests
 		[ClassInitialize]
 		public static void StartServer(TestContext ctx)
 		{
-			var serverSetup = new IpcBinaryServerProtocolSetup("GenericMethodTest");
+			var serverSetup = new NullServerProtocolSetup(4321);
 			ZyanHost = new ZyanComponentHost("GenericServer", serverSetup);
 			ZyanHost.RegisterComponent<ISampleServer, SampleServer>();
 
-			var clientSetup = new IpcBinaryClientProtocolSetup();
-			ZyanConnection = new ZyanConnection("ipc://GenericMethodTest/GenericServer", clientSetup);
+			var clientSetup = new NullClientProtocolSetup();
+			ZyanConnection = new ZyanConnection("null://NullChannel:4321/GenericServer", clientSetup);
 		}
 
 		[ClassCleanup]

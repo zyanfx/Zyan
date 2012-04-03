@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
@@ -111,6 +112,7 @@ namespace Zyan.Communication.Protocols.Null
 			NullChannel.ParseUrl(url, out objectUri);
 			objectUri = objectUri ?? url;
 			requestMessage.RequestHeaders[CommonTransportKeys.RequestUri] = objectUri;
+			requestMessage.RequestHeaders["__CustomErrorsEnabled"] = RemotingConfiguration.CustomErrorsMode == CustomErrorsModes.On;
 
 			IMessage responseMsg;
 			ITransportHeaders responseHeaders;
