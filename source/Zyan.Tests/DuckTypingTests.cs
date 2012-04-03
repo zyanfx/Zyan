@@ -2,9 +2,10 @@
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting;
 using Zyan.Communication.Toolbox;
 using Zyan.Communication;
-using Zyan.Communication.Protocols.Ipc;
+using Zyan.Communication.Protocols.Null;
 
 namespace Zyan.Tests
 {
@@ -132,7 +133,7 @@ namespace Zyan.Tests
 		[ClassInitialize]
 		public static void StartServer(TestContext ctx)
 		{
-			var serverSetup = new IpcBinaryServerProtocolSetup("DuckTypingTest");
+			var serverSetup = new NullServerProtocolSetup(1234);
 			ZyanHost = new ZyanComponentHost("DuckTypingServer", serverSetup);
 
 			// registration-time check
@@ -141,8 +142,8 @@ namespace Zyan.Tests
 			// invocation-time check (object factory can't be verified during registration)
 			ZyanHost.RegisterComponent<IDuck>("Chicken", () => new Chicken()); 
 
-			var clientSetup = new IpcBinaryClientProtocolSetup();
-			ZyanConnection = new ZyanConnection("ipc://DuckTypingTest/DuckTypingServer", clientSetup);
+			var clientSetup = new NullClientProtocolSetup();
+			ZyanConnection = new ZyanConnection("null://NullChannel:1234/DuckTypingServer", clientSetup);
 		}
 
 		[ClassCleanup]
