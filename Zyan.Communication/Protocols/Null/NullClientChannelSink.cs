@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
@@ -14,7 +15,7 @@ namespace Zyan.Communication.Protocols.Null
 	/// <summary>
 	/// Client channel sink for the <see cref="NullChannel"/>.
 	/// </summary>
-	public class NullClientChannelSink : IClientChannelSink
+	public class NullClientChannelSink : IClientChannelSink, IMessageSink
 	{
 		/// <summary>
 		/// Client channel sink provider for the <see cref="NullChannel"/>.
@@ -52,31 +53,22 @@ namespace Zyan.Communication.Protocols.Null
 
 		private string ChannelName { get; set; }
 
+		// =============== IClientChannelSink implementation ========================
+
 		/// <summary>
-		/// 
+		/// Request synchronous processing of a method call on the current sink.
 		/// </summary>
-		/// <param name="msg"></param>
-		/// <param name="requestHeaders"></param>
-		/// <param name="requestStream"></param>
-		/// <param name="responseHeaders"></param>
-		/// <param name="responseStream"></param>
+		/// <param name="msg"><see cref="IMessage"/> to process.</param>
+		/// <param name="requestHeaders">Request <see cref="ITransportHeaders"/>.</param>
+		/// <param name="requestStream">Request <see cref="Stream"/>.</param>
+		/// <param name="responseHeaders">Response <see cref="ITransportHeaders"/>.</param>
+		/// <param name="responseStream">Response <see cref="Stream"/>.</param>
 		public void ProcessMessage(IMessage msg, ITransportHeaders requestHeaders, Stream requestStream, out ITransportHeaders responseHeaders, out Stream responseStream)
 		{
-			// add message Uri to the transport headers
-			var mcm = (IMethodCallMessage)msg;
-			requestHeaders[CommonTransportKeys.RequestUri] = mcm.Uri;
+			IMessage replyMsg;
 
-			// create the request message
-			var requestMessage = new NullMessages.RequestMessage
-			{
-				RequestHeaders = requestHeaders,
-				RequestStream = requestStream
-			};
-
-			// process the request and receive the response message
-			var responseMessage = NullMessages.ProcessRequest(ChannelName, requestMessage);
-			responseHeaders = responseMessage.ResponseHeaders;
-			responseStream = responseMessage.ResponseStream;
+			// process serialized message
+			InternalProcessMessage(msg, requestHeaders, requestStream, out replyMsg, out responseHeaders, out responseStream);
 		}
 
 		/// <summary>
@@ -133,6 +125,77 @@ namespace Zyan.Communication.Protocols.Null
 		{
 			// we don't have any properties
 			get { return null; }
+		}
+
+		// =============== IMessageSink implementation ========================
+
+		/// <summary>
+		/// Asynchronously processes the given message.
+		/// </summary>
+		/// <param name="msg">The message to process. </param>
+		/// <param name="replySink">The reply sink for the reply message.</param>
+		/// <returns>Returns an <see cref="IMessageCtrl"/> interface that provides a way to control asynchronous messages after they have been dispatched.</returns>
+		public IMessageCtrl AsyncProcessMessage(IMessage msg, IMessageSink replySink)
+		{
+			// TODO
+			throw new NotImplementedException();
+		}
+
+		/// <summary>
+		/// Gets the next message sink in the sink chain.
+		/// </summary>
+		public IMessageSink NextSink
+		{
+			// we're the last sink in the chain
+			get { return null; }
+		}
+
+		/// <summary>
+		/// Synchronously processes the given message.
+		/// </summary>
+		/// <param name="msg">The message to process. </param>
+		/// <returns>Response message.</returns>
+		public IMessage SyncProcessMessage(IMessage msg)
+		{
+			IMessage replyMsg;
+			ITransportHeaders requestHeaders = new TransportHeaders();
+			//requestHeaders["Content-Type"] = "application/octet-stream";
+			//requestHeaders["__RequestVerb"] = "POST";
+			//requestHeaders["__ConnectionId"] = 2;
+			//requestHeaders["__IPAddress"] = IPAddress.Loopback.ToString();
+
+			ITransportHeaders responseHeaders;
+			Stream responseStream;
+
+			// process non-serialized message
+			InternalProcessMessage(msg, requestHeaders, null, out replyMsg, out responseHeaders, out responseStream);
+			return replyMsg;
+		}
+
+		/// <summary>
+		/// Processes the given method call message synchronously.
+		/// </summary>
+		private void InternalProcessMessage(IMessage msg, ITransportHeaders requestHeaders, Stream requestStream, out IMessage replyMsg, out ITransportHeaders responseHeaders, out Stream responseStream)
+		{
+			// add message Uri to the transport headers
+			var mcm = (IMethodCallMessage)msg;
+			requestHeaders[CommonTransportKeys.RequestUri] = mcm.Uri;
+
+			// create the request message
+			var requestMessage = new NullMessages.RequestMessage
+			{
+				Message = msg,
+				RequestHeaders = requestHeaders,
+				RequestStream = requestStream
+			};
+
+			// process the request and receive the response message
+			var responseMessage = NullMessages.ProcessRequest(ChannelName, requestMessage);
+
+			// return processed message parts
+			responseHeaders = responseMessage.ResponseHeaders;
+			responseStream = responseMessage.ResponseStream;
+			replyMsg = responseMessage.Message;
 		}
 	}
 }

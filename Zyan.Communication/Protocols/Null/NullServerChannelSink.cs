@@ -7,6 +7,7 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading;
+using Zyan.Communication.Toolbox;
 using IDictionary = System.Collections.IDictionary;
 
 namespace Zyan.Communication.Protocols.Null
@@ -112,18 +113,33 @@ namespace Zyan.Communication.Protocols.Null
 			NullChannel.ParseUrl(url, out objectUri);
 			objectUri = objectUri ?? url;
 			requestMessage.RequestHeaders[CommonTransportKeys.RequestUri] = objectUri;
-			requestMessage.RequestHeaders["__CustomErrorsEnabled"] = RemotingConfiguration.CustomErrorsMode == CustomErrorsModes.On;
+			requestMessage.RequestHeaders["__CustomErrorsEnabled"] = CustomErrorsEnabled.Value;
+			requestMessage.Message.Properties["__Uri"] = objectUri;
 
 			IMessage responseMsg;
 			ITransportHeaders responseHeaders;
 			Stream responseStream;
 
-			// process request message
+			// create sink stack to process request message
 			var stack = new ServerChannelSinkStack();
 			stack.Push(this, null);
-			var serverProcessing = NextChannelSink.ProcessMessage(stack, null, 
-				requestMessage.RequestHeaders, requestMessage.RequestStream, 
-				out responseMsg, out responseHeaders, out responseStream);
+
+			// process request message
+			ServerProcessing serverProcessing;
+			if (NextChannelSink != null)
+			{
+				// full processing mode, with deserialization
+				serverProcessing = NextChannelSink.ProcessMessage(stack, null,
+					requestMessage.RequestHeaders, requestMessage.RequestStream,
+					out responseMsg, out responseHeaders, out responseStream);
+			}
+			else
+			{
+				// fast processing mode, bypassing deserialization
+				serverProcessing = ChannelServices.DispatchMessage(stack, requestMessage.Message, out responseMsg);
+				responseHeaders = null;
+				responseStream = null;
+			}
 
 			// send back the reply
 			switch (serverProcessing)
@@ -132,6 +148,7 @@ namespace Zyan.Communication.Protocols.Null
 					stack.Pop(this);
 					NullMessages.AddResponse(requestMessage, new NullMessages.ResponseMessage
 					{
+						Message = responseMsg,
 						ResponseHeaders = responseHeaders,
 						ResponseStream = responseStream
 					});
@@ -142,8 +159,17 @@ namespace Zyan.Communication.Protocols.Null
 					break;
 
 				case ServerProcessing.OneWay:
+					stack.Pop(this);
 					break;
 			}
 		}
+
+		private Lazy<bool> CustomErrorsEnabled = new Lazy<bool>(() =>
+		{
+			if (MonoCheck.IsRunningOnMono)
+				return false;
+
+			return RemotingConfiguration.CustomErrorsMode == CustomErrorsModes.On;
+		});
 	}
 }

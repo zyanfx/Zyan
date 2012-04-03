@@ -38,6 +38,24 @@ namespace Zyan.Communication.Protocols.Null
 			ChannelName = channelName;
 			ChannelDataStore = new ChannelDataStore(new[] { "null://" + channelName });
 
+			// standard mode: message serialization must be enabled
+			if (clientSinkProvider != null || serverSinkProvider != null)
+			{
+				InitializeWithFormatters(clientSinkProvider, serverSinkProvider);
+			}
+			else
+			{
+				// fast mode (no additional sinks specified) — bypass serialization
+				ClientSinkProvider = new NullClientChannelSink.Provider();
+				ServerSink = new NullServerChannelSink(null);
+			}
+
+			// start listening for messages
+			StartListening(null);
+		}
+
+		private void InitializeWithFormatters(IClientChannelSinkProvider clientSinkProvider, IServerChannelSinkProvider serverSinkProvider)
+		{
 			ClientSinkProvider = clientSinkProvider = clientSinkProvider ?? new BinaryClientFormatterSinkProvider();
 			serverSinkProvider = serverSinkProvider ?? new BinaryServerFormatterSinkProvider { TypeFilterLevel = TypeFilterLevel.Full };
 
@@ -57,9 +75,6 @@ namespace Zyan.Communication.Protocols.Null
 			// create server sink chain
 			var nextSink = ChannelServices.CreateServerChannelSinkChain(serverSinkProvider, this);
 			ServerSink = new NullServerChannelSink(nextSink);
-
-			// start listening for messages
-			StartListening(null);
 		}
 
 		private IClientChannelSinkProvider ClientSinkProvider { get; set; }

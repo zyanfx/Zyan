@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using Zyan.Communication;
-using Zyan.Communication.Protocols.Ipc;
+using Zyan.Communication.Protocols.Null;
 using Zyan.InterLinq;
 
 namespace Zyan.Tests
@@ -112,7 +112,7 @@ namespace Zyan.Tests
 		[ClassInitialize]
 		public static void StartServer(TestContext ctx)
 		{
-			var serverSetup = new IpcBinaryServerProtocolSetup("LinqTest");
+			var serverSetup = new NullServerProtocolSetup(5432);
 			ZyanHost = new ZyanComponentHost("SampleQueryableServer", serverSetup);
 
 			ZyanHost.RegisterComponent<ISampleService, SampleService>();
@@ -122,8 +122,8 @@ namespace Zyan.Tests
 			ZyanHost.RegisterComponent<IObjectSource, SampleObjectSource>("Sample7", ActivationType.SingleCall);
 			ZyanHost.RegisterComponent<IEntitySource, DataWrapper>("DbSample", new DataWrapper());
 
-			var clientSetup = new IpcBinaryClientProtocolSetup();
-			ZyanConnection = new ZyanConnection("ipc://LinqTest/SampleQueryableServer", clientSetup);
+			var clientSetup = new NullClientProtocolSetup();
+			ZyanConnection = new ZyanConnection("null://NullChannel:5432/SampleQueryableServer", clientSetup);
 		}
 
 		[ClassCleanup]
