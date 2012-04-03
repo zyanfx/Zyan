@@ -4,7 +4,7 @@ using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using Zyan.Communication;
 using Zyan.Communication.Delegates;
-using Zyan.Communication.Protocols.Ipc;
+using Zyan.Communication.Protocols.Null;
 
 namespace Zyan.Tests
 {
@@ -233,12 +233,12 @@ namespace Zyan.Tests
 		[ClassInitialize]
 		public static void StartServer(TestContext ctx)
 		{
-			var serverSetup = new IpcBinaryServerProtocolSetup("EventFilterTest");
+			var serverSetup = new NullServerProtocolSetup(2345);
 			ZyanHost = new ZyanComponentHost("EventFilterServer", serverSetup);
 			ZyanHost.RegisterComponent<ISampleServer, SampleServer>(ActivationType.Singleton);
 
-			var clientSetup = new IpcBinaryClientProtocolSetup();
-			ZyanConnection = new ZyanConnection("ipc://EventFilterTest/EventFilterServer", clientSetup);
+			var clientSetup = new NullClientProtocolSetup();
+			ZyanConnection = new ZyanConnection("null://NullChannel:2345/EventFilterServer", clientSetup);
 		}
 
 		[ClassCleanup]
@@ -352,7 +352,7 @@ namespace Zyan.Tests
 		public void SessionBoundEvents_AreBoundToSessions()
 		{
 			// start a new session
-			using (var conn = new ZyanConnection(ZyanConnection.ServerUrl, new IpcBinaryClientProtocolSetup()))
+			using (var conn = new ZyanConnection(ZyanConnection.ServerUrl, new NullClientProtocolSetup()))
 			{
 				var proxy1 = ZyanConnection.CreateProxy<ISampleServer>();
 				var proxy2 = conn.CreateProxy<ISampleServer>();
@@ -379,7 +379,7 @@ namespace Zyan.Tests
 		public void EventsWithArgumentsDerivedFromSessionBoundEvents_AreBoundToSessions()
 		{
 			// start a new session
-			using (var conn = new ZyanConnection(ZyanConnection.ServerUrl, new IpcBinaryClientProtocolSetup()))
+			using (var conn = new ZyanConnection(ZyanConnection.ServerUrl, new NullClientProtocolSetup()))
 			{
 				var proxy1 = ZyanConnection.CreateProxy<ISampleServer>();
 				var proxy2 = conn.CreateProxy<ISampleServer>();
@@ -403,11 +403,11 @@ namespace Zyan.Tests
 		[TestMethod]
 		public void EventsWithArgumentsDerivedFromSessionBoundEvents_CanListenToOtherSessions()
 		{
-			var ipcProtocol = new IpcBinaryClientProtocolSetup();
+			var nullProtocol = new NullClientProtocolSetup();
 
 			// start two new sessions
-			using (var conn2 = new ZyanConnection(ZyanConnection.ServerUrl, ipcProtocol))
-			using (var conn3 = new ZyanConnection(ZyanConnection.ServerUrl, ipcProtocol))
+			using (var conn2 = new ZyanConnection(ZyanConnection.ServerUrl, nullProtocol))
+			using (var conn3 = new ZyanConnection(ZyanConnection.ServerUrl, nullProtocol))
 			{
 				var proxy1 = ZyanConnection.CreateProxy<ISampleServer>();
 				var proxy2 = conn2.CreateProxy<ISampleServer>();
@@ -443,7 +443,7 @@ namespace Zyan.Tests
 		public void EventsWithArgumentsDerivedFromSessionBoundEvents_AreBoundToSessionsAndCanBeFiltered()
 		{
 			// start a new session
-			using (var conn = new ZyanConnection(ZyanConnection.ServerUrl, new IpcBinaryClientProtocolSetup()))
+			using (var conn = new ZyanConnection(ZyanConnection.ServerUrl, new NullClientProtocolSetup()))
 			{
 				var proxy1 = ZyanConnection.CreateProxy<ISampleServer>();
 				var proxy2 = conn.CreateProxy<ISampleServer>();
