@@ -17,7 +17,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-        /// Creates a new instance of the InvalidSessionException class.
+		/// Creates a new instance of the InvalidSessionException class.
 		/// </summary>
 		/// <param name="message">Error message</param>
 		public InvalidSessionException(string message)
@@ -26,9 +26,9 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-        /// Creates a new instance of the InvalidSessionException class.
+		/// Creates a new instance of the InvalidSessionException class.
 		/// </summary>
-        /// <param name="message">Error message</param>
+		/// <param name="message">Error message</param>
 		/// <param name="innerException">Inner exception</param>
 		public InvalidSessionException(string message, Exception innerException)
 			: base(message, innerException)
@@ -36,7 +36,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-        /// Creates a new instance of the InvalidSessionException class.
+		/// Creates a new instance of the InvalidSessionException class.
 		/// </summary>
 		/// <param name="info">Serialization info</param>
 		/// <param name="context">Streaming context for serialization</param>
@@ -48,8 +48,8 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Returns object data for serialization.
 		/// </summary>
-        /// <param name="info">Serialization info</param>
-        /// <param name="context">Streaming context for serialization</param>
+		/// <param name="info">Serialization info</param>
+		/// <param name="context">Streaming context for serialization</param>
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			base.GetObjectData(info, context);

@@ -66,7 +66,7 @@ namespace Zyan.Communication
 		/// Returns a registered serialization handler for a specified type.
 		/// </summary>
 		/// <param name="handledType">Type</param>
-        /// <returns>Serialization handler</returns>
+		/// <returns>Serialization handler</returns>
 		public ISerializationHandler this[Type handledType]
 		{
 			get
