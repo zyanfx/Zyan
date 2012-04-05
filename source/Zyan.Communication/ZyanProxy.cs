@@ -12,14 +12,6 @@ using Zyan.InterLinq;
 namespace Zyan.Communication
 {
 	/// <summary>
-	/// Delegate for remote method invocation.
-	/// </summary>
-	/// <param name="methodCallMessage">Remoting message</param>
-	/// <param name="allowCallInterception">Specifies whether the interception of calls will be allowed, or not</param>
-	/// <returns>Response Remoting message</returns>
-	public delegate IMessage InvokeRemoteMethodDelegate(IMethodCallMessage methodCallMessage, bool allowCallInterception);
-
-	/// <summary>
 	/// Proxy to access a remote Zyan component.
 	/// </summary>
 	public class ZyanProxy : RealProxy
@@ -37,14 +29,14 @@ namespace Zyan.Communication
 		private string _uniqueName = string.Empty;
 
 		/// <summary>
-		/// Konstruktor.
+		/// Initializes a new instance of the <see cref="ZyanProxy"/> class.
 		/// </summary>
-		/// <param name="uniqueName">Unique component name</param>
-		/// <param name="type">Component interface type</param>
-		/// <param name="connection">Verbindungsobjekt</param>
-		/// <param name="implicitTransactionTransfer">Specifies whether transactions should be passed implicitly</param>
-		/// <param name="sessionID">Session ID</param>
-		/// <param name="componentHostName">Name of the remote component host</param>
+		/// <param name="uniqueName">Unique component name.</param>
+		/// <param name="type">Component interface type.</param>
+		/// <param name="connection"><see cref="ZyanConnection"/> instance.</param>
+		/// <param name="implicitTransactionTransfer">Specifies whether transactions should be passed implicitly.</param>
+		/// <param name="sessionID">Session ID.</param>
+		/// <param name="componentHostName">Name of the remote component host.</param>
 		/// <param name="autoLoginOnExpiredSession">Specifies whether Zyan should login automatically with cached credentials after the session is expired.</param>
 		/// <param name="autoLogoninCredentials">Optional credentials to be used for automatic logon after session is expired</param>
 		/// <param name="activationType">Component activation type</param>
@@ -86,23 +78,35 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Invoke remote method.
+		/// Invokes the method that is specified in the provided IMessage on the remote object that is represented by the current instance.
 		/// </summary>
-		/// <param name="message">Remoting method invocation message.</param>
-		/// <returns>Reply message</returns>
+		/// <param name="message">Remoting <see cref="IMessage"/> that contains information about the method call.</param>
+		/// <returns>The message returned by the invoked method, containing the return value and any out or ref parameters.</returns>
 		public override IMessage Invoke(IMessage message)
 		{
 			if (message == null)
 				throw new ArgumentNullException("message");
 
-			// Get method details
-			var methodCallMessage = (IMethodCallMessage)message;
-			var methodInfo = (MethodInfo)methodCallMessage.MethodBase;
+			// intercept remote method call and/or invoke the remote method
+			return InterceptAndInvoke((IMethodCallMessage)message, _connection.CallInterceptionEnabled);
+		}
 
+		/// <summary>
+		/// Intercepts the method that is specified in the provided IMessage and/or invokes it on the remote object.
+		/// </summary>
+		/// <remarks>This method is called by <see cref="CallInterceptionData"/>.MakeRemoteCall() method.</remarks>
+		/// <param name="methodCallMessage">Remoting <see cref="IMethodCallMessage"/> that contains information about the method call.</param>
+		/// <param name="allowInterception">Specifies whether call interception is allowed.</param>
+		/// <returns>The message returned by the invoked method, containing the return value and any out or ref parameters.</returns>
+		private IMessage InterceptAndInvoke(IMethodCallMessage methodCallMessage, bool allowInterception)
+		{
 			try
 			{
+				var methodInfo = (MethodInfo)methodCallMessage.MethodBase;
+
 				return
-					HandleLocallInvocation(methodCallMessage, methodInfo) ??
+					HandleCallInterception(methodCallMessage, allowInterception) ??
+					HandleLocalInvocation(methodCallMessage, methodInfo) ??
 					HandleEventSubscription(methodCallMessage, methodInfo) ??
 					HandleEventUnsubscription(methodCallMessage, methodInfo) ??
 					HandleLinqQuery(methodCallMessage, methodInfo) ??
@@ -127,7 +131,7 @@ namespace Zyan.Communication
 						case ZyanErrorAction.ThrowException:
 							throw;
 						case ZyanErrorAction.Retry:
-							return Invoke(message);
+							return Invoke(methodCallMessage);
 						case ZyanErrorAction.Ignore:
 							return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
 					}
@@ -135,6 +139,31 @@ namespace Zyan.Communication
 
 				throw;
 			}
+		}
+
+		/// <summary>
+		/// Handles method call interception.
+		/// </summary>
+		/// <param name="methodCallMessage">Remoting <see cref="IMethodCallMessage"/> that contains information about the method call.</param>
+		/// <param name="allowInterception">Specifies whether call interception is allowed.</param>
+		/// <returns><see cref="ReturnMessage"/>, if the call is intercepted, otherwise, false.</returns>
+		private ReturnMessage HandleCallInterception(IMethodCallMessage methodCallMessage, bool allowInterception)
+		{
+			if (!allowInterception || CallInterceptor.IsPaused)
+				return null;
+
+			var interceptor = _connection.CallInterceptors.FindMatchingInterceptor(_interfaceType, _uniqueName, methodCallMessage);
+			if (interceptor != null && interceptor.OnInterception != null)
+			{
+				var interceptionData = new CallInterceptionData(methodCallMessage.Args, InvokeRemoteMethod, methodCallMessage);
+				interceptor.OnInterception(interceptionData);
+
+				if (interceptionData.Intercepted)
+					return new ReturnMessage(interceptionData.ReturnValue, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
+			}
+
+			// Remote call is not intercepted or interceptor doesn't exist
+			return null;
 		}
 
 		/// <summary>
@@ -146,7 +175,7 @@ namespace Zyan.Communication
 		private ReturnMessage HandleRemoteInvocation(IMethodCallMessage methodCallMessage, MethodInfo methodInfo)
 		{
 			_connection.PrepareCallContext(_implicitTransactionTransfer);
-			return InvokeRemoteMethod(methodCallMessage, _connection.CallInterceptionEnabled);
+			return InvokeRemoteMethod(methodCallMessage);
 		}
 
 		/// <summary>
@@ -155,7 +184,7 @@ namespace Zyan.Communication
 		/// <param name="methodCallMessage"><see cref="IMethodCallMessage"/> to process.</param>
 		/// <param name="methodInfo"><see cref="MethodInfo"/> for the method being called.</param>
 		/// <returns><see cref="ReturnMessage"/>, if the call is processed successfully, otherwise, false.</returns>
-		private ReturnMessage HandleLocallInvocation(IMethodCallMessage methodCallMessage, MethodInfo methodInfo)
+		private ReturnMessage HandleLocalInvocation(IMethodCallMessage methodCallMessage, MethodInfo methodInfo)
 		{
 			// only methods of type object are handled locally
 			if (methodInfo.DeclaringType != typeof(object))
@@ -412,10 +441,9 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Invokes a remote method.
 		/// </summary>
-		/// <param name="methodCallMessage">Remoting message</param>
-		/// <param name="allowCallInterception">Specifies whether call interception is allowed</param>
+		/// <param name="methodCallMessage">Remoting message.</param>
 		/// <returns>Remoting response message</returns>
-		private ReturnMessage InvokeRemoteMethod(IMethodCallMessage methodCallMessage, bool allowCallInterception)
+		private ReturnMessage InvokeRemoteMethod(IMethodCallMessage methodCallMessage)
 		{
 			Guid trackingID = Guid.NewGuid();
 
@@ -459,72 +487,49 @@ namespace Zyan.Communication
 				var paramDefs = methodCallMessage.MethodBase.GetParameters();
 				var paramTypes = paramDefs.Select(p => p.ParameterType).ToArray();
 
-				bool callInterception = allowCallInterception && !CallInterceptor.IsPaused;
-
-				if (callInterception)
+				try
 				{
-					CallInterceptor interceptor = _connection.CallInterceptors.FindMatchingInterceptor(_interfaceType, _uniqueName, methodCallMessage);
+					object[] checkedArgs = InterceptDelegateParameters(methodCallMessage);
 
-					if (interceptor != null)
+					returnValue = _remoteDispatcher.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, genericArgs, paramTypes, checkedArgs);
+
+					AfterInvokeEventArgs afterInvokeArgs = new AfterInvokeEventArgs()
 					{
-						CallInterceptionData interceptionData = new CallInterceptionData(methodCallMessage.Args, new InvokeRemoteMethodDelegate(this.InvokeRemoteMethod), methodCallMessage);
+						TrackingID = trackingID,
+						InterfaceName = _interfaceType.FullName,
+						DelegateCorrelationSet = correlationSet,
+						MethodName = methodCallMessage.MethodName,
+						Arguments = methodCallMessage.Args,
+						ReturnValue = returnValue
+					};
 
-						if (interceptor.OnInterception != null)
-							interceptor.OnInterception(interceptionData);
-
-						if (interceptionData.Intercepted)
-							returnValue = interceptionData.ReturnValue;
+					_connection.OnAfterInvoke(afterInvokeArgs);
+				}
+				catch (InvalidSessionException)
+				{
+					if (_autoLoginOnExpiredSession)
+					{
+						if (_connection.Reconnect())
+							returnValue = _remoteDispatcher.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, genericArgs, paramTypes, methodCallMessage.Args);
 						else
-							callInterception = false;
+							throw;
 					}
 					else
-						callInterception = false;
-				}
-				if (!callInterception)
-				{
-					try
 					{
-						object[] checkedArgs = InterceptDelegateParameters(methodCallMessage);
-
-						returnValue = _remoteDispatcher.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, genericArgs, paramTypes, checkedArgs);
-
-						AfterInvokeEventArgs afterInvokeArgs = new AfterInvokeEventArgs()
-						{
-							TrackingID = trackingID,
-							InterfaceName = _interfaceType.FullName,
-							DelegateCorrelationSet = correlationSet,
-							MethodName = methodCallMessage.MethodName,
-							Arguments = methodCallMessage.Args,
-							ReturnValue = returnValue
-						};
-						_connection.OnAfterInvoke(afterInvokeArgs);
-					}
-					catch (InvalidSessionException)
-					{
-						if (_autoLoginOnExpiredSession)
-						{
-							if (_connection.Reconnect())
-								returnValue = _remoteDispatcher.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, genericArgs, paramTypes, methodCallMessage.Args);
-							else
-								throw;
-						}
-						else
-						{
-							throw;
-						}
+						throw;
 					}
 				}
-				CustomSerializationContainer container = returnValue as CustomSerializationContainer;
 
+				var container = returnValue as CustomSerializationContainer;
 				if (container != null)
 				{
-					ISerializationHandler serializationHandler = _connection.SerializationHandling[container.HandledType];
-
+					var serializationHandler = _connection.SerializationHandling[container.HandledType];
 					if (serializationHandler == null)
 						throw new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_SerializationHandlerNotFound, container.HandledType.FullName));
 
 					returnValue = serializationHandler.Deserialize(container.DataType, container.Data);
 				}
+
 				return new ReturnMessage(returnValue, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
 			}
 			catch (Exception ex)

@@ -1,7 +1,11 @@
-﻿using System.Runtime.Remoting.Messaging;
+﻿using System;
+using System.Runtime.Remoting.Messaging;
 
 namespace Zyan.Communication
 {
+	// Delegate for remote method invocation.
+	using InvokeRemoteMethodDelegate = Func<IMethodCallMessage, ReturnMessage>;
+
 	/// <summary>
 	/// Describes a single call interception action.
 	/// </summary>
@@ -31,10 +35,10 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Makes a remote call.
 		/// </summary>
-		/// <returns>Return value of the remotly called method</returns>
+		/// <returns>Return value of the remotly called method.</returns>
 		public object MakeRemoteCall()
 		{
-			var returnMessage = _remoteInvoker(_remotingMessage, false) as ReturnMessage;
+			var returnMessage = _remoteInvoker(_remotingMessage);
 
 			if (returnMessage != null)
 			{
@@ -43,6 +47,7 @@ namespace Zyan.Communication
 
 				return returnMessage.ReturnValue;
 			}
+
 			return null;
 		}
 
