@@ -45,6 +45,8 @@ namespace Zyan.Tests
 
 			string Function(int a, DateTime b, TimeSpan c);
 
+			bool GenericFunction<T>(int a, T b);
+
 			event EventHandler ProcedureCalled;
 		}
 
@@ -63,6 +65,11 @@ namespace Zyan.Tests
 			public string Function(int a, DateTime b, TimeSpan c)
 			{
 				return string.Format("Called with arguments: {0}, {1}, {2}", a, b, c);
+			}
+
+			public bool GenericFunction<T>(int a, T b)
+			{
+				return false;
 			}
 
 			public event EventHandler ProcedureCalled;
@@ -197,6 +204,69 @@ namespace Zyan.Tests
 			// intercepted
 			result = proxy.Function(123, DateTime.Today, TimeSpan.FromSeconds(1));
 			Assert.AreEqual(interceptedResult, result);
+		}
+
+		[TestMethod]
+		public void FunctionWithParameters_IsInterceptedAndRemoteMethodIsInvoked()
+		{
+			string interceptPrefix = "Intercepted:";
+
+			var interceptor = CallInterceptor.For<IInterceptableComponent>().Func<int, DateTime, TimeSpan, string>(
+				(component, arg1, arg2, arg3) => component.Function(arg1, arg2, arg3),
+				(data, arg1, arg2, arg3) =>
+				{
+					if (arg1 == 123)
+					{
+						data.Intercepted = true;
+						var realResult = data.MakeRemoteCall();
+						return interceptPrefix + realResult.ToString();
+					}
+
+					// not intercepted
+					return null;
+				});
+
+			ZyanConnection.CallInterceptors.Add(interceptor);
+			var proxy = ZyanConnection.CreateProxy<IInterceptableComponent>();
+
+			// not intercepted
+			var result = proxy.Function(321, DateTime.Now, TimeSpan.FromSeconds(1));
+			Assert.IsFalse(string.IsNullOrWhiteSpace(result));
+			Assert.IsFalse(result.StartsWith(interceptPrefix));
+
+			// intercepted
+			result = proxy.Function(123, DateTime.Today, TimeSpan.FromSeconds(1));
+			Assert.AreNotEqual(interceptPrefix, result);
+			Assert.IsTrue(result.StartsWith(interceptPrefix));
+		}
+
+		[TestMethod]
+		public void GenericFunctionWithParameters_IsIntercepted()
+		{
+			var interceptor = CallInterceptor.For<IInterceptableComponent>().Func<int, Guid, bool>(
+				(component, arg1, arg2) => component.GenericFunction(arg1, arg2),
+				(data, arg1, arg2) =>
+				{
+					if (arg1 == 123)
+					{
+						data.Intercepted = true;
+						return true;
+					}
+
+					// not intercepted
+					return false;
+				});
+
+			ZyanConnection.CallInterceptors.Add(interceptor);
+			var proxy = ZyanConnection.CreateProxy<IInterceptableComponent>();
+
+			// not intercepted
+			var result = proxy.GenericFunction(321, Guid.Empty);
+			Assert.IsFalse(result);
+
+			// intercepted
+			result = proxy.GenericFunction(123, Guid.Empty);
+			Assert.IsTrue(result);
 		}
 
 		[TestMethod]
