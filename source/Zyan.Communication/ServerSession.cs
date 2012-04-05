@@ -24,16 +24,16 @@ namespace Zyan.Communication
 		/// </summary>
 		/// <param name="sessionID">Session ID</param>
 		/// <param name="identity">Client identity</param>
-        /// <param name="sessionVariableAdapter">Adapter for accessing session variables</param>
+		/// <param name="sessionVariableAdapter">Adapter for accessing session variables</param>
 		internal ServerSession(Guid sessionID, IIdentity identity, SessionVariableAdapter sessionVariableAdapter) : this(sessionID, DateTime.Now, identity, sessionVariableAdapter) { }
 
 		/// <summary>
-        /// Creates a new instance of the ServerSession class.
+		/// Creates a new instance of the ServerSession class.
 		/// </summary>
-        /// <param name="sessionID">Session ID</param>
+		/// <param name="sessionID">Session ID</param>
 		/// <param name="timestamp">Zeitstempel der Sitzung</param>
-        /// <param name="identity">Client identity</param>
-        /// <param name="sessionVariableAdapter">Adapter for accessing session variables</param>
+		/// <param name="identity">Client identity</param>
+		/// <param name="sessionVariableAdapter">Adapter for accessing session variables</param>
 		internal ServerSession(Guid sessionID, DateTime timestamp, IIdentity identity, SessionVariableAdapter sessionVariableAdapter)
 		{
 			_timestamp = timestamp;
@@ -68,7 +68,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-        /// Gets the adapter for accessing session variables.
+		/// Gets the adapter for accessing session variables.
 		/// </summary>
 		public ISessionVariableAdapter SessionVariables
 		{

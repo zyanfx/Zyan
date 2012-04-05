@@ -14,7 +14,7 @@ namespace Zyan.Communication.Protocols.Null
 	/// <summary>
 	/// Transport layer for the <see cref="NullChannel"/>.
 	/// </summary>
-	public static class NullMessages
+	internal static class NullMessages
 	{
 		static NullMessages()
 		{

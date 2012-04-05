@@ -18,7 +18,7 @@ namespace Zyan.Communication
 		/// Deserializes raw data back into an object of a specified type.
 		/// </summary>
 		/// <param name="dataType">Type for deserialization</param>
-        /// <param name="data">Serialized raw data</param>
+		/// <param name="data">Serialized raw data</param>
 		/// <returns>Object</returns>
 		object Deserialize(Type dataType, byte[] data);
 	}

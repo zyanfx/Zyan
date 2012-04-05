@@ -13,11 +13,10 @@ namespace Zyan.Communication
 		/// </summary>
 		public CustomSerializationContainer()
 		{
-
 		}
 
 		/// <summary>
-        /// Creates a new instance of the CustomSerializationContainer class.
+		/// Creates a new instance of the CustomSerializationContainer class.
 		/// </summary>
 		/// <param name="handledType">Handled type</param>
 		/// <param name="dataType">Actual type</param>

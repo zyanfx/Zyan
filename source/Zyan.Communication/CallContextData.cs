@@ -5,7 +5,7 @@ using System.Runtime.Remoting.Messaging;
 namespace Zyan.Communication
 {
 	/// <summary>
-    /// Stores data that travels with the call context from client to server and back.
+	/// Stores data that travels with the call context from client to server and back.
 	/// </summary>
 	[Serializable]
 	public class LogicalCallContextData : ILogicalThreadAffinative
