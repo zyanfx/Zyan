@@ -15,7 +15,7 @@ namespace Zyan.Communication.Protocols.Null
 	/// <summary>
 	/// Server channel sink for the <see cref="NullChannel"/>.
 	/// </summary>
-	public class NullServerChannelSink : IServerChannelSink
+	internal class NullServerChannelSink : IServerChannelSink
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="NullServerChannelSink"/>
@@ -113,7 +113,6 @@ namespace Zyan.Communication.Protocols.Null
 			NullChannel.ParseUrl(url, out objectUri);
 			objectUri = objectUri ?? url;
 			requestMessage.RequestHeaders[CommonTransportKeys.RequestUri] = objectUri;
-			requestMessage.RequestHeaders["__CustomErrorsEnabled"] = CustomErrorsEnabled.Value;
 			requestMessage.Message.Properties["__Uri"] = objectUri;
 
 			IMessage responseMsg;
@@ -163,13 +162,5 @@ namespace Zyan.Communication.Protocols.Null
 					break;
 			}
 		}
-
-		private Lazy<bool> CustomErrorsEnabled = new Lazy<bool>(() =>
-		{
-			if (MonoCheck.IsRunningOnMono)
-				return false;
-
-			return RemotingConfiguration.CustomErrorsMode == CustomErrorsModes.On;
-		});
 	}
 }

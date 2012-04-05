@@ -4,18 +4,20 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication.Protocols.Null
 {
 	/// <summary>
 	/// Client channel sink for the <see cref="NullChannel"/>.
 	/// </summary>
-	public class NullClientChannelSink : IClientChannelSink, IMessageSink
+	internal class NullClientChannelSink : IClientChannelSink, IMessageSink
 	{
 		/// <summary>
 		/// Client channel sink provider for the <see cref="NullChannel"/>.
@@ -159,11 +161,6 @@ namespace Zyan.Communication.Protocols.Null
 		{
 			IMessage replyMsg;
 			ITransportHeaders requestHeaders = new TransportHeaders();
-			//requestHeaders["Content-Type"] = "application/octet-stream";
-			//requestHeaders["__RequestVerb"] = "POST";
-			//requestHeaders["__ConnectionId"] = 2;
-			//requestHeaders["__IPAddress"] = IPAddress.Loopback.ToString();
-
 			ITransportHeaders responseHeaders;
 			Stream responseStream;
 
@@ -180,6 +177,7 @@ namespace Zyan.Communication.Protocols.Null
 			// add message Uri to the transport headers
 			var mcm = (IMethodCallMessage)msg;
 			requestHeaders[CommonTransportKeys.RequestUri] = mcm.Uri;
+			requestHeaders["__CustomErrorsEnabled"] = CustomErrorsEnabled.Value;
 
 			// create the request message
 			var requestMessage = new NullMessages.RequestMessage
@@ -197,5 +195,13 @@ namespace Zyan.Communication.Protocols.Null
 			responseStream = responseMessage.ResponseStream;
 			replyMsg = responseMessage.Message;
 		}
+
+		private Lazy<bool> CustomErrorsEnabled = new Lazy<bool>(() =>
+		{
+			if (MonoCheck.IsRunningOnMono)
+				return false;
+
+			return RemotingConfiguration.CustomErrorsMode == CustomErrorsModes.On;
+		});
 	}
 }

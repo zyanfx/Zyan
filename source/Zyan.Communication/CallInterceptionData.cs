@@ -47,7 +47,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-        /// Gets or sets wether the call was intercepted.
+		/// Gets or sets wether the call was intercepted.
 		/// </summary>
 		public bool Intercepted
 		{

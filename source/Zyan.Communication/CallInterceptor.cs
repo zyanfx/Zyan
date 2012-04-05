@@ -36,20 +36,20 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-        /// Creates a new instance of the CallInterceptor class.
+		/// Creates a new instance of the CallInterceptor class.
 		/// </summary>
-        /// <param name="interfaceType">Interface type of the intercepted component</param>
-        /// <param name="memberType">Type of the intercepted member</param>
-        /// <param name="memberName">Name of the intercepted member</param>
-        /// <param name="parameterTypes">Types of parameters for the intercepted member</param>
-        /// <param name="onInterception">Callback for custom call interception logic</param>
+		/// <param name="interfaceType">Interface type of the intercepted component</param>
+		/// <param name="memberType">Type of the intercepted member</param>
+		/// <param name="memberName">Name of the intercepted member</param>
+		/// <param name="parameterTypes">Types of parameters for the intercepted member</param>
+		/// <param name="onInterception">Callback for custom call interception logic</param>
 		public CallInterceptor(Type interfaceType, MemberTypes memberType, string memberName, Type[] parameterTypes, CallInterceptionDelegate onInterception)
 			: this(interfaceType, null, memberType, memberName, parameterTypes, onInterception)
 		{
 		}
 
 		/// <summary>
-        /// Gets the interface type of the intercepted component.
+		/// Gets the interface type of the intercepted component.
 		/// </summary>
 		public Type InterfaceType { get; private set; }
 
@@ -59,25 +59,25 @@ namespace Zyan.Communication
 		public string UniqueName { get; private set; }
 
 		/// <summary>
-        /// Gets the Type of the intercepted member.
+		/// Gets the Type of the intercepted member.
 		/// </summary>
 		public MemberTypes MemberType { get; private set; }
 
 		/// <summary>
-        /// Gets the name of the intercepted member.
+		/// Gets the name of the intercepted member.
 		/// </summary>
 		public string MemberName { get; private set; }
 
 		/// <summary>
-        /// Gets the types of parameters for the intercepted member.
-        /// <remarks>
-        /// CAUTION! Order is relevant.
-        /// </remarks>
+		/// Gets the types of parameters for the intercepted member.
+		/// <remarks>
+		/// CAUTION! Order is relevant.
+		/// </remarks>
 		/// </summary>
 		public Type[] ParameterTypes { get; private set; }
 
 		/// <summary>
-        /// Get a callback for custom call interception logic
+		/// Get a callback for custom call interception logic
 		/// </summary>
 		public CallInterceptionDelegate OnInterception { get; private set; }
 
