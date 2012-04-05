@@ -49,6 +49,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CallInterceptionTests.cs" />
     <Compile Include="CallInterceptorBuilderTests.cs" />
     <Compile Include="ChannelWrapperTests.cs" />
     <Compile Include="CleanupTests.cs" />
