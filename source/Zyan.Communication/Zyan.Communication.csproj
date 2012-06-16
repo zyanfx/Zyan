@@ -293,6 +293,7 @@
     <Compile Include="Toolbox\Diagnostics\Trace.cs" />
     <Compile Include="Toolbox\Disposable.cs" />
     <Compile Include="Toolbox\DynamicTypeBinder.cs" />
+    <Compile Include="Toolbox\ExceptionHelper.cs" />
     <Compile Include="Toolbox\Extensions.cs" />
     <Compile Include="Toolbox\MessageHelpers.cs" />
     <Compile Include="Toolbox\MonoCheck.cs" />

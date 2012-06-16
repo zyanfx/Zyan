@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using Zyan.Communication.Toolbox;
 using Zyan.InterLinq.Types;
 using Zyan.InterLinq.Expressions;
 using System.Diagnostics;
@@ -246,7 +247,7 @@ namespace Zyan.InterLinq.Communication
 		/// </param>
 		protected virtual void HandleExceptionInRetrieve(Exception exception)
 		{
-			throw exception;
+			throw exception.PreserveStackTrace();
 		}
 
 		#endregion

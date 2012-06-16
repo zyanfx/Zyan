@@ -336,7 +336,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		{
 			AsyncResult myAr = (AsyncResult)ar;
 			if (myAr.Failed)
-				throw myAr.Exception;
+				throw myAr.Exception.PreserveStackTrace();
 			connection = myAr.Connection;
 			return myAr.Message;
 		}

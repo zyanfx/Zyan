@@ -149,7 +149,7 @@ namespace Zyan.Communication
 					if (cancelArgs.CancelException == null)
 						cancelArgs.CancelException = new InvokeCanceledException();
 
-					throw cancelArgs.CancelException;
+					throw cancelArgs.CancelException.PreserveStackTrace();
 				}
 
 				details.InterfaceName = cancelArgs.InterfaceName;
@@ -510,9 +510,9 @@ namespace Zyan.Communication
 			catch (Exception ex)
 			{
 				if (beforeInvokeOccured)
-					Invoke_FireInvokeCanceledEvent(details, ex);
+					Invoke_FireInvokeCanceledEvent(details, ex.PreserveStackTrace());
 				else
-					Invoke_FireInvokeRejectedEvent(details, ex);
+					Invoke_FireInvokeRejectedEvent(details, ex.PreserveStackTrace());
 			}
 			finally
 			{
@@ -641,7 +641,7 @@ namespace Zyan.Communication
 				if (!authResponse.Success)
 				{
 					var exception = authResponse.Exception ?? new SecurityException(authResponse.ErrorMessage);
-					throw exception;
+					throw exception.PreserveStackTrace();
 				}
 
 				var sessionVariableAdapter = new SessionVariableAdapter(_host.SessionManager, sessionID);

@@ -15,6 +15,7 @@ using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp;
 using Zyan.Communication.Protocols.Tcp.DuplexChannel;
 using Zyan.Communication.Protocols.Wrapper;
+using Zyan.Communication.Toolbox;
 using Zyan.Communication.Toolbox.Diagnostics;
 using Zyan.InterLinq.Expressions;
 
@@ -192,7 +193,7 @@ namespace Zyan.Communication
 				if (disposableChannel != null)
 					disposableChannel.Dispose();
 
-				throw ex;
+				throw ex.PreserveStackTrace();
 			}
 			StartKeepSessionAliveTimer();
 
