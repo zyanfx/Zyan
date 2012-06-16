@@ -7,6 +7,7 @@ using System.Runtime.Remoting;
 using System.Runtime.Remoting.Messaging;
 using System.Runtime.Remoting.Proxies;
 using Zyan.Communication.Delegates;
+using Zyan.Communication.Toolbox;
 using Zyan.InterLinq;
 
 namespace Zyan.Communication
@@ -474,7 +475,7 @@ namespace Zyan.Communication
 
 					_connection.OnInvokeCanceled(new InvokeCanceledEventArgs() { TrackingID = trackingID, CancelException = cancelArgs.CancelException });
 
-					throw cancelArgs.CancelException;
+					throw cancelArgs.CancelException.PreserveStackTrace();
 				}
 
 				// Prepare generic method arguments

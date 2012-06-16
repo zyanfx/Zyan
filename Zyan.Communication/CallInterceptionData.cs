@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Remoting.Messaging;
+using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication
 {
@@ -43,7 +44,7 @@ namespace Zyan.Communication
 			if (returnMessage != null)
 			{
 				if (returnMessage.Exception != null)
-					throw returnMessage.Exception;
+					throw returnMessage.Exception.PreserveStackTrace();
 
 				return returnMessage.ReturnValue;
 			}
