@@ -61,6 +61,7 @@
     <Compile Include="DuckTypingTests.cs" />
     <Compile Include="DynamicWireTests.cs" />
     <Compile Include="EventFilterTests.cs" />
+    <Compile Include="EventStubTests.cs" />
     <Compile Include="GenericMethodsTests.cs" />
     <Compile Include="LinqTests.cs" />
     <Compile Include="MefClientTests.cs" />
