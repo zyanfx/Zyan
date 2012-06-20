@@ -242,32 +242,42 @@ namespace Zyan.Communication
 				throw new ArgumentNullException("registration");
 
 			switch (registration.ActivationType)
-			{ 
+			{
 				case ActivationType.SingleCall:
-					
+
+					object instance = null;
 					if (registration.InitializationHandler != null)
-						return registration.InitializationHandler();
+						instance = registration.InitializationHandler();
 					else
-						return Activator.CreateInstance(registration.ImplementationType);
+						instance = Activator.CreateInstance(registration.ImplementationType);
+
+					// attach event handlers
+					registration.EventStub.WireTo(instance);
+					return instance;
 
 				case ActivationType.Singleton:
 
 					if (registration.SingletonInstance == null)
 					{
 						lock (registration.SyncLock)
-						{ 
+						{
 							if (registration.SingletonInstance == null)
 							{
-								if (registration.InitializationHandler!=null)
+								if (registration.InitializationHandler != null)
 									registration.SingletonInstance = registration.InitializationHandler();
 								else
 									registration.SingletonInstance = Activator.CreateInstance(registration.ImplementationType);
+
+								// attach event handlers
+								registration.EventStub.WireTo(registration.SingletonInstance);
 							}
 						}
 					}
+
 					return registration.SingletonInstance;
 			}
-			throw new NullReferenceException();
+
+			throw new InvalidOperationException("Component instance couldn't be created.");
 		}
 
 		/// <summary>
@@ -373,6 +383,9 @@ namespace Zyan.Communication
 			{
 				if (instance == null)
 					return;
+
+				// remove event handlers
+				regEntry.EventStub.UnwireFrom(instance);
 
 				if (regEntry.DisposeWithCatalog)
 				{
