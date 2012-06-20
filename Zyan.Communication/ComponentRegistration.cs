@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Zyan.Communication.Delegates;
 
 namespace Zyan.Communication
 {
@@ -30,6 +31,7 @@ namespace Zyan.Communication
 			this.ImplementationType = implementationType;
 			this.ActivationType = ActivationType.SingleCall;
 			this.UniqueName = interfaceType.FullName;
+			this.EventStub = new EventStub(InterfaceType);
 		}
 
 		/// <summary>
@@ -46,6 +48,7 @@ namespace Zyan.Communication
 			this.ActivationType = ActivationType.SingleCall;
 			this.UniqueName = interfaceType.FullName;
 			this.CleanUpHandler = cleanUpHandler;
+			this.EventStub = new EventStub(InterfaceType);
 		}
 
 		/// <summary>
@@ -61,6 +64,7 @@ namespace Zyan.Communication
 			this.ImplementationType = implementationType;
 			this.ActivationType = activationType;
 			this.UniqueName = interfaceType.FullName;
+			this.EventStub = new EventStub(InterfaceType);
 		}
 
 		/// <summary>
@@ -78,6 +82,7 @@ namespace Zyan.Communication
 			this.ActivationType = activationType;
 			this.UniqueName = interfaceType.FullName;
 			this.CleanUpHandler = cleanUpHandler;
+			this.EventStub = new EventStub(InterfaceType);
 		}
 
 		/// <summary>
@@ -92,6 +97,7 @@ namespace Zyan.Communication
 			this.InitializationHandler = intializationHandler;
 			this.ActivationType = ActivationType.SingleCall;
 			this.UniqueName = interfaceType.FullName;
+			this.EventStub = new EventStub(InterfaceType);
 		}
 
 		/// <summary>
@@ -108,6 +114,7 @@ namespace Zyan.Communication
 			this.ActivationType = ActivationType.SingleCall;
 			this.UniqueName = interfaceType.FullName;
 			this.CleanUpHandler = cleanUpHandler;
+			this.EventStub = new EventStub(InterfaceType);
 		}
 
 		/// <summary>
@@ -123,6 +130,7 @@ namespace Zyan.Communication
 			this.InitializationHandler = intializationHandler;
 			this.ActivationType = activationType;
 			this.UniqueName = interfaceType.FullName;
+			this.EventStub = new EventStub(InterfaceType);
 		}
 
 		/// <summary>
@@ -140,6 +148,7 @@ namespace Zyan.Communication
 			this.ActivationType = activationType;
 			this.UniqueName = interfaceType.FullName;
 			this.CleanUpHandler = cleanUpHandler;
+			this.EventStub = new EventStub(InterfaceType);
 		}
 
 		/// <summary>
@@ -155,6 +164,7 @@ namespace Zyan.Communication
 			this.SingletonInstance = singletonInstance;
 			this.ActivationType = ActivationType.Singleton;
 			this.UniqueName = interfaceType.FullName;
+			this.EventStub = new EventStub(InterfaceType);
 		}
 
 		/// <summary>
@@ -172,6 +182,7 @@ namespace Zyan.Communication
 			this.ActivationType = ActivationType.Singleton;
 			this.UniqueName = interfaceType.FullName;
 			this.CleanUpHandler = cleanUpHandler;
+			this.EventStub = new EventStub(InterfaceType);
 		}
 
 		/// <summary>
@@ -187,6 +198,7 @@ namespace Zyan.Communication
 			this.ImplementationType = implementationType;
 			this.UniqueName = uniqueName;
 			this.ActivationType = ActivationType.SingleCall;
+			this.EventStub = new EventStub(InterfaceType);
 		}
 
 		/// <summary>
@@ -204,6 +216,7 @@ namespace Zyan.Communication
 			this.UniqueName = uniqueName;
 			this.ActivationType = ActivationType.SingleCall;
 			this.CleanUpHandler = cleanUpHandler;
+			this.EventStub = new EventStub(InterfaceType);
 		}
 
 		/// <summary>
@@ -220,6 +233,7 @@ namespace Zyan.Communication
 			this.ImplementationType = implementationType;
 			this.UniqueName = uniqueName;
 			this.ActivationType = activationType;
+			this.EventStub = new EventStub(InterfaceType);
 		}
 
 		/// <summary>
@@ -238,6 +252,7 @@ namespace Zyan.Communication
 			this.UniqueName = uniqueName;
 			this.ActivationType = activationType;
 			this.CleanUpHandler = cleanUpHandler;
+			this.EventStub = new EventStub(InterfaceType);
 		}
 
 		/// <summary>
@@ -253,6 +268,7 @@ namespace Zyan.Communication
 			this.InitializationHandler = intializationHandler;
 			this.UniqueName = uniqueName;
 			this.ActivationType = ActivationType.SingleCall;
+			this.EventStub = new EventStub(InterfaceType);
 		}
 
 		/// <summary>
@@ -270,6 +286,7 @@ namespace Zyan.Communication
 			this.UniqueName = uniqueName;
 			this.ActivationType = ActivationType.SingleCall;
 			this.CleanUpHandler = cleanUpHandler;
+			this.EventStub = new EventStub(InterfaceType);
 		}
 
 		/// <summary>
@@ -286,6 +303,7 @@ namespace Zyan.Communication
 			this.InitializationHandler = intializationHandler;
 			this.UniqueName = uniqueName;
 			this.ActivationType = activationType;
+			this.EventStub = new EventStub(InterfaceType);
 		}
 
 		/// <summary>
@@ -304,6 +322,7 @@ namespace Zyan.Communication
 			this.UniqueName = uniqueName;
 			this.ActivationType = activationType;
 			this.CleanUpHandler = cleanUpHandler;
+			this.EventStub = new EventStub(InterfaceType);
 		}
 
 		/// <summary>
@@ -320,6 +339,7 @@ namespace Zyan.Communication
 			this.SingletonInstance = singletonInstance;
 			this.UniqueName = uniqueName;
 			this.ActivationType = ActivationType.Singleton;
+			this.EventStub = new EventStub(InterfaceType);
 		}
 
 		/// <summary>
@@ -338,6 +358,7 @@ namespace Zyan.Communication
 			this.UniqueName = uniqueName;
 			this.ActivationType = ActivationType.Singleton;
 			this.CleanUpHandler = cleanUpHandler;
+			this.EventStub = new EventStub(InterfaceType);
 		}
 
 		#endregion
@@ -404,6 +425,15 @@ namespace Zyan.Communication
 		/// Gets or sets the current instance (Singleton activation only) of the registered component.
 		/// </summary>
 		public object SingletonInstance
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// Gets or sets the event stub that caches all event handlers of the registered component.
+		/// </summary>
+		public EventStub EventStub
 		{
 			get;
 			set;
