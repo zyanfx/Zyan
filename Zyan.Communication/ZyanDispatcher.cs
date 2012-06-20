@@ -45,11 +45,11 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Creates wires between client component and server component.
 		/// </summary>
-		/// <param name="type">Implementation type of the server component</param>
-		/// <param name="instance">Instance of the server component</param>
+		/// <param name="type">Implementation type of the server component.</param>
+		/// <param name="eventStub"><see cref="EventStub"/> with cached subscriptions.</param>
 		/// <param name="delegateCorrelationSet">Correlation set (say how to wire)</param>
 		/// <param name="wiringList">Collection of built wires</param>
-		private void CreateClientServerWires(Type type, object instance, List<DelegateCorrelationInfo> delegateCorrelationSet, Dictionary<Guid, Delegate> wiringList)
+		private void CreateClientServerWires(Type type, EventStub eventStub, List<DelegateCorrelationInfo> delegateCorrelationSet, Dictionary<Guid, Delegate> wiringList)
 		{
 			if (delegateCorrelationSet == null)
 				return;
@@ -67,7 +67,6 @@ namespace Zyan.Communication
 
 				if (correlationInfo.IsEvent)
 				{
-					var eventInfo = type.GetEvent(correlationInfo.DelegateMemberName);
 					var dynamicEventWire = (DynamicEventWireBase)dynamicWire;
 					dynamicEventWire.EventFilter = correlationInfo.EventFilter;
 
@@ -75,15 +74,14 @@ namespace Zyan.Communication
 					var sessionId = ServerSession.CurrentSession.SessionID;
 					var sessionManager = _host.SessionManager;
 					dynamicEventWire.ValidateSession = () => sessionManager.ExistSession(sessionId);
-					dynamicEventWire.CancelSubscription = () => eventInfo.RemoveEventHandler(instance, dynamicEventWire.InDelegate);
+					dynamicEventWire.CancelSubscription = () => eventStub.RemoveHandler(correlationInfo.DelegateMemberName, dynamicEventWire.InDelegate);
 
-					eventInfo.AddEventHandler(instance, dynamicEventWire.InDelegate);
+					eventStub.AddHandler(correlationInfo.DelegateMemberName, dynamicEventWire.InDelegate);
 					wiringList.Add(correlationInfo.CorrelationID, dynamicEventWire.InDelegate);
 				}
 				else
 				{
-					var outputPinMetaData = type.GetProperty(correlationInfo.DelegateMemberName);
-					outputPinMetaData.SetValue(instance, dynamicWire.InDelegate, null);
+					eventStub.AddHandler(correlationInfo.DelegateMemberName, dynamicWire.InDelegate);
 					wiringList.Add(correlationInfo.CorrelationID, dynamicWire.InDelegate);
 				}
 			}
@@ -93,33 +91,22 @@ namespace Zyan.Communication
 		/// Removes wires between server and client components (as defined in correlation set).
 		/// </summary>
 		/// <param name="type">Type of the server component</param>
-		/// <param name="instance">Instance of the server component</param>
+		/// <param name="eventStub"><see cref="EventStub"/> with cached subscriptions.</param>
 		/// <param name="delegateCorrelationSet">Correlation set with wiring information</param>
 		/// <param name="wiringList">List with known wirings</param>
-		private void RemoveClientServerWires(Type type, object instance, List<DelegateCorrelationInfo> delegateCorrelationSet, Dictionary<Guid, Delegate> wiringList)
+		private void RemoveClientServerWires(Type type, EventStub eventStub, List<DelegateCorrelationInfo> delegateCorrelationSet, Dictionary<Guid, Delegate> wiringList)
 		{
 			if (delegateCorrelationSet == null)
 				return;
 
-			foreach (DelegateCorrelationInfo correlationInfo in delegateCorrelationSet)
+			foreach (var correlationInfo in delegateCorrelationSet)
 			{
-				if (correlationInfo.IsEvent)
+				if (wiringList.ContainsKey(correlationInfo.CorrelationID))
 				{
-					if (wiringList.ContainsKey(correlationInfo.CorrelationID))
-					{
-						EventInfo eventInfo = type.GetEvent(correlationInfo.DelegateMemberName);
-						Delegate dynamicWireDelegate = wiringList[correlationInfo.CorrelationID];
-
-						eventInfo.RemoveEventHandler(instance, dynamicWireDelegate);
-					}
+					var dynamicWireDelegate = wiringList[correlationInfo.CorrelationID];
+					eventStub.RemoveHandler(correlationInfo.DelegateMemberName, dynamicWireDelegate);
+					wiringList.Remove(correlationInfo.CorrelationID);
 				}
-				else
-				{
-					PropertyInfo delegatePropInfo = type.GetProperty(correlationInfo.DelegateMemberName);
-					delegatePropInfo.SetValue(instance, null, null);
-				}
-
-				wiringList.Remove(correlationInfo.CorrelationID);
 			}
 		}
 
@@ -351,20 +338,6 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Wires up event handlers.
-		/// </summary>
-		/// <param name="details">Invocation details</param>
-		private void Invoke_WireUpEventHandlers(InvocationDetails details)
-		{
-			details.WiringList = null;
-			if (details.Registration.ActivationType == ActivationType.SingleCall)
-			{
-				details.WiringList = new Dictionary<Guid, Delegate>();
-				CreateClientServerWires(details.Type, details.Instance, details.DelegateCorrelationSet, details.WiringList);
-			}
-		}
-
-		/// <summary>
 		/// Obtains metadata of the invoked method via reflection.
 		/// </summary>
 		/// <param name="details">Invocation details</param>
@@ -440,13 +413,10 @@ namespace Zyan.Communication
 		/// <param name="details">Invocation details</param>
 		private void Invoke_CleanUp(InvocationDetails details)
 		{
-			if (details.Registration != null && details.Registration.ActivationType == ActivationType.SingleCall)
+			if (details.Instance != null && details.Registration != null && 
+				details.Registration.ActivationType == ActivationType.SingleCall)
 			{
-				if (details.WiringList != null)
-					RemoveClientServerWires(details.Type, details.Instance, details.DelegateCorrelationSet, details.WiringList);
-
-				if (details.Instance != null)
-					_host.ComponentCatalog.CleanUpComponentInstance(details.Registration, details.Instance);
+				_host.ComponentCatalog.CleanUpComponentInstance(details.Registration, details.Instance);
 			}
 		}
 
@@ -497,7 +467,6 @@ namespace Zyan.Communication
 				Invoke_CheckInterfaceName(details);
 				Invoke_ConvertMethodArguments(details);
 				Invoke_ResolveComponentInstance(details);
-				Invoke_WireUpEventHandlers(details);
 				Invoke_ObtainMethodMetadata(details);
 				Invoke_InterceptDelegateParams(details);
 
@@ -546,23 +515,20 @@ namespace Zyan.Communication
 
 			var details = new InvocationDetails()
 			{
-				InterfaceName = interfaceName
+				InterfaceName = interfaceName,
+				Registration = _host.ComponentRegistry[uniqueName]
 			};
 
 			Invoke_LoadCallContextData(details);
-
-			details.Registration = _host.ComponentRegistry[uniqueName];
-
-			if (details.Registration.ActivationType != ActivationType.Singleton)
-				return;
-
 			Invoke_SetSession(details);
 			Invoke_ResolveComponentInstance(details);
 
-			var correlationSet = new List<DelegateCorrelationInfo>();
-			correlationSet.Add(correlation);
+			var correlationSet = new List<DelegateCorrelationInfo>
+			{
+				correlation
+			};
 
-			CreateClientServerWires(details.Type, details.Instance, correlationSet, details.Registration.EventWirings);
+			CreateClientServerWires(details.Type, details.Registration.EventStub, correlationSet, details.Registration.EventWirings);
 		}
 
 		/// <summary>
@@ -584,23 +550,20 @@ namespace Zyan.Communication
 
 			var details = new InvocationDetails()
 			{
-				InterfaceName = interfaceName
+				InterfaceName = interfaceName,
+				Registration = _host.ComponentRegistry[uniqueName]
 			};
 
 			Invoke_LoadCallContextData(details);
-
-			details.Registration = _host.ComponentRegistry[uniqueName];
-
-			if (details.Registration.ActivationType != ActivationType.Singleton)
-				return;
-
 			Invoke_SetSession(details);
 			Invoke_ResolveComponentInstance(details);
 
-			List<DelegateCorrelationInfo> correlationSet = new List<DelegateCorrelationInfo>();
-			correlationSet.Add(correlation);
+			var correlationSet = new List<DelegateCorrelationInfo>
+			{
+				correlation
+			};
 
-			RemoveClientServerWires(details.Type, details.Instance, correlationSet, details.Registration.EventWirings);
+			RemoveClientServerWires(details.Type, details.Registration.EventStub, correlationSet, details.Registration.EventWirings);
 		}
 
 		#endregion

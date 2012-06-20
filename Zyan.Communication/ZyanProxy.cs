@@ -367,12 +367,8 @@ namespace Zyan.Communication
 			if (correlationInfo == null)
 				throw new ArgumentNullException("correlationInfo");
 
-			// If component is singleton, attach event handler
-			if (_activationType == ActivationType.Singleton)
-			{
-				_connection.PrepareCallContext(false);
-				_connection.RemoteDispatcher.AddEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
-			}
+			_connection.PrepareCallContext(false);
+			_connection.RemoteDispatcher.AddEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
 		}
 
 		/// <summary>
@@ -384,12 +380,8 @@ namespace Zyan.Communication
 			if (correlationInfo == null)
 				throw new ArgumentNullException("correlationInfo");
 
-			// If component is singleton, detach event handler
-			if (_activationType == ActivationType.Singleton)
-			{
-				_connection.PrepareCallContext(false);
-				_connection.RemoteDispatcher.RemoveEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
-			}
+			_connection.PrepareCallContext(false);
+			_connection.RemoteDispatcher.RemoveEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
 		}
 
 		/// <summary>
