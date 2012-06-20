@@ -11,20 +11,15 @@ namespace Zyan.Communication.Delegates
 	internal abstract class DynamicEventWireBase : DynamicWireBase
 	{
 		/// <summary>
-		/// Server component.
-		/// </summary>
-		public object Component { get; set; }
-
-		/// <summary>
-		/// Server component's event descriptor.
-		/// </summary>
-		public EventInfo ServerEventInfo { get; set; }
-
-		/// <summary>
 		/// Session validation handler.
 		/// Returns True if client's session is valid, otherwise, False.
 		/// </summary>
 		public Func<bool> ValidateSession { get; set; }
+
+		/// <summary>
+		/// Gets or sets the method to cancel subscription.
+		/// </summary>
+		public Action CancelSubscription { get; set; }
 
 		/// <summary>
 		/// Gets or sets the event filter.
@@ -52,7 +47,10 @@ namespace Zyan.Communication.Delegates
 			catch (Exception ex)
 			{
 				// unsubscribe
-				ServerEventInfo.RemoveEventHandler(Component, InDelegate);
+				if (CancelSubscription != null)
+				{
+					CancelSubscription();
+				}
 
 				// log diagnostic message
 				Trace.WriteLine("Warning! Event subscription is canceled due to exception: {0}", ex);
