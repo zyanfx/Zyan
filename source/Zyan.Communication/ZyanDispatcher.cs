@@ -69,15 +69,13 @@ namespace Zyan.Communication
 				{
 					var eventInfo = type.GetEvent(correlationInfo.DelegateMemberName);
 					var dynamicEventWire = (DynamicEventWireBase)dynamicWire;
-
-					dynamicEventWire.ServerEventInfo = eventInfo;
-					dynamicEventWire.Component = instance;
 					dynamicEventWire.EventFilter = correlationInfo.EventFilter;
 
-					// add session validation handler
+					// add session validation handler and unsubscription callback
 					var sessionId = ServerSession.CurrentSession.SessionID;
 					var sessionManager = _host.SessionManager;
 					dynamicEventWire.ValidateSession = () => sessionManager.ExistSession(sessionId);
+					dynamicEventWire.CancelSubscription = () => eventInfo.RemoveEventHandler(instance, dynamicEventWire.InDelegate);
 
 					eventInfo.AddEventHandler(instance, dynamicEventWire.InDelegate);
 					wiringList.Add(correlationInfo.CorrelationID, dynamicEventWire.InDelegate);
