@@ -42,7 +42,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
@@ -70,6 +69,12 @@
     <EmbeddedResource Include="LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="LoginForm.de.resx">
+      <DependentUpon>LoginForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LoginForm.ru.resx">
+      <DependentUpon>LoginForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -92,9 +97,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\source\Zyan.Communication\Zyan.Communication.csproj">
-      <Project>{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}</Project>
-      <Name>Zyan.Communication</Name>
+    <ProjectReference Include="..\..\..\source\Zyan.Communication\Zyan.Communication.Fx3.csproj">
+      <Project>{260a24a8-69cf-4f36-8665-c6376f7ba16e}</Project>
+      <Name>Zyan.Communication.Fx3</Name>
     </ProjectReference>
     <ProjectReference Include="..\Zyan.Examples.EbcCalculator.Shared\Zyan.Examples.EbcCalculator.Shared.csproj">
       <Project>{54676D41-68F5-415A-9F79-06D015A73354}</Project>
