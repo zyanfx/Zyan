@@ -165,6 +165,11 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			try
 			{
 				connection.LockRead();
+				if (connection.Socket == null)
+				{
+					throw new MessageException("Connection closed.", null, connection);
+				}
+
 				int bytesRead = connection.Socket.EndReceive(myAr.InternalAsyncResult);
 				if (bytesRead == 16)
 				{

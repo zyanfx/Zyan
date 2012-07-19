@@ -264,7 +264,7 @@ namespace Zyan.Communication
 
 			_host.OnInvokeCanceled(args);
 
-			throw args.CancelException ?? new InvokeCanceledException();
+			throw args.CancelException.PreserveStackTrace() ?? new InvokeCanceledException();
 		}
 
 		/// <summary>
@@ -284,7 +284,7 @@ namespace Zyan.Communication
 
 			_host.OnInvokeRejected(args);
 
-			throw args.CancelException ?? new InvokeCanceledException();
+			throw args.CancelException.PreserveStackTrace() ?? new InvokeCanceledException();
 		}
 
 		/// <summary>
@@ -477,9 +477,9 @@ namespace Zyan.Communication
 			catch (Exception ex)
 			{
 				if (beforeInvokeOccured)
-					Invoke_FireInvokeCanceledEvent(details, ex.PreserveStackTrace());
+					Invoke_FireInvokeCanceledEvent(details, ex);
 				else
-					Invoke_FireInvokeRejectedEvent(details, ex.PreserveStackTrace());
+					Invoke_FireInvokeRejectedEvent(details, ex);
 			}
 			finally
 			{
