@@ -24,14 +24,29 @@ namespace Zyan.Communication.Composition
 
 		private object lockObject = new object();
 
+		/// <summary>
+		/// Gets the definition of this composable part.
+		/// </summary>
 		public ZyanComposablePartDefinition Definition { get; private set; }
 
+		/// <summary>
+		/// Gets the <see cref="ZyanConnection"/> used to create transparent proxies.
+		/// </summary>
 		public ZyanConnection Connection { get { return Definition.Connection; } }
 
+		/// <summary>
+		/// Gets the component interface.
+		/// </summary>
 		public Lazy<Type> ComponentInterface { get { return Definition.ComponentInterface; } }
 
+		/// <summary>
+		/// Gets the unique name of the component (typically, the same as ComponentInterfaceName).
+		/// </summary>
 		public string ComponentUniqueName { get { return Definition.ComponentUniqueName; } }
 
+		/// <summary>
+		/// Gets a value indicating whether implicit transaction transfer is enabled.
+		/// </summary>
 		public bool ImplicitTransactionTransfer { get { return Definition.ImplicitTransactionTransfer; } }
 
 		/// <summary>
@@ -101,6 +116,17 @@ namespace Zyan.Communication.Composition
 		public override void SetImport(ImportDefinition definition, IEnumerable<Export> exports)
 		{
 			throw new NotImplementedException();
+		}
+
+		/// <summary>
+		/// Returns a <see cref="System.String" /> that represents this instance.
+		/// </summary>
+		/// <returns>
+		/// A <see cref="System.String" /> that represents this instance.
+		/// </returns>
+		public override string ToString()
+		{
+			return Definition.ToString();
 		}
 	}
 }
