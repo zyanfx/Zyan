@@ -110,6 +110,7 @@
     <Compile Include="Delegates\DynamicWireT.cs" />
     <Compile Include="CallInterceptionData.cs" />
     <Compile Include="CallInterceptor.cs" />
+    <Compile Include="Delegates\EmptyDelegateFactory.cs" />
     <Compile Include="Delegates\EventFilter.cs" />
     <Compile Include="Delegates\EventFilterBase.cs" />
     <Compile Include="Delegates\EventStub.cs" />
