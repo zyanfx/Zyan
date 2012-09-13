@@ -74,6 +74,7 @@
     <Compile Include="CompressionTests.cs" />
     <Compile Include="DuckTypingTests.cs" />
     <Compile Include="DynamicWireTests.cs" />
+    <Compile Include="EmptyDelegateFactoryTests.cs" />
     <Compile Include="EventFilterTests.cs" />
     <Compile Include="EventsTests.cs" />
     <Compile Include="EventStubTests.cs" />
