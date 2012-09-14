@@ -118,6 +118,8 @@ namespace Zyan.Tests
 
 		#endregion
 
+		#region Initialization and cleanup
+
 		public TestContext TestContext { get; set; }
 
 		static ZyanComponentHost ZyanHost { get; set; }
@@ -155,6 +157,8 @@ namespace Zyan.Tests
 			ZyanHost.Dispose();
 			StreamService.DeleteTempFiles();
 		}
+
+		#endregion
 
 		[TestMethod]
 		public void ReadRemoteMemoryStream()

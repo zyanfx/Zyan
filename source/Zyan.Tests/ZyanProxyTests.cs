@@ -75,6 +75,8 @@ namespace Zyan.Tests
 
 		#endregion
 
+		#region Initialization and cleanup
+
 		public TestContext TestContext { get; set; }
 
 		static ZyanComponentHost ZyanHost { get; set; }
@@ -111,6 +113,8 @@ namespace Zyan.Tests
 			ZyanConnection.Dispose();
 			ZyanHost.Dispose();
 		}
+
+		#endregion
 
 		[TestMethod]
 		public void GetType_ShouldReturnISampleServer()

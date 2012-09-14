@@ -213,6 +213,8 @@ namespace Zyan.Tests
 
 		#endregion
 
+		#region Initialization and cleanup
+
 		public TestContext TestContext { get; set; }
 
 		static ZyanComponentHost ZyanHost { get; set; }
@@ -233,6 +235,8 @@ namespace Zyan.Tests
 		[ClassInitialize]
 		public static void StartServer(TestContext ctx)
 		{
+			ZyanComponentHost.LegacyBlockingEvents = true;
+
 			var serverSetup = new NullServerProtocolSetup(2345);
 			ZyanHost = new ZyanComponentHost("EventFilterServer", serverSetup);
 			ZyanHost.RegisterComponent<ISampleServer, SampleServer>(ActivationType.Singleton);
@@ -247,6 +251,8 @@ namespace Zyan.Tests
 			ZyanConnection.Dispose();
 			ZyanHost.Dispose();
 		}
+
+		#endregion
 
 		[TestMethod]
 		public void SubscriptionUnsubscription_RegressionTest()

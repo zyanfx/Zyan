@@ -106,6 +106,12 @@ namespace Zyan.Communication.Delegates
 		/// </summary>
 		private class DelegateHolder<T> : IDelegateHolder
 		{
+			public DelegateHolder()
+			{
+				// create default return value for the delegate
+				DefaultReturnValue = typeof(T).GetMethod("Invoke").ReturnType.GetDefaultValue();
+			}
+
 			public Delegate InvocationDelegate
 			{
 				get { return (Delegate)(object)InvocationMethod; }
@@ -130,10 +136,20 @@ namespace Zyan.Communication.Delegates
 
 			private object DynamicInvoke(object[] arguments)
 			{
-				return Delegate.SafeDynamicInvoke(arguments);
+				// run in legacy blocking mode
+				if (ZyanComponentHost.LegacyBlockingEvents)
+				{
+					return Delegate.SafeDynamicInvoke(arguments) ?? DefaultReturnValue;
+				}
+
+				// run in non-blocking mode
+				Delegate.OneWayDynamicInvoke(arguments);
+				return DefaultReturnValue;
 			}
 
 			private T TypedDelegate { get; set; }
+
+			private object DefaultReturnValue { get; set; }
 
 			private Delegate Delegate
 			{
@@ -141,14 +157,22 @@ namespace Zyan.Communication.Delegates
 				set { TypedDelegate = (T)(object)value; }
 			}
 
+			private object syncRoot = new object();
+
 			public void AddHandler(Delegate handler)
 			{
-				Delegate = Delegate.Combine(Delegate, handler);
+				lock (syncRoot)
+				{
+					Delegate = Delegate.Combine(Delegate, handler);
+				}
 			}
 
 			public void RemoveHandler(Delegate handler)
 			{
-				Delegate = Delegate.Remove(Delegate, handler);
+				lock (syncRoot)
+				{
+					Delegate = Delegate.Remove(Delegate, handler);
+				}
 			}
 		}
 
