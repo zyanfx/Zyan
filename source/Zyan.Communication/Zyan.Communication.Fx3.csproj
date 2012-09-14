@@ -110,6 +110,7 @@
     <Compile Include="Delegates\FlexibleEventFilter.cs" />
     <Compile Include="Delegates\IEventFilter.cs" />
     <Compile Include="Delegates\IFilteredEventHandler.cs" />
+    <Compile Include="Delegates\SafeDynamicInvoker.cs" />
     <Compile Include="Delegates\SessionEventArgs.cs" />
     <Compile Include="Delegates\SessionEventFilter.cs" />
     <Compile Include="DisconnectedEventArgs.cs" />
