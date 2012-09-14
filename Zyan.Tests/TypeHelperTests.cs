@@ -229,5 +229,26 @@ namespace Zyan.Tests
 				Assert.AreEqual(obj, newObj);
 			}
 		}
+
+		[TestMethod]
+		public void DefaultValuesTest()
+		{
+			var obj = typeof(void).GetDefaultValue();
+			Assert.IsNull(obj);
+
+			obj = typeof(string).GetDefaultValue();
+			Assert.IsNull(obj);
+
+			obj = typeof(ZyanConnection).GetDefaultValue();
+			Assert.IsNull(obj);
+
+			obj = typeof(int).GetDefaultValue();
+			Assert.IsNotNull(obj);
+			Assert.AreEqual(default(int), obj);
+
+			obj = typeof(DateTime).GetDefaultValue();
+			Assert.IsNotNull(obj);
+			Assert.AreEqual(default(DateTime), obj);
+		}
 	}
 }

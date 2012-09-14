@@ -359,6 +359,8 @@ namespace Zyan.Tests
 
 		#endregion
 
+		#region Initialization and cleanup
+
 		public TestContext TestContext { get; set; }
 
 		static ComposablePartCatalog MefCatalog { get; set; }
@@ -377,6 +379,8 @@ namespace Zyan.Tests
 			MefCatalog = new AssemblyCatalog(typeof(MefServerTests).Assembly);
 			MefContainer = new CompositionContainer(MefCatalog);
 		}
+
+		#endregion
 
 		[TestMethod]
 		public void ZyanComponentFromMefCatalog_IsRegisteredAsSingleCall()

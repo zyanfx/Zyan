@@ -4,7 +4,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Reflection;
+using System.Threading;
 using Zyan.Communication.Toolbox;
+using Zyan.Communication.Toolbox.Diagnostics;
 
 namespace Zyan.Communication.Delegates
 {
@@ -173,6 +175,37 @@ namespace Zyan.Communication.Delegates
 #else
 			throw exceptions.First();
 #endif
+		}
+
+		/// <summary>
+		/// Dynamically invokes the method represented by the given delegate as a one-way method. The delegate can be null. 
+		/// </summary>
+		/// <param name="deleg">The delegate to invoke.</param>
+		/// <param name="arguments">The arguments.</param>
+		public static void OneWayDynamicInvoke(this Delegate deleg, object[] arguments)
+		{
+			if (deleg == null)
+			{
+				return;
+			}
+
+			var dynamicInvoker = GetDynamicInvoker(deleg);
+			var invocationList = deleg.GetInvocationList();
+			foreach (var d in invocationList)
+			{
+				// TODO: implement it using custom thread pool
+				ThreadPool.QueueUserWorkItem(x =>
+				{
+					try
+					{
+						dynamicInvoker(d, arguments);
+					}
+					catch (Exception ex)
+					{
+						Trace.WriteLine("Exception in an event handler: {0}", ex);
+					}
+				});
+			}
 		}
 	}
 }

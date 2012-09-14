@@ -188,6 +188,33 @@ namespace Zyan.Communication.Toolbox
 			return null;
 		}
 
+		private static Dictionary<Type, object> defaultValues = new Dictionary<Type, object>();
+
+		/// <summary>
+		/// Gets the default value for the given type.
+		/// </summary>
+		/// <param name="type">The type.</param>
+		/// <returns>default() for the type.</returns>
+		public static object GetDefaultValue(this Type type)
+		{
+			if (type == typeof(void) || !type.IsValueType)
+			{
+				return null;
+			}
+
+			var result = default(object);
+			lock (defaultValues)
+			{
+				if (!defaultValues.TryGetValue(type, out result))
+				{
+					result = Activator.CreateInstance(type);
+					defaultValues[type] = result;
+				}
+			}
+
+			return result;
+		}
+
 		/// <summary>
 		/// Returns method signature, similar to MethodInfo.ToString().
 		/// </summary>

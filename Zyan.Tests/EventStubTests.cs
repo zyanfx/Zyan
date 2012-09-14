@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using Zyan.Communication;
 using Zyan.Communication.Delegates;
 
 namespace Zyan.Tests
@@ -89,6 +90,22 @@ namespace Zyan.Tests
 #else
 			Assert.IsInstanceOfType(instance, typeof(T));
 #endif
+		}
+
+		#endregion
+
+		#region Initialization and cleanup
+
+		[ClassInitializeNonStatic]
+		public void Initialize()
+		{
+			StartServer(null);
+		}
+
+		[ClassInitialize]
+		public static void StartServer(TestContext ctx)
+		{
+			ZyanComponentHost.LegacyBlockingEvents = true;
 		}
 
 		#endregion
