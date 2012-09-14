@@ -68,6 +68,7 @@
     <Compile Include="ComponentInfo.cs" />
     <Compile Include="ComponentRegistration.cs" />
     <Compile Include="CustomSerializationContainer.cs" />
+    <Compile Include="Delegates\EmptyDelegateFactory.cs" />
     <Compile Include="Delegates\DelegateCorrelationInfo.cs" />
     <Compile Include="Delegates\DelegateInterceptor.cs" />
     <Compile Include="Delegates\DynamicEventWireBase.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="Delegates\EventFilter.cs" />
     <Compile Include="Delegates\EventFilterBase.cs" />
     <Compile Include="Delegates\EventStub.cs" />
+    <Compile Include="Delegates\SafeDynamicInvoker.cs" />
     <Compile Include="Delegates\FilteredCustomHandlerT.cs" />
     <Compile Include="Delegates\FilteredEventHandler.cs" />
     <Compile Include="Delegates\FilteredSystemEventHandler.cs" />

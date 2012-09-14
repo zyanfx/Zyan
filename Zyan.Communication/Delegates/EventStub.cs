@@ -130,12 +130,7 @@ namespace Zyan.Communication.Delegates
 
 			private object DynamicInvoke(object[] arguments)
 			{
-				if (Delegate != null)
-				{
-					return Delegate.DynamicInvoke(arguments);
-				}
-
-				return null;
+				return Delegate.SafeDynamicInvoke(arguments);
 			}
 
 			private T TypedDelegate { get; set; }
