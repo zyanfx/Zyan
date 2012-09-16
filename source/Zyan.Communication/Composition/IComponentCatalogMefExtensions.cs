@@ -12,6 +12,7 @@ namespace Zyan.Communication.Composition
 {
 	// Shortcut name for registration method delegate
 	using ComponentRegistrationDelegate = Action<IComponentCatalog, ComposablePartCatalog, CompositionContainer, string, ActivationType>;
+	using IAnyInterface = IDisposable;
 
 	/// <summary>
 	/// Server-side MEF integration
@@ -77,10 +78,9 @@ namespace Zyan.Communication.Composition
 		}
 
 		/// <summary>
-		/// MethodInfo for RegisterComponent{I} method, used to create generic method delegates
+		/// MethodInfo for RegisterComponent{I} method, used to create generic method delegates.
 		/// </summary>
-		static MethodInfo RegisterComponentMethodInfo = typeof(IComponentCatalogMefExtensions).GetMethod("RegisterComponent", BindingFlags.Static | BindingFlags.NonPublic,
-			null, new[] { typeof(IComponentCatalog), typeof(ComposablePartCatalog), typeof(CompositionContainer), typeof(string), typeof(ActivationType) }, null);
+		static MethodInfo RegisterComponentMethodInfo = new ComponentRegistrationDelegate(RegisterComponent<IAnyInterface>).Method.GetGenericMethodDefinition();
 
 		/// <summary>
 		/// Registers component implementing interface I. Component instance is provided by MEF container.

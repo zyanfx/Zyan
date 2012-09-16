@@ -77,14 +77,15 @@ namespace Zyan.Communication.Delegates
 			}
 		}
 
-		private IDelegateHolder CreateDelegateHolder(Type delegateType)
+		private static IDelegateHolder CreateDelegateHolder(Type delegateType)
 		{
-			var method = GetType().GetMethod("CreateGenericDelegateHolder", BindingFlags.Instance | BindingFlags.NonPublic);
-			method = method.MakeGenericMethod(delegateType);
-			return (IDelegateHolder)method.Invoke(this, null);
+			var createDelegateHolder = createDelegateHolderMethod.MakeGenericMethod(delegateType).CreateDelegate<Func<IDelegateHolder>>();
+			return createDelegateHolder();
 		}
 
-		private IDelegateHolder CreateGenericDelegateHolder<T>()
+		private static MethodInfo createDelegateHolderMethod = new Func<IDelegateHolder>(CreateDelegateHolder<Action>).Method.GetGenericMethodDefinition();
+
+		private static IDelegateHolder CreateDelegateHolder<T>()
 		{
 			return new DelegateHolder<T>();
 		}
