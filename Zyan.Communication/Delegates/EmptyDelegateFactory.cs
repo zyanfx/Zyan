@@ -61,7 +61,7 @@ namespace Zyan.Communication.Delegates
 
 		private static DelegateFactoryCache cachedDelegates = new DelegateFactoryCache();
 
-		private static MethodInfo createEmptyDelegateMethod = typeof(EmptyDelegateFactory).GetMethod("CreateEmptyDelegate", BindingFlags.Static | BindingFlags.Public, null, new Type[0], null);
+		private static MethodInfo createEmptyDelegateMethod = new Func<Action>(CreateEmptyDelegate<Action>).Method.GetGenericMethodDefinition();
 
 		private class InternalDelegateFactory<TDelegate>
 		{
