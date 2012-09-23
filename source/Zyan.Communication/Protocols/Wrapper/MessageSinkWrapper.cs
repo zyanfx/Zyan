@@ -13,6 +13,11 @@ namespace Zyan.Communication.Protocols.Wrapper
 	{
 		public MessageSinkWrapper(IMessageSink innerSink)
 		{
+			if (innerSink == null)
+			{
+				throw new ArgumentNullException("innerSink");
+			}
+
 			InnerSink = innerSink;
 		}
 
