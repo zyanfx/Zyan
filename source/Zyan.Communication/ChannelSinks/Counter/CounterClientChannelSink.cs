@@ -325,6 +325,11 @@ namespace Zyan.Communication.ChannelSinks.Counter
 			/// </summary>
 			public IMessage Message { get { return _msg; } }
 
+			/// <summary>
+			/// Eindeutige Kennung der Sicherheitstransaktion
+			/// </summary>
+			public Guid SecureTransactionID { get { return _secureTransactionID; } }
+
 			/// <summary>Kopiert einen bestimmten Datenstrom</summary>
 			/// <param name="stream">Datenstrom</param>
 			/// <returns>Kopie des Datenstroms</returns>
