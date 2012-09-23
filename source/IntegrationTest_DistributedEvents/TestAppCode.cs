@@ -220,6 +220,7 @@ namespace IntegrationTest_DistributedEvents
 			_host = new ZyanComponentHost("EventTest", protocol, _catalog);
 
 			TcpDuplexServerProtocolSetup protocol2 = new TcpDuplexServerProtocolSetup(8084, new NullAuthenticationProvider(), true);
+			protocol2.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(1));
 			_duplexHost = new ZyanComponentHost("DuplexEventTest", protocol2, _catalog);
 		}
 

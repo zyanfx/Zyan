@@ -75,6 +75,7 @@ namespace IntegrationTest_DistributedEvents
 		{
 			// Duplex TCP Channel
 			TcpDuplexClientProtocolSetup protocol = new TcpDuplexClientProtocolSetup(true);
+			protocol.AddClientSinkAfterFormatter(new CompressionClientChannelSinkProvider(1));
 			_connectionDuplex = new ZyanConnection("tcpex://localhost:8084/DuplexEventTest", protocol);
 
 			_proxySingletonDuplex = _connectionDuplex.CreateProxy<IEventComponentSingleton>();
