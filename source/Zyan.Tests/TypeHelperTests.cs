@@ -207,6 +207,7 @@ namespace Zyan.Tests
 				ms.Seek(0, SeekOrigin.Begin);
 
 				var newObj = fmt.Deserialize(ms);
+				Assert.IsNotNull(newObj);
 			}
 		}
 

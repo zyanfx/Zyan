@@ -24,7 +24,6 @@ namespace Zyan.Communication
 		private Guid _sessionID;
 		private string _componentHostName = string.Empty;
 		private bool _autoLoginOnExpiredSession = false;
-		private Hashtable _autoLoginCredentials = null;
 		private ZyanConnection _connection = null;
 		private ActivationType _activationType = ActivationType.SingleCall;
 		private string _uniqueName = string.Empty;
@@ -39,9 +38,8 @@ namespace Zyan.Communication
 		/// <param name="sessionID">Session ID.</param>
 		/// <param name="componentHostName">Name of the remote component host.</param>
 		/// <param name="autoLoginOnExpiredSession">Specifies whether Zyan should login automatically with cached credentials after the session is expired.</param>
-		/// <param name="autoLogoninCredentials">Optional credentials to be used for automatic logon after session is expired</param>
 		/// <param name="activationType">Component activation type</param>
-		public ZyanProxy(string uniqueName, Type type, ZyanConnection connection, bool implicitTransactionTransfer, Guid sessionID, string componentHostName, bool autoLoginOnExpiredSession, Hashtable autoLogoninCredentials, ActivationType activationType)
+		public ZyanProxy(string uniqueName, Type type, ZyanConnection connection, bool implicitTransactionTransfer, Guid sessionID, string componentHostName, bool autoLoginOnExpiredSession, ActivationType activationType)
 			: base(type)
 		{
 			if (type.Equals(null))
@@ -63,10 +61,6 @@ namespace Zyan.Communication
 			_remoteDispatcher = _connection.RemoteDispatcher;
 			_implicitTransactionTransfer = implicitTransactionTransfer;
 			_autoLoginOnExpiredSession = autoLoginOnExpiredSession;
-
-			if (_autoLoginOnExpiredSession)
-				_autoLoginCredentials = autoLogoninCredentials;
-
 			_delegateCorrelationSet = new List<DelegateCorrelationInfo>();
 		}
 

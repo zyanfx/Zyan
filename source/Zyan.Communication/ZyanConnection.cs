@@ -351,7 +351,7 @@ namespace Zyan.Communication
 			if (info == null)
 				throw new ApplicationException(string.Format("Für Schnittstelle '{0}' ist auf dem Server '{1}' keine Komponente registriert.", interfaceType.FullName, _serverUrl));
 
-			ZyanProxy proxy = new ZyanProxy(info.UniqueName, typeof(T), this, implicitTransactionTransfer, _sessionID, _componentHostName, _autoLoginOnExpiredSession, _autoLoginCredentials, info.ActivationType);
+			ZyanProxy proxy = new ZyanProxy(info.UniqueName, typeof(T), this, implicitTransactionTransfer, _sessionID, _componentHostName, _autoLoginOnExpiredSession, info.ActivationType);
 
 			WeakReference proxyReference = new WeakReference(proxy);
 			_proxies.Add(proxyReference);
@@ -801,15 +801,32 @@ namespace Zyan.Communication
 			}
 		}
 
+		private bool _sendingHeartbeat;
+
 		/// <summary>
 		/// Will be called from polling timer on every interval.
 		/// </summary>
 		/// <param name="state">State (not used)</param>
 		internal void SendHeartbeat(object state)
 		{
+			if (_sendingHeartbeat)
+			{
+				// if polling timer interval is less than 
+				// channel timeout, skip sending a heartbeat
+				return;
+			}
+
 			try
 			{
-				RemoteDispatcher.ReceiveClientHeartbeat(_sessionID);
+				_sendingHeartbeat = true;
+				try
+				{
+					RemoteDispatcher.ReceiveClientHeartbeat(_sessionID);
+				}
+				finally
+				{
+					_sendingHeartbeat = false;
+				}
 			}
 			catch (Exception ex)
 			{
@@ -849,7 +866,11 @@ namespace Zyan.Communication
 					OnReconnected(EventArgs.Empty);
 				}
 				else
-					Dispose();
+				{
+					// connection wasn't restored, make sure
+					// that the polling timer is stopped
+					PollingEnabled = false;
+				}
 			}
 		}
 
