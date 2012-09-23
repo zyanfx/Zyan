@@ -89,7 +89,13 @@ namespace Zyan.Communication.Protocols.Wrapper
 		public IMessageSink CreateMessageSink(string url, object remoteChannelData, out string objectURI)
 		{
 			var innerSink = InnerChannelSender.CreateMessageSink(NormalizeUrl(url), remoteChannelData, out objectURI);
-			return new MessageSinkWrapper(innerSink);
+			if (innerSink != null)
+			{
+				return new MessageSinkWrapper(innerSink);
+			}
+
+			// wrong channel data, cannot create message sink
+			return null;
 		}
 
 		public object ChannelData
