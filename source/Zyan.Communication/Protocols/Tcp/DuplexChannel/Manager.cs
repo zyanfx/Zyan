@@ -490,5 +490,50 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			#endregion
 		}
 		#endregion
+
+		#region DefaultAddressFamily
+
+		private static AddressFamily DefaultAddressFamily
+		{
+			// prefer IPv4 address
+			get { return OSSupportsIPv4 ? AddressFamily.InterNetwork : AddressFamily.InterNetworkV6; }
+		}
+
+		private static bool? osSupportsIPv4;
+
+		/// <summary>
+		/// Gets a value indicating whether IPv4 support is available and enabled on the current host.
+		/// </summary>
+		/// <remarks>
+		/// This property is equivalent to Socket.OSSupportsIPv4 (which is not available under Mono and FX3.5).
+		/// </remarks>
+		public static bool OSSupportsIPv4
+		{
+			get
+			{
+				CheckProtocolSupport();
+				return osSupportsIPv4.Value;
+			}
+		}
+
+		private static void CheckProtocolSupport()
+		{
+			if (osSupportsIPv4 == null)
+			{
+				try
+				{
+					using (var tmpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+					{
+						osSupportsIPv4 = true;
+					}
+				}
+				catch
+				{
+					osSupportsIPv4 = false;
+				}
+			}
+		}
+
+		#endregion
 	}
 }

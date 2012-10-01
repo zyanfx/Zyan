@@ -212,7 +212,7 @@ namespace Zyan.Tests
 			// Setup TCP Duplex Server AppDomain
 			AppDomainSetup tcpDuplexAppDomainSetup = new AppDomainSetup() { ApplicationBase = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) };
 			_tcpDuplexServerAppDomain = AppDomain.CreateDomain("RecreateClientConnectionTests_Server", null, tcpDuplexAppDomainSetup);
-			_tcpDuplexServerAppDomain.Load("Zyan.Communication");
+			_tcpDuplexServerAppDomain.Load(typeof(ZyanConnection).Assembly.GetName());
 
 			// Start Zyan host inside the TCP Duplex Server AppDomain
 			var tcpDuplexServerWork = new CrossAppDomainDelegate(() =>
@@ -233,7 +233,7 @@ namespace Zyan.Tests
 			// Setup TCP Simplex Server AppDomain
 			AppDomainSetup tcpSimplexAppDomainSetup = new AppDomainSetup() { ApplicationBase = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) };
 			_tcpSimplexServerAppDomain = AppDomain.CreateDomain("RecreateClientConnectionTests_Server", null, tcpSimplexAppDomainSetup);
-			_tcpSimplexServerAppDomain.Load("Zyan.Communication");
+			_tcpSimplexServerAppDomain.Load(typeof(ZyanConnection).Assembly.GetName());
 
 			// Start Zyan host inside the TCP Simplex Server AppDomain
 			var tcpSimplexServerWork = new CrossAppDomainDelegate(() =>

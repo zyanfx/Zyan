@@ -222,7 +222,6 @@
     <Compile Include="Protocols\Tcp\DuplexChannel\Connection.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\DuplicateConnectionException.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\Manager.cs" />
-    <Compile Include="Protocols\Tcp\DuplexChannel\Manager.DefaultAddressFamily.Fx3.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\Message.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\MessageException.cs" />
     <Compile Include="Protocols\Tcp\DuplexChannel\ServerTransportSink.cs" />
