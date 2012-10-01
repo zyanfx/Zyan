@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using Zyan.Communication;
+using Zyan.Communication.Toolbox;
 
 namespace IntegrationTest_DistributedEvents
 {
@@ -34,7 +36,7 @@ namespace IntegrationTest_DistributedEvents
 			setup.ApplicationBase = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
 			_serverAppDomain = AppDomain.CreateDomain("Server", null, setup);
-			_serverAppDomain.Load("Zyan.Communication");
+			_serverAppDomain.Load(typeof(ZyanConnection).Assembly.GetName());
 
 			CrossAppDomainDelegate serverWork = new CrossAppDomainDelegate(() =>
 			{
@@ -46,16 +48,24 @@ namespace IntegrationTest_DistributedEvents
 			});
 			_serverAppDomain.DoCallBack(serverWork);
 
-
 			// Test TCP Custom
 			int tcpCustomTestResult = TcpCustomTest.RunTest();
-			
+
 			// Test TCP Duplex
 			int tcpDuplexTestResult = TcpDuplexTest.RunTest();
-			
+
 			EventServerLocator locator = _serverAppDomain.CreateInstanceAndUnwrap(Assembly.GetExecutingAssembly().FullName, "IntegrationTest_DistributedEvents.EventServerLocator") as EventServerLocator;
 			locator.GetEventServer().Dispose();
-			AppDomain.Unload(_serverAppDomain);
+			Console.WriteLine("Event server stopped.");
+
+			if (!MonoCheck.IsRunningOnMono || !MonoCheck.NoWindowsOS)
+			{
+				// Mono/Windows bug:
+				// AppDomain.Unload freezes in Mono under Windows if tests for
+				// System.Runtime.Remoting.Channels.Tcp.TcpChannel were executed.
+				AppDomain.Unload(_serverAppDomain);
+				Console.WriteLine("Server AppDomain unloaded.");
+			}
 
 			return (tcpCustomTestResult == 0 && tcpDuplexTestResult == 0) ? 0 : 1;
 		}
