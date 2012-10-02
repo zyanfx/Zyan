@@ -23,10 +23,10 @@ namespace Zyan.Communication.Toolbox.Compression
 	internal class CompressionHelper
 	{
 		// The size of the buffer.
-		private const int BUFFER_SIZE = 4096;
+		private const int BUFFER_SIZE = 8192;
 
-		// The size of 32-bit integer.
-		private const int INT_SIZE = sizeof(System.Int32);
+		// The size of 16-bit integer.
+		private const int SHORT_SIZE = sizeof(short);
 
 		public static Stream Compress(Stream inputStream, CompressionMethod level = CompressionMethod.Default)
 		{
@@ -38,43 +38,61 @@ namespace Zyan.Communication.Toolbox.Compression
 
 				// average compression using DeflateStream
 				case CompressionMethod.Average:
+				{
+					var stream = new MemoryStream();
+					using (var output = new DeflateStream(stream, CompressionMode.Compress, true))
 					{
-						var stream = new MemoryStream();
-						using (var output = new DeflateStream(stream, CompressionMode.Compress, true))
+						int read;
+						var buffer = new byte[BUFFER_SIZE];
+
+						while ((read = inputStream.Read(buffer, 0, BUFFER_SIZE)) > 0)
 						{
-							int read;
-							var buffer = new byte[BUFFER_SIZE];
-
-							while ((read = inputStream.Read(buffer, 0, BUFFER_SIZE)) > 0)
-							{
-								output.Write(buffer, 0, read);
-							}
+							output.Write(buffer, 0, read);
 						}
-
-						stream.Seek(0, SeekOrigin.Begin);
-						return stream;
 					}
+
+					stream.Seek(0, SeekOrigin.Begin);
+					return stream;
+				}
 
 				// fast compression using LZF
 				case CompressionMethod.Fast:
+				{
+					var buffer = new byte[BUFFER_SIZE];
+					var output = new byte[BUFFER_SIZE * 2]; // safe value for uncompressible data
+					var outStream = new MemoryStream();
+					var lzf = new LZF();
+
+					while (true)
 					{
-						// prepare input data
-						var input = new byte[(int)inputStream.Length];
-						inputStream.Read(input, 0, input.Length);
+						var readCount = (short)inputStream.Read(buffer, 0, buffer.Length);
+						if (readCount == 0)
+						{
+							break;
+						}
 
-						// allocate output buffer (1.5 size of the input buffer should be sufficient)
-						var output = new byte[input.Length + input.Length / 2];
-						var size = new LZF().Compress(input, input.Length, output, output.Length);
-						Array.Resize(ref output, size + INT_SIZE);
+						var writeCount = (short)lzf.Compress(buffer, readCount, output, output.Length);
+						if (writeCount == 0)
+						{
+							throw new InvalidOperationException("Cannot compress input stream.");
+						}
 
-						// save the original data size
-						var temp = BitConverter.GetBytes(input.Length);
-						Array.Copy(temp, 0, output, size, INT_SIZE);
+						// write source size
+						var temp = BitConverter.GetBytes(readCount);
+						outStream.Write(temp, 0, SHORT_SIZE);
 
-						// return as MemoryStream
-						var outStream = new MemoryStream(output);
-						return outStream;
+						// write destination size
+						temp = BitConverter.GetBytes(writeCount);
+						outStream.Write(temp, 0, SHORT_SIZE);
+
+						// write data chunk
+						outStream.Write(output, 0, writeCount);
 					}
+
+					// rewind the output stream
+					outStream.Seek(0, SeekOrigin.Begin);
+					return outStream;
+				}
 			}
 
 			// unknown compression method
@@ -91,40 +109,62 @@ namespace Zyan.Communication.Toolbox.Compression
 
 				// decompress using DeflateStream
 				case CompressionMethod.Average:
+				{
+					var stream = new MemoryStream();
+					using (var output = new DeflateStream(inputStream, CompressionMode.Decompress, true))
 					{
-						var stream = new MemoryStream();
-						using (var output = new DeflateStream(inputStream, CompressionMode.Decompress, true))
+						int read;
+						var buffer = new byte[BUFFER_SIZE];
+
+						while ((read = output.Read(buffer, 0, BUFFER_SIZE)) > 0)
 						{
-							int read;
-							var buffer = new byte[BUFFER_SIZE];
-
-							while ((read = output.Read(buffer, 0, BUFFER_SIZE)) > 0)
-							{
-								stream.Write(buffer, 0, read);
-							}
+							stream.Write(buffer, 0, read);
 						}
-
-						stream.Seek(0, SeekOrigin.Begin);
-						return stream;
 					}
+
+					stream.Seek(0, SeekOrigin.Begin);
+					return stream;
+				}
 
 				// decompress using LZF
 				case CompressionMethod.Fast:
+				{
+					var buffer = new byte[BUFFER_SIZE * 2];
+					var output = new byte[BUFFER_SIZE];
+					var temp = new byte[SHORT_SIZE * 2];
+					var outStream = new MemoryStream();
+					var lzf = new LZF();
+
+					while (true)
 					{
-						// read compressed data
-						var input = new byte[(int)inputStream.Length - INT_SIZE];
-						inputStream.Read(input, 0, input.Length);
+						// read chunk sizes
+						if (inputStream.Read(temp, 0, SHORT_SIZE * 2) == 0)
+						{
+							break;
+						}
 
-						// read decompressed size
-						var temp = new byte[INT_SIZE];
-						inputStream.Read(temp, 0, INT_SIZE);
-						var outputLength = BitConverter.ToInt32(temp, 0);
+						var sourceSize = BitConverter.ToInt16(temp, 0);
+						var destSize = BitConverter.ToInt16(temp, SHORT_SIZE);
 
-						// prepare output buffer
-						var output = new byte[outputLength];
-						new LZF().Decompress(input, input.Length, output, output.Length);
-						return new MemoryStream(output);
+						var readCount = inputStream.Read(buffer, 0, destSize);
+						if (readCount != destSize)
+						{
+							throw new InvalidOperationException("Cannot read input stream.");
+						}
+
+						var writeCount = lzf.Decompress(buffer, readCount, output, output.Length);
+						if (writeCount != sourceSize)
+						{
+							throw new InvalidOperationException("Cannot decompress input stream.");
+						}
+
+						outStream.Write(output, 0, writeCount);
 					}
+
+					// rewind the output stream
+					outStream.Seek(0, SeekOrigin.Begin);
+					return outStream;
+				}
 			}
 
 			// unknown compression method
