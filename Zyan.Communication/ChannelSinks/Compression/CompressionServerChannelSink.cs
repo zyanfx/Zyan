@@ -157,8 +157,8 @@ namespace Zyan.Communication.ChannelSinks.Compression
 				responseStream = CompressionHelper.Compress(responseStream, _compressionMethod);
 
 				// Send the compression flag to the client.
-				responseHeaders[CommonHeaders.CompressionEnabled] = true;
-				responseHeaders[CommonHeaders.CompressionMethod] = (int)_compressionMethod;
+				responseHeaders[CommonHeaders.CompressionEnabled] = "true";
+				responseHeaders[CommonHeaders.CompressionMethod] = ((int)_compressionMethod).ToString();
 			}
 
 			// Take off the stack and return the result.
