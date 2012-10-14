@@ -18,9 +18,12 @@ namespace Zyan.Communication.ChannelSinks.Compression
 	internal class CommonHeaders
 	{
 		/// <summary>Header to hold the compression state.</summary>
-		public const string CompressionEnabled = "cm_Enabled";
+		public const string CompressionEnabled = "X-CY_COMPRESSION_ENABLED";
 
 		/// <summary>Header to hold the compression supported flag.</summary>
-		public const string CompressionSupported = "cm_Supported";
+		public const string CompressionSupported = "X-CY_COMPRESSION_SUPPORTED";
+
+		/// <summary>Header to hold the compression method.</summary>
+		public const string CompressionMethod = "X-CY_COMPRESSION_METHOD";
 	}
 }

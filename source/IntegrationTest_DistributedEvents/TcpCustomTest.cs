@@ -62,7 +62,7 @@ namespace IntegrationTest_DistributedEvents
 		public static int RunTest()
 		{
 			TcpCustomClientProtocolSetup protocol = new TcpCustomClientProtocolSetup(true);
-			protocol.AddClientSinkAfterFormatter(new CompressionClientChannelSinkProvider(1));
+			protocol.AddClientSinkAfterFormatter(new CompressionClientChannelSinkProvider(1, CompressionMethod.LZF));
 			_connection = new ZyanConnection("tcp://localhost:8083/EventTest", protocol);
 
 			_proxySingleton = _connection.CreateProxy<IEventComponentSingleton>();
