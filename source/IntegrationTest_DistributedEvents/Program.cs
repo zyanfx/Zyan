@@ -50,12 +50,15 @@ namespace IntegrationTest_DistributedEvents
 
 			// Test TCP Custom
 			int tcpCustomTestResult = TcpCustomTest.RunTest();
+			Console.WriteLine("Passed: {0}", tcpCustomTestResult == 0);
 
 			// Test TCP Duplex
 			int tcpDuplexTestResult = TcpDuplexTest.RunTest();
+			Console.WriteLine("Passed: {0}", tcpDuplexTestResult == 0);
 
 			// Test HTTP Custom
 			int httpCustomTestResult = HttpCustomTest.RunTest();
+			Console.WriteLine("Passed: {0}", httpCustomTestResult == 0);
 
 			EventServerLocator locator = _serverAppDomain.CreateInstanceAndUnwrap(Assembly.GetExecutingAssembly().FullName, "IntegrationTest_DistributedEvents.EventServerLocator") as EventServerLocator;
 			locator.GetEventServer().Dispose();
@@ -70,7 +73,13 @@ namespace IntegrationTest_DistributedEvents
 				Console.WriteLine("Server AppDomain unloaded.");
 			}
 
-			return (tcpCustomTestResult == 0 && tcpDuplexTestResult == 0) ? 0 : 1;
+			var resultCode = (tcpCustomTestResult + tcpDuplexTestResult + httpCustomTestResult) == 0 ? 0 : 1;
+			if (resultCode == 0)
+			{
+				Console.WriteLine("All tests passed.");
+			}
+
+			return resultCode;
 		}
 	}
 }
