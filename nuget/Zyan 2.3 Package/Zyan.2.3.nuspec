@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>Zyan</id>
-    <version>2.2</version>
+    <version>2.3</version>
     <title>Zyan</title>
     <authors>Rainbird,yallie</authors>
     <owners>Hagen Siegel</owners>
