@@ -216,11 +216,11 @@ namespace IntegrationTest_DistributedEvents
 			_catalog.RegisterComponent<ITimerTriggeredEvent, TimerTriggeredEvent>(ActivationType.Singleton);
 			
 			TcpCustomServerProtocolSetup protocol = new TcpCustomServerProtocolSetup(8083, new NullAuthenticationProvider(), true);
-			protocol.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(1));
+			protocol.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(1, CompressionMethod.DeflateStream));
 			_host = new ZyanComponentHost("EventTest", protocol, _catalog);
 
 			TcpDuplexServerProtocolSetup protocol2 = new TcpDuplexServerProtocolSetup(8084, new NullAuthenticationProvider(), true);
-			protocol2.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(1));
+			protocol2.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(1, CompressionMethod.LZF));
 			_duplexHost = new ZyanComponentHost("DuplexEventTest", protocol2, _catalog);
 		}
 

@@ -30,18 +30,20 @@ namespace Zyan.Communication.ChannelSinks.Compression
 		// The compression threshold.
 		private readonly int _compressionThreshold;
 
+		// The compression method.
+		private readonly CompressionMethod _compressionMethod;
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="CompressionClientChannelSink"/> class.
 		/// </summary>
 		/// <param name="nextSink">Next sink.</param>
 		/// <param name="compressionThreshold">Compression threshold. If 0, compression is disabled globally.</param>
-		public CompressionClientChannelSink(IClientChannelSink nextSink, int compressionThreshold)
+		/// <param name="compressionMethod">The compression method.</param>
+		public CompressionClientChannelSink(IClientChannelSink nextSink, int compressionThreshold, CompressionMethod compressionMethod)
 		{
-			// Set the next sink.
 			_next = nextSink;
-
-			// Set the compression threshold.
 			_compressionThreshold = compressionThreshold;
+			_compressionMethod = compressionMethod;
 		}
 
 		/// <summary>
@@ -154,7 +156,7 @@ namespace Zyan.Communication.ChannelSinks.Compression
 				!IsCompressionExempt(msg))
 			{
 				// Process the message and compress it.
-				requestStream = CompressionHelper.Compress(requestStream);
+				requestStream = CompressionHelper.Compress(requestStream, _compressionMethod);
 
 				// Send the compression flag to the server.
 				requestHeaders[CommonHeaders.CompressionEnabled] = true;
@@ -162,6 +164,7 @@ namespace Zyan.Communication.ChannelSinks.Compression
 
 			// Send the compression supported flag to the server.
 			requestHeaders[CommonHeaders.CompressionSupported] = true;
+			requestHeaders[CommonHeaders.CompressionMethod] = (int)_compressionMethod;
 
 			// Send the request to the server.
 			_next.ProcessMessage(
@@ -171,8 +174,15 @@ namespace Zyan.Communication.ChannelSinks.Compression
 			// If the response has the compression flag, decompress the stream.
 			if (responseHeaders[CommonHeaders.CompressionEnabled] != null)
 			{
+				// Determine compression method
+				var method = CompressionMethod.Default;
+				if (responseHeaders[CommonHeaders.CompressionMethod] != null)
+				{
+					method = (CompressionMethod)Convert.ToInt32(responseHeaders[CommonHeaders.CompressionMethod]);
+				}
+
 				// Process the message and decompress it.
-				responseStream = CompressionHelper.Decompress(responseStream);
+				responseStream = CompressionHelper.Decompress(responseStream, method);
 			}
 		}
 	}

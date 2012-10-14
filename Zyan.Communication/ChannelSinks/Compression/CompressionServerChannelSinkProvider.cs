@@ -30,13 +30,26 @@ namespace Zyan.Communication.ChannelSinks.Compression
 		// The compression threshold.
 		private readonly int _compressionThreshold;
 
+		// The compression method.
+		private readonly CompressionMethod _compressionMethod;
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="CompressionServerChannelSinkProvider"/> class.
+		/// </summary>
+		public CompressionServerChannelSinkProvider()
+			: this(1 << 16, CompressionMethod.Default)
+		{
+		}
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="CompressionServerChannelSinkProvider"/> class.
 		/// </summary>
 		/// <param name="compressionThreshold">The compression threshold.</param>
-		public CompressionServerChannelSinkProvider(int compressionThreshold)
+		/// <param name="compressionMethod">The compression method.</param>
+		public CompressionServerChannelSinkProvider(int compressionThreshold, CompressionMethod compressionMethod)
 		{
 			_compressionThreshold = compressionThreshold;
+			_compressionMethod = compressionMethod;
 		}
 
 		/// <summary>
@@ -49,13 +62,18 @@ namespace Zyan.Communication.ChannelSinks.Compression
 			// read in web.config parameters
 			foreach (DictionaryEntry entry in properties)
 			{
-				switch ((String)entry.Key)
+				switch ((string)entry.Key)
 				{
 					case "compressionThreshold":
-						_compressionThreshold = Convert.ToInt32((String)entry.Value);
+						_compressionThreshold = Convert.ToInt32((string)entry.Value);
 						break;
+
+					case "compressionMethod":
+						_compressionMethod = (CompressionMethod)Enum.Parse(typeof(CompressionMethod), (string)entry.Value);
+						break;
+
 					default:
-						throw new ArgumentException("Invalid configuration entry: " + (String)entry.Key);
+						throw new ArgumentException("Invalid configuration entry: " + (string)entry.Key);
 				}
 			}
 		}
@@ -80,7 +98,7 @@ namespace Zyan.Communication.ChannelSinks.Compression
 
 			// Create this sink, passing to it the previous sink in the chain so that it knows
 			// to whom messages should be passed.
-			return new CompressionServerChannelSink(nextSink, _compressionThreshold);
+			return new CompressionServerChannelSink(nextSink, _compressionThreshold, _compressionMethod);
 		}
 
 		/// <summary>
