@@ -6,6 +6,7 @@ using Zyan.Communication.Protocols.Tcp;
 using Zyan.Communication.Security;
 using Zyan.Communication.ChannelSinks.Compression;
 using Zyan.Communication.Protocols.Http;
+using Zyan.Communication.Delegates;
 
 namespace IntegrationTest_DistributedEvents
 {
@@ -88,10 +89,7 @@ namespace IntegrationTest_DistributedEvents
 		{
 			get 
 			{
-				if (ServerEvent != null)
-					return ServerEvent.GetInvocationList().Length;
-				else
-					return 0;
+				return EventStub.GetHandlerCount(ServerEvent);
 			}
 		}
 	}
@@ -121,10 +119,7 @@ namespace IntegrationTest_DistributedEvents
 		{
 			get
 			{
-				if (ServerEvent != null)
-					return ServerEvent.GetInvocationList().Length;
-				else
-					return 0;
+				return EventStub.GetHandlerCount(ServerEvent);
 			}
 		}
 	}
@@ -228,6 +223,8 @@ namespace IntegrationTest_DistributedEvents
 			HttpCustomServerProtocolSetup protocol3 = new HttpCustomServerProtocolSetup(8085, new NullAuthenticationProvider(), true);
 			protocol3.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(1, CompressionMethod.LZF));
 			_httpHost = new ZyanComponentHost("HttpEventTest", protocol3, _catalog);
+
+			ZyanComponentHost.LegacyBlockingEvents = true;
 		}
 
 		public void Dispose()

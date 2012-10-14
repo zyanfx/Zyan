@@ -100,6 +100,8 @@ namespace Zyan.Communication.Delegates
 			void AddHandler(Delegate handler);
 
 			void RemoveHandler(Delegate handler);
+
+			int HandlerCount { get; }
 		}
 
 		/// <summary>
@@ -128,7 +130,7 @@ namespace Zyan.Communication.Delegates
 					{
 						// get Invoke method
 						var dynamicInvokeMethod = GetType().GetMethod("DynamicInvoke", BindingFlags.NonPublic | BindingFlags.Instance);
-						invocationMethod = DynamicWireFactory.BuildDelegate<T>(dynamicInvokeMethod, this);
+						invocationMethod = DynamicWireFactory.BuildInstanceDelegate<T>(dynamicInvokeMethod, this);
 					}
 
 					return invocationMethod;
@@ -173,6 +175,19 @@ namespace Zyan.Communication.Delegates
 				lock (syncRoot)
 				{
 					Delegate = Delegate.Remove(Delegate, handler);
+				}
+			}
+
+			public int HandlerCount
+			{
+				get
+				{
+					if (Delegate == null)
+					{
+						return 0;
+					}
+
+					return Delegate.GetInvocationList().Length;
 				}
 			}
 		}
@@ -247,6 +262,35 @@ namespace Zyan.Communication.Delegates
 		public void RemoveHandler(string name, Delegate handler)
 		{
 			DelegateHolders[name].RemoveHandler(handler);
+		}
+
+		/// <summary>
+		/// Gets the count of event handlers for the given event or delegate property.
+		/// </summary>
+		/// <param name="handler">The event handler.</param>
+		public static int GetHandlerCount(Delegate handler)
+		{
+			if (handler == null)
+			{
+				return 0;
+			}
+
+			var count = 0;
+			foreach (var d in handler.GetInvocationList())
+			{
+				// check if it's a delegate holder
+				if (d.Target is IDelegateHolder)
+				{
+					var holder = (IDelegateHolder)d.Target;
+					count += holder.HandlerCount;
+					continue;
+				}
+
+				// it's an ordinary subscriber
+				count++;
+			}
+
+			return count;
 		}
 	}
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Text;
 using Zyan.Communication.Toolbox;
 
@@ -168,6 +169,9 @@ namespace Zyan.Communication.Delegates
 		/// <summary>
 		/// Builds the strong-typed delegate for the dynamicInvoke: object DynamicInvoke(object[] args);
 		/// </summary>
+		/// <remarks>
+		/// Relies on the compiled LINQ expressions. Delegate Target property isn't equal to the "target" parameter.
+		/// </remarks>
 		/// <typeparam name="T">Delegate type.</typeparam>
 		/// <param name="dynamicInvoke"><see cref="MethodInfo"/> for the DynamicInvoke(object[] args) method.</param>
 		/// <param name="target">Target instance.</param>
@@ -207,6 +211,92 @@ namespace Zyan.Communication.Delegates
 			// create expression and compile delegate
 			var expression = Expression.Lambda<T>(resultExpression, parameters);
 			return expression.Compile();
+		}
+
+		/// <summary>
+		/// Builds the strong-typed delegate bound to the given target instance
+		/// for the dynamicInvoke method: object DynamicInvoke(object[] args);
+		/// </summary>
+		/// <remarks>
+		/// Relies on the dynamic methods. Delegate Target property is equal to the "target" parameter.
+		/// Doesn't support static methods.
+		/// </remarks>
+		/// <typeparam name="T">Delegate type.</typeparam>
+		/// <param name="dynamicInvoke"><see cref="MethodInfo"/> for the DynamicInvoke(object[] args) method.</param>
+		/// <param name="target">Target instance.</param>
+		/// <returns>Strong-typed delegate.</returns>
+		public static T BuildInstanceDelegate<T>(MethodInfo dynamicInvoke, object target)
+		{
+			// validate generic argument
+			if (!typeof(Delegate).IsAssignableFrom(typeof(T)))
+			{
+				throw new ApplicationException("Type is not delegate: " + typeof(T).FullName);
+			}
+
+			// reflect delegate type to get parameters and method return type
+			var delegateType = typeof(T);
+			var invokeMethod = delegateType.GetMethod("Invoke");
+
+			// figure out parameters
+			var paramTypeList = invokeMethod.GetParameters().Select(p => p.ParameterType).ToList();
+			var paramCount = paramTypeList.Count;
+			var ownerType = target.GetType();
+ 			paramTypeList.Insert(0, ownerType);
+			var paramTypes = paramTypeList.ToArray();
+			var typedInvoke = new DynamicMethod("TypedInvoke", invokeMethod.ReturnType, paramTypes, ownerType);
+
+			// create method body, declare local variable of type object[]
+			var ilGenerator = typedInvoke.GetILGenerator();
+			var argumentsArray = ilGenerator.DeclareLocal(typeof(object[]));
+
+			// var args = new object[paramCount];
+			ilGenerator.Emit(OpCodes.Nop);
+			ilGenerator.Emit(OpCodes.Ldc_I4, paramCount);
+			ilGenerator.Emit(OpCodes.Newarr, typeof(object));
+			ilGenerator.Emit(OpCodes.Stloc, argumentsArray);
+
+			// load method arguments one by one
+			var index = 1;
+			foreach (var paramType in paramTypes.Skip(1))
+			{
+				// load object[] array reference
+				ilGenerator.Emit(OpCodes.Ldloc, argumentsArray);
+				ilGenerator.Emit(OpCodes.Ldc_I4, index - 1); // array index
+				ilGenerator.Emit(OpCodes.Ldarg, index++); // method parameter index
+
+				// value type parameters need boxing
+				if (typeof(ValueType).IsAssignableFrom(paramType))
+				{
+					ilGenerator.Emit(OpCodes.Box, paramType);
+				}
+
+				// store reference
+				ilGenerator.Emit(OpCodes.Stelem_Ref);
+			}
+
+			// this
+			ilGenerator.Emit(OpCodes.Ldarg_0);
+			ilGenerator.Emit(OpCodes.Ldloc, argumentsArray); // object[] args
+			ilGenerator.Emit(OpCodes.Call, dynamicInvoke);
+
+			// discard return value
+			if (invokeMethod.ReturnType == typeof(void))
+			{
+				ilGenerator.Emit(OpCodes.Pop);
+			}
+
+			// unbox return value of value type
+			else if (typeof(ValueType).IsAssignableFrom(invokeMethod.ReturnType))
+			{
+				ilGenerator.Emit(OpCodes.Unbox_Any, invokeMethod.ReturnType);
+			}
+
+			// return value
+			ilGenerator.Emit(OpCodes.Ret);
+
+			// bake dynamic method, create a gelegate
+			var result = typedInvoke.CreateDelegate(delegateType, target);
+			return (T)(object)result;
 		}
 	}
 }
