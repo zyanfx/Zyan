@@ -226,7 +226,7 @@ namespace IntegrationTest_DistributedEvents
 			_duplexHost = new ZyanComponentHost("DuplexEventTest", protocol2, _catalog);
 
 			HttpCustomServerProtocolSetup protocol3 = new HttpCustomServerProtocolSetup(8085, new NullAuthenticationProvider(), true);
-			//protocol3.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(1, CompressionMethod.LZF));
+			protocol3.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(1, CompressionMethod.LZF));
 			_httpHost = new ZyanComponentHost("HttpEventTest", protocol3, _catalog);
 		}
 
