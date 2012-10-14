@@ -33,73 +33,8 @@ namespace Zyan.Communication.Delegates
 			EventFilter = eventFilter.Combine(sourceFilter);
 
 			// create strong-typed invoke method
-			TypedInvoke = BuildDynamicInvoke(InvokeMethodInfo);
+			TypedInvoke = DynamicWireFactory.BuildInstanceDelegate<TDelegate>(InvokeMethodInfo, this);
 			FilterLocally = filterLocally;
-		}
-
-		private TDelegate BuildDynamicInvoke(MethodInfo invokeMethodInfo)
-		{
-			// reflect delegate type to get parameters and method return type
-			var delegateType = typeof(TDelegate);
-			var invokeMethod = delegateType.GetMethod("Invoke");
-
-			// the first argument is 'this' instance
-			var paramTypes = Enumerable.Repeat(GetType(), 1).Concat(invokeMethod.GetParameters().Select(p => p.ParameterType)).ToArray();
-			var typedInvoke = new DynamicMethod("TypedInvoke", invokeMethod.ReturnType, paramTypes, typeof(FilteredCustomHandler<TDelegate>));
-			var paramCount = paramTypes.Length - 1;
-
-			// create method body, declare local variable of type object[]
-			var ilGenerator = typedInvoke.GetILGenerator();
-			var argumentsArray = ilGenerator.DeclareLocal(typeof(object[]));
-
-			// var args = new object[paramCount];
-			ilGenerator.Emit(OpCodes.Nop);
-			ilGenerator.Emit(OpCodes.Ldc_I4, paramCount);
-			ilGenerator.Emit(OpCodes.Newarr, typeof(object));
-			ilGenerator.Emit(OpCodes.Stloc, argumentsArray);
-
-			// load method arguments one by one
-			var index = 1;
-			foreach (var paramType in paramTypes.Skip(1))
-			{
-				// load object[] array reference
-				ilGenerator.Emit(OpCodes.Ldloc, argumentsArray);
-				ilGenerator.Emit(OpCodes.Ldc_I4, index - 1); // array index
-				ilGenerator.Emit(OpCodes.Ldarg, index++); // method parameter index
-
-				// value type parameters need boxing
-				if (typeof(ValueType).IsAssignableFrom(paramType))
-				{
-					ilGenerator.Emit(OpCodes.Box, paramType);
-				}
-
-				// store reference
-				ilGenerator.Emit(OpCodes.Stelem_Ref);
-			}
-
-			// this
-			ilGenerator.Emit(OpCodes.Ldarg_0);
-			ilGenerator.Emit(OpCodes.Ldloc, argumentsArray); // object[] args
-			ilGenerator.Emit(OpCodes.Call, invokeMethodInfo);
-
-			// discard return value
-			if (invokeMethod.ReturnType == typeof(void))
-			{
-				ilGenerator.Emit(OpCodes.Pop);
-			}
-
-			// unbox return value of value type
-			else if (typeof(ValueType).IsAssignableFrom(invokeMethod.ReturnType))
-			{
-				ilGenerator.Emit(OpCodes.Unbox_Any, invokeMethod.ReturnType);
-			}
-
-			// return value
-			ilGenerator.Emit(OpCodes.Ret);
-
-			// bake dynamic method, create a gelegate
-			var result = typedInvoke.CreateDelegate(delegateType, this);
-			return (TDelegate)(object)result;
 		}
 
 		private void ExtractSourceHandler(TDelegate eventHandler, out TDelegate sourceHandler, out IEventFilter sourceFilter)

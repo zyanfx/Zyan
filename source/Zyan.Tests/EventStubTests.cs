@@ -45,6 +45,8 @@ namespace Zyan.Tests
 			Action ActionDelegate { get; set; }
 
 			Func<int, string> FuncDelegate { get; set; }
+
+			int SimpleEventHandlerCount { get; }
 		}
 
 		public class SampleService : ISampleInterface
@@ -81,6 +83,11 @@ namespace Zyan.Tests
 			public Action ActionDelegate { get; set; }
 
 			public Func<int, string> FuncDelegate { get; set; }
+
+			public int SimpleEventHandlerCount
+			{
+				get { return EventStub.GetHandlerCount(SimpleEvent); }
+			}
 		}
 
 		public void AssertType<T>(object instance)
@@ -315,6 +322,22 @@ namespace Zyan.Tests
 			Assert.IsFalse(cancelEventFired);
 			Assert.IsFalse(actionFired);
 			Assert.IsFalse(funcFired);
+		}
+
+		[TestMethod]
+		public void EventStubHandlerCountTests()
+		{
+			var eventStub = new EventStub(typeof(ISampleInterface));
+			var sampleService = new SampleService();
+
+			eventStub.WireTo(sampleService);
+			Assert.AreEqual(0, sampleService.SimpleEventHandlerCount);
+
+			eventStub.AddHandler("SimpleEvent", new EventHandler((s, e) => { }));
+			Assert.AreEqual(1, sampleService.SimpleEventHandlerCount);
+
+			eventStub.AddHandler("SimpleEvent", new EventHandler((s, e) => { }));
+			Assert.AreEqual(2, sampleService.SimpleEventHandlerCount);
 		}
 	}
 }
