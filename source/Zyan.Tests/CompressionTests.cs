@@ -44,7 +44,7 @@ namespace Zyan.Tests
 		public void CompressionHelper_CompressesData()
 		{
 			// test all available compression methods
-			foreach (var level in new[] { CompressionMethod.None, CompressionMethod.Fast, CompressionMethod.Average })
+			foreach (var level in new[] { CompressionMethod.None, CompressionMethod.LZF, CompressionMethod.DeflateStream })
 			{
 				var inputStream = new MemoryStream(SampleData.Value);
 				var outputStream = CompressionHelper.Compress(inputStream, level);
@@ -64,7 +64,7 @@ namespace Zyan.Tests
 		public void CompressionHelper_DecompressesData()
 		{
 			// test all available compression methods
-			foreach (var level in new[] { CompressionMethod.None, CompressionMethod.Fast, CompressionMethod.Average })
+			foreach (var level in new[] { CompressionMethod.None, CompressionMethod.LZF, CompressionMethod.DeflateStream })
 			{
 				var source = SampleData.Value;
 				var compressed = CompressionHelper.Compress(new MemoryStream(source), level);

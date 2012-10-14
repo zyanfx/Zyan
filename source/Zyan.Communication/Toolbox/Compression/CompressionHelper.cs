@@ -37,7 +37,7 @@ namespace Zyan.Communication.Toolbox.Compression
 					return inputStream;
 
 				// average compression using DeflateStream
-				case CompressionMethod.Average:
+				case CompressionMethod.DeflateStream:
 				{
 					var stream = new MemoryStream();
 					using (var output = new DeflateStream(stream, CompressionMode.Compress, true))
@@ -56,7 +56,7 @@ namespace Zyan.Communication.Toolbox.Compression
 				}
 
 				// fast compression using LZF
-				case CompressionMethod.Fast:
+				case CompressionMethod.LZF:
 				{
 					var buffer = new byte[BUFFER_SIZE];
 					var output = new byte[BUFFER_SIZE * 2]; // safe value for uncompressible data
@@ -108,7 +108,7 @@ namespace Zyan.Communication.Toolbox.Compression
 					return inputStream;
 
 				// decompress using DeflateStream
-				case CompressionMethod.Average:
+				case CompressionMethod.DeflateStream:
 				{
 					var stream = new MemoryStream();
 					using (var output = new DeflateStream(inputStream, CompressionMode.Decompress, true))
@@ -127,7 +127,7 @@ namespace Zyan.Communication.Toolbox.Compression
 				}
 
 				// decompress using LZF
-				case CompressionMethod.Fast:
+				case CompressionMethod.LZF:
 				{
 					var buffer = new byte[BUFFER_SIZE * 2];
 					var output = new byte[BUFFER_SIZE];

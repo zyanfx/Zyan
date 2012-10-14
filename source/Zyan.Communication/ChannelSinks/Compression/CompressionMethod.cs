@@ -11,18 +11,18 @@
 		None,
 
 		/// <summary>
-		/// Fast compression, poor ratio (LZF).
+		/// LZF: very fast compression, poor ratio.
 		/// </summary>
-		Fast,
+		LZF,
 
 		/// <summary>
-		/// Average compression, better ratio (DeflateStream).
+		/// DeflateStream: slower compression, better ratio.
 		/// </summary>
-		Average,
+		DeflateStream,
 
 		/// <summary>
-		/// Default compression level is Average.
+		/// Default compression method is DeflateStream.
 		/// </summary>
-		Default = Average
+		Default = DeflateStream
 	}
 }
