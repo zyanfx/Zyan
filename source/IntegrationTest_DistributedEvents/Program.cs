@@ -54,6 +54,9 @@ namespace IntegrationTest_DistributedEvents
 			// Test TCP Duplex
 			int tcpDuplexTestResult = TcpDuplexTest.RunTest();
 
+			// Test HTTP Custom
+			int httpCustomTestResult = HttpCustomTest.RunTest();
+
 			EventServerLocator locator = _serverAppDomain.CreateInstanceAndUnwrap(Assembly.GetExecutingAssembly().FullName, "IntegrationTest_DistributedEvents.EventServerLocator") as EventServerLocator;
 			locator.GetEventServer().Dispose();
 			Console.WriteLine("Event server stopped.");

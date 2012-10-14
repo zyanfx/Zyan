@@ -5,6 +5,7 @@ using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp;
 using Zyan.Communication.Security;
 using Zyan.Communication.ChannelSinks.Compression;
+using Zyan.Communication.Protocols.Http;
 
 namespace IntegrationTest_DistributedEvents
 {
@@ -203,6 +204,7 @@ namespace IntegrationTest_DistributedEvents
 
 		private ZyanComponentHost _host;
 		private ZyanComponentHost _duplexHost;
+		private ZyanComponentHost _httpHost;
 		private ComponentCatalog _catalog;
 		
 		private EventServer ()
@@ -222,6 +224,10 @@ namespace IntegrationTest_DistributedEvents
 			TcpDuplexServerProtocolSetup protocol2 = new TcpDuplexServerProtocolSetup(8084, new NullAuthenticationProvider(), true);
 			protocol2.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(1, CompressionMethod.LZF));
 			_duplexHost = new ZyanComponentHost("DuplexEventTest", protocol2, _catalog);
+
+			HttpCustomServerProtocolSetup protocol3 = new HttpCustomServerProtocolSetup(8085, new NullAuthenticationProvider(), true);
+			//protocol3.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(1, CompressionMethod.LZF));
+			_httpHost = new ZyanComponentHost("HttpEventTest", protocol3, _catalog);
 		}
 
 		public void Dispose()
