@@ -159,12 +159,12 @@ namespace Zyan.Communication.ChannelSinks.Compression
 				requestStream = CompressionHelper.Compress(requestStream, _compressionMethod);
 
 				// Send the compression flag to the server.
-				requestHeaders[CommonHeaders.CompressionEnabled] = true;
+				requestHeaders[CommonHeaders.CompressionEnabled] = "true";
 			}
 
 			// Send the compression supported flag to the server.
-			requestHeaders[CommonHeaders.CompressionSupported] = true;
-			requestHeaders[CommonHeaders.CompressionMethod] = (int)_compressionMethod;
+			requestHeaders[CommonHeaders.CompressionSupported] = "true";
+			requestHeaders[CommonHeaders.CompressionMethod] = ((int)_compressionMethod).ToString();
 
 			// Send the request to the server.
 			_next.ProcessMessage(
