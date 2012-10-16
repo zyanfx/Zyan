@@ -109,9 +109,12 @@ namespace Zyan.Communication.Protocols.Tcp
 				if (!MonoCheck.IsRunningOnMono)
 				{
 					if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
+					{
 						RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
+					}
 				}
 			}
+
 			return channel;
 		}
 

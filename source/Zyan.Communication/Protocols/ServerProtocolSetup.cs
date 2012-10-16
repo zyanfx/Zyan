@@ -46,7 +46,7 @@ namespace Zyan.Communication.Protocols
 		/// <summary>
 		/// Creates a new instance of the ServerProtocolSetupBase class.
 		/// </summary>
-		public ServerProtocolSetup() { }
+		protected ServerProtocolSetup() { }
 
 		/// <summary>
 		/// Creates a new instance of the ServerProtocolSetup class.

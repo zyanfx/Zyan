@@ -42,7 +42,7 @@ namespace Zyan.Communication.Protocols
 		/// <summary>
 		/// Creates a new instance of the ClientProtocolSetup class.
 		/// </summary>
-		public ClientProtocolSetup() { }
+		protected ClientProtocolSetup() { }
 
 		/// <summary>
 		/// Creates a new instance of the ClientProtocolSetup class.
