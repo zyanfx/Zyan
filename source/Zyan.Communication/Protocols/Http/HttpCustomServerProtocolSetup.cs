@@ -196,6 +196,7 @@ namespace Zyan.Communication.Protocols.Http
 				_channelSettings["secure"] = false;
 
 				ConfigureEncryption();
+				ConfigureCompression();
 
 				if (_channelFactory == null)
 					throw new ApplicationException(LanguageResource.ApplicationException_NoChannelFactorySpecified);

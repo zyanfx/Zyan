@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Http;
@@ -6,7 +7,7 @@ using System.Runtime.Serialization.Formatters;
 using Zyan.Communication.ChannelSinks.Encryption;
 using Zyan.Communication.Security;
 using Zyan.Communication.Toolbox;
-using System.Collections;
+using Zyan.Communication.ChannelSinks.Compression;
 
 namespace Zyan.Communication.Protocols
 {
@@ -18,6 +19,8 @@ namespace Zyan.Communication.Protocols
 		private bool _encryption = true;
 		private string _algorithm = "3DES";
 		private bool _oaep = false;
+		private int _compressionThreshold = 1 << 16;
+		private CompressionMethod _compressionMethod = CompressionMethod.Default; 
 
 		/// <summary>
 		/// Creates a new instance of the CustomServerProtocolSetup class.
@@ -63,6 +66,24 @@ namespace Zyan.Communication.Protocols
 			set { _oaep = value; }
 		}
 
+		/// <summary>
+		/// Gets or sets the compression threshold.
+		/// </summary>
+		public int CompressionThreshold
+		{
+			get { return _compressionThreshold; }
+			set { _compressionThreshold = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the compression method.
+		/// </summary>
+		public CompressionMethod CompressionMethod
+		{
+			get { return _compressionMethod; }
+			set { _compressionMethod = value; }
+		}
+
 		private bool _encryptionConfigured = false;
 
 		/// <summary>
@@ -90,6 +111,24 @@ namespace Zyan.Communication.Protocols
 					Oaep = _oaep
 				});
 			}
+		}
+
+		private bool _compressionConfigured = false;
+
+		/// <summary>
+		/// Configures the compression sinks.
+		/// </summary>
+		protected void ConfigureCompression()
+		{
+			if (_compressionConfigured)
+			{
+				return;
+			}
+
+			_compressionConfigured = true;
+
+			this.AddClientSinkAfterFormatter(new CompressionClientChannelSinkProvider(_compressionThreshold, _compressionMethod));
+			this.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(_compressionThreshold, _compressionMethod));
 		}
 	}
 }
