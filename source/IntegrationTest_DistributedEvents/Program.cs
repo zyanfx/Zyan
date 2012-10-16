@@ -48,6 +48,10 @@ namespace IntegrationTest_DistributedEvents
 			});
 			_serverAppDomain.DoCallBack(serverWork);
 
+			// Test IPC Binary
+			int ipcBinaryTestResult = IpcBinaryTest.RunTest();
+			Console.WriteLine("Passed: {0}", ipcBinaryTestResult == 0);
+
 			// Test TCP Binary
 			int tcpBinaryTestResult = TcpBinaryTest.RunTest();
 			Console.WriteLine("Passed: {0}", tcpBinaryTestResult == 0);
@@ -68,7 +72,7 @@ namespace IntegrationTest_DistributedEvents
 			locator.GetEventServer().Dispose();
 			Console.WriteLine("Event server stopped.");
 
-			if (!MonoCheck.IsRunningOnMono || !MonoCheck.NoWindowsOS)
+			if (!MonoCheck.IsRunningOnMono || MonoCheck.IsUnixOS)
 			{
 				// Mono/Windows bug:
 				// AppDomain.Unload freezes in Mono under Windows if tests for
@@ -77,7 +81,7 @@ namespace IntegrationTest_DistributedEvents
 				Console.WriteLine("Server AppDomain unloaded.");
 			}
 
-			if (tcpBinaryTestResult + tcpCustomTestResult + tcpDuplexTestResult + httpCustomTestResult == 0)
+			if (ipcBinaryTestResult + tcpBinaryTestResult + tcpCustomTestResult + tcpDuplexTestResult + httpCustomTestResult == 0)
 			{
 				Console.WriteLine("All tests passed.");
 				return 0;

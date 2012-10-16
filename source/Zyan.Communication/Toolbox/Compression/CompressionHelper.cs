@@ -22,11 +22,14 @@ namespace Zyan.Communication.Toolbox.Compression
 {
 	internal class CompressionHelper
 	{
-		// The size of the buffer.
-		private const int BUFFER_SIZE = 8192;
+		// The default value for the compression threshold: 64K.
+		public const int CompressionThreshold = 1 << 16;
+
+		// The size of the buffer: 16K.
+		private const int BufferSize = 1 << 14;
 
 		// The size of 16-bit integer.
-		private const int SHORT_SIZE = sizeof(short);
+		private const int ShortSize = sizeof(short);
 
 		public static Stream Compress(Stream inputStream, CompressionMethod level = CompressionMethod.Default)
 		{
@@ -43,9 +46,9 @@ namespace Zyan.Communication.Toolbox.Compression
 					using (var output = new DeflateStream(stream, CompressionMode.Compress, true))
 					{
 						int read;
-						var buffer = new byte[BUFFER_SIZE];
+						var buffer = new byte[BufferSize];
 
-						while ((read = inputStream.Read(buffer, 0, BUFFER_SIZE)) > 0)
+						while ((read = inputStream.Read(buffer, 0, BufferSize)) > 0)
 						{
 							output.Write(buffer, 0, read);
 						}
@@ -58,8 +61,8 @@ namespace Zyan.Communication.Toolbox.Compression
 				// fast compression using LZF
 				case CompressionMethod.LZF:
 				{
-					var buffer = new byte[BUFFER_SIZE];
-					var output = new byte[BUFFER_SIZE * 2]; // safe value for uncompressible data
+					var buffer = new byte[BufferSize];
+					var output = new byte[BufferSize * 2]; // safe value for uncompressible data
 					var outStream = new MemoryStream();
 					var lzf = new LZF();
 
@@ -79,11 +82,11 @@ namespace Zyan.Communication.Toolbox.Compression
 
 						// write source size
 						var temp = BitConverter.GetBytes(readCount);
-						outStream.Write(temp, 0, SHORT_SIZE);
+						outStream.Write(temp, 0, ShortSize);
 
 						// write destination size
 						temp = BitConverter.GetBytes(writeCount);
-						outStream.Write(temp, 0, SHORT_SIZE);
+						outStream.Write(temp, 0, ShortSize);
 
 						// write data chunk
 						outStream.Write(output, 0, writeCount);
@@ -114,9 +117,9 @@ namespace Zyan.Communication.Toolbox.Compression
 					using (var output = new DeflateStream(inputStream, CompressionMode.Decompress, true))
 					{
 						int read;
-						var buffer = new byte[BUFFER_SIZE];
+						var buffer = new byte[BufferSize];
 
-						while ((read = output.Read(buffer, 0, BUFFER_SIZE)) > 0)
+						while ((read = output.Read(buffer, 0, BufferSize)) > 0)
 						{
 							stream.Write(buffer, 0, read);
 						}
@@ -129,22 +132,22 @@ namespace Zyan.Communication.Toolbox.Compression
 				// decompress using LZF
 				case CompressionMethod.LZF:
 				{
-					var buffer = new byte[BUFFER_SIZE * 2];
-					var output = new byte[BUFFER_SIZE];
-					var temp = new byte[SHORT_SIZE * 2];
+					var buffer = new byte[BufferSize * 2];
+					var output = new byte[BufferSize];
+					var temp = new byte[ShortSize * 2];
 					var outStream = new MemoryStream();
 					var lzf = new LZF();
 
 					while (true)
 					{
 						// read chunk sizes
-						if (inputStream.Read(temp, 0, SHORT_SIZE * 2) == 0)
+						if (inputStream.Read(temp, 0, ShortSize * 2) == 0)
 						{
 							break;
 						}
 
 						var sourceSize = BitConverter.ToInt16(temp, 0);
-						var destSize = BitConverter.ToInt16(temp, SHORT_SIZE);
+						var destSize = BitConverter.ToInt16(temp, ShortSize);
 
 						var readCount = inputStream.Read(buffer, 0, destSize);
 						if (readCount != destSize)

@@ -16,6 +16,7 @@
 using System;
 using System.Collections;
 using System.Runtime.Remoting.Channels;
+using Zyan.Communication.Toolbox.Compression;
 
 namespace Zyan.Communication.ChannelSinks.Compression
 {
@@ -37,7 +38,7 @@ namespace Zyan.Communication.ChannelSinks.Compression
 		/// Initializes a new instance of the <see cref="CompressionClientChannelSinkProvider" /> class.
 		/// </summary>
 		public CompressionClientChannelSinkProvider()
-			: this(1 << 16, CompressionMethod.Default)
+			: this(CompressionHelper.CompressionThreshold, CompressionMethod.Default)
 		{ 
 		}
 

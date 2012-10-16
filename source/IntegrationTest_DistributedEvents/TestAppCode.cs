@@ -7,6 +7,8 @@ using Zyan.Communication.Security;
 using Zyan.Communication.ChannelSinks.Compression;
 using Zyan.Communication.Protocols.Http;
 using Zyan.Communication.Delegates;
+using Zyan.Communication.Protocols.Ipc;
+using Zyan.Communication.Toolbox;
 
 namespace IntegrationTest_DistributedEvents
 {
@@ -197,6 +199,7 @@ namespace IntegrationTest_DistributedEvents
 			}
 		}
 
+		private ZyanComponentHost _ipcBinaryHost;
 		private ZyanComponentHost _tcpBinaryHost;
 		private ZyanComponentHost _tcpCustomHost;
 		private ZyanComponentHost _tcpDuplexHost;
@@ -215,10 +218,14 @@ namespace IntegrationTest_DistributedEvents
 
 			// Setting compression threshold to 1 byte means that all messages will be compressed.
 			// This setting should not be used in production code because smaller packets will grow in size.
-			// By default, Zyan only compresses messages larger than 64 kilobytes (1 << 16 bytes).
+			// By default, Zyan only compresses messages larger than 64 kilobytes.
 			var tcpBinaryProtocol = new TcpBinaryServerProtocolSetup(8082);
 			tcpBinaryProtocol.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(1, CompressionMethod.LZF));
 			_tcpBinaryHost = new ZyanComponentHost("TcpBinaryEventTest", tcpBinaryProtocol, _catalog);
+
+			var ipcBinaryProtocol = new IpcBinaryServerProtocolSetup("IpcTestServer");
+			ipcBinaryProtocol.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(1, CompressionMethod.DeflateStream));
+			_ipcBinaryHost = new ZyanComponentHost("IpcBinaryEventTest", ipcBinaryProtocol, _catalog);
 
 			var tcpCustomProtocol = new TcpCustomServerProtocolSetup(8083, new NullAuthenticationProvider(), true)
 			{
@@ -247,6 +254,12 @@ namespace IntegrationTest_DistributedEvents
 
 		public void Dispose()
 		{
+			if (_ipcBinaryHost != null)
+			{
+				_ipcBinaryHost.Dispose();
+				_ipcBinaryHost = null;
+			}
+
 			if (_tcpBinaryHost != null)
 			{
 				_tcpBinaryHost.Dispose();
