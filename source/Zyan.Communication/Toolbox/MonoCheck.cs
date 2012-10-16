@@ -20,12 +20,12 @@ namespace Zyan.Communication.Toolbox
 		/// <summary>
 		/// Returns true if the local operating system is not Windows.
 		/// </summary>
-		public static bool NoWindowsOS
+		public static bool IsUnixOS
 		{
 			get
 			{
 				int p = (int)Environment.OSVersion.Platform;
-				return !((p == 4) || (p == 6) || (p == 128));
+				return (p == 4) || (p == 6) || (p == 128);
 			}
 		}
 	}

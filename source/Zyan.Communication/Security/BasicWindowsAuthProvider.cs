@@ -19,7 +19,7 @@ namespace Zyan.Communication.Security
 		/// <returns>Wahr, wenn die Anmeldung erflgreich war, ansonsten Falsch</returns>
 		private bool ValidateWindowsCredentials(string username, string password, string domain)
 		{
-			if (MonoCheck.IsRunningOnMono && MonoCheck.NoWindowsOS)
+			if (MonoCheck.IsRunningOnMono && MonoCheck.IsUnixOS)
 				return false; // Windows-Authentication isn´t supported on Linux or Mac.
 
 			IntPtr token = IntPtr.Zero;
