@@ -7,7 +7,7 @@ using Zyan.Communication.ChannelSinks.Compression;
 
 namespace IntegrationTest_DistributedEvents
 {
-	public static class TcpCustomTest
+	public static class TcpBinaryTest
 	{
 		private static ZyanConnection _connection;
 		private static IEventComponentSingleton _proxySingleton;
@@ -61,9 +61,9 @@ namespace IntegrationTest_DistributedEvents
 
 		public static int RunTest()
 		{
-			var protocol = new TcpCustomClientProtocolSetup(true);
+			var protocol = new TcpBinaryClientProtocolSetup();
 			protocol.AddClientSinkAfterFormatter(new CompressionClientChannelSinkProvider(1, CompressionMethod.LZF));
-			_connection = new ZyanConnection("tcp://localhost:8083/TcpCustomEventTest", protocol);
+			_connection = new ZyanConnection("tcp://localhost:8082/TcpBinaryEventTest", protocol);
 
 			_proxySingleton = _connection.CreateProxy<IEventComponentSingleton>();
 			_proxySingleCall = _connection.CreateProxy<IEventComponentSingleCall>();
@@ -80,13 +80,13 @@ namespace IntegrationTest_DistributedEvents
 			if (_callbackCountSingleton == 1)
 			{
 				successCount++;
-				Console.WriteLine("[TCP Custom] Singleton Callback Test passed.");
+				Console.WriteLine("[TCP Binary] Singleton Callback Test passed.");
 			}
 			_proxyCallbackSingleCall.DoSomething();
 			if (_callbackCountSingleCall == 1)
 			{
 				successCount++;
-				Console.WriteLine("[TCP Custom] SingleCall Callback Test passed.");
+				Console.WriteLine("[TCP Binary] SingleCall Callback Test passed.");
 			}
 
 			RegisterEvents();
@@ -99,14 +99,14 @@ namespace IntegrationTest_DistributedEvents
 			if (_firedCountSingleton == 1)
 			{
 				successCount++;
-				Console.WriteLine("[TCP Custom] Singleton Event Test passed.");
+				Console.WriteLine("[TCP Binary] Singleton Event Test passed.");
 			}
 
 			_proxySingleCall.TriggerEvent();
 			if (_firedCountSingleCall == 1)
 			{
 				successCount++;
-				Console.WriteLine("[TCP Custom] SingleCall Event Test passed.");
+				Console.WriteLine("[TCP Binary] SingleCall Event Test passed.");
 			}
 
 			UnregisterEvents();
@@ -115,7 +115,7 @@ namespace IntegrationTest_DistributedEvents
 			if (_registrationsSingleCall == _proxySingleCall.Registrations)
 				successCount++;
 
-			RequestResponseResult requestResponseResult = new RequestResponseResult("TCP Custom");
+			RequestResponseResult requestResponseResult = new RequestResponseResult("TCP Binary");
 
 			_proxyRequestResponseSingleCall.DoRequestResponse("Success", requestResponseResult.ReceiveResponseSingleCall);
 
