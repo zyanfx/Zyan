@@ -802,7 +802,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// <returns>True if successful, otherwiese false</returns>
 		private bool SetTcpKeepAlive(Socket socket, ulong time, ulong interval)
 		{
-			if (MonoCheck.IsRunningOnMono && MonoCheck.NoWindowsOS)
+			if (MonoCheck.IsRunningOnMono && MonoCheck.IsUnixOS)
 				return false; // Socket.IOControl method doesn´t work on Linux or Mac with mono
 
 			try

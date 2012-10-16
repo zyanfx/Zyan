@@ -107,7 +107,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		private static IEnumerable<IPAddress> GetUnicastAddresses(IPInterfaceProperties ipProps)
 		{
 			// straightforward version (may throw exceptions on Mono 2.10.x/Windows)
-			if (!MonoCheck.IsRunningOnMono || !MonoCheck.NoWindowsOS)
+			if (!MonoCheck.IsRunningOnMono || MonoCheck.IsUnixOS)
 			{
 				return ipProps.UnicastAddresses.Select(address => address.Address);
 			}
