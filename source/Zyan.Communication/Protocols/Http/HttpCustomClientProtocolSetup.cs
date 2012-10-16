@@ -357,6 +357,7 @@ namespace Zyan.Communication.Protocols.Http
 				_channelSettings["port"] = 0;
 
 				ConfigureEncryption();
+				ConfigureCompression();
 
 				if (_channelFactory == null)
 					throw new ApplicationException(LanguageResource.ApplicationException_NoChannelFactorySpecified);
