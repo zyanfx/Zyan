@@ -48,6 +48,10 @@ namespace IntegrationTest_DistributedEvents
 			});
 			_serverAppDomain.DoCallBack(serverWork);
 
+			// Test TCP Binary
+			int tcpBinaryTestResult = TcpBinaryTest.RunTest();
+			Console.WriteLine("Passed: {0}", tcpBinaryTestResult == 0);
+
 			// Test TCP Custom
 			int tcpCustomTestResult = TcpCustomTest.RunTest();
 			Console.WriteLine("Passed: {0}", tcpCustomTestResult == 0);
@@ -73,13 +77,13 @@ namespace IntegrationTest_DistributedEvents
 				Console.WriteLine("Server AppDomain unloaded.");
 			}
 
-			var resultCode = (tcpCustomTestResult + tcpDuplexTestResult + httpCustomTestResult) == 0 ? 0 : 1;
-			if (resultCode == 0)
+			if (tcpBinaryTestResult + tcpCustomTestResult + tcpDuplexTestResult + httpCustomTestResult == 0)
 			{
 				Console.WriteLine("All tests passed.");
+				return 0;
 			}
 
-			return resultCode;
+			return 1;
 		}
 	}
 }

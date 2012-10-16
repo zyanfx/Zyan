@@ -197,9 +197,10 @@ namespace IntegrationTest_DistributedEvents
 			}
 		}
 
-		private ZyanComponentHost _host;
-		private ZyanComponentHost _duplexHost;
-		private ZyanComponentHost _httpHost;
+		private ZyanComponentHost _tcpBinaryHost;
+		private ZyanComponentHost _tcpCustomHost;
+		private ZyanComponentHost _tcpDuplexHost;
+		private ZyanComponentHost _httpCustomHost;
 		private ComponentCatalog _catalog;
 		
 		private EventServer ()
@@ -211,33 +212,50 @@ namespace IntegrationTest_DistributedEvents
 			_catalog.RegisterComponent<ICallbackComponentSingleCall, CallbackComponentSingleCall>(ActivationType.SingleCall);
 			_catalog.RegisterComponent<IRequestResponseCallbackSingleCall, RequestResponseCallbackSingleCall>(ActivationType.SingleCall);
 			_catalog.RegisterComponent<ITimerTriggeredEvent, TimerTriggeredEvent>(ActivationType.Singleton);
-			
-			TcpCustomServerProtocolSetup protocol = new TcpCustomServerProtocolSetup(8083, new NullAuthenticationProvider(), true);
-			protocol.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(1, CompressionMethod.DeflateStream));
-			_host = new ZyanComponentHost("EventTest", protocol, _catalog);
 
-			TcpDuplexServerProtocolSetup protocol2 = new TcpDuplexServerProtocolSetup(8084, new NullAuthenticationProvider(), true);
-			protocol2.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(1, CompressionMethod.LZF));
-			_duplexHost = new ZyanComponentHost("DuplexEventTest", protocol2, _catalog);
+			var tcpBinaryProtocol = new TcpBinaryServerProtocolSetup(8082);
+			tcpBinaryProtocol.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(1, CompressionMethod.LZF));
+			_tcpBinaryHost = new ZyanComponentHost("TcpBinaryEventTest", tcpBinaryProtocol, _catalog);
 
-			HttpCustomServerProtocolSetup protocol3 = new HttpCustomServerProtocolSetup(8085, new NullAuthenticationProvider(), true);
-			protocol3.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(1, CompressionMethod.LZF));
-			_httpHost = new ZyanComponentHost("HttpEventTest", protocol3, _catalog);
+			var tcpCustomProtocol = new TcpCustomServerProtocolSetup(8083, new NullAuthenticationProvider(), true);
+			tcpCustomProtocol.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(1, CompressionMethod.DeflateStream));
+			_tcpCustomHost = new ZyanComponentHost("TcpCustomEventTest", tcpCustomProtocol, _catalog);
+
+			var tcpDuplexProtocol = new TcpDuplexServerProtocolSetup(8084, new NullAuthenticationProvider(), true);
+			tcpDuplexProtocol.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(1, CompressionMethod.LZF));
+			_tcpDuplexHost = new ZyanComponentHost("TcpDuplexEventTest", tcpDuplexProtocol, _catalog);
+
+			var httpCustomProtocol = new HttpCustomServerProtocolSetup(8085, new NullAuthenticationProvider(), true);
+			httpCustomProtocol.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(1, CompressionMethod.DeflateStream));
+			_httpCustomHost = new ZyanComponentHost("HttpCustomEventTest", httpCustomProtocol, _catalog);
 
 			ZyanComponentHost.LegacyBlockingEvents = true;
 		}
 
 		public void Dispose()
 		{
-			if (_host != null)
+			if (_tcpCustomHost != null)
 			{
-				_host.Dispose();
-				_host = null;
+				_tcpCustomHost.Dispose();
+				_tcpCustomHost = null;
 			}
-			if (_duplexHost != null)
+
+			if (_tcpBinaryHost != null)
 			{
-				_duplexHost.Dispose();
-				_duplexHost = null;
+				_tcpBinaryHost.Dispose();
+				_tcpBinaryHost = null;
+			}
+
+			if (_tcpDuplexHost != null)
+			{
+				_tcpDuplexHost.Dispose();
+				_tcpDuplexHost = null;
+			}
+
+			if (_httpCustomHost != null)
+			{
+				_httpCustomHost.Dispose();
+				_httpCustomHost = null;
 			}
 		}
 	}
