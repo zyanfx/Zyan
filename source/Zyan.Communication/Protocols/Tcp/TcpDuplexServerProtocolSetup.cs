@@ -14,13 +14,9 @@ namespace Zyan.Communication.Protocols.Tcp
 	/// <summary>
 	/// Server protocol setup for bi-directional TCP communication with support for user defined authentication and security.
 	/// </summary>
-	public class TcpDuplexServerProtocolSetup : ServerProtocolSetup
+	public class TcpDuplexServerProtocolSetup : CustomServerProtocolSetup
 	{
-		private bool _encryption = true;
-		private string _algorithm = "3DES";
-		private bool _oaep = false;
 		private int _tcpPort = 0;
-
 		private bool _tcpKeepAliveEnabled = true;
 		private ulong _tcpKeepAliveTime = 30000;
 		private ulong _tcpKeepAliveInterval = 1000;
@@ -65,24 +61,6 @@ namespace Zyan.Communication.Protocols.Tcp
 
 				_tcpPort = value;
 			}
-		}
-
-		/// <summary>
-		/// Gets or sets the name of the symmetric encryption algorithm.
-		/// </summary>
-		public string Algorithm
-		{
-			get { return _algorithm; }
-			set { _algorithm = value; }
-		}
-
-		/// <summary>
-		/// Gets or sets, if OEAP padding should be activated.
-		/// </summary>
-		public bool Oeap
-		{
-			get { return _oaep; }
-			set { _oaep = value; }
 		}
 
 		/// <summary>
@@ -183,7 +161,7 @@ namespace Zyan.Communication.Protocols.Tcp
 		{
 			TcpPort = tcpPort;
 			AuthenticationProvider = authProvider;
-			_encryption = encryption;
+			Encryption = encryption;
 		}
 
 		/// <summary>
@@ -198,7 +176,7 @@ namespace Zyan.Communication.Protocols.Tcp
 		{
 			TcpPort = tcpPort;
 			AuthenticationProvider = authProvider;
-			_encryption = encryption;
+			Encryption = encryption;
 		}
 
 		/// <summary>
@@ -215,7 +193,7 @@ namespace Zyan.Communication.Protocols.Tcp
 		{
 			TcpPort = tcpPort;
 			AuthenticationProvider = authProvider;
-			_encryption = encryption;
+			Encryption = encryption;
 			TcpKeepAliveEnabled = keepAlive;
 			TcpKeepAliveTime = keepAliveTime;
 			TcpKeepAliveInterval = KeepAliveInterval;
@@ -236,7 +214,7 @@ namespace Zyan.Communication.Protocols.Tcp
 		{
 			TcpPort = tcpPort;
 			AuthenticationProvider = authProvider;
-			_encryption = encryption;
+			Encryption = encryption;
 			TcpKeepAliveEnabled = keepAlive;
 			TcpKeepAliveTime = keepAliveTime;
 			TcpKeepAliveInterval = KeepAliveInterval;
@@ -254,8 +232,8 @@ namespace Zyan.Communication.Protocols.Tcp
 		{
 			TcpPort = tcpPort;
 			AuthenticationProvider = authProvider;
-			_encryption = encryption;
-			_algorithm = algorithm;
+			Encryption = encryption;
+			Algorithm = algorithm;
 		}
 
 		/// <summary>
@@ -271,8 +249,8 @@ namespace Zyan.Communication.Protocols.Tcp
 		{
 			TcpPort = tcpPort;
 			AuthenticationProvider = authProvider;
-			_encryption = encryption;
-			_algorithm = algorithm;
+			Encryption = encryption;
+			Algorithm = algorithm;
 		}
 
 		/// <summary>
@@ -290,8 +268,8 @@ namespace Zyan.Communication.Protocols.Tcp
 		{
 			TcpPort = tcpPort;
 			AuthenticationProvider = authProvider;
-			_encryption = encryption;
-			_algorithm = algorithm;
+			Encryption = encryption;
+			Algorithm = algorithm;
 			TcpKeepAliveEnabled = keepAlive;
 			TcpKeepAliveTime = keepAliveTime;
 			TcpKeepAliveInterval = KeepAliveInterval;
@@ -313,8 +291,8 @@ namespace Zyan.Communication.Protocols.Tcp
 		{
 			TcpPort = tcpPort;
 			AuthenticationProvider = authProvider;
-			_encryption = encryption;
-			_algorithm = algorithm;
+			Encryption = encryption;
+			Algorithm = algorithm;
 			TcpKeepAliveEnabled = keepAlive;
 			TcpKeepAliveTime = keepAliveTime;
 			TcpKeepAliveInterval = KeepAliveInterval;
@@ -333,9 +311,9 @@ namespace Zyan.Communication.Protocols.Tcp
 		{
 			TcpPort = tcpPort;
 			AuthenticationProvider = authProvider;
-			_encryption = encryption;
-			_algorithm = algorithm;
-			_oaep = oaep;
+			Encryption = encryption;
+			Algorithm = algorithm;
+			Oaep = oaep;
 		}
 
 		/// <summary>
@@ -352,9 +330,9 @@ namespace Zyan.Communication.Protocols.Tcp
 		{
 			TcpPort = tcpPort;
 			AuthenticationProvider = authProvider;
-			_encryption = encryption;
-			_algorithm = algorithm;
-			_oaep = oaep;
+			Encryption = encryption;
+			Algorithm = algorithm;
+			Oaep = oaep;
 		}
 
 		/// <summary>
@@ -373,9 +351,9 @@ namespace Zyan.Communication.Protocols.Tcp
 		{
 			TcpPort = tcpPort;
 			AuthenticationProvider = authProvider;
-			_encryption = encryption;
-			_algorithm = algorithm;
-			_oaep = oaep;
+			Encryption = encryption;
+			Algorithm = algorithm;
+			Oaep = oaep;
 			TcpKeepAliveEnabled = keepAlive;
 			TcpKeepAliveTime = keepAliveTime;
 			TcpKeepAliveInterval = KeepAliveInterval;
@@ -398,40 +376,12 @@ namespace Zyan.Communication.Protocols.Tcp
 		{
 			TcpPort = tcpPort;
 			AuthenticationProvider = authProvider;
-			_encryption = encryption;
-			_algorithm = algorithm;
-			_oaep = oaep;
+			Encryption = encryption;
+			Algorithm = algorithm;
+			Oaep = oaep;
 			TcpKeepAliveEnabled = keepAlive;
 			TcpKeepAliveTime = keepAliveTime;
 			TcpKeepAliveInterval = KeepAliveInterval;
-		}
-
-		private bool _encryptionConfigured = false;
-
-		/// <summary>
-		/// Configures encrpytion sinks, if encryption is enabled.
-		/// </summary>
-		private void ConfigureEncryption()
-		{
-			if (_encryption)
-			{
-				if (_encryptionConfigured)
-					return;
-
-				_encryptionConfigured = true;
-
-				this.AddClientSinkAfterFormatter(new CryptoClientChannelSinkProvider()
-				{
-					Algorithm = _algorithm,
-					Oaep = _oaep
-				});
-				this.AddServerSinkBeforeFormatter(new CryptoServerChannelSinkProvider()
-				{
-					Algorithm = _algorithm,
-					RequireCryptoClient = true,
-					Oaep = _oaep
-				});
-			}
 		}
 
 		/// <summary>
@@ -462,10 +412,12 @@ namespace Zyan.Communication.Protocols.Tcp
 				if (!MonoCheck.IsRunningOnMono)
 				{
 					if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
+					{
 						RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
+					}
 				}
-				return channel;
 			}
+
 			return channel;
 		}
 

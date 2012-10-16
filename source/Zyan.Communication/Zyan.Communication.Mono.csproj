@@ -238,6 +238,8 @@
     <Compile Include="Notification\NotificationSender.cs" />
     <Compile Include="Notification\NotificationService.cs" />
     <Compile Include="Protocols\ClientProtocolSetup.cs" />
+    <Compile Include="Protocols\CustomClientProtocolSetup.cs" />
+    <Compile Include="Protocols\CustomServerProtocolSetup.cs" />
     <Compile Include="Protocols\Http\HttpCustomClientProtocolSetup.cs" />
     <Compile Include="Protocols\Http\HttpCustomServerProtocolSetup.cs" />
     <Compile Include="Protocols\Ipc\IpcBinaryClientProtocolSetup.cs" />
