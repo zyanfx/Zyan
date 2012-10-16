@@ -213,37 +213,50 @@ namespace IntegrationTest_DistributedEvents
 			_catalog.RegisterComponent<IRequestResponseCallbackSingleCall, RequestResponseCallbackSingleCall>(ActivationType.SingleCall);
 			_catalog.RegisterComponent<ITimerTriggeredEvent, TimerTriggeredEvent>(ActivationType.Singleton);
 
+			// Setting compression threshold to 1 byte means that all messages will be compressed.
+			// This setting should not be used in production code because smaller packets will grow in size.
+			// By default, Zyan only compresses messages larger than 64 kilobytes (1 << 16 bytes).
 			var tcpBinaryProtocol = new TcpBinaryServerProtocolSetup(8082);
 			tcpBinaryProtocol.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(1, CompressionMethod.LZF));
 			_tcpBinaryHost = new ZyanComponentHost("TcpBinaryEventTest", tcpBinaryProtocol, _catalog);
 
-			var tcpCustomProtocol = new TcpCustomServerProtocolSetup(8083, new NullAuthenticationProvider(), true);
-			tcpCustomProtocol.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(1, CompressionMethod.DeflateStream));
+			var tcpCustomProtocol = new TcpCustomServerProtocolSetup(8083, new NullAuthenticationProvider(), true)
+			{
+ 				CompressionThreshold = 1,
+				CompressionMethod = CompressionMethod.DeflateStream
+			};
 			_tcpCustomHost = new ZyanComponentHost("TcpCustomEventTest", tcpCustomProtocol, _catalog);
 
-			var tcpDuplexProtocol = new TcpDuplexServerProtocolSetup(8084, new NullAuthenticationProvider(), true);
-			tcpDuplexProtocol.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(1, CompressionMethod.LZF));
+			var tcpDuplexProtocol = new TcpDuplexServerProtocolSetup(8084, new NullAuthenticationProvider(), true)
+			{
+				CompressionThreshold = 1,
+				CompressionMethod = CompressionMethod.DeflateStream
+			};
 			_tcpDuplexHost = new ZyanComponentHost("TcpDuplexEventTest", tcpDuplexProtocol, _catalog);
 
-			var httpCustomProtocol = new HttpCustomServerProtocolSetup(8085, new NullAuthenticationProvider(), true);
-			httpCustomProtocol.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(1, CompressionMethod.DeflateStream));
+			var httpCustomProtocol = new HttpCustomServerProtocolSetup(8085, new NullAuthenticationProvider(), true)
+			{
+				CompressionThreshold = 1,
+				CompressionMethod = CompressionMethod.LZF
+			};
 			_httpCustomHost = new ZyanComponentHost("HttpCustomEventTest", httpCustomProtocol, _catalog);
 
+			// use legacy blocking events mode because we check the handlers synchronously 
 			ZyanComponentHost.LegacyBlockingEvents = true;
 		}
 
 		public void Dispose()
 		{
-			if (_tcpCustomHost != null)
-			{
-				_tcpCustomHost.Dispose();
-				_tcpCustomHost = null;
-			}
-
 			if (_tcpBinaryHost != null)
 			{
 				_tcpBinaryHost.Dispose();
 				_tcpBinaryHost = null;
+			}
+
+			if (_tcpCustomHost != null)
+			{
+				_tcpCustomHost.Dispose();
+				_tcpCustomHost = null;
 			}
 
 			if (_tcpDuplexHost != null)

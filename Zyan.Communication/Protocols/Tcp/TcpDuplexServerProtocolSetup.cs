@@ -403,6 +403,7 @@ namespace Zyan.Communication.Protocols.Tcp
 				_channelSettings["keepAliveInterval"] = _tcpKeepAliveInterval;
 
 				ConfigureEncryption();
+				ConfigureCompression();
 
 				if (_channelFactory == null)
 					throw new ApplicationException(LanguageResource.ApplicationException_NoChannelFactorySpecified);
