@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="HttpCustomTest.cs" />
     <Compile Include="IpcBinaryTest.cs" />
+    <Compile Include="NullChannelTest.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TcpBinaryTest.cs" />
