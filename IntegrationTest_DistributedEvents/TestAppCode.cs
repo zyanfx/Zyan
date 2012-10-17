@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Timers;
 using Zyan.Communication;
+using Zyan.Communication.ChannelSinks.Compression;
+using Zyan.Communication.Delegates;
 using Zyan.Communication.Protocols;
+using Zyan.Communication.Protocols.Http;
+using Zyan.Communication.Protocols.Ipc;
+using Zyan.Communication.Protocols.Null;
 using Zyan.Communication.Protocols.Tcp;
 using Zyan.Communication.Security;
-using Zyan.Communication.ChannelSinks.Compression;
-using Zyan.Communication.Protocols.Http;
-using Zyan.Communication.Delegates;
-using Zyan.Communication.Protocols.Ipc;
 using Zyan.Communication.Toolbox;
 
 namespace IntegrationTest_DistributedEvents
@@ -204,6 +205,7 @@ namespace IntegrationTest_DistributedEvents
 		private ZyanComponentHost _tcpCustomHost;
 		private ZyanComponentHost _tcpDuplexHost;
 		private ZyanComponentHost _httpCustomHost;
+		private ZyanComponentHost _nullChannelHost;
 		private ComponentCatalog _catalog;
 		
 		private EventServer ()
@@ -247,6 +249,9 @@ namespace IntegrationTest_DistributedEvents
 				CompressionMethod = CompressionMethod.LZF
 			};
 			_httpCustomHost = new ZyanComponentHost("HttpCustomEventTest", httpCustomProtocol, _catalog);
+
+			var nullChannelProtocol = new NullServerProtocolSetup(1234); 
+			_nullChannelHost = new ZyanComponentHost("NullEventTest", nullChannelProtocol, _catalog);
 
 			// use legacy blocking events mode because we check the handlers synchronously 
 			ZyanComponentHost.LegacyBlockingEvents = true;
