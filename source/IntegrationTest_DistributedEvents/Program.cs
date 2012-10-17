@@ -68,6 +68,13 @@ namespace IntegrationTest_DistributedEvents
 			int httpCustomTestResult = HttpCustomTest.RunTest();
 			Console.WriteLine("Passed: {0}", httpCustomTestResult == 0);
 
+			// Test NULL Channel
+			_serverAppDomain.DoCallBack(new CrossAppDomainDelegate(() =>
+			{
+				int nullChannelTestResult = NullChannelTest.RunTest();
+				Console.WriteLine("Passed: {0}", nullChannelTestResult == 0);
+			}));
+
 			EventServerLocator locator = _serverAppDomain.CreateInstanceAndUnwrap(Assembly.GetExecutingAssembly().FullName, "IntegrationTest_DistributedEvents.EventServerLocator") as EventServerLocator;
 			locator.GetEventServer().Dispose();
 			Console.WriteLine("Event server stopped.");
