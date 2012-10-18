@@ -14,6 +14,7 @@
 With Zyan you can publish every .NET class for remote access over the network.
 Zyan is highly customizable and provides you with tools to build modular and plugable distributed applications.</description>
     <summary />
+    <releaseNotes>What's new: traffic compression for all supported protocols, proper semantic of the single-call component events, non-blocking event raising, improved compatibility with Mono Framework, lots of bugfixes. For more details, see the project website.</releaseNotes>
     <language>en-US</language>
     <tags>Sockets TCP Remoting Distributed Cloud WCF EBC event-based-components flowdesign easy</tags>
   </metadata>

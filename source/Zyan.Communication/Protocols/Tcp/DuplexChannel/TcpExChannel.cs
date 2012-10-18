@@ -23,7 +23,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 	/// <summary name="TcpExChannel">
 	/// A replacement for the standard Tcp remoting channel that allows communication in both directions over a single tcp connection.
 	/// <remarks>TcpExChannel only supports IPv4.</remarks>
-    /// <b>Remoting Configuration Parameters</b>
+	/// <b>Remoting Configuration Parameters</b>
 	/// <list type="bullet">
 	/// <item><term>port</term><description>The tcp port the channel should listen on.  If this is specified, the channel will automatically start listening on that port.</description></item>
 	/// <item><term>listen</term><description>Indicates the channel should start listening.  This is not required if the port parameter is specified.  If no port is specified the channel will choose a random unused port.</description></item>
@@ -45,7 +45,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		private ulong _tcpKeepAliveInterval = 1000;
 		private short _maxRetries = 10;
 		private int _retryDelay = 1000;
-        private IPAddress _bindToAddress = IPAddress.Any;
+		private IPAddress _bindToAddress = IPAddress.Any;
 		
 		#region TCP KeepAlive
 
@@ -139,7 +139,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			int retryDelay = 1000;
 			bool listen = false;
 			TypeFilterLevel typeFilterLevel = TypeFilterLevel.Low;
-            IPAddress bindToAddress = IPAddress.Any;
+			IPAddress bindToAddress = IPAddress.Any;
 
 			if (properties.Contains("port"))
 			{
@@ -166,8 +166,8 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				maxRetries = Convert.ToInt16(properties["maxRetries"]);
 			if (properties.Contains("retryDelay"))
 				retryDelay = Convert.ToInt32(properties["retryDelay"]);
-            if (properties.Contains("bindTo"))
-                bindToAddress =IPAddress.Parse((string)properties["bindTo"]);
+			if (properties.Contains("bindTo"))
+				bindToAddress =IPAddress.Parse((string)properties["bindTo"]);
 			if (properties.Contains("typeFilterLevel"))
 			{
 				if (properties["typeFilterLevel"] is string)
@@ -185,7 +185,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			_tcpKeepAliveInterval = KeepAliveInterval;
 			_maxRetries = maxRetries;
 			_retryDelay = retryDelay;
-            _bindToAddress = bindToAddress;
+			_bindToAddress = bindToAddress;
 
 			if (clientSinkProvider == null)
 				clientSinkProvider = new BinaryClientFormatterSinkProvider();
