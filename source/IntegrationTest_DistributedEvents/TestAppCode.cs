@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Timers;
 using Zyan.Communication;
 using Zyan.Communication.ChannelSinks.Compression;
@@ -10,6 +11,7 @@ using Zyan.Communication.Protocols.Null;
 using Zyan.Communication.Protocols.Tcp;
 using Zyan.Communication.Security;
 using Zyan.Communication.Toolbox;
+using System.Net.NetworkInformation;
 
 namespace IntegrationTest_DistributedEvents
 {
@@ -83,14 +85,14 @@ namespace IntegrationTest_DistributedEvents
 			}
 		}
 
-		public int Fired 
+		public int Fired
 		{
-			get { return _firedCount; } 
+			get { return _firedCount; }
 		}
 
-		public int Registrations 
+		public int Registrations
 		{
-			get 
+			get
 			{
 				return EventStub.GetHandlerCount(ServerEvent);
 			}
@@ -178,7 +180,7 @@ namespace IntegrationTest_DistributedEvents
 	}
 
 	public class EventServerLocator : MarshalByRefObject
-	{ 
+	{
 		public EventServer GetEventServer()
 		{
 			return EventServer.Instance;
@@ -191,7 +193,7 @@ namespace IntegrationTest_DistributedEvents
 
 		public static EventServer Instance
 		{
-			get 
+			get
 			{
 				if (_instance == null)
 					_instance = new EventServer();
@@ -241,6 +243,12 @@ namespace IntegrationTest_DistributedEvents
 				CompressionThreshold = 1,
 				CompressionMethod = CompressionMethod.DeflateStream
 			};
+            var firstNic = NetworkInterface.GetAllNetworkInterfaces().First();
+            var firstNicIPSettings = firstNic.GetIPProperties();
+            string bindToAddress = firstNicIPSettings.UnicastAddresses.First().Address.ToString();
+
+            tcpBinaryProtocol.AddChannelSetting("bindTo", bindToAddress);
+
 			_tcpDuplexHost = new ZyanComponentHost("TcpDuplexEventTest", tcpDuplexProtocol, _catalog);
 
 			var httpCustomProtocol = new HttpCustomServerProtocolSetup(8085, new NullAuthenticationProvider(), true)
@@ -250,10 +258,10 @@ namespace IntegrationTest_DistributedEvents
 			};
 			_httpCustomHost = new ZyanComponentHost("HttpCustomEventTest", httpCustomProtocol, _catalog);
 
-			var nullChannelProtocol = new NullServerProtocolSetup(1234); 
+			var nullChannelProtocol = new NullServerProtocolSetup(1234);
 			_nullChannelHost = new ZyanComponentHost("NullEventTest", nullChannelProtocol, _catalog);
 
-			// use legacy blocking events mode because we check the handlers synchronously 
+			// use legacy blocking events mode because we check the handlers synchronously
 			ZyanComponentHost.LegacyBlockingEvents = true;
 		}
 
