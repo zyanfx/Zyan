@@ -1,12 +1,12 @@
 /*
  THIS CODE IS BASED ON:
- -------------------------------------------------------------------------------------------------------------- 
+ --------------------------------------------------------------------------------------------------------------
  TcpEx Remoting Channel
  Version 1.2 - 18 November, 2003
  Richard Mason - r.mason@qut.edu.au
  Originally published at GotDotNet:
  http://www.gotdotnet.com/Community/UserSamples/Details.aspx?SampleGuid=3F46C102-9970-48B1-9225-8758C38905B1
- Copyright © 2003 Richard Mason. All Rights Reserved. 
+ Copyright © 2003 Richard Mason. All Rights Reserved.
  --------------------------------------------------------------------------------------------------------------
 */
 using System;
@@ -172,10 +172,13 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			Message.BeginReceive(connection, new AsyncCallback(ReceiveMessage), null);
 		}
 		
-		public static int StartListening(int port, TcpExChannel channel)
+		public static int StartListening(int port, TcpExChannel channel, IPAddress bindToAddress)
 		{
+            if (bindToAddress == null)
+                throw new ArgumentNullException("bindToAddress");
+
 			Socket listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-			listener.Bind(new IPEndPoint(IPAddress.Any, port));
+			listener.Bind(new IPEndPoint(bindToAddress, port));
 			listener.Listen(1000);
 			listener.BeginAccept(new AsyncCallback(listener_Accept), new object[] {listener, channel});
 
@@ -183,7 +186,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		}
 
 		/// <summary>
-		/// Stops listening of a specified channel. 
+		/// Stops listening of a specified channel.
 		/// </summary>
 		/// <param name="channel">TcpEx Channel</param>
 		public static void StopListening(TcpExChannel channel)
@@ -222,7 +225,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				//TODO: Add Tracing here!
 			}
 			catch (SerializationException)
-			{ 
+			{
 				// Client sends bad data
 				//TODO: Add Tracing here!
 			}

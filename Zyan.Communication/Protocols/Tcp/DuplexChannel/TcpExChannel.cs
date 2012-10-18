@@ -16,12 +16,14 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Messaging;
 using System.Runtime.Serialization.Formatters;
 using Zyan.Communication.Toolbox.Diagnostics;
+using System.Net;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
 	/// <summary name="TcpExChannel">
 	/// A replacement for the standard Tcp remoting channel that allows communication in both directions over a single tcp connection.
-	/// <b>Remoting Configuration Parameters</b>
+	/// <remarks>TcpExChannel only supports IPv4.</remarks>
+    /// <b>Remoting Configuration Parameters</b>
 	/// <list type="bullet">
 	/// <item><term>port</term><description>The tcp port the channel should listen on.  If this is specified, the channel will automatically start listening on that port.</description></item>
 	/// <item><term>listen</term><description>Indicates the channel should start listening.  This is not required if the port parameter is specified.  If no port is specified the channel will choose a random unused port.</description></item>
@@ -43,6 +45,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		private ulong _tcpKeepAliveInterval = 1000;
 		private short _maxRetries = 10;
 		private int _retryDelay = 1000;
+        private IPAddress _bindToAddress = IPAddress.Any;
 		
 		#region TCP KeepAlive
 
@@ -79,7 +82,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// </summary>
 		public TcpExChannel()
 		{
-			Initialise(TypeFilterLevel.Low, null, null, 0, false, true, 30000, 1000, 10, 1000);
+			Initialise(TypeFilterLevel.Low, null, null, 0, false, true, 30000, 1000, 10, 1000, IPAddress.Any);
 		}
 
 		/// <summary>
@@ -88,7 +91,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// <param name="port">Tcp port.</param>
 		public TcpExChannel(int port)
 		{
-			Initialise(TypeFilterLevel.Low, null, null, port, true, true, 30000, 1000, 10, 1000);
+			Initialise(TypeFilterLevel.Low, null, null, port, true, true, 30000, 1000, 10, 1000, IPAddress.Any);
 		}
 
 		/// <summary>
@@ -97,7 +100,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// <param name="listen">if set to <c>true</c>, the channel will listen for incoming connections.</param>
 		public TcpExChannel(bool listen)
 		{
-			Initialise(TypeFilterLevel.Low, null, null, 0, listen, true, 30000, 1000, 10, 1000);
+			Initialise(TypeFilterLevel.Low, null, null, 0, listen, true, 30000, 1000, 10, 1000, IPAddress.Any);
 		}
 
 		/// <summary>
@@ -107,7 +110,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// <param name="listen">if set to <c>true</c>, the channel will listen for incoming connections.</param>
 		public TcpExChannel(TypeFilterLevel filterLevel, bool listen)
 		{
-			Initialise(filterLevel, null, null, 0, listen, true, 30000, 1000, 10, 1000);
+			Initialise(filterLevel, null, null, 0, listen, true, 30000, 1000, 10, 1000, IPAddress.Any);
 		}
 
 		/// <summary>
@@ -117,7 +120,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// <param name="port">Tcp port.</param>
 		public TcpExChannel(TypeFilterLevel filterLevel, int port)
 		{
-			Initialise(filterLevel, null, null, port, true, true, 30000, 1000,10,1000);
+			Initialise(filterLevel, null, null, port, true, true, 30000, 1000,10,1000, IPAddress.Any);
 		}
 
 		/// <summary>
@@ -136,6 +139,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			int retryDelay = 1000;
 			bool listen = false;
 			TypeFilterLevel typeFilterLevel = TypeFilterLevel.Low;
+            IPAddress bindToAddress = IPAddress.Any;
 
 			if (properties.Contains("port"))
 			{
@@ -162,6 +166,8 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				maxRetries = Convert.ToInt16(properties["maxRetries"]);
 			if (properties.Contains("retryDelay"))
 				retryDelay = Convert.ToInt32(properties["retryDelay"]);
+            if (properties.Contains("bindTo"))
+                bindToAddress =IPAddress.Parse((string)properties["bindTo"]);
 			if (properties.Contains("typeFilterLevel"))
 			{
 				if (properties["typeFilterLevel"] is string)
@@ -169,16 +175,17 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				else
 					typeFilterLevel = (TypeFilterLevel)properties["typeFilterLevel"];
 			}
-			Initialise(typeFilterLevel, clientSinkProvider, serverSinkProvider, port, listen, tcpKeepAliveEnabled, tcpKeepAliveTime, tcpKeepAliveInterval, maxRetries, retryDelay);
+			Initialise(typeFilterLevel, clientSinkProvider, serverSinkProvider, port, listen, tcpKeepAliveEnabled, tcpKeepAliveTime, tcpKeepAliveInterval, maxRetries, retryDelay, bindToAddress);
 		}
 
-		private void Initialise(TypeFilterLevel typeFilterLevel, IClientChannelSinkProvider clientSinkProvider, IServerChannelSinkProvider serverSinkProvider, int port, bool listen, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval, short maxRetries, int retryDelay)
+		private void Initialise(TypeFilterLevel typeFilterLevel, IClientChannelSinkProvider clientSinkProvider, IServerChannelSinkProvider serverSinkProvider, int port, bool listen, bool keepAlive, ulong keepAliveTime, ulong KeepAliveInterval, short maxRetries, int retryDelay, IPAddress bindToAddress)
 		{
 			_tcpKeepAliveEnabled = keepAlive;
 			_tcpKeepAliveTime = keepAliveTime;
 			_tcpKeepAliveInterval = KeepAliveInterval;
 			_maxRetries = maxRetries;
 			_retryDelay = retryDelay;
+            _bindToAddress = bindToAddress;
 
 			if (clientSinkProvider == null)
 				clientSinkProvider = new BinaryClientFormatterSinkProvider();
@@ -371,7 +378,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 			if (data is int)
 			{
-				this.port = Manager.StartListening((int)data, this);
+				this.port = Manager.StartListening((int)data, this, _bindToAddress);
 				channelData = new TcpExChannelData(this);
 
 				foreach (string url in Manager.GetAddresses(this.port, Guid.Empty))
