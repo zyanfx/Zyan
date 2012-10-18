@@ -11,7 +11,6 @@ using Zyan.Communication.Protocols.Null;
 using Zyan.Communication.Protocols.Tcp;
 using Zyan.Communication.Security;
 using Zyan.Communication.Toolbox;
-using System.Net.NetworkInformation;
 
 namespace IntegrationTest_DistributedEvents
 {
@@ -243,11 +242,7 @@ namespace IntegrationTest_DistributedEvents
 				CompressionThreshold = 1,
 				CompressionMethod = CompressionMethod.DeflateStream
 			};
-            var firstNic = NetworkInterface.GetAllNetworkInterfaces().First();
-            var firstNicIPSettings = firstNic.GetIPProperties();
-            string bindToAddress = firstNicIPSettings.UnicastAddresses.First().Address.ToString();
-
-            tcpBinaryProtocol.AddChannelSetting("bindTo", bindToAddress);
+			tcpDuplexProtocol.AddChannelSetting("bindTo", "127.0.0.1");
 
 			_tcpDuplexHost = new ZyanComponentHost("TcpDuplexEventTest", tcpDuplexProtocol, _catalog);
 

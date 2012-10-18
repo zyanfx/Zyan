@@ -25,7 +25,7 @@ using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
-	internal partial class Manager
+	internal class Manager
 	{
 		#region Uri Utilities
 
@@ -174,8 +174,8 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		
 		public static int StartListening(int port, TcpExChannel channel, IPAddress bindToAddress)
 		{
-            if (bindToAddress == null)
-                throw new ArgumentNullException("bindToAddress");
+			if (bindToAddress == null)
+				throw new ArgumentNullException("bindToAddress");
 
 			Socket listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 			listener.Bind(new IPEndPoint(bindToAddress, port));
