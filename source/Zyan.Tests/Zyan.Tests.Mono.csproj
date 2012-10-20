@@ -51,6 +51,7 @@
     <Compile Include="CallInterceptionTests.cs" />
     <Compile Include="CallInterceptorBuilderTests.cs" />
     <Compile Include="CleanupTests.cs" />
+    <Compile Include="DefaultProtocolTests.cs" />
     <Compile Include="EmptyDelegateFactoryTests.cs" />
     <Compile Include="EventFilterTests.cs" />
     <Compile Include="EventsTests.cs" />

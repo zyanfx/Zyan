@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -9,18 +10,9 @@ using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication.Delegates
 {
-	#region Synonym definitions
-
 	// Factory method for dynamic wires.
 	using DynamicWireFactoryMethod = Func<bool, DynamicWireBase>;
-
-#if !FX3
-	using DynamicWireFactoryCache = System.Collections.Concurrent.ConcurrentDictionary<string, Func<bool, DynamicWireBase>>;
-#else
-	using DynamicWireFactoryCache = Zyan.Communication.Toolbox.ConcurrentDictionary<string, Func<bool, DynamicWireBase>>;
-#endif
-
-	#endregion
+	using DynamicWireFactoryCache = ConcurrentDictionary<string, Func<bool, DynamicWireBase>>;
 
 	/// <summary>
 	/// Factory class for creation of dynamic wires.

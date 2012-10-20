@@ -1,20 +1,13 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using Zyan.Communication;
+using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication.SessionMgmt
 {
-	#region Synonym definitions
-#if !FX3
-	using SessionDictionary = System.Collections.Concurrent.ConcurrentDictionary<Guid, ServerSession>;
-	using SessionVariableDictionary = System.Collections.Concurrent.ConcurrentDictionary<Guid, System.Collections.Concurrent.ConcurrentDictionary<string, object>>;
-	using VariableDictionary = System.Collections.Concurrent.ConcurrentDictionary<string, object>;
-#else
-	using SessionDictionary = Zyan.Communication.Toolbox.ConcurrentDictionary<Guid, ServerSession>;
-	using SessionVariableDictionary = Zyan.Communication.Toolbox.ConcurrentDictionary<Guid, Zyan.Communication.Toolbox.ConcurrentDictionary<string, object>>;
-	using VariableDictionary = Zyan.Communication.Toolbox.ConcurrentDictionary<string, object>;
-#endif
-	#endregion
+	using SessionDictionary = ConcurrentDictionary<Guid, ServerSession>;
+	using SessionVariableDictionary = ConcurrentDictionary<Guid, ConcurrentDictionary<string, object>>;
+	using VariableDictionary = ConcurrentDictionary<string, object>;
 
 	/// <summary>
 	/// Slim in-process session manager.
