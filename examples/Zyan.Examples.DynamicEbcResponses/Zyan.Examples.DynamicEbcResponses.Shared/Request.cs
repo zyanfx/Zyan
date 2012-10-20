@@ -1,5 +1,6 @@
 using System;
 using Zyan.Communication;
+using Zyan.Communication.Delegates;
 
 namespace Zyan.Examples.DynamicEbcResponses.Shared
 {
@@ -12,7 +13,6 @@ namespace Zyan.Examples.DynamicEbcResponses.Shared
     [Serializable]
     public class Request<TRequestData, TResponseData>
     {
-
         /// <summary>
         /// initializes a request with the argument and the callback delegate
         /// </summary>

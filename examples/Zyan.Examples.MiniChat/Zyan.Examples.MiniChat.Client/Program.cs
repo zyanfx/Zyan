@@ -13,12 +13,9 @@ namespace Zyan.Examples.MiniChat.Client
 {
 	static class Program
 	{
-		private static ZyanConnection _connection;
+		private static Hashtable Credentials { get; set; }
 
-		private static Hashtable _credentials;
-
-		public static ZyanConnection ServerConnection
-		{ get { return _connection; } }
+		public static ZyanConnection Connection { get; private set; }
 
 		/// <summary>
 		/// Der Haupteinstiegspunkt für die Anwendung.
@@ -46,22 +43,22 @@ namespace Zyan.Examples.MiniChat.Client
 			if (string.IsNullOrEmpty(nickname))
 				return;
 
-			_credentials = new Hashtable();
-			_credentials.Add("nickname", nickname);
+			Credentials = new Hashtable();
+			Credentials.Add("nickname", nickname);
 
 			TcpDuplexClientProtocolSetup protocol = new TcpDuplexClientProtocolSetup(true);
 
 			try
 			{
-				using (_connection = new ZyanConnection(serverUrl, protocol, _credentials, false, true))
+				using (Connection = new ZyanConnection(serverUrl, protocol, Credentials, false, true))
 				{
-					_connection.PollingInterval = new TimeSpan(0, 0, 30);
-					_connection.PollingEnabled = true;
-					_connection.Disconnected += new EventHandler<DisconnectedEventArgs>(_connection_Disconnected);
-					_connection.NewLogonNeeded += new EventHandler<NewLogonNeededEventArgs>(_connection_NewLogonNeeded);
-					_connection.Error += new EventHandler<ZyanErrorEventArgs>(_connection_Error);
+					Connection.PollingInterval = new TimeSpan(0, 0, 30);
+					Connection.PollingEnabled = true;
+					Connection.Disconnected += new EventHandler<DisconnectedEventArgs>(Connection_Disconnected);
+					Connection.NewLogonNeeded += new EventHandler<NewLogonNeededEventArgs>(Connection_NewLogonNeeded);
+					Connection.Error += new EventHandler<ZyanErrorEventArgs>(Connection_Error);
 
-					_connection.CallInterceptors.For<IMiniChat>()
+					Connection.CallInterceptors.For<IMiniChat>()
 						.Add<string, string>(
 							(chat, nickname2, text) => chat.SendMessage(nickname2, text),
 							(data, nickname2, text) =>
@@ -73,7 +70,7 @@ namespace Zyan.Examples.MiniChat.Client
 								}
 							});
 
-					_connection.CallInterceptionEnabled = true;
+					Connection.CallInterceptionEnabled = true;
 
 					Application.Run(new ChatForm(nickname));
 				}
@@ -84,7 +81,7 @@ namespace Zyan.Examples.MiniChat.Client
 			}
 		}
 
-		static void _connection_Error(object sender, ZyanErrorEventArgs e)
+		static void Connection_Error(object sender, ZyanErrorEventArgs e)
 		{
 			if (e.Exception is SocketException || e.Exception is InvalidSessionException || e.Exception is RemotingException)
 			{
@@ -94,7 +91,7 @@ namespace Zyan.Examples.MiniChat.Client
 				while (!problemSolved && retryCount < 10)
 				{
 					Thread.Sleep(5000);
-					problemSolved = _connection.Reconnect();
+					problemSolved = Connection.Reconnect();
 					retryCount++;
 				}
 				if (problemSolved)
@@ -106,12 +103,12 @@ namespace Zyan.Examples.MiniChat.Client
 				e.Action = ZyanErrorAction.ThrowException;
 		}
 
-		static void _connection_NewLogonNeeded(object sender, NewLogonNeededEventArgs e)
+		static void Connection_NewLogonNeeded(object sender, NewLogonNeededEventArgs e)
 		{
-			e.Credentials = _credentials;
+			e.Credentials = Credentials;
 		}
 
-		static void _connection_Disconnected(object sender, DisconnectedEventArgs e)
+		static void Connection_Disconnected(object sender, DisconnectedEventArgs e)
 		{
 			e.Retry = e.RetryCount < 6;
 		}
