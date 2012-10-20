@@ -435,3 +435,8 @@ namespace Zyan.Communication.Toolbox
 		}
 	}
 }
+
+// add namespace for compatibility
+namespace System.Collections.Concurrent
+{
+}

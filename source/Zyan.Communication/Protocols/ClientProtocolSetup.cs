@@ -6,6 +6,10 @@ using System.Runtime.Remoting.Channels;
 using System.Collections;
 using System.Runtime.Remoting;
 using Zyan.Communication.Toolbox;
+using Zyan.Communication.Protocols.Http;
+using Zyan.Communication.Protocols.Ipc;
+using Zyan.Communication.Protocols.Null;
+using Zyan.Communication.Protocols.Tcp;
 
 namespace Zyan.Communication.Protocols
 {
@@ -14,6 +18,22 @@ namespace Zyan.Communication.Protocols
 	/// </summary>
 	public class ClientProtocolSetup : IClientProtocolSetup
 	{
+		/// <summary>
+		/// Initializes the <see cref="ClientProtocolSetup" /> class.
+		/// </summary>
+		static ClientProtocolSetup()
+		{
+			// set up default client protocols
+			DefaultClientProtocols = new Dictionary<string, Lazy<IClientProtocolSetup>>
+			{
+				{ "tcpex://", new Lazy<IClientProtocolSetup>(() => new TcpDuplexClientProtocolSetup(), true) },
+				{ "tcp://", new Lazy<IClientProtocolSetup>(() => new TcpCustomClientProtocolSetup(), true) },
+				{ "ipc://", new Lazy<IClientProtocolSetup>(() => new IpcBinaryClientProtocolSetup(), true) },
+				{ "http://", new Lazy<IClientProtocolSetup>(() => new HttpCustomClientProtocolSetup(), true) },
+				{ "null://", new Lazy<IClientProtocolSetup>(() => new NullClientProtocolSetup(), true) }
+			};
+		}
+
 		/// <summary>
 		/// Unique channel name.
 		/// </summary>
@@ -65,6 +85,36 @@ namespace Zyan.Communication.Protocols
 		{
 			return new ClientProtocolSetup(channelFactory);
 		}
+
+		/// <summary>
+		/// Registers the default protocol setup for the given URL prefix.
+		/// </summary>
+		/// <param name="urlPrefix">The URL prefix.</param>
+		/// <param name="factory">The protocol setup factory.</param>
+		public static void RegisterClientProtocol(string urlPrefix, Func<IClientProtocolSetup> factory)
+		{
+			DefaultClientProtocols[urlPrefix] = new Lazy<IClientProtocolSetup>(factory, true);
+		}
+
+		/// <summary>
+		/// Gets the default client protocol setup for the given URL.
+		/// </summary>
+		/// <param name="url">The URL to connect to.</param>
+		/// <returns><see cref="IClientProtocolSetup"/> implementation, or null, if the default protocol is not found.</returns>
+		public static IClientProtocolSetup GetClientProtocol(string url)
+		{
+			foreach (var pair in DefaultClientProtocols)
+			{
+				if (url.StartsWith(pair.Key, StringComparison.InvariantCultureIgnoreCase))
+				{
+					return pair.Value.Value;
+				}
+			}
+
+			return null;
+		}
+
+		private static Dictionary<string, Lazy<IClientProtocolSetup>> DefaultClientProtocols { get; set; }
 
 		/// <summary>
 		/// Gets a dictionary with channel settings.

@@ -16,8 +16,7 @@ namespace IntegrationTest_DistributedEvents
 			_testName = testName;
 		}
 
-		public int Count
-		{ get; set; }
+		public int Count { get; set; }
 
 		public void ReceiveResponseSingleCall(string text)
 		{
@@ -69,12 +68,16 @@ namespace IntegrationTest_DistributedEvents
 			Console.WriteLine("Passed: {0}", httpCustomTestResult == 0);
 
 			// Test NULL Channel
+			const string nullChannelResultSlot = "NullChannelResult";
 			_serverAppDomain.DoCallBack(new CrossAppDomainDelegate(() =>
 			{
-				int nullChannelTestResult = NullChannelTest.RunTest();
-				Console.WriteLine("Passed: {0}", nullChannelTestResult == 0);
+				int result = NullChannelTest.RunTest();
+				AppDomain.CurrentDomain.SetData(nullChannelResultSlot, result);
 			}));
+			var nullChannelTestResult = Convert.ToInt32(_serverAppDomain.GetData(nullChannelResultSlot));
+			Console.WriteLine("Passed: {0}", nullChannelTestResult == 0);
 
+			// Stop the event server
 			EventServerLocator locator = _serverAppDomain.CreateInstanceAndUnwrap(Assembly.GetExecutingAssembly().FullName, "IntegrationTest_DistributedEvents.EventServerLocator") as EventServerLocator;
 			locator.GetEventServer().Dispose();
 			Console.WriteLine("Event server stopped.");
@@ -88,7 +91,7 @@ namespace IntegrationTest_DistributedEvents
 				Console.WriteLine("Server AppDomain unloaded.");
 			}
 
-			if (ipcBinaryTestResult + tcpBinaryTestResult + tcpCustomTestResult + tcpDuplexTestResult + httpCustomTestResult == 0)
+			if (ipcBinaryTestResult + tcpBinaryTestResult + tcpCustomTestResult + tcpDuplexTestResult + httpCustomTestResult + nullChannelTestResult == 0)
 			{
 				Console.WriteLine("All tests passed.");
 				return 0;

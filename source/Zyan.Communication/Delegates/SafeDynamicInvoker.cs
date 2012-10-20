@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -10,13 +11,7 @@ using Zyan.Communication.Toolbox.Diagnostics;
 
 namespace Zyan.Communication.Delegates
 {
-	#region Synonyms
-#if !FX3
-	using DelegateFactoryCache = System.Collections.Concurrent.ConcurrentDictionary<Type, Func<Delegate, object[], object>>;
-#else
-	using DelegateFactoryCache = Zyan.Communication.Toolbox.ConcurrentDictionary<Type, Func<Delegate, object[], object>>;
-#endif
-	#endregion
+	using DelegateFactoryCache = ConcurrentDictionary<Type, Func<Delegate, object[], object>>;
 
 	/// <summary>
 	/// A safer replacement for the Delegate.DynamicInvoke method.
