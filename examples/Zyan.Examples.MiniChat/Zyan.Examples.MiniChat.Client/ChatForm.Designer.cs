@@ -36,8 +36,8 @@
 			// 
 			// _sayBox
 			// 
-			this._sayBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
+			this._sayBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this._sayBox.Location = new System.Drawing.Point(12, 38);
 			this._sayBox.Name = "_sayBox";
 			this._sayBox.Size = new System.Drawing.Size(351, 20);
@@ -56,9 +56,9 @@
 			// 
 			// _chatList
 			// 
-			this._chatList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-						| System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
+			this._chatList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this._chatList.FormattingEnabled = true;
 			this._chatList.Location = new System.Drawing.Point(12, 77);
 			this._chatList.Name = "_chatList";
@@ -72,6 +72,7 @@
 			this._nickName.ReadOnly = true;
 			this._nickName.Size = new System.Drawing.Size(136, 20);
 			this._nickName.TabIndex = 0;
+			this._nickName.TabStop = false;
 			this._nickName.Text = "Rainbird";
 			// 
 			// ChatForm

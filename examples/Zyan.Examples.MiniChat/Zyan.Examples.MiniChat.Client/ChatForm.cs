@@ -9,7 +9,6 @@ namespace Zyan.Examples.MiniChat.Client
 {
 	public partial class ChatForm : Form
 	{
-
 		private IMiniChat _chatProxy;
 
 		public ChatForm(string nickname)
@@ -17,7 +16,7 @@ namespace Zyan.Examples.MiniChat.Client
 			InitializeComponent();
 
 			_nickName.Text = nickname;
-			_chatProxy = Program.ServerConnection.CreateProxy<IMiniChat>();
+			_chatProxy = Program.Connection.CreateProxy<IMiniChat>();
 			_chatProxy.MessageReceived += new Action<string, string>(_chatProxy_MessageReceived);
 		}
 
@@ -28,13 +27,17 @@ namespace Zyan.Examples.MiniChat.Client
 				Invoke(new Action<string, string>(_chatProxy_MessageReceived), arg1, arg2);
 				return;
 			}
-			if (arg1 != _nickName.Text)
-				_chatList.Items.Insert(0, string.Format("{0}: {1}", arg1, arg2));
+
+			_chatList.Items.Insert(0, string.Format("{0}: {1}", arg1, arg2));
 		}
 
 		private void _sendButton_Click(object sender, EventArgs e)
 		{
-			ThreadPool.QueueUserWorkItem(x => _chatProxy.SendMessage(_nickName.Text, _sayBox.Text));
+			var nickName = _nickName.Text;
+			var message = _sayBox.Text;
+			_sayBox.SelectAll();
+
+			ThreadPool.QueueUserWorkItem(x => _chatProxy.SendMessage(nickName, message));
 		}
 
 		private void ChatForm_FormClosed(object sender, FormClosedEventArgs e)
