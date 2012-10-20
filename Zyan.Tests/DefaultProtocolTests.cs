@@ -56,10 +56,10 @@ namespace Zyan.Tests
 		}
 
 		[TestMethod]
-		public void TcpUrlResolvesToTcpCustomProtocolSetup()
+		public void TcpUrlResolvesToTcpBinaryProtocolSetup()
 		{
 			var protocol = ClientProtocolSetup.GetClientProtocol("tcp://localhost:1234/svc");
-			Assert.AreEqual(typeof(TcpCustomClientProtocolSetup), protocol.GetType());
+			Assert.AreEqual(typeof(TcpBinaryClientProtocolSetup), protocol.GetType());
 		}
 
 		[TestMethod]
