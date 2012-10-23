@@ -31,7 +31,12 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			this.server = server;
 			this.channel = channel;
 
-			Connection.GetConnection(server, channel, channel.TcpKeepAliveEnabled, channel.TcpKeepAliveTime, channel.TcpKeepAliveInterval, channel.MaxRetries, channel.RetryDelay); // Try to connect so we fail during creation if the other side isn't listening
+			if (channel.ConnectDuringCreation)
+			{
+				// Try to connect so we fail during creation if the other side isn't listening
+				Connection.GetConnection(server, channel, channel.TcpKeepAliveEnabled, channel.TcpKeepAliveTime, 
+					channel.TcpKeepAliveInterval, channel.MaxRetries, channel.RetryDelay);
+			}
 		}
 
 		#region Implementation of IClientChannelSink

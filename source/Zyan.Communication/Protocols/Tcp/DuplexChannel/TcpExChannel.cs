@@ -73,6 +73,15 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			get { return _tcpKeepAliveInterval; }
 		}
 
+		/// <summary>
+		/// Gets or sets the value indicating whether the client-side should connect
+		/// to the server during the creation of the transport channel.
+		/// </summary>
+		public bool ConnectDuringCreation
+		{
+			get; set;
+		}
+
 		#endregion
 
 		#region Constructors, initialization
@@ -167,7 +176,9 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			if (properties.Contains("retryDelay"))
 				retryDelay = Convert.ToInt32(properties["retryDelay"]);
 			if (properties.Contains("bindTo"))
-				bindToAddress =IPAddress.Parse((string)properties["bindTo"]);
+				bindToAddress = IPAddress.Parse((string)properties["bindTo"]);
+			if (properties.Contains("connectDuringCreation"))
+				ConnectDuringCreation = Convert.ToBoolean(properties["connectDuringCreation"]);
 			if (properties.Contains("typeFilterLevel"))
 			{
 				if (properties["typeFilterLevel"] is string)
