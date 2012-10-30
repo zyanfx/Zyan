@@ -775,7 +775,14 @@ namespace Zyan.Communication
 		{
 			var eventHandler = ClientHeartbeatReceived;
 			if (eventHandler != null)
-				ThreadPool.QueueUserWorkItem(state => eventHandler(this, e));
+			{
+				var currentSession = ServerSession.CurrentSession;
+				ThreadPool.QueueUserWorkItem(state =>
+				{
+					ServerSession.CurrentSession = currentSession;
+					eventHandler(this, e);
+				});
+			}
 		}
 
 		/// <summary>
@@ -784,6 +791,12 @@ namespace Zyan.Communication
 		/// <param name="sessionID">Client´s session key</param>
 		public void ReceiveClientHeartbeat(Guid sessionID)
 		{
+			// validate server session
+			var details = new InvocationDetails();
+			Invoke_LoadCallContextData(details);
+			Invoke_SetSession(details);
+
+			// fire the heartbeat event
 			OnClientHeartbeatReceived(new ClientHeartbeatEventArgs(DateTime.Now, sessionID));
 		}
 
