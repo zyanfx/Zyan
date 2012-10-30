@@ -1,0 +1,136 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Security.Principal;
+using System.Text;
+using System.Threading;
+using Zyan.Communication;
+using Zyan.Communication.Security;
+using Zyan.Communication.Protocols;
+using Zyan.Communication.Protocols.Null;
+
+namespace Zyan.Tests
+{
+	#region Unit testing platform abstraction layer
+#if NUNIT
+	using NUnit.Framework;
+	using TestClass = NUnit.Framework.TestFixtureAttribute;
+	using TestMethod = NUnit.Framework.TestAttribute;
+	using ClassInitializeNonStatic = NUnit.Framework.TestFixtureSetUpAttribute;
+	using ClassInitialize = DummyAttribute;
+	using ClassCleanupNonStatic = NUnit.Framework.TestFixtureTearDownAttribute;
+	using ClassCleanup = DummyAttribute;
+	using TestContext = System.Object;
+#else
+	using Microsoft.VisualStudio.TestTools.UnitTesting;
+	using ClassInitializeNonStatic = DummyAttribute;
+	using ClassCleanupNonStatic = DummyAttribute;
+#endif
+	#endregion
+
+	/// <summary>
+	/// Regression test for heartbeat session. Issue #1808
+	/// </summary>
+	[TestClass]
+	public class HeartbeatSessionTests
+	{
+		#region Setup test environment and cleanup
+
+		public class JohnGaltIdentity : IIdentity
+		{
+			public const string DefaultName = "John Galt";
+
+			public string AuthenticationType { get { return string.Empty; } }
+
+			public bool IsAuthenticated { get { return true; } }
+
+			public string Name { get { return DefaultName; } }
+		}
+
+		public class JohnGaltAuthenticationProvider : IAuthenticationProvider
+		{
+			public AuthResponseMessage Authenticate(AuthRequestMessage authRequest)
+			{
+				return new AuthResponseMessage()
+				{
+					ErrorMessage = string.Empty,
+					Success = true,
+					AuthenticatedIdentity = new JohnGaltIdentity()
+				};
+			}
+		}
+
+		[ClassInitializeNonStatic]
+		public void Initialize()
+		{
+			StartServer(null);
+		}
+
+		[ClassCleanupNonStatic]
+		public void Cleanup()
+		{
+		}
+
+		[ClassInitialize]
+		public static void StartServer(TestContext ctx)
+		{
+			ZyanHost = new ZyanComponentHost("HeartbeatServer", new NullServerProtocolSetup(5678)
+			{
+				AuthenticationProvider = new JohnGaltAuthenticationProvider()
+			});
+		}
+
+		[ClassCleanup]
+		public static void StopServer()
+		{
+			if (ZyanHost != null)
+			{
+				ZyanHost.Dispose();
+				ZyanHost = null;
+			}
+		}
+
+		private static ZyanComponentHost ZyanHost { get; set; }
+
+		#endregion
+
+		[TestMethod]
+		public void HeartbeatSessionShouldBeValid()
+		{
+			var heartbeatsReceived = 0;
+			var nullSession = false;
+			var userIdentity = default(IIdentity);
+
+			// set up heartbeat event handler
+			ZyanHost.PollingEventTracingEnabled = true;
+			ZyanHost.ClientHeartbeatReceived += (s, e) =>
+			{
+				heartbeatsReceived++;
+
+				if (ServerSession.CurrentSession != null)
+				{
+					userIdentity = ServerSession.CurrentSession.Identity;
+				}
+				else
+				{
+					nullSession = true;
+				}
+			};
+
+			// set up the connection
+			using (var conn = new ZyanConnection("null://NullChannel:5678/HeartbeatServer", new NullClientProtocolSetup()))
+			{
+				conn.PollingInterval = TimeSpan.FromMilliseconds(5);
+				conn.PollingEnabled = true;
+				Thread.Sleep(100);
+			}
+
+			// validate heartbeat
+			Assert.IsTrue(heartbeatsReceived > 0);
+			Assert.IsFalse(nullSession);
+			Assert.AreEqual(JohnGaltIdentity.DefaultName, userIdentity.Name);
+		}
+	}
+}
