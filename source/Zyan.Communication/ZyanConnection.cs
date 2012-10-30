@@ -825,6 +825,7 @@ namespace Zyan.Communication
 				_sendingHeartbeat = true;
 				try
 				{
+					PrepareCallContext(false);
 					RemoteDispatcher.ReceiveClientHeartbeat(_sessionID);
 				}
 				finally
