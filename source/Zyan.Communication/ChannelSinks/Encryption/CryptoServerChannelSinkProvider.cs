@@ -117,7 +117,7 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 
 					default: // Ansonsten ...
 						// Ausnahme werfen
-						throw new ArgumentException(string.Format("Ungültige Konfigurationseinstellung: {0}", (String)entry.Key));
+						throw new ArgumentException(string.Format(LanguageResource.ArgumentException_InvalidConfigurationSetting, (String)entry.Key));
 				}
 			}
 		}

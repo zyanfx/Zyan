@@ -48,7 +48,7 @@ namespace Zyan.Communication.Delegates
 		{
 			if (!typeof(Delegate).IsAssignableFrom(typeof(TDelegate)))
 			{
-				throw new InvalidOperationException(typeof(TDelegate) + " is not a delegate type.");
+				throw new ApplicationException(string.Format(LanguageResource.ApplicationException_TypeIsNotDelegate, typeof(TDelegate).FullName));
 			}
 
 			return InternalDelegateFactory<TDelegate>.EmptyDelegate;
