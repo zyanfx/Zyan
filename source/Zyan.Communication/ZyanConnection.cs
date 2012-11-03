@@ -78,7 +78,8 @@ namespace Zyan.Communication
 		/// <param name="setup">Objekt mit Konfigurationseinstellungen für die Verbindung</param>
 		public ZyanConnection(ZyanConnectionSetup setup)
 			: this(setup.ServerUrl, setup.ProtocolSetup, setup.Credentials, setup.AutoLoginOnExpiredSession, setup.KeepSessionAlive)
-		{ }
+		{
+		}
 
 		/// <summary>
 		/// Creates a new instance of the ZyanConnection class.
@@ -86,7 +87,8 @@ namespace Zyan.Communication
 		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp")</param>
 		public ZyanConnection(string serverUrl)
 			: this(serverUrl, ClientProtocolSetup.GetClientProtocol(serverUrl), null, false, true)
-		{ }
+		{
+		}
 
 		/// <summary>
 		/// Creates a new instance of the ZyanConnection class.
@@ -95,7 +97,8 @@ namespace Zyan.Communication
 		/// <param name="autoLoginOnExpiredSession">Specifies whether the proxy should relogin automatically when the session expired</param>
 		public ZyanConnection(string serverUrl, bool autoLoginOnExpiredSession)
 			: this(serverUrl, ClientProtocolSetup.GetClientProtocol(serverUrl), null, autoLoginOnExpiredSession, !autoLoginOnExpiredSession)
-		{ }
+		{
+		}
 
 		/// <summary>
 		/// Creates a new instance of the ZyanConnection class.
@@ -104,7 +107,8 @@ namespace Zyan.Communication
 		/// <param name="protocolSetup">Protocol an communication settings</param>
 		public ZyanConnection(string serverUrl, IClientProtocolSetup protocolSetup)
 			: this(serverUrl, protocolSetup, null, false, true)
-		{ }
+		{
+		}
 
 		/// <summary>
 		/// Creates a new instance of the ZyanConnection class.
@@ -114,7 +118,8 @@ namespace Zyan.Communication
 		/// <param name="autoLoginOnExpiredSession">Specifies whether the proxy should relogin automatically when the session expired</param>
 		public ZyanConnection(string serverUrl, IClientProtocolSetup protocolSetup, bool autoLoginOnExpiredSession)
 			: this(serverUrl, protocolSetup, null, autoLoginOnExpiredSession, true)
-		{ }
+		{
+		}
 
 		/// <summary>
 		/// Creates a new instance of the ZyanConnection class.
@@ -284,7 +289,8 @@ namespace Zyan.Communication
 				}
 			}
 			catch
-			{ }
+			{
+			}
 		}
 
 		/// <summary>
@@ -346,14 +352,14 @@ namespace Zyan.Communication
 				uniqueName = interfaceType.FullName;
 
 			if (!interfaceType.IsInterface)
-				throw new ApplicationException(string.Format("Der angegebene Typ '{0}' ist keine Schnittstelle! Für die Erzeugung einer entfernten Komponenteninstanz, wird deren öffentliche Schnittstelle benötigt!", interfaceType.FullName));
+				throw new ApplicationException(string.Format(LanguageResource.ApplicationException_SpecifiedTypeIsNotAnInterface, interfaceType.FullName));
 
 			ComponentInfo info = (from entry in _registeredComponents
 								  where entry.UniqueName.Equals(uniqueName)
 								  select entry).FirstOrDefault();
 
 			if (info == null)
-				throw new ApplicationException(string.Format("Für Schnittstelle '{0}' ist auf dem Server '{1}' keine Komponente registriert.", interfaceType.FullName, _serverUrl));
+				throw new ApplicationException(string.Format(LanguageResource.ApplicationException_NoServerComponentIsRegisteredForTheGivenInterface, interfaceType.FullName, _serverUrl));
 
 			ZyanProxy proxy = new ZyanProxy(info.UniqueName, typeof(T), this, implicitTransactionTransfer, _sessionID, _componentHostName, _autoLoginOnExpiredSession, info.ActivationType);
 
@@ -436,9 +442,7 @@ namespace Zyan.Communication
 		/// <param name="e">Event arguments</param>
 		protected internal virtual void OnBeforeInvoke(BeforeInvokeEventArgs e)
 		{
-			// Wenn für BeforeInvoke Ereignisprozeduren registriert sind ...
 			if (BeforeInvoke != null)
-				// Ereignis feuern
 				BeforeInvoke(this, e);
 		}
 
@@ -448,9 +452,7 @@ namespace Zyan.Communication
 		/// <param name="e">Event arguments</param>
 		protected internal virtual void OnAfterInvoke(AfterInvokeEventArgs e)
 		{
-			// Wenn für AfterInvoke Ereignisprozeduren registriert sind ...
 			if (AfterInvoke != null)
-				// Ereignis feuern
 				AfterInvoke(this, e);
 		}
 
@@ -460,9 +462,7 @@ namespace Zyan.Communication
 		/// <param name="e">Event arguments</param>
 		protected internal virtual void OnInvokeCanceled(InvokeCanceledEventArgs e)
 		{
-			// Wenn für AfterInvoke Ereignisprozeduren registriert sind ...
 			if (InvokeCanceled != null)
-				// Ereignis feuern
 				InvokeCanceled(this, e);
 		}
 

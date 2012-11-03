@@ -173,7 +173,7 @@ namespace Zyan.Communication.Delegates
 			// validate generic argument
 			if (!typeof(Delegate).IsAssignableFrom(typeof(T)))
 			{
-				throw new ApplicationException("Type is not delegate: " + typeof(T).FullName);
+				throw new ApplicationException(string.Format(LanguageResource.ApplicationException_TypeIsNotDelegate, typeof(T).FullName));
 			}
 
 			// get delegate MethodInfo
@@ -222,7 +222,7 @@ namespace Zyan.Communication.Delegates
 			// validate generic argument
 			if (!typeof(Delegate).IsAssignableFrom(typeof(T)))
 			{
-				throw new ApplicationException("Type is not delegate: " + typeof(T).FullName);
+				throw new ApplicationException(string.Format(LanguageResource.ApplicationException_TypeIsNotDelegate, typeof(T).FullName));
 			}
 
 			// reflect delegate type to get parameters and method return type

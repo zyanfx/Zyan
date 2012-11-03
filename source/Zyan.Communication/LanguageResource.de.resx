@@ -273,4 +273,19 @@
   <data name="RemotingException_ErrorSendingChannelInfo" xml:space="preserve">
     <value>Fehler beim Senden der Kanalbeschreibung an den entfernten Computer.</value>
   </data>
+  <data name="ApplicationException_NoServerComponentIsRegisteredForTheGivenInterface" xml:space="preserve">
+    <value>Für Schnittstelle '{0}' ist auf dem Server '{1}' keine Komponente registriert.</value>
+  </data>
+  <data name="ApplicationException_SpecifiedTypeIsNotAnInterface" xml:space="preserve">
+    <value>Der angegebene Typ '{0}' ist keine Schnittstelle! Für die Erzeugung einer entfernten Komponenteninstanz, wird deren öffentliche Schnittstelle benötigt!</value>
+  </data>
+  <data name="ApplicationException_TypeIsNotDelegate" xml:space="preserve">
+    <value>Typ ist nicht Delegatentype: {0}.</value>
+  </data>
+  <data name="ArgumentException_InvalidConfigurationSetting" xml:space="preserve">
+    <value>Ungültige Konfigurationseinstellung: '{0}'.</value>
+  </data>
+  <data name="ArgumentException_UnsupportedEncryptionAlgorithm" xml:space="preserve">
+    <value>Der angegeben Verschlüsselungsalgorithmus '{0}' wird nicht unterstützt. Bitte geben Sie einen der folgende Algorithmen an: '3DES', 'DES', 'RIJNDAEL' oder 'RC2'.</value>
+  </data>
 </root>

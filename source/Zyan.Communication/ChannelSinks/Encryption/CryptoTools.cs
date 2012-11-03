@@ -40,7 +40,7 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 					return new DESCryptoServiceProvider();
 
 				default: // Ansonsten ...
-					throw new ArgumentException(string.Format("Der angegeben Verschlüsselungsalgorithmus '{0}' wird nicht unterstützt. Bitte geben Sie einen der folgende Algorithmen an: '3DES', 'DES', 'RIJNDAEL' oder 'RC2'.", algorithm), "algorithm");
+					throw new ArgumentException(string.Format(LanguageResource.ArgumentException_UnsupportedEncryptionAlgorithm, algorithm), "algorithm");
 			}
 		}
 
