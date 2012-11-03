@@ -4,37 +4,37 @@ using System.Transactions;
 namespace Zyan.Communication.Toolbox
 {
 	/// <summary>
-	/// Stellt sicher, dass die durchlaufende Nachricht innerhalb einer Transaktion verarbeitet wird.
+	/// Ensures that the specified message is processed within a transaction.
 	/// </summary>
+	/// <typeparam name="T"></typeparam>
 	public class TransactionStarter<T>
 	{
 		/// <summary>
-		/// Erzeugt eine neue Instanz von TransactionStarter.
+		/// Initializes a new instance of the <see cref="TransactionStarter{T}" /> class.
 		/// </summary>
 		public TransactionStarter()
 		{
-			// Standardwerte setzen
+			// Standard settings
 			IsolationLevel = IsolationLevel.ReadCommitted;
 			ScopeOption = TransactionScopeOption.Required;
 			Timeout = new TimeSpan(0, 0, 30);
 		}
 
 		/// <summary>
-		/// Erzeugt eine neue Instanz von TransactionStarter
+		/// Initializes a new instance of the <see cref="TransactionStarter{T}" /> class.
 		/// </summary>
-		/// <param name="isolationLevel">Isolationsstufe</param>
-		/// <param name="scopeOption">bereichsoption</param>
-		/// <param name="timeout">Ablaufzeitspanne</param>
+		/// <param name="isolationLevel">The isolation level.</param>
+		/// <param name="scopeOption">The scope option.</param>
+		/// <param name="timeout">The timeout.</param>
 		public TransactionStarter(IsolationLevel isolationLevel, TransactionScopeOption scopeOption, TimeSpan timeout)
 		{
-			// Felder füllen
 			IsolationLevel = isolationLevel;
 			ScopeOption = scopeOption;
 			Timeout = timeout;
 		}
 
 		/// <summary>
-		/// Gibt die Isolationsstufe der Transaktion zurück, oder legt sie fest.
+		/// Gets or sets the isolation level.
 		/// </summary>
 		public IsolationLevel IsolationLevel
 		{
@@ -43,7 +43,7 @@ namespace Zyan.Communication.Toolbox
 		}
 
 		/// <summary>
-		/// Gibt die Ablaufzeitspanne zurück oder legt sie fest.
+		/// Gets or sets the timeout.
 		/// </summary>
 		public TimeSpan Timeout
 		{
@@ -52,7 +52,7 @@ namespace Zyan.Communication.Toolbox
 		}
 
 		/// <summary>
-		/// Gibt die Bereichsoption zurück oder legt sie fest.
+		/// Gets or sets the transaction scope option.
 		/// </summary>
 		public TransactionScopeOption ScopeOption
 		{
@@ -61,62 +61,57 @@ namespace Zyan.Communication.Toolbox
 		}
 
 		/// <summary>
-		/// Eingangs-Pin.
+		/// Input pin.
 		/// </summary>
-		/// <param name="message">Nachricht</param>
+		/// <param name="message">The message</param>
 		public void In(T message)
 		{
-			// Transaktionsoptionen setzen
 			TransactionOptions options = new TransactionOptions();
 			options.IsolationLevel = IsolationLevel;
 			options.Timeout = Timeout;
 
 			try
 			{
-				// Transaktionsbereich erzeugen
 				using (TransactionScope scope = new TransactionScope(ScopeOption, options))
 				{
-					// Nachricht an Ausgangs-Pin übergeben
+					// Pass the message to the output pin
 					Out(message);
 
-					// Transaktion abschließen
+					// commit the transaction
 					scope.Complete();
 				}
 			}
 			catch (TransactionAbortedException)
 			{
-				// Wenn der Transaktionsabbruch-Pin verdrahtet ist ...
+				// If the transaction abort pin is wired up...
 				if (Out_TransactionAborted != null)
-					// Pin aufrufen
 					Out_TransactionAborted();
 			}
 		}
 
 		/// <summary>
-		/// Ausgangs-Pin.
+		/// Output pin.
 		/// </summary>
 		public Action<T> Out;
 
 		/// <summary>
-		/// Ausgangs-Pin, bei Transaktionsabbruch.
+		/// Output pin used when transaction is aborted.
 		/// </summary>
 		public Action Out_TransactionAborted;
 
 		/// <summary>
-		/// Erstellt eine neue Instanz und verdrahtet damit zwei Pins.
+		/// Creates a new instance and wires up the input and output pins.
 		/// </summary>
-		/// <param name="inputPin">Eingangs-Pin</param>
-		/// <returns>Ausgangs-Pin</returns>
+		/// <param name="inputPin">Input pin.</param>
+		/// <returns>Output pin.</returns>
 		public static Action<T> WireUp(Action<T> inputPin)
 		{
-			// Neue Instanz erzeugen
-			TransactionStarter<T> instance = new TransactionStarter<T>();
+			var instance = new TransactionStarter<T>
+			{
+				Out = inputPin
+			};
 
-			// Ausgang-Pin der Instanz mit dem angegebenen Eigangs-Pin verdraten
-			instance.Out = inputPin;
-
-			// Delegat auf den Eingangs-Pin der Instanz zurückgeben
-			return new Action<T>(instance.In);
+			return instance.In;
 		}
 	}
 }
