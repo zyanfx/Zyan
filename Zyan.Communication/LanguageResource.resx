@@ -273,4 +273,19 @@
   <data name="RemotingException_ErrorSendingChannelInfo" xml:space="preserve">
     <value>Error sending channel information to remote host.</value>
   </data>
+  <data name="ApplicationException_NoServerComponentIsRegisteredForTheGivenInterface" xml:space="preserve">
+    <value>No server component is registered for the interface {0} at the server {1}.</value>
+  </data>
+  <data name="ApplicationException_SpecifiedTypeIsNotAnInterface" xml:space="preserve">
+    <value>The specified type '{0}' is not an interface. Transparent proxy creation requires an interface type.</value>
+  </data>
+  <data name="ApplicationException_TypeIsNotDelegate" xml:space="preserve">
+    <value>Type is not delegate: {0}.</value>
+  </data>
+  <data name="ArgumentException_InvalidConfigurationSetting" xml:space="preserve">
+    <value>Invalid configuration setting: '{0}'.</value>
+  </data>
+  <data name="ArgumentException_UnsupportedEncryptionAlgorithm" xml:space="preserve">
+    <value>The specified encryption algorithm '{0}' is not supported. Use one of the following algorithms: '3DES', 'DES', 'RIJNDAEL' or 'RC2'.</value>
+  </data>
 </root>

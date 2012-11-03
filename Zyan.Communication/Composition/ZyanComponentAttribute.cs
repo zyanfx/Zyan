@@ -34,7 +34,7 @@ namespace Zyan.Communication.Composition
 		{
 			if (!componentInterface.IsInterface)
 			{
-				throw new InvalidOperationException("Interface type required: " + componentInterface);
+				throw new ApplicationException(string.Format(LanguageResource.ApplicationException_SpecifiedTypeIsNotAnInterface, componentInterface.FullName));
 			}
 
 			ComponentInterface = componentInterface;

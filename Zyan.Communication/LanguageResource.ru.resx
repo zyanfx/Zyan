@@ -264,4 +264,19 @@
   <data name="ApplicationException_NoChannelCreated" xml:space="preserve">
     <value>Канал Remoting не был создан.</value>
   </data>
+  <data name="ApplicationException_NoServerComponentIsRegisteredForTheGivenInterface" xml:space="preserve">
+    <value>Для интерфейса {0} на сервере {1} нет зарегистрированных компонентов.</value>
+  </data>
+  <data name="ApplicationException_SpecifiedTypeIsNotAnInterface" xml:space="preserve">
+    <value>Тип {0} не является интерфейсом. Для создания прозрачного прокси-объекта требуется интерфейс.</value>
+  </data>
+  <data name="ApplicationException_TypeIsNotDelegate" xml:space="preserve">
+    <value>Тип не является делегатом: {0}.</value>
+  </data>
+  <data name="ArgumentException_InvalidConfigurationSetting" xml:space="preserve">
+    <value>Недопустимый параметр конфигурации: '{0}'.</value>
+  </data>
+  <data name="ArgumentException_UnsupportedEncryptionAlgorithm" xml:space="preserve">
+    <value>Указанный алгоритм шифрования '{0}' не используется. Укажите алгоритм из следующего списка: '3DES', 'DES', 'RIJNDAEL' или 'RC2'</value>
+  </data>
 </root>
