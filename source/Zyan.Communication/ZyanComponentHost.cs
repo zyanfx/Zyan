@@ -1,14 +1,14 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
-using Zyan.Communication.Security;
+using Zyan.Communication.Notification;
 using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp;
+using Zyan.Communication.Security;
 using Zyan.Communication.SessionMgmt;
-using Zyan.Communication.Notification;
-using System.Linq.Expressions;
 using Zyan.InterLinq.Expressions;
 
 namespace Zyan.Communication
@@ -21,106 +21,95 @@ namespace Zyan.Communication
 		#region Constructors
 
 		/// <summary>
-		/// Konstruktor.
+		/// Initializes a new instance of the <see cref="ZyanComponentHost" /> class.
 		/// </summary>
-		/// <param name="name">Name des Komponentenhosts</param>
-		/// <param name="tcpPort">TCP-Anschlussnummer</param>
+		/// <param name="name">The name of the component host.</param>
+		/// <param name="tcpPort">The TCP port.</param>
 		public ZyanComponentHost(string name, int tcpPort)
 			: this(name, new TcpBinaryServerProtocolSetup(tcpPort), new InProcSessionManager(), new ComponentCatalog(true))
-		{ }
+		{
+		}
 
 		/// <summary>
-		/// Konstruktor.
+		/// Initializes a new instance of the <see cref="ZyanComponentHost" /> class.
 		/// </summary>
-		/// <param name="name">Name des Komponentenhosts</param>
-		/// <param name="tcpPort">TCP-Anschlussnummer</param>
-		/// <param name="catalog">Komponenten-Katalog</param>
+		/// <param name="name">The name of the component host.</param>
+		/// <param name="tcpPort">The TCP port.</param>
+		/// <param name="catalog">The component catalog.</param>
 		public ZyanComponentHost(string name, int tcpPort, ComponentCatalog catalog)
 			: this(name, new TcpBinaryServerProtocolSetup(tcpPort), new InProcSessionManager(), catalog)
-		{ }
+		{
+		}
 
 		/// <summary>
-		/// Konstruktor.
+		/// Initializes a new instance of the <see cref="ZyanComponentHost" /> class.
 		/// </summary>
-		/// <param name="name">Name des Komponentenhosts</param>
-		/// <param name="protocolSetup">Protokoll-Einstellungen</param>
+		/// <param name="name">The name of the component host.</param>
+		/// <param name="protocolSetup">The protocol setup.</param>
 		public ZyanComponentHost(string name, IServerProtocolSetup protocolSetup)
 			: this(name, protocolSetup, new InProcSessionManager(), new ComponentCatalog(true))
-		{ }
+		{
+		}
 
 		/// <summary>
-		/// Konstruktor.
+		/// Initializes a new instance of the <see cref="ZyanComponentHost" /> class.
 		/// </summary>
-		/// <param name="name">Name des Komponentenhosts</param>
-		/// <param name="protocolSetup">Protokoll-Einstellungen</param>
-		/// <param name="catalog">Komponenten-Katalog</param>
+		/// <param name="name">The name of the component host.</param>
+		/// <param name="protocolSetup">The protocol setup.</param>
+		/// <param name="catalog">The component catalog.</param>
 		public ZyanComponentHost(string name, IServerProtocolSetup protocolSetup, ComponentCatalog catalog)
 			: this(name, protocolSetup, new InProcSessionManager(), catalog)
-		{ }
+		{
+		}
 
 		/// <summary>
-		/// Konstruktor.
+		/// Initializes a new instance of the <see cref="ZyanComponentHost" /> class.
 		/// </summary>
-		/// <param name="name">Name des Komponentenhosts</param>
-		/// <param name="protocolSetup">Protokoll-Einstellungen</param>
-		/// <param name="sessionManager">Sitzungsverwaltung</param>
+		/// <param name="name">The name of the component host.</param>
+		/// <param name="protocolSetup">The protocol setup.</param>
+		/// <param name="sessionManager">The session manager.</param>
 		public ZyanComponentHost(string name, IServerProtocolSetup protocolSetup, ISessionManager sessionManager)
 			: this(name, protocolSetup, sessionManager, new ComponentCatalog(true))
-		{ }
+		{
+		}
 
 		/// <summary>
-		/// Konstruktor.
+		/// Initializes a new instance of the <see cref="ZyanComponentHost" /> class.
 		/// </summary>
-		/// <param name="name">Name des Komponentenhosts</param>
-		/// <param name="protocolSetup">Protokoll-Einstellungen</param>
-		/// <param name="sessionManager">Sitzungsverwaltung</param>
-		/// <param name="catalog">Komponenten-Katalog</param>
+		/// <param name="name">The name of the component host.</param>
+		/// <param name="protocolSetup">The protocol setup.</param>
+		/// <param name="sessionManager">The session manager.</param>
+		/// <param name="catalog">The component catalog.</param>
 		public ZyanComponentHost(string name, IServerProtocolSetup protocolSetup, ISessionManager sessionManager, ComponentCatalog catalog)
 		{
-			// Wenn kein Name angegeben wurde ...
 			if (string.IsNullOrEmpty(name))
-				// Ausnahme werfen
 				throw new ArgumentException(LanguageResource.ArgumentException_ComponentHostNameMissing, "name");
 
-			// Wenn keine Protokoll-Einstellungen angegeben wurde ...
 			if (protocolSetup == null)
-				// Ausnahme werfen
 				throw new ArgumentNullException("protocolSetup");
 
-			// Wenn keine Sitzungsverwaltung übergeben wurde ...
 			if (sessionManager == null)
-				// Ausnahme werfen
 				throw new ArgumentNullException("sessionManager");
 
-			// Wenn kein Komponenten-Katalog angegeben wurde ...
 			if (catalog == null)
-				// Ausnahme werfen
 				throw new ArgumentNullException("catalog");
 
-			// Werte übernehmen
 			_name = name;
 			_protocolSetup = protocolSetup;
 			_sessionManager = sessionManager;
 			_sessionManager.ClientSessionTerminated += (s, e) => OnClientSessionTerminated(e);
 			_catalog = catalog;
-
-			// Verwaltung für Serialisierungshandling erzeugen
 			_serializationHandling = new SerializationHandlerRepository();
-
-			// Komponentenaufrufer erzeugen
 			_dispatcher = new ZyanDispatcher(this);
 
-			// Authentifizierungsanbieter übernehmen und verdrahten
+			// Set up authentication request delegate
 			_authProvider = protocolSetup.AuthenticationProvider;
 			this.Authenticate = _authProvider.Authenticate;
-
-			// Komponenten Host der Host-Auflistung zufügen
-			_hosts.Add(this);
 
 			// Register standard serialization handlers
 			RegisterStandardSerializationHandlers();
 
-			// Beginnen auf Client-Anfragen zu horchen
+			_hosts.Add(this);
 			StartListening();
 		}
 
@@ -290,7 +279,7 @@ namespace Zyan.Communication
 		private string _channelName = string.Empty;
 
 		/// <summary>
-		/// Gibt den Namen des Komponentenhosts zurück.
+		/// Gets the name of the component host.
 		/// </summary>
 		public string Name
 		{
@@ -298,43 +287,34 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Startet das Horchen auf Client-Anfragen.
+		/// Starts listening to the client requests.
 		/// </summary>
 		private void StartListening()
 		{
-			// TCP-Kommunikationskanal öffnen
-			IChannel channel = _protocolSetup.CreateChannel();
-
-			// Wenn der Kanal erzeugt wurde ...
-			if (channel != null)
-			{
-				// Kanalnamen merken
-				_channelName = channel.ChannelName;
-
-				// Kanal registrieren
-				ChannelServices.RegisterChannel(channel, false);
-
-				// Komponentenhost für entfernte Zugriffe veröffentlichen
-				RemotingServices.Marshal(_dispatcher, _name);
-			}
-			else
+			var channel = _protocolSetup.CreateChannel();
+			if (channel == null)
+			{ 
 				throw new ApplicationException(LanguageResource.ApplicationException_NoChannel);
+			}
+
+			// register the channel and publish the dispatcher
+			_channelName = channel.ChannelName;
+			ChannelServices.RegisterChannel(channel, false);
+			RemotingServices.Marshal(_dispatcher, _name);
 		}
 
 		/// <summary>
-		/// Beendet das Horchen auf Client-Anfragen.
+		/// Stop listening to the client requests.
 		/// </summary>
 		private void StopListening()
 		{
-			// Veröffentlichung des Komponentenhosts für entfernte Zugriffe löschen
+			// detach the dispatcher and close the communication channel
 			RemotingServices.Disconnect(_dispatcher);
-
-			// Kommunikationskanal schließen
 			CloseChannel();
 		}
 
 		/// <summary>
-		/// Schließt den Kanal, falls dieser geöffent ist.
+		/// Closes the channel if it is open.
 		/// </summary>
 		private void CloseChannel()
 		{
@@ -453,15 +433,16 @@ namespace Zyan.Communication
 
 		#region Notifications
 
-		// Benachrichtigungsdienst
+		// Notification service
 		private volatile NotificationService _notificationService = null;
 
-		// Sperrobjekt für Instanzerstellung des Benachrichtigungsdienstes
+		// Lock object for the notification service instance creation
 		private object _notificationServiceLockObject = new object();
 
 		/// <summary>
-		/// Gibt zurück, ob der Benachrichtigungsdienst läuft, oder nicht.
+		/// Gets a value indicating whether the notification service is running.
 		/// </summary>
+		[Obsolete("The NotificationService feature may not be supported in future Zyan versions. Please use remote delegates to create your notification system.", false)]
 		public bool IsNotificationServiceRunning
 		{
 			get
@@ -474,41 +455,39 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Startet den Benachrichtigungsdienst.
+		/// Starts the notification service.
 		/// </summary>
 		[Obsolete("The NotificationService feature may not be supported in future Zyan versions. Please use remote delegates to create your notification system.", false)]
 		public void StartNotificationService()
 		{
 			lock (_notificationServiceLockObject)
 			{
-				// Wenn der Dienst nicht bereits läuft ...
 				if (_notificationService == null)
 				{
-					// Instanz erzeugen
 					_notificationService = new NotificationService();
 				}
 			}
 		}
 
 		/// <summary>
-		/// Beendet den Benachrichtigungsdienst.
+		/// Stops the notification service.
 		/// </summary>
+		[Obsolete("The NotificationService feature may not be supported in future Zyan versions. Please use remote delegates to create your notification system.", false)]
 		public void StopNotificationService()
 		{
 			lock (_notificationServiceLockObject)
 			{
-				// Wenn der Dienst läuft ...
 				if (_notificationService != null)
 				{
-					// Instanz löschen
 					_notificationService = null;
 				}
 			}
 		}
 
 		/// <summary>
-		/// Gibt den Benachrichtigungsdienst zurück.
-		/// </summary>		
+		/// Gets the notification service.
+		/// </summary>
+		[Obsolete("The NotificationService feature may not be supported in future Zyan versions. Please use remote delegates to create your notification system.", false)]
 		public NotificationService NotificationService
 		{
 			get
@@ -520,38 +499,34 @@ namespace Zyan.Communication
 			}
 		}
 
+#pragma warning disable 612
+
 		/// <summary>
-		/// Veröffentlicht ein Ereignis einer Serverkomponente.
+		/// Publishes the event of the server component.
 		/// </summary>
-		/// <param name="eventName">Ereignisname</param>
-		/// <returns>Delegat für Benachrichtigungsversand an registrierte Clients</returns>
+		/// <param name="eventName">Name of the event.</param>
+		/// <exception cref="System.ApplicationException"></exception>
 		[Obsolete("The NotificationService feature may not be supported in future Zyan versions. Please use remote delegates to create your notification system.", false)]
 		public EventHandler<NotificationEventArgs> PublishEvent(string eventName)
 		{
-			// Wenn kein Benachrichtigungsdienst läuft ...
 			if (!IsNotificationServiceRunning)
-				// Ausnahme werfen
 				throw new ApplicationException(LanguageResource.ApplicationException_NotificationServiceNotRunning);
 
-			// Sendevorrichtung erstellen
-			NotificationSender sender = new NotificationSender(NotificationService, eventName);
-
-			// Delegat auf Methode zum Benachrichtigungsversand erzeugen
-			EventHandler<NotificationEventArgs> sendHandler = new EventHandler<NotificationEventArgs>(sender.HandleServerEvent);
-
-			// Delegat zurückgeben
-			return sendHandler;
+			var sender = new NotificationSender(NotificationService, eventName);
+			return new EventHandler<NotificationEventArgs>(sender.HandleServerEvent);
 		}
+
+#pragma warning restore 612
 
 		#endregion
 
 		#region User defined Serialization Handling
 
-		// Serialisierungshandling.
+		// Repository of the serialization handlers.
 		private SerializationHandlerRepository _serializationHandling = null;
 
 		/// <summary>
-		/// Gibt die Verwaltung für benutzerdefinierte Serialisierungsbehandlung zurück.
+		/// Gets the serialization handling repository.
 		/// </summary>
 		public SerializationHandlerRepository SerializationHandling
 		{
