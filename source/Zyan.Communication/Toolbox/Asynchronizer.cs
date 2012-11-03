@@ -4,40 +4,37 @@ using System.Threading;
 namespace Zyan.Communication.Toolbox
 {
 	/// <summary>
-	/// Führt die Verarbeitung einer Nachricht asynchron aus.
+	/// Performs the processing of a message asynchronously.
 	/// </summary>
 	public class Asynchronizer<T>
 	{
 		/// <summary>
-		/// Aktion, die zur asynchronen Verarbeitung der Nachricht aufgerufen wird.
+		/// Action that is called for asynchronous message processing.
 		/// </summary>
 		public Action<T> Out { get; set; }
 
 		/// <summary>
-		/// Bestimmte Nachricht mit der festgelegten Aktion asychron verarbeiten.
+		/// Takes a message and outputs it asynchronously.
 		/// </summary>
-		/// <param name="message">Nachricht</param>
+		/// <param name="message">The message to process.</param>
 		public void In(T message)
 		{
-			// Verarbeitung in neuem Thread starten
 			ThreadPool.QueueUserWorkItem(x => this.Out(message));
 		}
 
 		/// <summary>
-		/// Erstellt eine neue Instanz und verdrahtet damit zwei Pins.
+		/// Creates a new instance and wires up the input and output pins.
 		/// </summary>
-		/// <param name="inputPin">Eingangs-Pin</param>
-		/// <returns>Ausgangs-Pin</returns>
+		/// <param name="inputPin">Input pin.</param>
+		/// <returns>Output pin.</returns>
 		public static Action<T> WireUp(Action<T> inputPin)
 		{
-			// Neue Instanz erzeugen
-			Asynchronizer<T> instance = new Asynchronizer<T>();
+			var instance = new Asynchronizer<T>
+			{
+				Out = inputPin
+			};
 
-			// Eingangs-Pin mit Ausgangs-Pin der Instanz verdrahten
-			instance.Out = inputPin;
-
-			// Delegat auf Eingangs-Pin der Instanz zurückgeben
-			return new Action<T>(instance.In);
+			return instance.In;
 		}
 	}
 }

@@ -4,48 +4,48 @@ using System.Threading;
 namespace Zyan.Communication.Toolbox
 {
 	/// <summary>
-	/// Stellt sicher, dass die Verarbeitung von Nachrichten im ursprünglichen Thread stattfinden.
+	/// Ensures that the processing of messages is performed in the original thread.
 	/// </summary>
 	public class SyncContextSwitcher<T>
 	{
-		// Bei Erstellung den aktuellen Synchronisierungskontext merken
+		// The current synchronization context is stored at the creation time
 		private readonly SynchronizationContext syncContext = SynchronizationContext.Current;
 
 		/// <summary>
-		/// Aktion, die ausgeführt wird, wenn eine Nachricht verarbeitet werden soll.
+		/// Action to be performed when a message is to be processed.
 		/// </summary>
 		public Action<T> Out;
 
 		/// <summary>
-		/// Verarbeitet eine Nachricht und berücksichtigt dabei den Synchronisierungskontext.
+		/// Processes a message using the original synchronization context.
 		/// </summary>
-		/// <param name="message">Nachricht</param>
+		/// <param name="message">The message.</param>
 		public void In(T message)
 		{
-			// Wenn der Aufruf aus einem anderen thread stammt ...
+			// If the synchronization context is known, send the message to it
 			if (syncContext != null)
-				// Aufruf an ursprünglichen Thread senden
+			{
 				syncContext.Send(x => this.Out(message), null);
-			else
-				// Aufruf direkt ausführen
-				Out(message);
+				return;
+			}
+
+			// Execute action directly
+			Out(message);
 		}
 
 		/// <summary>
-		/// Erstellt eine neue Instanz und verdrahtet damit zwei Pins.
+		/// Creates a new instance and wires up the pins.
 		/// </summary>
-		/// <param name="inputPin">Eingangs-Pin</param>
-		/// <returns>Ausgangs-Pin</returns>
+		/// <param name="inputPin">Input pin</param>
+		/// <returns>Output pin</returns>
 		public static Action<T> WireUp(Action<T> inputPin)
 		{
-			// Neue Instanz erzeugen
-			SyncContextSwitcher<T> instance = new SyncContextSwitcher<T>();
+			var instance = new SyncContextSwitcher<T>
+			{
+				Out = inputPin
+			};
 
-			// Eingangs-Pin mit Ausgangs-Pin der Instanz verdrahten
-			instance.Out = inputPin;
-
-			// Delegat auf Eingangs-Pin der Instanz zurückgeben
-			return new Action<T>(instance.In);
+			return instance.In;
 		}
 	}
 }
