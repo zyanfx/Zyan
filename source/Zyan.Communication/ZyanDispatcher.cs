@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
-using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using System.Security;
 using System.Security.Principal;
@@ -236,7 +235,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Sets a transaction for the current worker thread, if provied.
+		/// Sets a transaction for the current worker thread, if provided.
 		/// </summary>
 		/// <param name="details">Invocation details</param>
 		private void Invoke_SetTransaction(InvocationDetails details)
@@ -667,11 +666,14 @@ namespace Zyan.Communication
 
 		#region Notification (old NotificationService feature)
 
+#pragma warning disable 612
+
 		/// <summary>
 		/// Subscribe to a specified NotificationService event.
 		/// </summary>
 		/// <param name="eventName">Event name</param>
 		/// <param name="handler">Delegate to client side event handler</param>
+		[Obsolete("The NotificationService feature may not be supported in future Zyan versions. Please use remote delegates to create your notification system.", false)]
 		public void Subscribe(string eventName, EventHandler<NotificationEventArgs> handler)
 		{
 			if (!_host.IsNotificationServiceRunning)
@@ -685,6 +687,7 @@ namespace Zyan.Communication
 		/// </summary>
 		/// <param name="eventName">Event name</param>
 		/// <param name="handler">Delegate to client side event handler</param>
+		[Obsolete("The NotificationService feature may not be supported in future Zyan versions. Please use remote delegates to create your notification system.", false)]
 		public void Unsubscribe(string eventName, EventHandler<NotificationEventArgs> handler)
 		{
 			if (!_host.IsNotificationServiceRunning)
@@ -692,6 +695,8 @@ namespace Zyan.Communication
 
 			_host.NotificationService.Unsubscribe(eventName, handler);
 		}
+
+#pragma warning restore 612
 
 		#endregion
 

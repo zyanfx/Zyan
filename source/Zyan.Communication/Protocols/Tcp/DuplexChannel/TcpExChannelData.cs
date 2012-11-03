@@ -22,7 +22,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 	/// </summary>
 	[Serializable]
 	public class TcpExChannelData : IChannelDataStore
-	{	
+	{
 		private HybridDictionary _properties;
 		
 		[NonSerialized]
