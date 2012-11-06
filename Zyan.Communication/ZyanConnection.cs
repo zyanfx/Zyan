@@ -125,6 +125,18 @@ namespace Zyan.Communication
 		/// Creates a new instance of the ZyanConnection class.
 		/// </summary>
 		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp").</param>
+		/// <param name="credentials">Login credentials.</param>
+		/// <param name="autoLoginOnExpiredSession">Specifies whether the proxy should relogin automatically when the session expired.</param>
+		/// <param name="keepSessionAlive">Specifies whether the session should be automaticly kept alive.</param>
+		public ZyanConnection(string serverUrl, Hashtable credentials, bool autoLoginOnExpiredSession, bool keepSessionAlive)
+			: this(serverUrl, ClientProtocolSetup.GetClientProtocol(serverUrl), null, autoLoginOnExpiredSession, true)
+		{
+		}
+
+		/// <summary>
+		/// Creates a new instance of the ZyanConnection class.
+		/// </summary>
+		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp").</param>
 		/// <param name="protocolSetup">Protocol and communication settings.</param>
 		/// <param name="credentials">Login credentials.</param>
 		/// <param name="autoLoginOnExpiredSession">Specifies whether the proxy should relogin automatically when the session expired.</param>

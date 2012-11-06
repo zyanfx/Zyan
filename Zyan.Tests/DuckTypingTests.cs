@@ -144,8 +144,7 @@ namespace Zyan.Tests
 			// invocation-time check (object factory can't be verified during registration)
 			ZyanHost.RegisterComponent<IDuck>("Chicken", () => new Chicken()); 
 
-			var clientSetup = new NullClientProtocolSetup();
-			ZyanConnection = new ZyanConnection("null://NullChannel:1234/DuckTypingServer", clientSetup);
+			ZyanConnection = new ZyanConnection("null://NullChannel:1234/DuckTypingServer");
 		}
 
 		[ClassCleanup]
