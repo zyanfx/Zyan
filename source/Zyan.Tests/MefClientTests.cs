@@ -112,8 +112,7 @@ namespace Zyan.Tests
 			ZyanHost.RegisterComponent<IMefClientSample, MefClientSample>();
 			ZyanHost.RegisterComponent<IMefClientSample, MefClientSample2>("AnotherComponent");
 
-			var clientSetup = new IpcBinaryClientProtocolSetup();
-			ZyanConnection = new ZyanConnection("ipc://MefClientTest/MefClientServer", clientSetup);
+			ZyanConnection = new ZyanConnection("ipc://MefClientTest/MefClientServer");
 
 			MefCatalog = new ZyanCatalog(ZyanConnection);
 			MefContainer = new CompositionContainer(MefCatalog);

@@ -111,8 +111,7 @@ namespace Zyan.Tests
 			ZyanHost = new ZyanComponentHost("CallInterceptorServer", serverSetup);
 			ZyanHost.RegisterComponent<IInterceptableComponent, InterceptableComponent>(ActivationType.Singleton);
 
-			var clientSetup = new NullClientProtocolSetup();
-			ZyanConnection = new ZyanConnection("null://NullChannel:3456/CallInterceptorServer", clientSetup);
+			ZyanConnection = new ZyanConnection("null://NullChannel:3456/CallInterceptorServer");
 			ZyanConnection.CallInterceptionEnabled = true;
 		}
 

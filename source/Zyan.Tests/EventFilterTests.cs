@@ -241,8 +241,7 @@ namespace Zyan.Tests
 			ZyanHost = new ZyanComponentHost("EventFilterServer", serverSetup);
 			ZyanHost.RegisterComponent<ISampleServer, SampleServer>(ActivationType.Singleton);
 
-			var clientSetup = new NullClientProtocolSetup();
-			ZyanConnection = new ZyanConnection("null://NullChannel:4567/EventFilterServer", clientSetup);
+			ZyanConnection = new ZyanConnection("null://NullChannel:4567/EventFilterServer");
 		}
 
 		[ClassCleanup]

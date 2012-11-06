@@ -120,7 +120,7 @@ namespace Zyan.Tests
 			};
 
 			// set up the connection
-			using (var conn = new ZyanConnection("null://NullChannel:5678/HeartbeatServer", new NullClientProtocolSetup()))
+			using (var conn = new ZyanConnection("null://NullChannel:5678/HeartbeatServer"))
 			{
 				conn.PollingInterval = TimeSpan.FromMilliseconds(5);
 				conn.PollingEnabled = true;

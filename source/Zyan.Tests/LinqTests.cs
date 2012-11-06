@@ -124,8 +124,7 @@ namespace Zyan.Tests
 			ZyanHost.RegisterComponent<IObjectSource, SampleObjectSource>("Sample7", ActivationType.SingleCall);
 			ZyanHost.RegisterComponent<IEntitySource, DataWrapper>("DbSample", new DataWrapper());
 
-			var clientSetup = new NullClientProtocolSetup();
-			ZyanConnection = new ZyanConnection("null://NullChannel:5432/SampleQueryableServer", clientSetup);
+			ZyanConnection = new ZyanConnection("null://NullChannel:5432/SampleQueryableServer");
 		}
 
 		[ClassCleanup]

@@ -93,8 +93,7 @@ namespace Zyan.Tests
 			ZyanHost.RegisterComponent<ISampleServer, SampleServer>("Singleton", ActivationType.Singleton);
 			ZyanHost.RegisterComponent<ISampleServer, SampleServer>("SingleCall", ActivationType.SingleCall);
 
-			var clientSetup = new NullClientProtocolSetup();
-			ZyanConnection = new ZyanConnection("null://NullChannel:2345/EventsServer", clientSetup);
+			ZyanConnection = new ZyanConnection("null://NullChannel:2345/EventsServer");
 		}
 
 		[ClassCleanup]
