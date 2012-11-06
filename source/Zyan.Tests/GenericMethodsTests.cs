@@ -135,8 +135,7 @@ namespace Zyan.Tests
 			ZyanHost = new ZyanComponentHost("GenericServer", serverSetup);
 			ZyanHost.RegisterComponent<ISampleServer, SampleServer>();
 
-			var clientSetup = new NullClientProtocolSetup();
-			ZyanConnection = new ZyanConnection("null://NullChannel:4321/GenericServer", clientSetup);
+			ZyanConnection = new ZyanConnection("null://NullChannel:4321/GenericServer");
 		}
 
 		[ClassCleanup]

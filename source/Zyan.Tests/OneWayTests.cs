@@ -118,8 +118,7 @@ namespace Zyan.Tests
 			ZyanHost = new ZyanComponentHost("OneWayServer", serverSetup);
 			ZyanHost.RegisterComponent<ISampleServer, SampleServer>();
 
-			var clientSetup = new IpcBinaryClientProtocolSetup();
-			ZyanConnection = new ZyanConnection("ipc://OneWayTest/OneWayServer", clientSetup);
+			ZyanConnection = new ZyanConnection("ipc://OneWayTest/OneWayServer");
 		}
 
 		[ClassCleanup]
