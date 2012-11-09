@@ -366,17 +366,23 @@ namespace Zyan.Communication
 			if (!interfaceType.IsInterface)
 				throw new ApplicationException(string.Format(LanguageResource.ApplicationException_SpecifiedTypeIsNotAnInterface, interfaceType.FullName));
 
-			ComponentInfo info = (from entry in _registeredComponents
-								  where entry.UniqueName.Equals(uniqueName)
-								  select entry).FirstOrDefault();
+			ComponentInfo info;
+			lock (_registeredComponents)
+			{
+				info = (from entry in _registeredComponents
+						where entry.UniqueName.Equals(uniqueName)
+						select entry).FirstOrDefault();
+			}
 
 			if (info == null)
 				throw new ApplicationException(string.Format(LanguageResource.ApplicationException_NoServerComponentIsRegisteredForTheGivenInterface, interfaceType.FullName, _serverUrl));
 
-			ZyanProxy proxy = new ZyanProxy(info.UniqueName, typeof(T), this, implicitTransactionTransfer, _sessionID, _componentHostName, _autoLoginOnExpiredSession, info.ActivationType);
-
-			WeakReference proxyReference = new WeakReference(proxy);
-			_proxies.Add(proxyReference);
+			var proxy = new ZyanProxy(info.UniqueName, typeof(T), this, implicitTransactionTransfer, _sessionID, _componentHostName, _autoLoginOnExpiredSession, info.ActivationType);
+			lock (_proxies)
+			{
+				var proxyReference = new WeakReference(proxy);
+				_proxies.Add(proxyReference);
+			}
 
 			return (T)proxy.GetTransparentProxy();
 		}
