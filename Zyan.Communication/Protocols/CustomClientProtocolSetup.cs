@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections;
-using System.Net;
-using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
-using System.Runtime.Remoting.Channels.Http;
-using System.Runtime.Serialization.Formatters;
-using Zyan.Communication.ChannelSinks.Encryption;
-using Zyan.Communication.Toolbox;
 using Zyan.Communication.ChannelSinks.Compression;
+using Zyan.Communication.ChannelSinks.Encryption;
 
 namespace Zyan.Communication.Protocols
 {

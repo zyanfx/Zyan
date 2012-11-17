@@ -301,6 +301,10 @@
     <Compile Include="Toolbox\Extensions.cs" />
     <Compile Include="Toolbox\MessageHelpers.cs" />
     <Compile Include="Toolbox\MonoCheck.cs" />
+    <Compile Include="Threading\ClrThreadPool.cs" />
+    <Compile Include="Threading\IThreadPool.cs" />
+    <Compile Include="Threading\IThreadPoolExtensions.cs" />
+    <Compile Include="Threading\SimpleLockThreadPool.cs" />
     <Compile Include="Toolbox\TypeComparer.cs" />
     <Compile Include="Toolbox\TypeHelper.cs" />
     <Compile Include="Version.cs" />
