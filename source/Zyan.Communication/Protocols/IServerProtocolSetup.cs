@@ -1,6 +1,6 @@
-﻿using System.Runtime.Remoting.Channels;
+﻿using System.Collections.Generic;
+using System.Runtime.Remoting.Channels;
 using Zyan.Communication.Security;
-using System.Collections.Generic;
 
 namespace Zyan.Communication.Protocols
 {

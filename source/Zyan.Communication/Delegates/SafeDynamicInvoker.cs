@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Reflection;
 using System.Threading;
+using Zyan.Communication.Threading;
 using Zyan.Communication.Toolbox;
 using Zyan.Communication.Toolbox.Diagnostics;
 
@@ -188,7 +189,7 @@ namespace Zyan.Communication.Delegates
 			var invocationList = deleg.GetInvocationList();
 			foreach (var d in invocationList)
 			{
-				// TODO: implement it using custom thread pool
+				// implemented using custom thread pool
 				ThreadPool.QueueUserWorkItem(x =>
 				{
 					try
@@ -200,6 +201,29 @@ namespace Zyan.Communication.Delegates
 						Trace.WriteLine("Exception in an event handler: {0}", ex);
 					}
 				});
+			}
+		}
+
+		private static IThreadPool threadPool = new SimpleLockThreadPool();
+
+		/// <summary>
+		/// Gets or sets the thread pool used to send server events to remote subscribers.
+		/// </summary>
+		/// <remarks>
+		/// Assign this property to an instance of the <see cref="ClrThreadPool"/> class
+		/// to fall back to the standard <see cref="System.Threading.ThreadPool"/>.
+		/// </remarks>
+		public static IThreadPool ThreadPool
+		{
+			get { return threadPool; }
+			set
+			{
+				if (value == null)
+				{
+					throw new ArgumentNullException("value");
+				}
+
+				threadPool = value;
 			}
 		}
 	}
