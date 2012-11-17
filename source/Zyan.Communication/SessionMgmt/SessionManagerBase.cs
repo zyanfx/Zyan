@@ -43,12 +43,12 @@ namespace Zyan.Communication.SessionMgmt
 		/// Creates a new <see cref="ServerSession"/> with the given arguments.
 		/// </summary>
 		/// <param name="sessionID">Session unique identifier.</param>
-		/// <param name="startTime">Session start time.</param>
+		/// <param name="timeStamp">Session time stamp.</param>
 		/// <param name="identity"><see cref="IIdentity"/> for the user to associate a new session with.</param>
 		/// <returns>New <see cref="ServerSession"/> instance associated with the current <see cref="ISessionManager"/> component.</returns>
-		protected ServerSession CreateServerSession(Guid sessionID, DateTime startTime, IIdentity identity)
+		protected virtual ServerSession CreateServerSession(Guid sessionID, DateTime timeStamp, IIdentity identity)
 		{
-			return new ServerSession(sessionID, startTime, identity, new SessionVariableAdapter(this, sessionID));
+			return new ServerSession(sessionID, timeStamp, identity, new SessionVariableAdapter(this, sessionID));
 		}
 
 		/// <summary>

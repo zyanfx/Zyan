@@ -268,6 +268,10 @@
     <Compile Include="SessionMgmt\SessionManagerBase.cs" />
     <Compile Include="SessionMgmt\SessionVariableAdapter.cs" />
     <Compile Include="SessionMgmt\SqlSessionManager.cs" />
+    <Compile Include="Threading\ClrThreadPool.cs" />
+    <Compile Include="Threading\IThreadPool.cs" />
+    <Compile Include="Threading\IThreadPoolExtensions.cs" />
+    <Compile Include="Threading\SimpleLockThreadPool.cs" />
     <Compile Include="Toolbox\AssemblyLocator.cs" />
     <Compile Include="Toolbox\Compression\CompressionHelper.cs" />
     <Compile Include="Toolbox\Compression\LZF.cs" />
