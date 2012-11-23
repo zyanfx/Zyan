@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<summaries>
+    <assembly name="Zyan.Communication">
+        <summary>
+            Zyan is an easy to use distributed application framework for .NET and Mono.
+        </summary>
+        <namespace name="Zyan.Communication">
+            <summary>
+                This namespace contains core classes of the public API of Zyan Communication Framework.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.Communication.ChannelSinks.Compression">
+            <summary>
+                This namespace contains compression channel sinks. Compression sinks enable transparent compression for the network traffic.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.Communication.ChannelSinks.Counter">
+            <summary>
+                This namespace contains counter sinks used to gather network statistics.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.Communication.ChannelSinks.Encryption">
+            <summary>
+                This namespace contains encryption channel sinks. Encryption sinks enable transparent encryption for the network traffic.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.Communication.Composition">
+            <summary>
+                This namespace contains MEF integration classes. It is only available for the .NET Framework 4.0 and above.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.Communication.Delegates">
+            <summary>
+                This namespace contains utility classes for delegates, events and dynamic wires for EBC programming.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.Communication.Notification">
+            <summary>
+                This namespace is obsolete.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.Communication.Protocols">
+            <summary>
+                This namespace contains base protocol setup classes. Protocol setup classes are used to tune Zyan transport channels.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.Communication.Protocols.Http">
+            <summary>
+                This namespace contains classes related to HTTP-based network communication.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.Communication.Protocols.Ipc">
+            <summary>
+                This namespace contains classes related to interprocess communication.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.Communication.Protocols.Null">
+            <summary>
+                This namespace contains classes related to local (inside the same AppDomain) communication. The primary use for local protocols it unit testing and profiling.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.Communication.Protocols.Tcp">
+            <summary>
+                This namespace contains classes related to TCP-based network communication.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.Communication.Protocols.Tcp.DuplexChannel">
+            <summary>
+                This namespace contains duplex TCP-channel implementation classes.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.Communication.Security">
+            <summary>
+                This namespace contains classes related to authentication and security.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.Communication.Security.Exceptions">
+            <summary>
+                This namespace contains exception classes related to authentication and security.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.Communication.SessionMgmt">
+            <summary>
+                This namespace contains classes related to the session management.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.Communication.Threading">
+            <summary>
+                This namespace contains classes related to thread management.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.Communication.Toolbox">
+            <summary>
+                This namespace contains various utility classes.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.InterLinq">
+            <summary>
+                This namespace contains InterLINQ provider integration for the Zyan Communication Framework.
+                InterLINQ makes local LINQ technologies multi-tier compatible.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.InterLinq.Communication">
+            <summary>
+                This namespace contains InterLINQ server classes to simplify the server and client architecture.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.InterLinq.Communication.Remoting">
+            <summary>
+                This namespace contains the classes required for the communication over .NET Remoting.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.InterLinq.Communication.Wcf">
+            <summary>
+                This namespace contains the classes required for the communication over WCF.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.InterLinq.Communication.Wcf.NetDataContractSerializer">
+            <summary>
+                This namespace contains the classes required to use the System.Runtime.Serialization.NetDataContractSerializer.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.InterLinq.Expressions">
+            <summary>
+                This namespace contains a serializable expression structure like the one in System.Linq.Expressions.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.InterLinq.Expressions.Helpers">
+            <summary>
+                This namespace contains helper classes for several conversions and traversings.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.InterLinq.Expressions.SerializableTypes">
+            <summary>
+                This namespace contains a few serializable classes used by serializable expressions.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.InterLinq.Types">
+            <summary>
+                This namespace contains InterLINQ type system.
+            </summary>
+        </namespace>
+        <namespace name="Zyan.InterLinq.Types.Anonymous">
+            <summary>
+                This namespace contains classes related to handling of anonymous types.
+            </summary>
+        </namespace>
+    </assembly>
+</summaries>

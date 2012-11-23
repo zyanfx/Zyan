@@ -238,34 +238,5 @@ namespace Zyan.Communication.Toolbox
 			sb.Append(")");
 			return sb.ToString();
 		}
-
-		/// <summary>
-		/// Conditional lock with double checking.
-		/// </summary>
-		/// <param name="lockObject">Object to lock.</param>
-		/// <param name="predicate">Locking condition.</param>
-		/// <param name="block">Critical section code.</param>
-		public static void LockIf(this object lockObject, Func<bool> predicate, Action block)
-		{
-			if (lockObject == null)
-				throw new ArgumentNullException("lockObject");
-
-			if (predicate == null)
-				throw new ArgumentNullException("predicate");
-
-			if (block == null)
-				throw new ArgumentNullException("block");
-
-			if (predicate())
-			{
-				lock (lockObject)
-				{
-					if (predicate())
-					{
-						block();
-					}
-				}
-			}
-		}
 	}
 }
