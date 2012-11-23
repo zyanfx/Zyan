@@ -5,7 +5,7 @@ using Zyan.Communication.Toolbox;
 namespace Zyan.Communication
 {
 	/// <summary>
-	/// Delegate to call custom call intercaption logic.
+	/// Delegate to call custom call interception logic.
 	/// </summary>
 	/// <param name="action">Interception action details</param>
 	public delegate void CallInterceptionDelegate(CallInterceptionData action);
