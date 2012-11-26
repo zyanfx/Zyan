@@ -22,15 +22,17 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
 	/// <summary name="TcpExChannel">
 	/// A replacement for the standard Tcp remoting channel that allows communication in both directions over a single tcp connection.
-	/// <remarks>TcpExChannel only supports IPv4.</remarks>
-	/// <b>Remoting Configuration Parameters</b>
+	/// </summary>
+	/// <remarks>
+	/// TcpExChannel only supports IPv4.
+	/// <b>Remoting Configuration Parameters:</b>
 	/// <list type="bullet">
 	/// <item><term>port</term><description>The tcp port the channel should listen on.  If this is specified, the channel will automatically start listening on that port.</description></item>
 	/// <item><term>listen</term><description>Indicates the channel should start listening.  This is not required if the port parameter is specified.  If no port is specified the channel will choose a random unused port.</description></item>
 	/// <item><term>bufferSize</term><description>The size of the buffer to use when sending data over a connection.</description></item>
 	/// <item><term>priority</term><description>The priority of the channel.</description></item>
 	/// </list>
-	/// </summary>
+	/// </remarks>
 	public class TcpExChannel : IChannel, IChannelSender, IChannelReceiver, IDisposable
 	{
 		private int port = 0;
@@ -218,13 +220,11 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			serverSinkProvider.GetChannelData(channelData);
 
 			if (listen)
-			{	
+			{
 				StartListening(port);
-
-				channelData = new TcpExChannelData(this);
 			}
-			else
-				channelData = new TcpExChannelData(this);
+
+			channelData = new TcpExChannelData(this);
 
 			Manager.BeginReadMessage(_channelID, null, new AsyncCallback(messageSink.ReceiveMessage), _channelID);
 		}

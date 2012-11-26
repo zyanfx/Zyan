@@ -419,7 +419,7 @@ namespace Zyan.Communication.Protocols.Tcp
 			{
 				_channelSettings["name"] = _channelName;
 				_channelSettings["port"] = 0;
-				_channelSettings["listen"] = true;
+				_channelSettings["listen"] = false;
 				_channelSettings["typeFilterLevel"] = TypeFilterLevel.Full;
 				_channelSettings["keepAliveEnabled"] = _tcpKeepAliveEnabled;
 				_channelSettings["keepAliveTime"] = _tcpKeepAliveTime;
