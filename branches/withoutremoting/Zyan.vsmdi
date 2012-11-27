@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<TestLists xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <TestList name="Zyan Standardtestliste" id="04838fa3-d2df-42f6-b18b-0c245ef535a1" parentListId="8c43106b-9dc1-4907-a29f-aa66a61bf5b6">
+    <TestLinks>
+      <TestLink id="1ffe54b5-bb89-4ab2-8b20-997b65cb184a" name="generictest1" storage="zyan.tests\distributedevents\generictest1.generictest" type="Microsoft.VisualStudio.TestTools.TestTypes.Generic.GenericTest, Microsoft.VisualStudio.QualityTools.Tips.GenericTest.ObjectModel,   PublicKeyToken=b03f5f7f11d50a3a" />
+    </TestLinks>
+  </TestList>
+  <TestList name="Testlisten" id="8c43106b-9dc1-4907-a29f-aa66a61bf5b6">
+    <RunConfiguration id="2a784eed-d823-4f59-a355-e62f8e2151c4" name="Lokal" storage="local.testsettings" type="Microsoft.VisualStudio.TestTools.Common.TestRunConfiguration, Microsoft.VisualStudio.QualityTools.Common, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  </TestList>
+</TestLists>

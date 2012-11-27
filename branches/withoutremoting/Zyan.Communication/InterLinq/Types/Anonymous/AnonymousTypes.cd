@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="Zyan.InterLinq.Types.Anonymous.AnonymousMetaType">
+    <Position X="0.5" Y="0.5" Width="4.25" />
+    <Members>
+      <Method Name="AddDebuggerHiddenAttribute" Hidden="true" />
+      <Property Name="FieldNames" Hidden="true" />
+      <Method Name="GenerateClassAttributes" Hidden="true" />
+      <Method Name="GenerateConstructor" Hidden="true" />
+      <Method Name="GenerateEqualsMethod" Hidden="true" />
+      <Method Name="GenerateGetHashCodeMethod" Hidden="true" />
+      <Method Name="GenerateGetMethod" Hidden="true" />
+      <Method Name="GenerateProperty" Hidden="true" />
+      <Method Name="GenerateToStringMethod" Hidden="true" />
+      <Property Name="GenericClassParameterNames" Hidden="true" />
+      <Property Name="PropertyNames" Hidden="true" />
+    </Members>
+    <AssociationLine Name="MetaProperties" Type="InterLinq.Types.Anonymous.AnonymousMetaProperty" FixedToPoint="true">
+      <Path>
+        <Point X="1.875" Y="2.969" />
+        <Point X="1.875" Y="3.5" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="-3.002" Y="0.016" Height="0.16" Width="2.882" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgwAAgAQAgAAAAQEABJQgKAAQAAAAAAA=</HashCode>
+      <FileName>Types\Anonymous\AnonymousMetaType.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="MetaProperties" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Zyan.InterLinq.Types.Anonymous.AnonymousMetaProperty">
+    <Position X="1.25" Y="3.5" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgAAAAAQAAAAAAIAAAAACAAAAAAA=</HashCode>
+      <FileName>Types\Anonymous\AnonymousMetaProperty.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Zyan.InterLinq.Types.Anonymous.AnonymousObject">
+    <Position X="5.25" Y="0.5" Width="4" />
+    <AssociationLine Name="Properties" Type="InterLinq.Types.Anonymous.AnonymousProperty" FixedToPoint="true">
+      <Path>
+        <Point X="6.625" Y="1.81" />
+        <Point X="6.625" Y="3" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-2.546" Y="0.081" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAACAAA=</HashCode>
+      <FileName>Types\Anonymous\AnonymousObject.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Properties" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Zyan.InterLinq.Types.Anonymous.AnonymousProperty">
+    <Position X="6.25" Y="3" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAQAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Types\Anonymous\AnonymousProperty.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Tahoma" Size="8.25" />
+</ClassDiagram>

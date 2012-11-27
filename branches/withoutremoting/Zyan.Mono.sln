@@ -1,0 +1,105 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{DD15B030-587C-4A27-840B-2D7615608FD9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Tests.Mono", "Zyan.Tests\Zyan.Tests.Mono.csproj", "{3E62B4CF-9BB5-48A9-8DEC-63A1DA88D258}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTest_DistributedEvents.Mono", "IntegrationTest_DistributedEvents\IntegrationTest_DistributedEvents.Mono.csproj", "{BDEB5710-9DF2-4629-A70F-7BB91F6C787B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests.InterLinq", "Tests.InterLinq", "{502B0A21-982C-48A4-81D7-6073B99194E0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterLinq.UnitTests.Server.Mono", "Zyan.Tests.InterLinq\Server\InterLinq.UnitTests.Server.Mono.csproj", "{F2C28EEA-A38F-4BDB-A599-29B38D5FFF66}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterLinq.UnitTests.Artefacts.Mono", "Zyan.Tests.InterLinq\Artefacts\InterLinq.UnitTests.Artefacts.Mono.csproj", "{DF5A0083-AB07-4E04-BA02-8D21ED866337}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterLinq.UnitTests.NUnit.Mono", "Zyan.Tests.InterLinq\UnitTests\InterLinq.UnitTests.NUnit.Mono.csproj", "{37A20035-ABE1-44D1-901E-845157D85010}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Communication.Mono", "Zyan.Communication\Zyan.Communication.Mono.csproj", "{F14FF4B4-A9C6-415F-9484-444CBBDBBEA2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{37A20035-ABE1-44D1-901E-845157D85010}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37A20035-ABE1-44D1-901E-845157D85010}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37A20035-ABE1-44D1-901E-845157D85010}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{37A20035-ABE1-44D1-901E-845157D85010}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37A20035-ABE1-44D1-901E-845157D85010}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37A20035-ABE1-44D1-901E-845157D85010}.Release|x64.ActiveCfg = Release|Any CPU
+		{3E62B4CF-9BB5-48A9-8DEC-63A1DA88D258}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E62B4CF-9BB5-48A9-8DEC-63A1DA88D258}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E62B4CF-9BB5-48A9-8DEC-63A1DA88D258}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3E62B4CF-9BB5-48A9-8DEC-63A1DA88D258}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E62B4CF-9BB5-48A9-8DEC-63A1DA88D258}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E62B4CF-9BB5-48A9-8DEC-63A1DA88D258}.Release|x64.ActiveCfg = Release|Any CPU
+		{BDEB5710-9DF2-4629-A70F-7BB91F6C787B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDEB5710-9DF2-4629-A70F-7BB91F6C787B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDEB5710-9DF2-4629-A70F-7BB91F6C787B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BDEB5710-9DF2-4629-A70F-7BB91F6C787B}.Debug|x64.Build.0 = Debug|Any CPU
+		{BDEB5710-9DF2-4629-A70F-7BB91F6C787B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDEB5710-9DF2-4629-A70F-7BB91F6C787B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDEB5710-9DF2-4629-A70F-7BB91F6C787B}.Release|x64.ActiveCfg = Release|Any CPU
+		{BDEB5710-9DF2-4629-A70F-7BB91F6C787B}.Release|x64.Build.0 = Release|Any CPU
+		{DF5A0083-AB07-4E04-BA02-8D21ED866337}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF5A0083-AB07-4E04-BA02-8D21ED866337}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF5A0083-AB07-4E04-BA02-8D21ED866337}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DF5A0083-AB07-4E04-BA02-8D21ED866337}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF5A0083-AB07-4E04-BA02-8D21ED866337}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF5A0083-AB07-4E04-BA02-8D21ED866337}.Release|x64.ActiveCfg = Release|Any CPU
+		{F14FF4B4-A9C6-415F-9484-444CBBDBBEA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F14FF4B4-A9C6-415F-9484-444CBBDBBEA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F14FF4B4-A9C6-415F-9484-444CBBDBBEA2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F14FF4B4-A9C6-415F-9484-444CBBDBBEA2}.Debug|x64.Build.0 = Debug|Any CPU
+		{F14FF4B4-A9C6-415F-9484-444CBBDBBEA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F14FF4B4-A9C6-415F-9484-444CBBDBBEA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F14FF4B4-A9C6-415F-9484-444CBBDBBEA2}.Release|x64.ActiveCfg = Release|Any CPU
+		{F14FF4B4-A9C6-415F-9484-444CBBDBBEA2}.Release|x64.Build.0 = Release|Any CPU
+		{F2C28EEA-A38F-4BDB-A599-29B38D5FFF66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2C28EEA-A38F-4BDB-A599-29B38D5FFF66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2C28EEA-A38F-4BDB-A599-29B38D5FFF66}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F2C28EEA-A38F-4BDB-A599-29B38D5FFF66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2C28EEA-A38F-4BDB-A599-29B38D5FFF66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2C28EEA-A38F-4BDB-A599-29B38D5FFF66}.Release|x64.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3E62B4CF-9BB5-48A9-8DEC-63A1DA88D258} = {DD15B030-587C-4A27-840B-2D7615608FD9}
+		{BDEB5710-9DF2-4629-A70F-7BB91F6C787B} = {DD15B030-587C-4A27-840B-2D7615608FD9}
+		{F2C28EEA-A38F-4BDB-A599-29B38D5FFF66} = {502B0A21-982C-48A4-81D7-6073B99194E0}
+		{DF5A0083-AB07-4E04-BA02-8D21ED866337} = {502B0A21-982C-48A4-81D7-6073B99194E0}
+		{37A20035-ABE1-44D1-901E-845157D85010} = {502B0A21-982C-48A4-81D7-6073B99194E0}
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Zyan.Tests.InterLinq\Server\InterLinq.UnitTests.Server.Mono.csproj
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 5
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs15
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = Zyan.Communication\\Zyan.Communication.csproj
+		SccProjectName1 = Zyan.Communication
+		SccLocalPath1 = Zyan.Communication
+		SccProjectUniqueName2 = Zyan.Tests\\Zyan.Tests.csproj
+		SccProjectTopLevelParentUniqueName2 = Zyan.sln
+		SccProjectName2 = Zyan.Tests
+		SccLocalPath2 = Zyan.Tests
+		SccProjectUniqueName3 = IntegrationTest_DistributedEvents\\IntegrationTest_DistributedEvents.csproj
+		SccProjectTopLevelParentUniqueName3 = Zyan.sln
+		SccProjectName3 = IntegrationTest_DistributedEvents
+		SccLocalPath3 = IntegrationTest_DistributedEvents
+		SccProjectUniqueName4 = Zyan.InterLinq\\Zyan.InterLinq.csproj
+		SccProjectName4 = Zyan.InterLinq
+		SccLocalPath4 = Zyan.InterLinq
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = Zyan.vsmdi
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

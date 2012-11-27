@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{3E62B4CF-9BB5-48A9-8DEC-63A1DA88D258}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Zyan.Tests</RootNamespace>
+    <AssemblyName>Zyan.Tests.NUnit</AssemblyName>
+    <AssemblyOriginatorKeyFile>..\Zyan.Key\zyan.snk</AssemblyOriginatorKeyFile>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\bin\UnitTests\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NUNIT</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\bin\UnitTests\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MemoDb, Version=0.1.1.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\libraries\MemoDb\MemoDb.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>..\..\libraries\NUnit\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CallInterceptionTests.cs" />
+    <Compile Include="CallInterceptorBuilderTests.cs" />
+    <Compile Include="ChannelWrapperTests.cs" />
+    <Compile Include="CleanupTests.cs" />
+    <Compile Include="CompressionTests.cs" />
+    <Compile Include="DefaultProtocolTests.cs" />
+    <Compile Include="DuckTypingTests.cs" />
+    <Compile Include="DynamicWireTests.cs" />
+    <Compile Include="EmptyDelegateFactoryTests.cs" />
+    <Compile Include="EventFilterTests.cs" />
+    <Compile Include="EventsTests.cs" />
+    <Compile Include="EventStubTests.cs" />
+    <Compile Include="GenericMethodsTests.cs" />
+    <Compile Include="HeartbeatSessionTests.cs" />
+    <Compile Include="LinqTests.cs" />
+    <Compile Include="MefClientTests.cs" />
+    <Compile Include="MefServerTests.cs" />
+    <Compile Include="Misc\AssertEx.cs" />
+    <Compile Include="Misc\DataWrapper.cs" />
+    <Compile Include="Misc\DummyAttribute.cs" />
+    <Compile Include="Misc\Entities.cs" />
+    <Compile Include="Misc\SampleObjectSource.cs" />
+    <Compile Include="OneWayTests.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RecreateClientConnectionTests.cs" />
+    <Compile Include="SafeDynamicInvokerTests.cs" />
+    <Compile Include="StreamTests.cs" />
+    <Compile Include="TypeHelperTests.cs" />
+    <Compile Include="ZyanProxyTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Zyan.Communication\Zyan.Communication.csproj">
+      <Project>{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}</Project>
+      <Name>Zyan.Communication</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
