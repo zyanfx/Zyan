@@ -169,7 +169,8 @@ namespace Zyan.Communication
 		/// <returns><see cref="ReturnMessage"/>, if the call is processed successfully, otherwise, false.</returns>
 		private ReturnMessage HandleRemoteInvocation(IMethodCallMessage methodCallMessage, MethodInfo methodInfo)
 		{
-			_connection.PrepareCallContext(_implicitTransactionTransfer);
+            //TODO: Get rid of .NET Remoting call context.
+			//_connection.PrepareCallContext(_implicitTransactionTransfer);
 			return InvokeRemoteMethod(methodCallMessage);
 		}
 
@@ -361,7 +362,8 @@ namespace Zyan.Communication
 			if (correlationInfo == null)
 				throw new ArgumentNullException("correlationInfo");
 
-			_connection.PrepareCallContext(false);
+            //TODO: Get rid of .NET Remoting call context.
+			//_connection.PrepareCallContext(false);
 			_connection.RemoteDispatcher.AddEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
 		}
 
@@ -374,7 +376,8 @@ namespace Zyan.Communication
 			if (correlationInfo == null)
 				throw new ArgumentNullException("correlationInfo");
 
-			_connection.PrepareCallContext(false);
+            //TODO: Get rid of .NET Remoting call context.
+			//_connection.PrepareCallContext(false);
 			_connection.RemoteDispatcher.RemoveEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
 		}
 
@@ -590,7 +593,8 @@ namespace Zyan.Communication
 						_delegateCorrelationSet.Remove(correlationInfo);
 					else
 					{
-						_connection.PrepareCallContext(false);
+                        //TODO: Get rid of .NET Remoting call context.
+						//_connection.PrepareCallContext(false);
 						_connection.RemoteDispatcher.RemoveEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
 					}
 				}

@@ -2,6 +2,7 @@
 using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp;
 using Zyan.Communication.Security;
+using System;
 
 namespace Zyan.InterLinq.Communication
 {
@@ -37,7 +38,9 @@ namespace Zyan.InterLinq.Communication
 		/// <returns>Returns a default <see cref="IServerProtocolSetup"/> for the <see cref="ZyanComponentHost"/>.</returns>
 		public static IServerProtocolSetup GetDefaultServerProtocol(int port)
 		{
-			return new TcpDuplexServerProtocolSetup(port, new NullAuthenticationProvider(), false);
+            //TODO: Implement TCP Duplex transport without .NET Remoting first.
+            throw new NotImplementedException();
+			//return new TcpDuplexServerProtocolSetup(port, new NullAuthenticationProvider(), false);
 		}
 
 		/// <summary>
@@ -46,7 +49,9 @@ namespace Zyan.InterLinq.Communication
 		/// <returns>Returns a default <see cref="IClientProtocolSetup"/> for the <see cref="ZyanComponentHost"/>.</returns>
 		public static IClientProtocolSetup GetDefaultClientProtocol()
 		{
-			return new TcpDuplexClientProtocolSetup(false);
+            //TODO: Implement TCP Duplex transport without .NET Remoting first.
+            throw new NotImplementedException();
+			//return new TcpDuplexClientProtocolSetup(false);
 		}
 	}
 }
