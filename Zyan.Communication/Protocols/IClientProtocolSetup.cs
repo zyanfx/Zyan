@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.Remoting.Channels;
+using Zyan.Communication.Transport;
 
 namespace Zyan.Communication.Protocols
 {
@@ -9,20 +9,20 @@ namespace Zyan.Communication.Protocols
 	public interface IClientProtocolSetup
 	{
 		/// <summary>
-		/// Gets a list of all Remoting sinks from the client sink chain.
+		/// Gets a list of all stages of the send pipeline.
 		/// </summary>
-		List<IClientChannelSinkProvider> ClientSinkChain { get; }
+		List<ISendPipelineStage> SendPipeline { get; }
 
 		/// <summary>
-		/// Gets a list of all Remoting sinks from the server sink chain.
+        /// Gets a list of all stages of the receive pipeline.
 		/// </summary>
-		List<IServerChannelSinkProvider> ServerSinkChain { get; }
+		List<IReceivePipelineStage> ReceivePipeline { get; }
 
 		/// <summary>
-		/// Creates and configures a Remoting channel.
+		/// Creates and configures a transport channel.
 		/// </summary>
-		/// <returns>Remoting channel</returns>
-		IChannel CreateChannel();
+		/// <returns>Transport channel</returns>
+		IZyanTransportChannel CreateChannel();
 
 		/// <summary>
 		/// Gets a dictionary with channel settings.

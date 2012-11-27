@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.Remoting;
-using System.Runtime.Remoting.Channels;
 using Zyan.Communication.Security;
 using Zyan.Communication.Toolbox;
+using Zyan.Communication.Transport;
 
 namespace Zyan.Communication.Protocols
 {
@@ -26,17 +25,17 @@ namespace Zyan.Communication.Protocols
 		/// <summary>
 		/// List for building the client sink chain.
 		/// </summary>
-		protected List<IClientChannelSinkProvider> _clientSinkChain = new List<IClientChannelSinkProvider>();
+        protected List<ISendPipelineStage> _sendPipeline = new List<ISendPipelineStage>();
 
 		/// <summary>
 		/// List for building the server sink chain.
 		/// </summary>
-		protected List<IServerChannelSinkProvider> _serverSinkChain = new List<IServerChannelSinkProvider>();
+        protected List<IReceivePipelineStage> _receivePipeline = new List<IReceivePipelineStage>();
 
 		/// <summary>
 		/// Delegate to factory method, which creates the .NET Remoting channel instance.
 		/// </summary>
-		protected Func<IDictionary, IClientChannelSinkProvider, IServerChannelSinkProvider, IChannel> _channelFactory = null;
+		protected Func<IDictionary, IZyanTransportChannel> _channelFactory = null;
 
 		/// <summary>
 		/// Authentication provider.
@@ -52,7 +51,7 @@ namespace Zyan.Communication.Protocols
 		/// Creates a new instance of the ServerProtocolSetup class.
 		/// </summary>
 		/// <param name="channelFactory">Delegate to channel factory method</param>
-		public ServerProtocolSetup(Func<IDictionary, IClientChannelSinkProvider, IServerChannelSinkProvider, IChannel> channelFactory)
+        public ServerProtocolSetup(Func<IDictionary, IZyanTransportChannel> channelFactory)
 			: this()
 		{
 			if (channelFactory == null)
@@ -66,7 +65,7 @@ namespace Zyan.Communication.Protocols
 		/// </summary>
 		/// <param name="channelFactory">Delegate to channel factory method</param>
 		/// <returns></returns>
-		public static IServerProtocolSetup WithChannel(Func<IDictionary, IClientChannelSinkProvider, IServerChannelSinkProvider, IChannel> channelFactory)
+		public static IServerProtocolSetup WithChannel(Func<IDictionary, IZyanTransportChannel> channelFactory)
 		{
 			return new ServerProtocolSetup(channelFactory);
 		}
@@ -76,77 +75,23 @@ namespace Zyan.Communication.Protocols
 		/// </summary>
 		public virtual Dictionary<string, object> ChannelSettings { get { return _channelSettings; } }
 
-		/// <summary>
-		/// Gets a list of all Remoting sinks from the client sink chain.
-		/// </summary>
-		public virtual List<IClientChannelSinkProvider> ClientSinkChain { get { return _clientSinkChain; } }
+        /// <summary>
+        /// Gets a list of all stages of the send pipeline.
+        /// </summary>
+		public virtual List<ISendPipelineStage> SendPipeline { get { return _sendPipeline; } }
 
-		/// <summary>
-		/// Gets a list of all Remoting sinks from the server sink chain.
-		/// </summary>
-		public virtual List<IServerChannelSinkProvider> ServerSinkChain { get { return _serverSinkChain; } }
+        /// <summary>
+        /// Gets a list of all stages of the receive pipeline.
+        /// </summary>
+		public virtual List<IReceivePipelineStage> ReceivePipeline { get { return _receivePipeline; } }
 
-		/// <summary>
-		/// Builds the client sink chain.
-		/// </summary>
-		/// <returns>First sink provider in sink chain</returns>
-		protected virtual IClientChannelSinkProvider BuildClientSinkChain()
+        /// <summary>
+        /// Creates and configures a transport channel.
+        /// </summary>
+        /// <returns>Transport channel</returns>
+		public virtual IZyanTransportChannel CreateChannel()
 		{
-			IClientChannelSinkProvider firstProvider = null;
-			IClientChannelSinkProvider lastProvider = null;
-
-			foreach (var sinkProvider in _clientSinkChain)
-			{
-				sinkProvider.Next = null;
-
-				if (firstProvider == null)
-					firstProvider = sinkProvider;
-
-				if (lastProvider == null)
-					lastProvider = sinkProvider;
-				else
-				{
-					lastProvider.Next = sinkProvider;
-					lastProvider = sinkProvider;
-				}
-			}
-			return firstProvider;
-		}
-
-		/// <summary>
-		/// Builds the server sink chain.
-		/// </summary>
-		/// <returns>First sink provider in sink chain</returns>
-		protected virtual IServerChannelSinkProvider BuildServerSinkChain()
-		{
-			IServerChannelSinkProvider firstProvider = null;
-			IServerChannelSinkProvider lastProvider = null;
-
-			foreach (var sinkProvider in _serverSinkChain)
-			{
-				sinkProvider.Next = null;
-
-				if (firstProvider == null)
-					firstProvider = sinkProvider;
-
-				if (lastProvider == null)
-					lastProvider = sinkProvider;
-				else
-				{
-					lastProvider.Next = sinkProvider;
-					lastProvider = sinkProvider;
-				}
-			}
-			return firstProvider;
-		}
-
-		/// <summary>
-		/// Creates and configures a Remoting channel.
-		/// </summary>
-		/// <returns>Remoting channel</returns>
-		public virtual IChannel CreateChannel()
-		{
-			IChannel channel = ChannelServices.GetChannel(_channelName);
+            IZyanTransportChannel channel = TransportChannelManager.Instance.GetChannel(_channelName);
 
 			if (channel == null)
 			{
@@ -155,13 +100,8 @@ namespace Zyan.Communication.Protocols
 
 				_channelSettings["name"] = _channelName;
 
-				channel = _channelFactory(_channelSettings, BuildClientSinkChain(), BuildServerSinkChain());
-
-				if (!MonoCheck.IsRunningOnMono)
-				{
-					if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
-						RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
-				}
+				channel = _channelFactory(_channelSettings);
+                				
 				return channel;
 			}
 			return channel;

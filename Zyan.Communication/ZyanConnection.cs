@@ -5,18 +5,18 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.Remoting;
-using System.Runtime.Remoting.Channels;
-using System.Runtime.Remoting.Messaging;
+//using System.Runtime.Remoting;
+//using System.Runtime.Remoting.Channels;
+//using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using System.Transactions;
-using Zyan.Communication.Notification;
 using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp.DuplexChannel;
 using Zyan.Communication.Protocols.Wrapper;
 using Zyan.Communication.Toolbox;
 using Zyan.Communication.Toolbox.Diagnostics;
 using Zyan.InterLinq.Expressions;
+using Zyan.Communication.Transport;
 
 namespace Zyan.Communication
 {
@@ -47,7 +47,7 @@ namespace Zyan.Communication
 		private IClientProtocolSetup _protocolSetup = null;
 
 		// Remoting-Channel
-		private IChannel _remotingChannel = null;
+		private IZyanTransportChannel _transportChannel = null;
 
 		// List of created proxies
 		private List<WeakReference> _proxies;
@@ -172,42 +172,50 @@ namespace Zyan.Communication
 			string[] addressParts = _serverUrl.Split('/');
 			_componentHostName = addressParts[addressParts.Length - 1];
 
-			_remotingChannel = _protocolSetup.CreateChannel();
-			if (AllowUrlRandomization)
-			{
-				_remotingChannel = ChannelWrapper.WrapChannel(_remotingChannel);
-			}
+			_transportChannel = _protocolSetup.CreateChannel();
 
-			if (_remotingChannel != null)
+            //TODO: Implement URL randomization without .NET Remoting dependency
+            //if (AllowUrlRandomization)
+            //{
+            //    _transportChannel = ChannelWrapper.WrapChannel(_transportChannel);
+            //}
+
+			if (_transportChannel != null)
 			{
-				var registeredChannel = ChannelServices.GetChannel(_remotingChannel.ChannelName);
+				var registeredChannel = TransportChannelManager.Instance.GetChannel(_transportChannel.ChannelName);
 
 				if (registeredChannel == null)
-					ChannelServices.RegisterChannel(_remotingChannel, false);
+                    TransportChannelManager.Instance.RegisterChannel(_transportChannel);
 			}
 			else
 				throw new ApplicationException(LanguageResource.ApplicationException_NoChannelCreated);
 
-			string channelName = _remotingChannel.ChannelName;
-
-			_subscriptions = new Dictionary<Guid, NotificationReceiver>();
+			string channelName = _transportChannel.ChannelName;
 
 			if (credentials != null && credentials.Count == 0)
 				credentials = null;
 
 			try
-			{
-				RemoteDispatcher.Logon(_sessionID, credentials);
+			{				
+                IZyanRequestMessage logonRequestMessage;
+                //TODO: Generate logon request message and send it through transport channel
+                //RemoteDispatcher.Logon(_sessionID, credentials);
+                IZyanResponseMessage logonResponseMessage = _transportChannel.SendRequest(logonRequestMessage);
 
-				_registeredComponents = new List<ComponentInfo>(RemoteDispatcher.GetRegisteredComponents());
-				_sessionAgeLimit = RemoteDispatcher.SessionAgeLimit;
+                IZyanRequestMessage registeredComponentsRequestMessage;
+                //TODO: Request registered components through transport channel
+				//_registeredComponents = new List<ComponentInfo>(RemoteDispatcher.GetRegisteredComponents());
+                IZyanResponseMessage registeredComponentsResponseMessage = _transportChannel.SendRequest(registeredComponentsRequestMessage);
+
+                //TODO: Extract session age limit from logon response message.
+                //_sessionAgeLimit = RemoteDispatcher.SessionAgeLimit;
 			}
 			catch (Exception ex)
 			{
 				// unregister remoting channel
-				var registeredChannel = ChannelServices.GetChannel(channelName);
+                var registeredChannel = TransportChannelManager.Instance.GetChannel(channelName);
 				if (registeredChannel != null)
-					ChannelServices.UnregisterChannel(registeredChannel);
+                    TransportChannelManager.Instance.UnregisterChannel(registeredChannel);
 
 				// dispose channel if it's disposable
 				var disposableChannel = registeredChannel as IDisposable;
@@ -243,26 +251,26 @@ namespace Zyan.Communication
 		// Maximum session lifetime (in minutes)
 		private int _sessionAgeLimit = 0;
 
-		/// <summary>
-		/// Prepares the .NET Remoting call context before a remote call.
-		/// </summary>
-		internal void PrepareCallContext(bool implicitTransactionTransfer)
-		{
-			LogicalCallContextData data = new LogicalCallContextData();
-			data.Store.Add("sessionid", _sessionID);
+        ///// <summary>
+        ///// Prepares the .NET Remoting call context before a remote call.
+        ///// </summary>
+        //internal void PrepareCallContext(bool implicitTransactionTransfer)
+        //{
+        //    LogicalCallContextData data = new LogicalCallContextData();
+        //    data.Store.Add("sessionid", _sessionID);
 
-			if (implicitTransactionTransfer && Transaction.Current != null)
-			{
-				Transaction transaction = Transaction.Current;
+        //    if (implicitTransactionTransfer && Transaction.Current != null)
+        //    {
+        //        Transaction transaction = Transaction.Current;
 
-				if (transaction.TransactionInformation.Status == TransactionStatus.InDoubt ||
-					transaction.TransactionInformation.Status == TransactionStatus.Active)
-				{
-					data.Store.Add("transaction", transaction);
-				}
-			}
-			CallContext.SetData("__ZyanContextData_" + _componentHostName, data);
-		}
+        //        if (transaction.TransactionInformation.Status == TransactionStatus.InDoubt ||
+        //            transaction.TransactionInformation.Status == TransactionStatus.Active)
+        //        {
+        //            data.Store.Add("transaction", transaction);
+        //        }
+        //    }
+        //    CallContext.SetData("__ZyanContextData_" + _componentHostName, data);
+        //}
 
 		/// <summary>
 		/// Starts the session keep alive timer.
@@ -290,7 +298,7 @@ namespace Zyan.Communication
 		{
 			try
 			{
-				PrepareCallContext(false);
+                //PrepareCallContext(false);
 
 				int serverSessionAgeLimit = RemoteDispatcher.RenewSession();
 
@@ -387,28 +395,28 @@ namespace Zyan.Communication
 			return (T)proxy.GetTransparentProxy();
 		}
 
-		// Proxy of remote dispatcher
-		private IZyanDispatcher _remoteDispatcher = null;
+        //// Proxy of remote dispatcher
+        //private IZyanDispatcher _remoteDispatcher = null;
 
-		/// <summary>
-		/// Gets a proxy to access the remote dispatcher.
-		/// </summary>
-		protected internal IZyanDispatcher RemoteDispatcher
-		{
-			get
-			{
-				if (_remoteDispatcher == null)
-				{
-					var serverUrl = _serverUrl;
-					if (AllowUrlRandomization)
-						serverUrl = ChannelWrapper.RandomizeUrl(_serverUrl);
+        ///// <summary>
+        ///// Gets a proxy to access the remote dispatcher.
+        ///// </summary>
+        //protected internal IZyanDispatcher RemoteDispatcher
+        //{
+        //    get
+        //    {
+        //        if (_remoteDispatcher == null)
+        //        {
+        //            var serverUrl = _serverUrl;
+        //            if (AllowUrlRandomization)
+        //                serverUrl = ChannelWrapper.RandomizeUrl(_serverUrl);
 
-					_remoteDispatcher = (IZyanDispatcher)Activator.GetObject(typeof(IZyanDispatcher), serverUrl);
-				}
+        //            _remoteDispatcher = (IZyanDispatcher)Activator.GetObject(typeof(IZyanDispatcher), serverUrl);
+        //        }
 
-				return _remoteDispatcher;
-			}
-		}
+        //        return _remoteDispatcher;
+        //    }
+        //}
 
 		#endregion
 
@@ -486,59 +494,7 @@ namespace Zyan.Communication
 
 		#endregion
 
-		#region Notification (old NotificationService feature)
-
-		// Repository for event subscriptions (NotficationService)
-		private volatile Dictionary<Guid, NotificationReceiver> _subscriptions = null;
-
-		// Object for thread synchronization of event subscriptions
-		private object _subscriptionsLockObject = new object();
-
-		/// <summary>
-		/// Subscribes for receiving notifications of a specified event.
-		/// </summary>
-		/// <param name="eventName">Event name</param>
-		/// <param name="handler">Client side event handler</param>
-		/// <returns>Unique subscription ID</returns>
-		[Obsolete("The NotificationService feature may not be supported in future Zyan versions. Please use remote delegates to create your notification system.", false)]
-		public Guid SubscribeEvent(string eventName, EventHandler<NotificationEventArgs> handler)
-		{
-			NotificationReceiver receiver = new NotificationReceiver(eventName, handler);
-			RemoteDispatcher.Subscribe(eventName, receiver.FireNotifyEvent);
-
-			Guid subscriptionID = Guid.NewGuid();
-
-			lock (_subscriptionsLockObject)
-			{
-				_subscriptions.Add(subscriptionID, receiver);
-			}
-			return subscriptionID;
-		}
-
-		/// <summary>
-		/// Unsubscribe for receiving notifications of a specified event.
-		/// </summary>
-		/// <param name="subscriptionID">Unique subscription ID</param>
-		[Obsolete("The NotificationService feature may not be supported in future Zyan versions. Please use remote delegates to create your notification system.")]
-		public void UnsubscribeEvent(Guid subscriptionID)
-		{
-			lock (_subscriptionsLockObject)
-			{
-				if (_subscriptions.ContainsKey(subscriptionID))
-				{
-					NotificationReceiver receiver = _subscriptions[subscriptionID];
-					RemoteDispatcher.Unsubscribe(receiver.EventName, receiver.FireNotifyEvent);
-
-					_subscriptions.Remove(subscriptionID);
-
-					receiver.Dispose();
-				}
-			}
-		}
-
-		#endregion
-
-		#region Intercept calls
+	    #region Intercept calls
 
 		/// <summary>
 		/// Gets whether registered call interceptors should be processed.
@@ -630,8 +586,9 @@ namespace Zyan.Communication
 					}
 					RemoteDispatcher.Logoff(_sessionID);
 				}
-				catch (RemotingException)
-				{ }
+                //TODO: Get rid of .NET Remoting dependency.
+                //catch (RemotingException)
+                //{ }
 				catch (SocketException)
 				{ }
 				catch (WebException)
@@ -646,19 +603,19 @@ namespace Zyan.Communication
 				{
 					_connections.Remove(this);
 				}
-				if (_remotingChannel != null)
+				if (_transportChannel != null)
 				{
 					// unregister remoting channel
-					var registeredChannel = ChannelServices.GetChannel(_remotingChannel.ChannelName);
-					if (registeredChannel != null && registeredChannel == _remotingChannel)
-						ChannelServices.UnregisterChannel(_remotingChannel);
+                    var registeredChannel = TransportChannelManager.Instance.GetChannel(_transportChannel.ChannelName);
+					if (registeredChannel != null && registeredChannel == _transportChannel)
+                        TransportChannelManager.Instance.UnregisterChannel(_transportChannel);
 
 					// dispose remoting channel, if it's disposable
-					var disposableChannel = _remotingChannel as IDisposable;
+					var disposableChannel = _transportChannel as IDisposable;
 					if (disposableChannel != null)
 						disposableChannel.Dispose();
 
-					_remotingChannel = null;
+					_transportChannel = null;
 				}
 				_remoteDispatcher = null;
 				_serverUrl = string.Empty;
@@ -833,7 +790,7 @@ namespace Zyan.Communication
 		{
 			if (_sendingHeartbeat)
 			{
-				// if polling timer interval is less than 
+				// if polling timer interval is less than
 				// channel timeout, skip sending a heartbeat
 				return;
 			}
@@ -843,7 +800,7 @@ namespace Zyan.Communication
 				_sendingHeartbeat = true;
 				try
 				{
-					PrepareCallContext(false);
+                    //PrepareCallContext(false);
 					RemoteDispatcher.ReceiveClientHeartbeat(_sessionID);
 				}
 				finally
