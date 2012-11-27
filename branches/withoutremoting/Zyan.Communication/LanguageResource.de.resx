@@ -1,0 +1,291 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ApplicationException_MultipleModuleControlersNotAllowed" xml:space="preserve">
+    <value>Mehrere Modulcontroller im selben Modul sind nicht zulässig.</value>
+  </data>
+  <data name="ArgumentException_ComponentHostNameMissing" xml:space="preserve">
+    <value>Für den Komponentenhost wurde kein Name angegeben!</value>
+  </data>
+  <data name="ArgumentException_EmptySessionIDIsNotAllowed" xml:space="preserve">
+    <value>Leerer Sitzungsschlüssel ist nicht erlaubt!</value>
+  </data>
+  <data name="ArgumentException_FactoryMethodDelegateMissing" xml:space="preserve">
+    <value>Keinen Delegaten für Komponentenerzeugung angegeben.</value>
+  </data>
+  <data name="ArgumentException_InterfaceNameMissing" xml:space="preserve">
+    <value>Kein Schnittstellenname angegeben!</value>
+  </data>
+  <data name="ArgumentException_InvalidConfigSetting" xml:space="preserve">
+    <value>Ungültige Konfigurationseinstellung: {0}</value>
+  </data>
+  <data name="ArgumentException_InvalidConnectionAgeLimitSetting" xml:space="preserve">
+    <value>Einstellung 'connectionAgeLimit' muss 0 oder größer sein.</value>
+  </data>
+  <data name="ArgumentException_InvalidSweepFrequencySetting" xml:space="preserve">
+    <value>Einstellung 'sweepFrequency' muss 0 oder größer sein.</value>
+  </data>
+  <data name="ArgumentException_MaxAttempts" xml:space="preserve">
+    <value>Anzahl der Wiederholungsversuche 'maxRetries' muss mindestens auf 1 eingestellt sein.</value>
+  </data>
+  <data name="ArgumentException_MethodNameMissing" xml:space="preserve">
+    <value>Kein Methodenname angegeben!</value>
+  </data>
+  <data name="ArgumentException_ServerUrlMissing" xml:space="preserve">
+    <value>Es wurde kein Server-URL angegeben! Bitte geben Sie einen gültigen Server-URL an, da sonst keine Verbindung zum Komponentenhost aufgebaut werden kann.</value>
+  </data>
+  <data name="ArgumentException_TypeIsNotAClass" xml:space="preserve">
+    <value>Der angegebene Implementierungstyp ist keine Klasse!</value>
+  </data>
+  <data name="ArgumentException_TypeIsNotAInterface" xml:space="preserve">
+    <value>Der angegebene Schnittstellentyp ist keine Schnittstelle!</value>
+  </data>
+  <data name="ArgumentOutOfRangeException_InvalidHttpPortRange" xml:space="preserve">
+    <value>Die HTTP-Anschlussnummer muss im Bereich 0-65535 liegen!</value>
+  </data>
+  <data name="ArgumentOutOfRangeException_InvalidTcpPortRange" xml:space="preserve">
+    <value>Die TCP-Anschlussnummer muss im Bereich 0-65535 liegen!</value>
+  </data>
+  <data name="CryptoRemotingException_ClientConnectionInfoMissing" xml:space="preserve">
+    <value>Keine passenden Client-Verbindungsinformationen gefunden.</value>
+  </data>
+  <data name="CryptoRemotingException_InvalidClientRequest" xml:space="preserve">
+    <value>Ungültige Anfrage vom Client: {0}.</value>
+  </data>
+  <data name="CryptoRemotingException_InvalidTransactionID" xml:space="preserve">
+    <value>Ungültige Sicherheitstransaktionskennung. Möglicherweise wegen Zeitüberschreitung.</value>
+  </data>
+  <data name="CryptoRemotingException_IVMissing" xml:space="preserve">
+    <value>Es wurde kein Inizialisierungsvektor vom Server übermittelt.</value>
+  </data>
+  <data name="CryptoRemotingException_KeyChanged" xml:space="preserve">
+    <value>Der Schlüssel wurde seit dem verschlüsseln der Nachricht geändert.</value>
+  </data>
+  <data name="CryptoRemotingException_PublicKeyNotFound" xml:space="preserve">
+    <value>Kein öffentlicher Schlüssel gefunden.</value>
+  </data>
+  <data name="CryptoRemotingException_ServerRequiresEncryption" xml:space="preserve">
+    <value>Der Server benötigt eine verschlüsselte Verbindung für diesen Client.</value>
+  </data>
+  <data name="CryptoRemotingException_SharedKeyMissing" xml:space="preserve">
+    <value>Es wurde kein gemeinsamer Schlüssel vom Server übermittelt.</value>
+  </data>
+  <data name="SecurityException_ContextInfoMissing" xml:space="preserve">
+    <value>Es wurden keine Kontextinformationen übertragen.</value>
+  </data>
+  <data name="SecurityException_CredentialsMissing" xml:space="preserve">
+    <value>Es wurden keine Anmeldeinformationen angegeben.</value>
+  </data>
+  <data name="SecurityException_PasswordMissing" xml:space="preserve">
+    <value>Es wurde kein Kennwort angegeben.</value>
+  </data>
+  <data name="SecurityException_UserNameMissing" xml:space="preserve">
+    <value>Es wurde kein Benutzername angegeben.</value>
+  </data>
+  <data name="SecurityException_WindowsTokenMissing" xml:space="preserve">
+    <value>Es wurde kein Windows-Sicherheitstoken übergeben.</value>
+  </data>
+  <data name="UserNotAuthenicatedByWindows" xml:space="preserve">
+    <value>Benutzer wurde nicht von Windows authentifiziert.</value>
+  </data>
+  <data name="ArgumentException_OutPutPinNameMissing" xml:space="preserve">
+    <value>Es wurde kein Eigenschaftsname eines Ausgangs-Pins angegeben.</value>
+  </data>
+  <data name="ApplicationException_NotificationServiceNotRunning" xml:space="preserve">
+    <value>Benachrichtigungsdienst ist auf dem Host nicht gestartet.</value>
+  </data>
+  <data name="InvalidCredentials" xml:space="preserve">
+    <value>Benutzername und/oder Kennwort sind nicht korrekt.</value>
+  </data>
+  <data name="ApplicationException_NoChannel" xml:space="preserve">
+    <value>Es wurde kein Kanal erstellt.</value>
+  </data>
+  <data name="ArgumentException_TypeHasAlreadyAHandler" xml:space="preserve">
+    <value>Für Typ '{0}' ist bereits ein Serialisierungshandler registriert.</value>
+  </data>
+  <data name="KeyNotFoundException_SerializationHandlerNotFound" xml:space="preserve">
+    <value>Für Typ '{0}' ist kein Serialisierungshandler registriert.</value>
+  </data>
+  <data name="RemotingException_ConnectionError" xml:space="preserve">
+    <value>Fehler beim Verbinden mit dem Remotehost: {0}.</value>
+  </data>
+  <data name="SocketException_LostConnectionToServer" xml:space="preserve">
+    <value>Verbindung zu Server '{0}' ist abgebrochen.</value>
+  </data>
+  <data name="ArgumentException_AddressMustNotBeEmpty" xml:space="preserve">
+    <value>Adresse darf nicht leer sein.</value>
+  </data>
+  <data name="Format_Exception_InvalidAddressFormat" xml:space="preserve">
+    <value>Ungültiges Format für Parameter 'address': {0}.</value>
+  </data>
+  <data name="RemotingException_NoAddressForReconnect" xml:space="preserve">
+    <value>Keine Adresse zum Wiederverbinden vorhanden.</value>
+  </data>
+  <data name="KeyNotFoundException_CannotFindComponentForInterface" xml:space="preserve">
+    <value>Kann keine Komponente für Schnittstelle '{0}' finden.</value>
+  </data>
+  <data name="InvalidSessionException_SessionIDInvalid" xml:space="preserve">
+    <value>Sitzungsschlüssel '{0}' ist ungültig. Bitte melden Sie sich neu an.</value>
+  </data>
+  <data name="MissingMethodException_MethodNotFound" xml:space="preserve">
+    <value>Methode nicht gefunden: '{0}'.</value>
+  </data>
+  <data name="AccountLockedException_DefaultMessage" xml:space="preserve">
+    <value>Konto ist gesperrt.</value>
+  </data>
+  <data name="AccountNotFoundException_DefaultMessage" xml:space="preserve">
+    <value>Unbekannter Benutzername oder falsches Kennwort.</value>
+  </data>
+  <data name="PasswordExpiredException_DefaultMessage" xml:space="preserve">
+    <value>Kennwort ist abgelaufen.</value>
+  </data>
+  <data name="ApplicationException_NoFormatterSpecified" xml:space="preserve">
+    <value>Kein Formatierer festgelegt.</value>
+  </data>
+  <data name="ApplicationException_NoChannelFactorySpecified" xml:space="preserve">
+    <value>Keine Methode zur Kanalerzeugung spezifiziert.</value>
+  </data>
+  <data name="ApplicationException_NoChannelCreated" xml:space="preserve">
+    <value>Es wurde kein Remotingkanal erzeugt.</value>
+  </data>
+  <data name="RemotingException_MessageSinkNotSet" xml:space="preserve">
+    <value>Keine Nachrichtensenke festgelegt.</value>
+  </data>
+  <data name="RemotingException_ErrorReceivingChannelInfo" xml:space="preserve">
+    <value>Fehler beim Empfangen der Kanalbeschreibung vom entfernten Computer.</value>
+  </data>
+  <data name="RemotingException_ErrorSendingChannelInfo" xml:space="preserve">
+    <value>Fehler beim Senden der Kanalbeschreibung an den entfernten Computer.</value>
+  </data>
+  <data name="ApplicationException_NoServerComponentIsRegisteredForTheGivenInterface" xml:space="preserve">
+    <value>Für Schnittstelle '{0}' ist auf dem Server '{1}' keine Komponente registriert.</value>
+  </data>
+  <data name="ApplicationException_SpecifiedTypeIsNotAnInterface" xml:space="preserve">
+    <value>Der angegebene Typ '{0}' ist keine Schnittstelle! Für die Erzeugung einer entfernten Komponenteninstanz, wird deren öffentliche Schnittstelle benötigt!</value>
+  </data>
+  <data name="ApplicationException_TypeIsNotDelegate" xml:space="preserve">
+    <value>Typ ist nicht Delegatentype: {0}.</value>
+  </data>
+  <data name="ArgumentException_InvalidConfigurationSetting" xml:space="preserve">
+    <value>Ungültige Konfigurationseinstellung: '{0}'.</value>
+  </data>
+  <data name="ArgumentException_UnsupportedEncryptionAlgorithm" xml:space="preserve">
+    <value>Der angegeben Verschlüsselungsalgorithmus '{0}' wird nicht unterstützt. Bitte geben Sie einen der folgende Algorithmen an: '3DES', 'DES', 'RIJNDAEL' oder 'RC2'.</value>
+  </data>
+</root>

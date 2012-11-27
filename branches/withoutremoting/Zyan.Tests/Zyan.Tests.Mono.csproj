@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{3E62B4CF-9BB5-48A9-8DEC-63A1DA88D258}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Zyan.Tests</RootNamespace>
+    <AssemblyName>Zyan.Tests.Mono</AssemblyName>
+    <AssemblyOriginatorKeyFile>..\Zyan.Key\zyan.snk</AssemblyOriginatorKeyFile>
+    <FileAlignment>512</FileAlignment>
+    <SignAssembly>True</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>..\..\bin\UnitTestsMono\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NUNIT</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>True</Optimize>
+    <OutputPath>..\..\bin\UnitTestsMono\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="MemoDb">
+      <HintPath>..\..\libraries\MemoDb\MemoDb.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework, Version=2.4.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
+      <HintPath>..\..\libraries\NUnit\nunit.framework.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CallInterceptionTests.cs" />
+    <Compile Include="CallInterceptorBuilderTests.cs" />
+    <Compile Include="CleanupTests.cs" />
+    <Compile Include="DefaultProtocolTests.cs" />
+    <Compile Include="EmptyDelegateFactoryTests.cs" />
+    <Compile Include="EventFilterTests.cs" />
+    <Compile Include="EventsTests.cs" />
+    <Compile Include="EventStubTests.cs" />
+    <Compile Include="GenericMethodsTests.cs" />
+    <Compile Include="HeartbeatSessionTests.cs" />
+    <Compile Include="LinqTests.cs" />
+    <Compile Include="MefClientTests.cs" />
+    <Compile Include="MefServerTests.cs" />
+    <Compile Include="Misc\AssertEx.cs" />
+    <Compile Include="Misc\DataWrapper.cs" />
+    <Compile Include="Misc\DummyAttribute.cs" />
+    <Compile Include="Misc\Entities.cs" />
+    <Compile Include="Misc\SampleObjectSource.cs" />
+    <Compile Include="OneWayTests.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StreamTests.cs" />
+    <Compile Include="TypeHelperTests.cs" />
+    <Compile Include="ZyanProxyTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Zyan.Communication\Zyan.Communication.Mono.csproj">
+      <Project>{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}</Project>
+      <Name>Zyan.Communication.Mono</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ItemGroup>
+    <None Include="DynamicWireTests.cs" />
+    <None Include="ChannelWrapperTests.cs" />
+    <None Include="CompressionTests.cs" />
+    <None Include="DuckTypingTests.cs" />
+  </ItemGroup>
+</Project>
