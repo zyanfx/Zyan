@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections;
-using System.Runtime.Remoting.Channels;
 using Zyan.Communication.ChannelSinks.Compression;
 using Zyan.Communication.ChannelSinks.Encryption;
+using Zyan.Communication.Transport;
 
 namespace Zyan.Communication.Protocols
 {
@@ -16,7 +16,7 @@ namespace Zyan.Communication.Protocols
 		private bool _oaep = false;
 		private int _maxAttempts = 2;
 		private int _compressionThreshold = 1 << 16;
-		private CompressionMethod _compressionMethod = CompressionMethod.Default; 
+		private CompressionMethod _compressionMethod = CompressionMethod.Default;
 
 		/// <summary>
 		/// Creates a new instance of the CustomClientProtocolSetup class.
@@ -30,7 +30,7 @@ namespace Zyan.Communication.Protocols
 		/// Creates a new instance of the CustomClientProtocolSetup class.
 		/// </summary>
 		/// <param name="channelFactory">Delegate to channel factory method</param>
-		public CustomClientProtocolSetup(Func<IDictionary, IClientChannelSinkProvider, IServerChannelSinkProvider, IChannel> channelFactory)
+        public CustomClientProtocolSetup(Func<IDictionary, IZyanTransportChannel> channelFactory)
 			: base(channelFactory)
 		{
 		}
@@ -103,19 +103,20 @@ namespace Zyan.Communication.Protocols
 
 				_encryptionConfigured = true;
 
-				this.AddClientSinkAfterFormatter(new CryptoClientChannelSinkProvider()
-				{
-					Algorithm = _algorithm,
-					MaxAttempts = _maxAttempts,
-					Oaep = _oaep
-				});
+                //TODO: Implement encryption as pipeline stages first.
+                //this.AddClientSinkAfterFormatter(new CryptoClientChannelSinkProvider()
+                //{
+                //    Algorithm = _algorithm,
+                //    MaxAttempts = _maxAttempts,
+                //    Oaep = _oaep
+                //});
 
-				this.AddServerSinkBeforeFormatter(new CryptoServerChannelSinkProvider()
-				{
-					Algorithm = _algorithm,
-					RequireCryptoClient = true,
-					Oaep = _oaep
-				});
+                //this.AddServerSinkBeforeFormatter(new CryptoServerChannelSinkProvider()
+                //{
+                //    Algorithm = _algorithm,
+                //    RequireCryptoClient = true,
+                //    Oaep = _oaep
+                //});
 			}
 		}
 
@@ -133,8 +134,9 @@ namespace Zyan.Communication.Protocols
 
 			_compressionConfigured = true;
 
-			this.AddClientSinkAfterFormatter(new CompressionClientChannelSinkProvider(_compressionThreshold, _compressionMethod));
-			this.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(_compressionThreshold, _compressionMethod));
+            //TODO: Implement compression as pipeline stages first.
+            //this.AddClientSinkAfterFormatter(new CompressionClientChannelSinkProvider(_compressionThreshold, _compressionMethod));
+            //this.AddServerSinkBeforeFormatter(new CompressionServerChannelSinkProvider(_compressionThreshold, _compressionMethod));
 		}
 	}
 }

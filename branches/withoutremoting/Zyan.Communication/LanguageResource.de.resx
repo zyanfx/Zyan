@@ -288,4 +288,7 @@
   <data name="ArgumentException_UnsupportedEncryptionAlgorithm" xml:space="preserve">
     <value>Der angegeben Verschlüsselungsalgorithmus '{0}' wird nicht unterstützt. Bitte geben Sie einen der folgende Algorithmen an: '3DES', 'DES', 'RIJNDAEL' oder 'RC2'.</value>
   </data>
+  <data name="ArgumentException_DuplicateChannelName" xml:space="preserve">
+    <value>Es ist bereits ein Kanal mit dem Namen '{0}' registriert.</value>
+  </data>
 </root>

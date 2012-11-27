@@ -178,6 +178,15 @@ namespace Zyan.Communication {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A channel named &apos;{0}&apos; is already registered..
+        /// </summary>
+        internal static string ArgumentException_DuplicateChannelName {
+            get {
+                return ResourceManager.GetString("ArgumentException_DuplicateChannelName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Empty session ID is not allowed..
         /// </summary>
         internal static string ArgumentException_EmptySessionIDIsNotAllowed {

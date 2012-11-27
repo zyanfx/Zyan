@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.Remoting.Channels;
+using Zyan.Communication.Transport;
 using Zyan.Communication.Security;
 
 namespace Zyan.Communication.Protocols
@@ -9,21 +9,21 @@ namespace Zyan.Communication.Protocols
 	/// </summary>
 	public interface IServerProtocolSetup
 	{
-		/// <summary>
-		/// Gets a list of all Remoting sinks from the client sink chain.
-		/// </summary>
-		List<IClientChannelSinkProvider> ClientSinkChain { get; }
+        /// <summary>
+        /// Gets a list of all stages of the send pipeline.
+        /// </summary>
+        List<ISendPipelineStage> SendPipeline { get; }
 
-		/// <summary>
-		/// Gets a list of all Remoting sinks from the server sink chain.
-		/// </summary>
-		List<IServerChannelSinkProvider> ServerSinkChain { get; }
+        /// <summary>
+        /// Gets a list of all stages of the receive pipeline.
+        /// </summary>
+        List<IReceivePipelineStage> ReceivePipeline { get; }
 
-		/// <summary>
-		/// Creates and configures a Remoting channel.
-		/// </summary>
-		/// <returns>Remoting channel</returns>
-		IChannel CreateChannel();
+        /// <summary>
+        /// Creates and configures a transport channel.
+        /// </summary>
+        /// <returns>Transport channel</returns>
+        IZyanTransportChannel CreateChannel();
 
 		/// <summary>
 		/// Gets the authentication provider.

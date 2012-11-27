@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Runtime.Remoting;
-using System.Runtime.Remoting.Channels;
-using Zyan.Communication.Notification;
 using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp;
 using Zyan.Communication.Security;
 using Zyan.Communication.SessionMgmt;
 using Zyan.InterLinq.Expressions;
+using Zyan.Communication.Transport;
 
 namespace Zyan.Communication
 {
@@ -20,26 +18,28 @@ namespace Zyan.Communication
 	{
 		#region Constructors
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ZyanComponentHost" /> class.
-		/// </summary>
-		/// <param name="name">The name of the component host.</param>
-		/// <param name="tcpPort">The TCP port.</param>
-		public ZyanComponentHost(string name, int tcpPort)
-			: this(name, new TcpBinaryServerProtocolSetup(tcpPort), new InProcSessionManager(), new ComponentCatalog(true))
-		{
-		}
+        //TODO: Implement TCP transport first.
+        ///// <summary>
+        ///// Initializes a new instance of the <see cref="ZyanComponentHost" /> class.
+        ///// </summary>
+        ///// <param name="name">The name of the component host.</param>
+        ///// <param name="tcpPort">The TCP port.</param>
+        //public ZyanComponentHost(string name, int tcpPort)
+        //    : this(name, new TcpBinaryServerProtocolSetup(tcpPort), new InProcSessionManager(), new ComponentCatalog(true))
+        //{
+        //}
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ZyanComponentHost" /> class.
-		/// </summary>
-		/// <param name="name">The name of the component host.</param>
-		/// <param name="tcpPort">The TCP port.</param>
-		/// <param name="catalog">The component catalog.</param>
-		public ZyanComponentHost(string name, int tcpPort, ComponentCatalog catalog)
-			: this(name, new TcpBinaryServerProtocolSetup(tcpPort), new InProcSessionManager(), catalog)
-		{
-		}
+        //TODO: Implement TCP transport first.
+        ///// <summary>
+        ///// Initializes a new instance of the <see cref="ZyanComponentHost" /> class.
+        ///// </summary>
+        ///// <param name="name">The name of the component host.</param>
+        ///// <param name="tcpPort">The TCP port.</param>
+        ///// <param name="catalog">The component catalog.</param>
+        //public ZyanComponentHost(string name, int tcpPort, ComponentCatalog catalog)
+        //    : this(name, new TcpBinaryServerProtocolSetup(tcpPort), new InProcSessionManager(), catalog)
+        //{
+        //}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ZyanComponentHost" /> class.
@@ -293,14 +293,15 @@ namespace Zyan.Communication
 		{
 			var channel = _protocolSetup.CreateChannel();
 			if (channel == null)
-			{ 
+			{
 				throw new ApplicationException(LanguageResource.ApplicationException_NoChannel);
 			}
 
 			// register the channel and publish the dispatcher
 			_channelName = channel.ChannelName;
-			ChannelServices.RegisterChannel(channel, false);
-			RemotingServices.Marshal(_dispatcher, _name);
+            channel.Dispatcher = _dispatcher;
+
+            TransportChannelManager.Instance.RegisterChannel(channel);			
 		}
 
 		/// <summary>
@@ -309,8 +310,11 @@ namespace Zyan.Communication
 		private void StopListening()
 		{
 			// detach the dispatcher and close the communication channel
-			RemotingServices.Disconnect(_dispatcher);
-			CloseChannel();
+            var channel = TransportChannelManager.Instance.GetChannel(_channelName);
+            if (channel != null)
+                channel.Dispatcher = null;
+
+            CloseChannel();
 		}
 
 		/// <summary>
@@ -319,9 +323,9 @@ namespace Zyan.Communication
 		private void CloseChannel()
 		{
 			// unregister remoting channel
-			var channel = ChannelServices.GetChannel(_channelName);
+            var channel = TransportChannelManager.Instance.GetChannel(_channelName);
 			if (channel != null)
-				ChannelServices.UnregisterChannel(channel);
+                TransportChannelManager.Instance.UnregisterChannel(channel);
 
 			// dispose channel if it's disposable
 			var disposableChannel = channel as IDisposable;
@@ -428,95 +432,6 @@ namespace Zyan.Communication
 			if (InvokeRejected != null)
 				InvokeRejected(this, e);
 		}
-
-		#endregion
-
-		#region Notifications
-
-		// Notification service
-		private volatile NotificationService _notificationService = null;
-
-		// Lock object for the notification service instance creation
-		private object _notificationServiceLockObject = new object();
-
-		/// <summary>
-		/// Gets a value indicating whether the notification service is running.
-		/// </summary>
-		[Obsolete("The NotificationService feature may not be supported in future Zyan versions. Please use remote delegates to create your notification system.", false)]
-		public bool IsNotificationServiceRunning
-		{
-			get
-			{
-				lock (_notificationServiceLockObject)
-				{
-					return _notificationService != null;
-				}
-			}
-		}
-
-		/// <summary>
-		/// Starts the notification service.
-		/// </summary>
-		[Obsolete("The NotificationService feature may not be supported in future Zyan versions. Please use remote delegates to create your notification system.", false)]
-		public void StartNotificationService()
-		{
-			lock (_notificationServiceLockObject)
-			{
-				if (_notificationService == null)
-				{
-					_notificationService = new NotificationService();
-				}
-			}
-		}
-
-		/// <summary>
-		/// Stops the notification service.
-		/// </summary>
-		[Obsolete("The NotificationService feature may not be supported in future Zyan versions. Please use remote delegates to create your notification system.", false)]
-		public void StopNotificationService()
-		{
-			lock (_notificationServiceLockObject)
-			{
-				if (_notificationService != null)
-				{
-					_notificationService = null;
-				}
-			}
-		}
-
-		/// <summary>
-		/// Gets the notification service.
-		/// </summary>
-		[Obsolete("The NotificationService feature may not be supported in future Zyan versions. Please use remote delegates to create your notification system.", false)]
-		public NotificationService NotificationService
-		{
-			get
-			{
-				lock (_notificationServiceLockObject)
-				{
-					return _notificationService;
-				}
-			}
-		}
-
-#pragma warning disable 612
-
-		/// <summary>
-		/// Publishes the event of the server component.
-		/// </summary>
-		/// <param name="eventName">Name of the event.</param>
-		/// <exception cref="System.ApplicationException"></exception>
-		[Obsolete("The NotificationService feature may not be supported in future Zyan versions. Please use remote delegates to create your notification system.", false)]
-		public EventHandler<NotificationEventArgs> PublishEvent(string eventName)
-		{
-			if (!IsNotificationServiceRunning)
-				throw new ApplicationException(LanguageResource.ApplicationException_NotificationServiceNotRunning);
-
-			var sender = new NotificationSender(NotificationService, eventName);
-			return new EventHandler<NotificationEventArgs>(sender.HandleServerEvent);
-		}
-
-#pragma warning restore 612
 
 		#endregion
 
