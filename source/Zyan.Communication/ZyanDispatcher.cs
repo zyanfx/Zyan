@@ -716,33 +716,24 @@ namespace Zyan.Communication
 		/// <returns>Session age limit (in minutes)</returns>
 		public int RenewSession()
 		{
-			LogicalCallContextData data = CallContext.GetData("__ZyanContextData_" + _host.Name) as LogicalCallContextData;
-
-			if (data != null)
+			// validate context data
+			var data = CallContext.GetData("__ZyanContextData_" + _host.Name) as LogicalCallContextData;
+			if (data == null || !data.Store.ContainsKey("sessionid"))
 			{
-				if (data.Store.ContainsKey("sessionid"))
-				{
-					Guid sessionID = (Guid)data.Store["sessionid"];
-
-					if (_host.SessionManager.ExistSession(sessionID))
-					{
-						ServerSession session = _host.SessionManager.GetSessionBySessionID(sessionID);
-						session.Timestamp = DateTime.Now;
-
-						ServerSession.CurrentSession = session;
-					}
-					else
-					{
-						InvalidSessionException ex = new InvalidSessionException(string.Format("Sitzungsschlüssel '{0}' ist ungültig! Bitte melden Sie sich erneut am Server an.", sessionID.ToString()));
-						throw ex;
-					}
-				}
+				throw new SecurityException(LanguageResource.SecurityException_ContextInfoMissing);
 			}
-			else
+
+			// validate session
+			var sessionID = (Guid)data.Store["sessionid"];
+			if (!_host.SessionManager.ExistSession(sessionID))
 			{
-				SecurityException ex = new SecurityException(LanguageResource.SecurityException_ContextInfoMissing);
-				throw ex;
+				throw new InvalidSessionException(string.Format(LanguageResource.InvalidSessionException_SessionIDInvalid, sessionID.ToString()));
 			}
+
+			// renew session
+			var session = _host.SessionManager.GetSessionBySessionID(sessionID);
+			ServerSession.CurrentSession = session;
+			_host.SessionManager.RenewSession(session);
 			return SessionAgeLimit;
 		}
 
