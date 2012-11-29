@@ -42,8 +42,14 @@ namespace Zyan.Communication.SessionMgmt
 		/// <summary>
 		/// Stores the given <see cref="ServerSession"/> to the session list.
 		/// </summary>
-		/// <param name="session"><see cref="ServerSession"/> to store.</param>
+		/// <param name="session">The <see cref="ServerSession"/> to store.</param>
 		void StoreSession(ServerSession session);
+
+		/// <summary>
+		/// Renews the given session.
+		/// </summary>
+		/// <param name="session">The <see cref="ServerSession"/> to renew.</param>
+		void RenewSession(ServerSession session);
 
 		/// <summary>
 		/// Removes the given session from the session list.

@@ -399,7 +399,7 @@ namespace Zyan.Communication.SessionMgmt
 		/// <summary>
 		/// Stores a session in the SQL Server database.
 		/// </summary>
-		/// <param name="session">Session identity</param>
+		/// <param name="session">The <see cref="ServerSession"/> to store.</param>
 		private void StoreSessionOnSqlServer(ServerSession session)
 		{
 			using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead }))
@@ -422,6 +422,35 @@ namespace Zyan.Communication.SessionMgmt
 						command.Parameters.Add("@identityName", SqlDbType.NVarChar, 255).Value = session.Identity.Name;
 
 						// Execute the query and commit the transaction
+						connection.Open();
+						command.ExecuteNonQuery();
+						connection.Close();
+						scope.Complete();
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Updates a session in the SQL Server database.
+		/// </summary>
+		/// <param name="session">The <see cref="ServerSession"/> to update.</param>
+		private void RenewSessionOnSqlServer(ServerSession session)
+		{
+			using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead }))
+			{
+				using (SqlConnection connection = new SqlConnection(_connectionString))
+				{
+					// Prepare the SQL statement
+					StringBuilder sqlBuilder = new StringBuilder();
+					sqlBuilder.AppendFormat("UPDATE [{0}].[{1}] SET SessionTimestamp=@sessionTimestamp WHERE SessionID=@sessionID", _sqlSchema, _sqlSessionTableName);
+
+					using (SqlCommand command = new SqlCommand(sqlBuilder.ToString(), connection))
+					{
+						command.Parameters.Add("@sessionID", SqlDbType.UniqueIdentifier).Value = session.SessionID;
+						command.Parameters.Add("@sessionTimestamp", SqlDbType.DateTime).Value = session.Timestamp;
+
+						// Execute the statement and commit the transaction
 						connection.Open();
 						command.ExecuteNonQuery();
 						connection.Close();
@@ -521,6 +550,16 @@ namespace Zyan.Communication.SessionMgmt
 		public override void StoreSession(ServerSession session)
 		{
 			StoreSessionOnSqlServer(session);
+		}
+
+		/// <summary>
+		/// Renews the given session.
+		/// </summary>
+		/// <param name="session">The <see cref="ServerSession" /> to renew.</param>
+		public override void RenewSession(ServerSession session)
+		{
+			base.RenewSession(session);
+			RenewSessionOnSqlServer(session);
 		}
 
 		/// <summary>
