@@ -212,6 +212,9 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			TcpExChannel channel = (TcpExChannel)state[1];
 			Socket client = listener.EndAccept(ar);
 
+			// Wait for next Client request
+			listener.BeginAccept(new AsyncCallback(listener_Accept), new object[] {listener, channel});
+
 			try
 			{
 				StartListening(Connection.CreateConnection(client, channel, channel.TcpKeepAliveEnabled, channel.TcpKeepAliveTime, channel.TcpKeepAliveInterval, channel.MaxRetries, channel.RetryDelay));
@@ -229,8 +232,6 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				// Client sends bad data
 				//TODO: Add Tracing here!
 			}
-			// Wait for next Client request
-			listener.BeginAccept(new AsyncCallback(listener_Accept), new object[] {listener, channel});
 		}
 
 		// Hashtable<string(server), Stack<object[Connection, Message]>>
