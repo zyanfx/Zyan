@@ -450,13 +450,13 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		{
 			lock (_connectionsLockObject)
 			{
-				_connections.Add(_remoteChannelData.ChannelID.ToString(), this);
+				_connections[_remoteChannelData.ChannelID.ToString()] = this;
 
 				if (_remoteChannelData.Addresses != null)
 				{
 					foreach (string address in _remoteChannelData.Addresses)
 					{
-						_connections.Add(address, this);
+						_connections[address] = this;
 					}
 				}
 			}
