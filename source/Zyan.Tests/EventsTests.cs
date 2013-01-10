@@ -92,6 +92,7 @@ namespace Zyan.Tests
 			ZyanHost = new ZyanComponentHost("EventsServer", serverSetup);
 			ZyanHost.RegisterComponent<ISampleServer, SampleServer>("Singleton", ActivationType.Singleton);
 			ZyanHost.RegisterComponent<ISampleServer, SampleServer>("SingleCall", ActivationType.SingleCall);
+			ZyanHost.RegisterComponent<ISampleServer, SampleServer>("SingletonExternal", new SampleServer());
 
 			ZyanConnection = new ZyanConnection("null://NullChannel:2345/EventsServer");
 		}
@@ -134,6 +135,38 @@ namespace Zyan.Tests
 			var eventHandler = new EventHandler((s, e) => handled = true);
 
 			var proxy = ZyanConnection.CreateProxy<ISampleServer>("Singleton");
+			proxy.TestEvent += eventHandler;
+			handled = false;
+
+			proxy.RaiseTestEvent();
+			Assert.IsTrue(handled);
+
+			proxy.TestEvent -= eventHandler; // unsubscription #1
+			handled = false;
+
+			proxy.RaiseTestEvent();
+			Assert.IsFalse(handled);
+
+			proxy.TestEvent += eventHandler;
+			handled = false;
+
+			proxy.RaiseTestEvent();
+			Assert.IsTrue(handled);
+
+			proxy.TestEvent -= eventHandler; // unsubscription #2
+			handled = false;
+
+			proxy.RaiseTestEvent();
+			Assert.IsFalse(handled);
+		}
+
+		[TestMethod]
+		public void SubscriptionUnsubscription_SingletonExternal()
+		{
+			var handled = false;
+			var eventHandler = new EventHandler((s, e) => handled = true);
+
+			var proxy = ZyanConnection.CreateProxy<ISampleServer>("SingletonExternal");
 			proxy.TestEvent += eventHandler;
 			handled = false;
 
@@ -203,6 +236,55 @@ namespace Zyan.Tests
 				var proxy1 = ZyanConnection.CreateProxy<ISampleServer>("Singleton");
 				var proxy2 = conn2.CreateProxy<ISampleServer>("Singleton");
 				var proxy3 = conn3.CreateProxy<ISampleServer>("Singleton");
+
+				var proxy1handled = false;
+				var handler1 = new EventHandler((sender, args) => proxy1handled = true);
+				proxy1.TestEvent += handler1;
+
+				var proxy2handled = false;
+				var handler2 = new EventHandler((sender, args) => proxy2handled = true);
+				proxy2.TestEvent += handler2;
+
+				var proxy3handled = false;
+				var handler3 = new EventHandler((sender, args) => { proxy3handled = true; throw new Exception(); });
+				proxy3.TestEvent += handler3;
+
+				proxy1.RaiseTestEvent();
+				Assert.IsTrue(proxy1handled);
+				Assert.IsTrue(proxy2handled);
+				Assert.IsTrue(proxy3handled);
+
+				proxy1handled = false;
+				proxy2handled = false;
+				proxy3handled = false;
+
+				proxy2.RaiseTestEvent();
+				Assert.IsTrue(proxy1handled);
+				Assert.IsTrue(proxy2handled);
+				Assert.IsFalse(proxy3handled);
+
+				proxy1handled = false;
+				proxy2handled = false;
+
+				proxy3.RaiseTestEvent();
+				Assert.IsTrue(proxy1handled);
+				Assert.IsTrue(proxy2handled);
+				Assert.IsFalse(proxy3handled);
+			}
+		}
+
+		[TestMethod]
+		public void EventsOnExternalSingletonComponentsWorkGlobally()
+		{
+			var nullProtocol = new NullClientProtocolSetup();
+
+			// start two new sessions
+			using (var conn2 = new ZyanConnection(ZyanConnection.ServerUrl, nullProtocol))
+			using (var conn3 = new ZyanConnection(ZyanConnection.ServerUrl, nullProtocol))
+			{
+				var proxy1 = ZyanConnection.CreateProxy<ISampleServer>("SingletonExternal");
+				var proxy2 = conn2.CreateProxy<ISampleServer>("SingletonExternal");
+				var proxy3 = conn3.CreateProxy<ISampleServer>("SingletonExternal");
 
 				var proxy1handled = false;
 				var handler1 = new EventHandler((sender, args) => proxy1handled = true);
