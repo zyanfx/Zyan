@@ -60,7 +60,7 @@ namespace Zyan.Communication
 
 			if (!ComponentRegistry.ContainsKey(uniqueName))
 			{
-				ComponentRegistration registration = new ComponentRegistration(interfaceType, implementationType, uniqueName, activationType, cleanUpHandler);
+				var registration = new ComponentRegistration(interfaceType, implementationType, uniqueName, activationType, cleanUpHandler);
 				registration.DisposeWithCatalog = true;
 				ComponentRegistry.Add(uniqueName, registration);
 			}
@@ -91,7 +91,7 @@ namespace Zyan.Communication
 
 			if (!ComponentRegistry.ContainsKey(uniqueName))
 			{
-				ComponentRegistration registration = new ComponentRegistration(interfaceType, factoryMethod, uniqueName, activationType, cleanUpHandler);
+				var registration = new ComponentRegistration(interfaceType, factoryMethod, uniqueName, activationType, cleanUpHandler);
 				registration.DisposeWithCatalog = true;
 				ComponentRegistry.Add(uniqueName, registration);
 			}
@@ -128,8 +128,9 @@ namespace Zyan.Communication
 
 			if (!ComponentRegistry.ContainsKey(uniqueName))
 			{
-				ComponentRegistration registration = new ComponentRegistration(interfaceType, instance, uniqueName, cleanUpHandler);
+				var registration = new ComponentRegistration(interfaceType, instance, uniqueName, cleanUpHandler);
 				registration.DisposeWithCatalog = !externallyOwned;
+				registration.EventStub.WireTo(instance);
 				ComponentRegistry.Add(uniqueName, registration);
 			}
 
