@@ -7,6 +7,7 @@ using System.Reflection;
 using Zyan.Communication;
 using Zyan.Communication.Security;
 using Zyan.Communication.Protocols;
+using Zyan.Communication.Protocols.Null;
 using Zyan.Communication.Protocols.Tcp;
 
 namespace Zyan.Tests
@@ -334,6 +335,36 @@ namespace Zyan.Tests
 			Assert.AreEqual("Hallo", proxy2.Echo("Hallo"));
 
 			connection.Dispose();
+		}
+
+		[TestMethod]
+		public void RefreshRegisteredComponentsTest()
+		{
+			using (var host = new ZyanComponentHost("RefreshTest", new NullServerProtocolSetup(123)))
+			using (var conn = new ZyanConnection("null://NullChannel:123/RefreshTest"))
+			{
+				// this component is registered after connection is established
+				var componentName = Guid.NewGuid().ToString();
+				host.RegisterComponent<ISampleServer, SampleServer>(componentName);
+
+				try
+				{
+					// proxy cannot be created because connection doesn't know about the component
+					var proxy1 = conn.CreateProxy<ISampleServer>(componentName);
+					Assert.Fail("Component is not yet known for ZyanConnection.");
+				}
+				catch (ApplicationException)
+				{
+				}
+
+				// refresh the list of registered components and create a proxy
+				conn.RefreshRegisteredComponents();
+				var proxy2 = conn.CreateProxy<ISampleServer>(componentName);
+
+				var echoString = "Hello there";
+				var result = proxy2.Echo(echoString);
+				Assert.AreEqual(echoString, result);
+			}
 		}
 
 		#endregion
