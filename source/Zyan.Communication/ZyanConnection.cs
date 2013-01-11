@@ -965,6 +965,14 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
+		/// Refreshes the list of server-side components.
+		/// </summary>
+		public void RefreshRegisteredComponents()
+		{
+			_registeredComponents = new List<ComponentInfo>(RemoteDispatcher.GetRegisteredComponents());
+		}
+
+		/// <summary>
 		/// Reconnects to all remote events or delegates of any know proxy for this connection, after a server restart.
 		/// <remarks>
 		/// Caution! This method does not check, if the event handler registrations are truly lost (caused by a server restart).
