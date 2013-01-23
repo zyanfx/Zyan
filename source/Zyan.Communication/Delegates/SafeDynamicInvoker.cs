@@ -189,12 +189,16 @@ namespace Zyan.Communication.Delegates
 			var invocationList = deleg.GetInvocationList();
 			foreach (var d in invocationList)
 			{
+				// avoid closing over the loop variable (not needed in C# v5)
+				// see details here: http://blogs.msdn.com/b/ericlippert/archive/2009/11/12/closing-over-the-loop-variable-considered-harmful.aspx
+				var @delegate = d;
+
 				// implemented using custom thread pool
 				ThreadPool.QueueUserWorkItem(x =>
 				{
 					try
 					{
-						dynamicInvoker(d, arguments);
+						dynamicInvoker(@delegate, arguments);
 					}
 					catch (Exception ex)
 					{
