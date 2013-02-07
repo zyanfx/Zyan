@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Security.Principal;
 using Zyan.Communication.SessionMgmt;
+using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication
 {
@@ -14,6 +15,7 @@ namespace Zyan.Communication
 		private IIdentity _identity;
 		private DateTime _timestamp;
 		private string _clientAddress;
+		private static string _serverSessionSlotName = Guid.NewGuid().ToString();
 
 		// Adapter for accessing session variables.
 		[NonSerialized]
@@ -85,9 +87,15 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Gets the session of the current thread.
+		/// Gets the session of the current logical server thread.
 		/// </summary>
-		[ThreadStatic]
-		public static ServerSession CurrentSession;
+		/// <remarks>
+		/// This property doesn't cross application domain boundaries.
+		/// </remarks>
+		public static ServerSession CurrentSession
+		{
+			get { return LocalCallContextData.GetData<ServerSession>(_serverSessionSlotName); }
+			internal set { LocalCallContextData.SetData(_serverSessionSlotName, value); }
+		}
 	}
 }
