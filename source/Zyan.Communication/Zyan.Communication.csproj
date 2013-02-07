@@ -292,6 +292,7 @@
     <Compile Include="SessionMgmt\SessionVariableAdapter.cs" />
     <Compile Include="SessionMgmt\SqlSessionManager.cs" />
     <Compile Include="Toolbox\AssemblyLocator.cs" />
+    <Compile Include="Toolbox\LocalCallContextData.cs" />
     <Compile Include="Toolbox\Compression\CompressionHelper.cs" />
     <Compile Include="Toolbox\Compression\LZF.cs" />
     <Compile Include="Toolbox\Diagnostics\Trace.cs" />

@@ -286,6 +286,7 @@
     <Compile Include="Toolbox\ExtensionsFx3.cs" />
     <Compile Include="Toolbox\IProducerConsumerCollectionFx3.cs" />
     <Compile Include="Toolbox\LazyFx3.cs" />
+    <Compile Include="Toolbox\LocalCallContextData.cs" />
     <Compile Include="Toolbox\MessageHelpers.cs" />
     <Compile Include="Toolbox\MonoCheck.cs" />
     <Compile Include="Toolbox\ObjectPoolFx3.cs" />
