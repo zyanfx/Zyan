@@ -21,21 +21,11 @@ namespace Zyan.Communication.Protocols
 		/// Dictionary for channel settings.
 		/// </summary>
 		protected Dictionary<string, object> _channelSettings = new Dictionary<string, object>();
-
-		/// <summary>
-		/// List for building the client sink chain.
-		/// </summary>
-        protected List<ISendPipelineStage> _sendPipeline = new List<ISendPipelineStage>();
-
-		/// <summary>
-		/// List for building the server sink chain.
-		/// </summary>
-        protected List<IReceivePipelineStage> _receivePipeline = new List<IReceivePipelineStage>();
-
+        		
 		/// <summary>
 		/// Delegate to factory method, which creates the .NET Remoting channel instance.
 		/// </summary>
-		protected Func<IDictionary, IZyanTransportChannel> _channelFactory = null;
+		protected Func<IDictionary, IServerTransportAdapter> _channelFactory = null;
 
 		/// <summary>
 		/// Authentication provider.
@@ -50,24 +40,24 @@ namespace Zyan.Communication.Protocols
 		/// <summary>
 		/// Creates a new instance of the ServerProtocolSetup class.
 		/// </summary>
-		/// <param name="channelFactory">Delegate to channel factory method</param>
-        public ServerProtocolSetup(Func<IDictionary, IZyanTransportChannel> channelFactory)
+		/// <param name="transportAdapterFactory">Delegate to transport adapter factory method</param>
+        public ServerProtocolSetup(Func<IDictionary, IServerTransportAdapter> transportAdapterFactory)
 			: this()
 		{
-			if (channelFactory == null)
+			if (transportAdapterFactory == null)
 				throw new ArgumentNullException("channelFactory");
 
-			_channelFactory = channelFactory;
+			_channelFactory = transportAdapterFactory;
 		}
 
 		/// <summary>
 		/// Creates a new ServerProtocolSetup with a specified channel factory method.
 		/// </summary>
-		/// <param name="channelFactory">Delegate to channel factory method</param>
+		/// <param name="transportAdapterFactory">Delegate to transport adapter factory method</param>
 		/// <returns></returns>
-		public static IServerProtocolSetup WithChannel(Func<IDictionary, IZyanTransportChannel> channelFactory)
+		public static IServerProtocolSetup WithChannel(Func<IDictionary, IServerTransportAdapter> transportAdapterFactory)
 		{
-			return new ServerProtocolSetup(channelFactory);
+			return new ServerProtocolSetup(transportAdapterFactory);
 		}
 
 		/// <summary>
@@ -76,22 +66,12 @@ namespace Zyan.Communication.Protocols
 		public virtual Dictionary<string, object> ChannelSettings { get { return _channelSettings; } }
 
         /// <summary>
-        /// Gets a list of all stages of the send pipeline.
+        /// Creates and configures a transport adapter.
         /// </summary>
-		public virtual List<ISendPipelineStage> SendPipeline { get { return _sendPipeline; } }
-
-        /// <summary>
-        /// Gets a list of all stages of the receive pipeline.
-        /// </summary>
-		public virtual List<IReceivePipelineStage> ReceivePipeline { get { return _receivePipeline; } }
-
-        /// <summary>
-        /// Creates and configures a transport channel.
-        /// </summary>
-        /// <returns>Transport channel</returns>
-		public virtual IZyanTransportChannel CreateChannel()
+        /// <returns>Transport adapter</returns>
+		public virtual IServerTransportAdapter CreateTransportAdapter()
 		{
-            IZyanTransportChannel channel = TransportChannelManager.Instance.GetChannel(_channelName);
+            var channel = ServerTransportAdapterManager.Instance.GetTransportAdapter(_channelName);
 
 			if (channel == null)
 			{

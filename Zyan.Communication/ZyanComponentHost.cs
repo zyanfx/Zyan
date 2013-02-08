@@ -8,6 +8,7 @@ using Zyan.Communication.Security;
 using Zyan.Communication.SessionMgmt;
 using Zyan.InterLinq.Expressions;
 using Zyan.Communication.Transport;
+using System.Collections;
 
 namespace Zyan.Communication
 {
@@ -291,28 +292,107 @@ namespace Zyan.Communication
 		/// </summary>
 		private void StartListening()
 		{
-			var channel = _protocolSetup.CreateChannel();
+			var channel = _protocolSetup.CreateTransportAdapter();
 			if (channel == null)
 			{
 				throw new ApplicationException(LanguageResource.ApplicationException_NoChannel);
 			}
+			_channelName = channel.UniqueName;
 
-			// register the channel and publish the dispatcher
-			_channelName = channel.ChannelName;
-            channel.Dispatcher = _dispatcher;
+            channel.ReceiveRequest = this.ReceiveRequestMessage;            
+            channel.StartListening();
 
-            TransportChannelManager.Instance.RegisterChannel(channel);			
+            ServerTransportAdapterManager.Instance.Register(channel);			
 		}
 
-		/// <summary>
-		/// Stop listening to the client requests.
-		/// </summary>
-		private void StopListening()
+        /// <summary>
+        /// Called by transport adapter, when a request message is received.
+        /// </summary>
+        /// <param name="request">Request message</param>
+        private IResponseMessage ReceiveRequestMessage(IRequestMessage request)
+        {
+            var channel = ServerTransportAdapterManager.Instance.GetTransportAdapter(_channelName);
+
+            Exception exception=null;
+            object returnValue = null;
+
+            try
+            {
+                switch (request.RequestType)
+                {
+                    case RequestType.RemoteMethodCall:
+                        
+                        returnValue = _dispatcher.Invoke
+                        (
+                            request.TrackingID,
+                            request.InterfaceName, 
+                            request.DelegateCorrelationSet, 
+                            request.MethodName, 
+                            request.GenericArguments, 
+                            request.ParameterTypes, 
+                            request.CallContext,
+                            request.ParameterValues
+                        );                        
+                        break;
+
+                    case RequestType.SystemOperation:
+
+                        switch (request.MethodName.ToLower())
+                        {
+                            case "logon":
+                                _dispatcher.Logon((Guid)request.ParameterValues[0], (Hashtable)request.ParameterValues[1]);
+                                returnValue = _dispatcher.SessionAgeLimit;
+                                break;
+
+                            case "logoff":
+                                _dispatcher.Logoff((Guid)request.ParameterValues[0]);
+                                break;
+
+                            case "getregisteredcomponents":
+                                returnValue = _dispatcher.GetRegisteredComponents();
+                                break;
+
+                            case "existsession":
+                                returnValue = _dispatcher.ExistSession((Guid)request.ParameterValues[0]);
+                                break;
+                                
+                            case "receiveclientheartbeat":
+                                _dispatcher.ReceiveClientHeartbeat((Guid)request.ParameterValues[0], request.CallContext);
+                                break;
+
+                            default:
+                                //TODO: Localize this exception message!
+                                throw new InvalidOperationException(string.Format("Invalid dispatcher operation '{0}'.",request.MethodName));
+                        }
+
+                        break;
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+            }
+
+            var response = new ResponseMessage()
+            {
+                Address = request.ResponseAddress,
+                Exception = exception,
+                ReturnValue = returnValue,
+                TrackingID = request.TrackingID
+            };
+            return response;
+        }
+
+        /// <summary>
+        /// Stop listening to the client requests.
+        /// </summary>
+        private void StopListening()
 		{
 			// detach the dispatcher and close the communication channel
-            var channel = TransportChannelManager.Instance.GetChannel(_channelName);
+            var channel = ServerTransportAdapterManager.Instance.GetTransportAdapter(_channelName);
             if (channel != null)
-                channel.Dispatcher = null;
+                channel.ReceiveRequest = null;
 
             CloseChannel();
 		}
@@ -323,9 +403,9 @@ namespace Zyan.Communication
 		private void CloseChannel()
 		{
 			// unregister remoting channel
-            var channel = TransportChannelManager.Instance.GetChannel(_channelName);
+            var channel = ClientTransportAdapterManager.Instance.GetTransportAdapter(_channelName);
 			if (channel != null)
-                TransportChannelManager.Instance.UnregisterChannel(channel);
+                ClientTransportAdapterManager.Instance.Unregister(channel);
 
 			// dispose channel if it's disposable
 			var disposableChannel = channel as IDisposable;
