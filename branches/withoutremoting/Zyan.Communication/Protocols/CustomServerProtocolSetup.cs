@@ -29,7 +29,7 @@ namespace Zyan.Communication.Protocols
 		/// Creates a new instance of the CustomServerProtocolSetup class.
 		/// </summary>
 		/// <param name="channelFactory">Delegate to channel factory method</param>
-		public CustomServerProtocolSetup(Func<IDictionary, IZyanTransportChannel> channelFactory)
+		public CustomServerProtocolSetup(Func<IDictionary, IServerTransportAdapter> channelFactory)
 			: base(channelFactory)
 		{
 		}

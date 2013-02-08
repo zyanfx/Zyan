@@ -20,9 +20,10 @@ namespace Zyan.Communication
 		/// <param name="methodName">Name of the invoked method</param>
 		/// <param name="genericArguments">Generic arguments of the invoked method</param>
 		/// <param name="paramTypes">Parameter types</param>
-		/// <param name="args">Parameter values</param>
+		/// <param name="callContextData">Call context data</param>
+        /// <param name="args">Parameter values</param>
 		/// <returns>Return value</returns>
-		object Invoke(Guid trackingID, string interfaceName, List<DelegateCorrelationInfo> delegateCorrelationSet, string methodName, Type[] genericArguments, Type[] paramTypes, params object[] args);
+		object Invoke(Guid trackingID, string interfaceName, List<DelegateCorrelationInfo> delegateCorrelationSet, string methodName, Type[] genericArguments, Type[] paramTypes, LogicalCallContextData callContextData, params object[] args);
 
 		/// <summary>
 		/// Returns an array with metadata about all registered components.
@@ -58,11 +59,11 @@ namespace Zyan.Communication
 			get;
 		}
 
-		/// <summary>
-		/// Extends the lifetime of the current session and returs the current session age limit.
-		/// </summary>
-		/// <returns>Session age limit (in minutes)</returns>
-		int RenewSession();
+        ///// <summary>
+        ///// Extends the lifetime of the current session and returs the current session age limit.
+        ///// </summary>
+        ///// <returns>Session age limit (in minutes)</returns>
+        //int RenewSession();
 
 		/// <summary>
 		/// Adds a handler to an event of a server component.
@@ -70,7 +71,8 @@ namespace Zyan.Communication
 		/// <param name="interfaceName">Name of the server component interface</param>
 		/// <param name="correlation">Correlation information</param>
 		/// <param name="uniqueName">Unique name of the server component instance (May left empty, if component isn´t registered with a unique name)</param>
-		void AddEventHandler(string interfaceName, DelegateCorrelationInfo correlation, string uniqueName);
+		/// <param name="callContext">Call context data</param>
+        void AddEventHandler(string interfaceName, DelegateCorrelationInfo correlation, string uniqueName, LogicalCallContextData callContext);
 
 		/// <summary>
 		/// Removes a handler from an event of a server component.
@@ -78,7 +80,8 @@ namespace Zyan.Communication
 		/// <param name="interfaceName">Name of the server component interface</param>
 		/// <param name="correlation">Correlation information</param>
 		/// <param name="uniqueName">Unique name of the server component instance (May left empty, if component isn´t registered with a unique name)</param>
-		void RemoveEventHandler(string interfaceName, DelegateCorrelationInfo correlation, string uniqueName);
+        /// <param name="callContext">Call context data</param>
+        void RemoveEventHandler(string interfaceName, DelegateCorrelationInfo correlation, string uniqueName, LogicalCallContextData callContext);
 
 		/// <summary>
 		/// Event: Occours when a heartbeat signal is received from a client.
@@ -89,6 +92,7 @@ namespace Zyan.Communication
 		/// Called from client to send a heartbeat signal.
 		/// </summary>
 		/// <param name="sessionID">Client´s session key</param>
-		void ReceiveClientHeartbeat(Guid sessionID);
+        /// <param name="callContext">Call context data</param>
+		void ReceiveClientHeartbeat(Guid sessionID, LogicalCallContextData callContext);
 	}
 }

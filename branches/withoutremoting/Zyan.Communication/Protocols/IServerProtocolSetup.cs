@@ -10,20 +10,10 @@ namespace Zyan.Communication.Protocols
 	public interface IServerProtocolSetup
 	{
         /// <summary>
-        /// Gets a list of all stages of the send pipeline.
-        /// </summary>
-        List<ISendPipelineStage> SendPipeline { get; }
-
-        /// <summary>
-        /// Gets a list of all stages of the receive pipeline.
-        /// </summary>
-        List<IReceivePipelineStage> ReceivePipeline { get; }
-
-        /// <summary>
         /// Creates and configures a transport channel.
         /// </summary>
         /// <returns>Transport channel</returns>
-        IZyanTransportChannel CreateChannel();
+        IServerTransportAdapter CreateTransportAdapter();
 
 		/// <summary>
 		/// Gets the authentication provider.

@@ -17,6 +17,7 @@ using Zyan.Communication.Toolbox;
 using Zyan.Communication.Toolbox.Diagnostics;
 using Zyan.InterLinq.Expressions;
 using Zyan.Communication.Transport;
+using Zyan.Communication.Delegates;
 
 namespace Zyan.Communication
 {
@@ -46,8 +47,8 @@ namespace Zyan.Communication
 		// Protocol and communication settings
 		private IClientProtocolSetup _protocolSetup = null;
 
-		// Remoting-Channel
-		private IZyanTransportChannel _transportChannel = null;
+		// Transport adapter
+		private IClientTransportAdapter _transportAdapter = null;
 
 		// List of created proxies
 		private List<WeakReference> _proxies;
@@ -172,7 +173,7 @@ namespace Zyan.Communication
 			string[] addressParts = _serverUrl.Split('/');
 			_componentHostName = addressParts[addressParts.Length - 1];
 
-			_transportChannel = _protocolSetup.CreateChannel();
+			_transportAdapter = _protocolSetup.CreateTransportAdapter();
 
             //TODO: Implement URL randomization without .NET Remoting dependency
             //if (AllowUrlRandomization)
@@ -180,54 +181,121 @@ namespace Zyan.Communication
             //    _transportChannel = ChannelWrapper.WrapChannel(_transportChannel);
             //}
 
-			if (_transportChannel != null)
+			if (_transportAdapter != null)
 			{
-				var registeredChannel = TransportChannelManager.Instance.GetChannel(_transportChannel.ChannelName);
+				var registeredChannel = ClientTransportAdapterManager.Instance.GetTransportAdapter(_transportAdapter.UniqueName);
 
 				if (registeredChannel == null)
-                    TransportChannelManager.Instance.RegisterChannel(_transportChannel);
+                    ClientTransportAdapterManager.Instance.Register(_transportAdapter);
 			}
 			else
 				throw new ApplicationException(LanguageResource.ApplicationException_NoChannelCreated);
 
-			string channelName = _transportChannel.ChannelName;
+			string channelName = _transportAdapter.UniqueName;
 
 			if (credentials != null && credentials.Count == 0)
 				credentials = null;
 
-			try
-			{				
-                IZyanRequestMessage logonRequestMessage;
+            //try
+            //{   
                 //TODO: Generate logon request message and send it through transport channel
-                //RemoteDispatcher.Logon(_sessionID, credentials);
-                IZyanResponseMessage logonResponseMessage = _transportChannel.SendRequest(logonRequestMessage);
-
-                IZyanRequestMessage registeredComponentsRequestMessage;
+                //RemoteDispatcher.Logon(_sessionID, credentials);                
+                _sessionAgeLimit = SendLogonMessage(_sessionID, credentials);
+                                
                 //TODO: Request registered components through transport channel
 				//_registeredComponents = new List<ComponentInfo>(RemoteDispatcher.GetRegisteredComponents());
-                IZyanResponseMessage registeredComponentsResponseMessage = _transportChannel.SendRequest(registeredComponentsRequestMessage);
+                _registeredComponents = SendGetRegisteredComponentsMessage();
 
                 //TODO: Extract session age limit from logon response message.
-                //_sessionAgeLimit = RemoteDispatcher.SessionAgeLimit;
-			}
-			catch (Exception ex)
-			{
-				// unregister remoting channel
-                var registeredChannel = TransportChannelManager.Instance.GetChannel(channelName);
-				if (registeredChannel != null)
-                    TransportChannelManager.Instance.UnregisterChannel(registeredChannel);
+                //_sessionAgeLimit = RemoteDispatcher.SessionAgeLimit;                
+            //}
+            //catch (Exception ex)
+            //{
+            //    // unregister remoting channel
+            //    var registeredChannel = ClientTransportAdapterManager.Instance.GetTransportAdapter(channelName);
+            //    if (registeredChannel != null)
+            //        ClientTransportAdapterManager.Instance.Unregister(registeredChannel);
 
-				// dispose channel if it's disposable
-				var disposableChannel = registeredChannel as IDisposable;
-				if (disposableChannel != null)
-					disposableChannel.Dispose();
+            //    // dispose channel if it's disposable
+            //    var disposableChannel = registeredChannel as IDisposable;
+            //    if (disposableChannel != null)
+            //        disposableChannel.Dispose();
 
-				throw ex.PreserveStackTrace();
-			}
+            //    throw ex.PreserveStackTrace();
+            //}
 			StartKeepSessionAliveTimer();
 
 			_connections.Add(this);
 		}
+
+        internal void SendAddEventHandlerMessage(string interfaceType,DelegateCorrelationInfo correlationInfo, string uniqueName)
+        {
+            //_connection.RemoteDispatcher.AddEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
+            _transportAdapter.SendRequest(new RequestMessage()
+            {
+                RequestType = RequestType.SystemOperation,
+                MethodName = "AddEventHandler",
+                Address = _serverUrl,
+                ParameterValues=new object[] { interfaceType, correlationInfo, uniqueName },
+                CallContext = PrepareCallContext(false)
+            });
+        }
+
+        internal void SendRemoveEventHandlerMessage(string interfaceType, DelegateCorrelationInfo correlationInfo, string uniqueName)
+        {
+            //_connection.RemoteDispatcher.AddEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
+            _transportAdapter.SendRequest(new RequestMessage()
+            {
+                RequestType = RequestType.SystemOperation,
+                MethodName = "RemoveEventHandler",
+                Address = _serverUrl,
+                ParameterValues = new object[] { interfaceType, correlationInfo, uniqueName },
+                CallContext = PrepareCallContext(false)
+            });
+        }
+
+        internal List<ComponentInfo> SendGetRegisteredComponentsMessage()
+        {
+            var registeredComponentsResponseMessage = _transportAdapter.SendRequest(new RequestMessage()
+            {
+                RequestType = RequestType.SystemOperation,
+                MethodName = "GetRegisteredComponents",
+                Address = _serverUrl
+            });
+            return ((ComponentInfo[])registeredComponentsResponseMessage.ReturnValue).ToList();
+        }
+
+        internal object SendRemoteMethodCallMessage(Guid trackingID, string uniqueName, List<DelegateCorrelationInfo> correlationSet,string methodName, Type[] genericArgs, Type[] paramTypes, object[] paramValues, LogicalCallContextData callContextData)
+        { 
+            var rpcResponseMessage = _transportAdapter.SendRequest(new RequestMessage()
+            {
+                RequestType=RequestType.RemoteMethodCall,
+                TrackingID=trackingID,
+                Address = _serverUrl,
+                DelegateCorrelationSet = correlationSet,
+                GenericArguments = genericArgs,
+                InterfaceName = uniqueName,
+                MethodName = methodName,
+                ParameterTypes = paramTypes,
+                ParameterValues = paramValues,
+                CallContext = callContextData
+            });
+            return rpcResponseMessage.ReturnValue;
+        }
+
+        private int SendLogonMessage(Guid sessionID, Hashtable credentials)
+        {
+            var logonResponseMessage = _transportAdapter.SendRequest(new RequestMessage()
+            {
+                RequestType = RequestType.SystemOperation,
+                MethodName = "Logon",
+                Address = _serverUrl,
+                ParameterValues = new object[] { sessionID, credentials }
+            });
+            _sessionAgeLimit = (int)logonResponseMessage.ReturnValue;
+
+            return _sessionAgeLimit;
+        }
 
 		#endregion
 
@@ -251,26 +319,26 @@ namespace Zyan.Communication
 		// Maximum session lifetime (in minutes)
 		private int _sessionAgeLimit = 0;
 
-        ///// <summary>
-        ///// Prepares the .NET Remoting call context before a remote call.
-        ///// </summary>
-        //internal void PrepareCallContext(bool implicitTransactionTransfer)
-        //{
-        //    LogicalCallContextData data = new LogicalCallContextData();
-        //    data.Store.Add("sessionid", _sessionID);
+        /// <summary>
+        /// Prepares the .NET Remoting call context before a remote call.
+        /// </summary>
+        internal LogicalCallContextData PrepareCallContext(bool implicitTransactionTransfer)
+        {
+            LogicalCallContextData data = new LogicalCallContextData();
+            data.Store.Add("sessionid", _sessionID);
 
-        //    if (implicitTransactionTransfer && Transaction.Current != null)
-        //    {
-        //        Transaction transaction = Transaction.Current;
+            if (implicitTransactionTransfer && Transaction.Current != null)
+            {
+                Transaction transaction = Transaction.Current;
 
-        //        if (transaction.TransactionInformation.Status == TransactionStatus.InDoubt ||
-        //            transaction.TransactionInformation.Status == TransactionStatus.Active)
-        //        {
-        //            data.Store.Add("transaction", transaction);
-        //        }
-        //    }
-        //    CallContext.SetData("__ZyanContextData_" + _componentHostName, data);
-        //}
+                if (transaction.TransactionInformation.Status == TransactionStatus.InDoubt ||
+                    transaction.TransactionInformation.Status == TransactionStatus.Active)
+                {
+                    data.Store.Add("transaction", transaction);
+                }
+            }
+            return data;
+        }
 
 		/// <summary>
 		/// Starts the session keep alive timer.
@@ -297,10 +365,15 @@ namespace Zyan.Communication
 		private void KeepSessionAlive(object state)
 		{
 			try
-			{
-                //PrepareCallContext(false);
-
-				int serverSessionAgeLimit = RemoteDispatcher.RenewSession();
+			{                
+                var response = _transportAdapter.SendRequest(new RequestMessage() 
+                { 
+                    RequestType=RequestType.SystemOperation,
+                    MethodName="RenewSession",
+                    Address=_serverUrl,
+                    CallContext=PrepareCallContext(false)
+                });
+                int serverSessionAgeLimit = (int)response.ReturnValue;
 
 				if (_sessionAgeLimit != serverSessionAgeLimit)
 				{
@@ -584,7 +657,14 @@ namespace Zyan.Communication
 							}
 						}
 					}
-					RemoteDispatcher.Logoff(_sessionID);
+					//RemoteDispatcher.Logoff(_sessionID);
+                    _transportAdapter.SendRequest(new RequestMessage() 
+                    { 
+                        RequestType=RequestType.SystemOperation,
+                        MethodName="Logoff",
+                        Address=_serverUrl,
+                        ParameterValues=new object[] { _sessionID }
+                    });
 				}
                 //TODO: Get rid of .NET Remoting dependency.
                 //catch (RemotingException)
@@ -603,21 +683,20 @@ namespace Zyan.Communication
 				{
 					_connections.Remove(this);
 				}
-				if (_transportChannel != null)
+				if (_transportAdapter != null)
 				{
 					// unregister remoting channel
-                    var registeredChannel = TransportChannelManager.Instance.GetChannel(_transportChannel.ChannelName);
-					if (registeredChannel != null && registeredChannel == _transportChannel)
-                        TransportChannelManager.Instance.UnregisterChannel(_transportChannel);
+                    var registeredChannel = ClientTransportAdapterManager.Instance.GetTransportAdapter(_transportAdapter.UniqueName);
+					if (registeredChannel != null && registeredChannel == _transportAdapter)
+                        ClientTransportAdapterManager.Instance.Unregister(_transportAdapter);
 
 					// dispose remoting channel, if it's disposable
-					var disposableChannel = _transportChannel as IDisposable;
+					var disposableChannel = _transportAdapter as IDisposable;
 					if (disposableChannel != null)
 						disposableChannel.Dispose();
 
-					_transportChannel = null;
-				}
-				_remoteDispatcher = null;
+					_transportAdapter = null;
+				}				
 				_serverUrl = string.Empty;
 				_sessionID = Guid.Empty;
 				_protocolSetup = null;
@@ -799,9 +878,16 @@ namespace Zyan.Communication
 			{
 				_sendingHeartbeat = true;
 				try
-				{
-                    //PrepareCallContext(false);
-					RemoteDispatcher.ReceiveClientHeartbeat(_sessionID);
+				{                    
+                    _transportAdapter.SendRequest(new RequestMessage() 
+                    { 
+                        RequestType=RequestType.SystemOperation,
+                        MethodName = "ReceiveClientHeartbeat",
+                        Address=_serverUrl,
+                        ParameterValues=new object[] { _sessionID },
+                        CallContext = PrepareCallContext(false)
+                    });                    
+                    //RemoteDispatcher.ReceiveClientHeartbeat(_sessionID);
 				}
 				finally
 				{
@@ -874,6 +960,18 @@ namespace Zyan.Communication
 			}
 		}
 
+        private bool SendExistSessionMessage(Guid sessionID)
+        {
+            var existSessionResponse = _transportAdapter.SendRequest(new RequestMessage()
+            {
+                RequestType = RequestType.SystemOperation,
+                MethodName = "ExistSession",
+                Address = _serverUrl,
+                ParameterValues = new object[] { sessionID }
+            });
+            return (bool)existSessionResponse.ReturnValue;
+        }
+
 		/// <summary>
 		/// Reestablish connection to server.
 		/// </summary>
@@ -883,9 +981,10 @@ namespace Zyan.Communication
 		/// </remarks>
 		/// <returns>True, if reconnecting was successfull, otherwis false </returns>
 		internal bool InternalReconnect()
-		{
+		{            
 			// When the session isn´t valid, the server process must have been restarted
-			if (!RemoteDispatcher.ExistSession(_sessionID))
+			//if (!RemoteDispatcher.ExistSession(_sessionID))
+            if (!SendExistSessionMessage(_sessionID))
 			{
 				Hashtable credentials = null;
 				bool performNewLogon = true;
@@ -906,20 +1005,35 @@ namespace Zyan.Communication
 				}
 				if (performNewLogon)
 				{
-					RemoteDispatcher.Logon(_sessionID, credentials);
+					//RemoteDispatcher.Logon(_sessionID, credentials);
+                    SendLogonMessage(_sessionID, credentials);
 					ReconnectRemoteEvents();
 
-					RemoteDispatcher.ReceiveClientHeartbeat(_sessionID);
+					//RemoteDispatcher.ReceiveClientHeartbeat(_sessionID);
+                    SendReceiveClientHeartbeatMessage(_sessionID);
+                    
 					return true;
 				}
 			}
 			else
 			{
-				RemoteDispatcher.ReceiveClientHeartbeat(_sessionID);
+				//RemoteDispatcher.ReceiveClientHeartbeat(_sessionID);
+                SendReceiveClientHeartbeatMessage(_sessionID);
 				return true;
 			}
 			return false;
 		}
+
+        private void SendReceiveClientHeartbeatMessage(Guid sessionID)
+        {
+            _transportAdapter.SendRequest(new RequestMessage()
+            {
+                RequestType = RequestType.SystemOperation,
+                Address = _serverUrl,
+                MethodName = "ReceiveClientHeartbeat",
+                ParameterValues = new object[] { sessionID }
+            });
+        }
 
 		/// <summary>
 		/// Reconnects to all remote events or delegates of any know proxy for this connection, after a server restart.
@@ -948,7 +1062,8 @@ namespace Zyan.Communication
 			{
 				try
 				{
-					return RemoteDispatcher.ExistSession(_sessionID);
+					//return RemoteDispatcher.ExistSession(_sessionID);
+                    return SendExistSessionMessage(_sessionID);
 				}
 				catch
 				{
