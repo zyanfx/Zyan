@@ -68,7 +68,7 @@ namespace Zyan.Communication.Composition
 						if (innerParts == null)
 						{
 							innerParts = new List<ZyanComposablePartDefinition>();
-							foreach (var component in Connection.RemoteDispatcher.GetRegisteredComponents())
+							foreach (var component in Connection.SendGetRegisteredComponentsMessage())
 							{
 								var part = new ZyanComposablePartDefinition(Connection, component.InterfaceName, component.UniqueName, ImplicitTransactionTransfer);
 								innerParts.Add(part);

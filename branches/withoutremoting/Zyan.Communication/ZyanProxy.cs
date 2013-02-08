@@ -17,8 +17,7 @@ namespace Zyan.Communication
 	/// </summary>
 	public class ZyanProxy : RealProxy
 	{
-		private Type _interfaceType = null;
-		private IZyanDispatcher _remoteDispatcher = null;
+		private Type _interfaceType = null;		
 		private List<DelegateCorrelationInfo> _delegateCorrelationSet = null;
 		private bool _implicitTransactionTransfer = false;
 		private Guid _sessionID;
@@ -58,7 +57,6 @@ namespace Zyan.Communication
 			_componentHostName = componentHostName;
 			_interfaceType = type;
 			_activationType = activationType;
-			_remoteDispatcher = _connection.RemoteDispatcher;
 			_implicitTransactionTransfer = implicitTransactionTransfer;
 			_autoLoginOnExpiredSession = autoLoginOnExpiredSession;
 			_delegateCorrelationSet = new List<DelegateCorrelationInfo>();
@@ -95,45 +93,53 @@ namespace Zyan.Communication
 		/// <returns>The message returned by the invoked method, containing the return value and any out or ref parameters.</returns>
 		private IMessage InterceptAndInvoke(IMethodCallMessage methodCallMessage, bool allowInterception)
 		{
-			try
-			{
+            //try
+            //{
 				var methodInfo = (MethodInfo)methodCallMessage.MethodBase;
 
-				return
-					HandleCallInterception(methodCallMessage, allowInterception) ??
-					HandleLocalInvocation(methodCallMessage, methodInfo) ??
-					HandleEventSubscription(methodCallMessage, methodInfo) ??
-					HandleEventUnsubscription(methodCallMessage, methodInfo) ??
-					HandleLinqQuery(methodCallMessage, methodInfo) ??
-					HandleRemoteInvocation(methodCallMessage, methodInfo);
-			}
-			catch (Exception ex)
-			{
-				if (_connection.ErrorHandlingEnabled)
-				{
-					ZyanErrorEventArgs e = new ZyanErrorEventArgs()
-					{
-						Exception = ex,
-						RemotingMessage = methodCallMessage,
-						ServerComponentType = _interfaceType,
-						RemoteMemberName = methodCallMessage.MethodName
-					};
+                return
+                    HandleCallInterception(methodCallMessage, allowInterception) ??
+                    //HandleLocalInvocation(methodCallMessage, methodInfo) ??
+                    HandleEventSubscription(methodCallMessage, methodInfo) ??
+                    HandleEventUnsubscription(methodCallMessage, methodInfo) ??
+                    HandleLinqQuery(methodCallMessage, methodInfo) ??
+                    HandleRemoteInvocation(methodCallMessage, methodInfo);
 
-					_connection.OnError(e);
+                //return
+                //    HandleCallInterception(methodCallMessage, allowInterception) ??
+                //    HandleLocalInvocation(methodCallMessage, methodInfo) ??
+                //    HandleEventSubscription(methodCallMessage, methodInfo) ??
+                //    HandleEventUnsubscription(methodCallMessage, methodInfo) ??
+                //    HandleLinqQuery(methodCallMessage, methodInfo) ??
+                //    HandleRemoteInvocation(methodCallMessage, methodInfo);
+            //}
+            //catch (Exception ex)
+            //{
+            //    if (_connection.ErrorHandlingEnabled)
+            //    {
+            //        ZyanErrorEventArgs e = new ZyanErrorEventArgs()
+            //        {
+            //            Exception = ex,
+            //            RemotingMessage = methodCallMessage,
+            //            ServerComponentType = _interfaceType,
+            //            RemoteMemberName = methodCallMessage.MethodName
+            //        };
 
-					switch (e.Action)
-					{
-						case ZyanErrorAction.ThrowException:
-							throw;
-						case ZyanErrorAction.Retry:
-							return Invoke(methodCallMessage);
-						case ZyanErrorAction.Ignore:
-							return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
-					}
-				}
+            //        _connection.OnError(e);
 
-				throw;
-			}
+            //        switch (e.Action)
+            //        {
+            //            case ZyanErrorAction.ThrowException:
+            //                throw;
+            //            case ZyanErrorAction.Retry:
+            //                return Invoke(methodCallMessage);
+            //            case ZyanErrorAction.Ignore:
+            //                return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
+            //        }
+            //    }
+
+            //    throw;
+            //}
 		}
 
 		/// <summary>
@@ -168,9 +174,7 @@ namespace Zyan.Communication
 		/// <param name="methodInfo"><see cref="MethodInfo"/> for the method being called.</param>
 		/// <returns><see cref="ReturnMessage"/>, if the call is processed successfully, otherwise, false.</returns>
 		private ReturnMessage HandleRemoteInvocation(IMethodCallMessage methodCallMessage, MethodInfo methodInfo)
-		{
-            //TODO: Get rid of .NET Remoting call context.
-			//_connection.PrepareCallContext(_implicitTransactionTransfer);
+		{            
 			return InvokeRemoteMethod(methodCallMessage);
 		}
 
@@ -363,8 +367,8 @@ namespace Zyan.Communication
 				throw new ArgumentNullException("correlationInfo");
 
             //TODO: Get rid of .NET Remoting call context.
-			//_connection.PrepareCallContext(false);
-			_connection.RemoteDispatcher.AddEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
+			//_connection.RemoteDispatcher.AddEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
+            _connection.SendAddEventHandlerMessage(_interfaceType.FullName, correlationInfo, _uniqueName);
 		}
 
 		/// <summary>
@@ -377,8 +381,8 @@ namespace Zyan.Communication
 				throw new ArgumentNullException("correlationInfo");
 
             //TODO: Get rid of .NET Remoting call context.
-			//_connection.PrepareCallContext(false);
-			_connection.RemoteDispatcher.RemoveEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
+			//_connection.RemoteDispatcher.RemoveEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
+            _connection.SendRemoveEventHandlerMessage(_interfaceType.FullName, correlationInfo, _uniqueName);
 		}
 
 		/// <summary>
@@ -437,8 +441,8 @@ namespace Zyan.Communication
 		{
 			Guid trackingID = Guid.NewGuid();
 
-			try
-			{
+            //try
+            //{
 				object returnValue = null;
 
 				List<DelegateCorrelationInfo> correlationSet = null;
@@ -481,7 +485,17 @@ namespace Zyan.Communication
 				{
 					object[] checkedArgs = InterceptDelegateParameters(methodCallMessage);
 
-					returnValue = _remoteDispatcher.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, genericArgs, paramTypes, checkedArgs);
+                    returnValue = _connection.SendRemoteMethodCallMessage
+                                  (
+                                    trackingID, 
+                                    _uniqueName, 
+                                    correlationSet, 
+                                    methodCallMessage.MethodName, 
+                                    genericArgs, 
+                                    paramTypes, 
+                                    checkedArgs,
+                                    _connection.PrepareCallContext(_implicitTransactionTransfer)
+                                  );
 
 					AfterInvokeEventArgs afterInvokeArgs = new AfterInvokeEventArgs()
 					{
@@ -499,10 +513,24 @@ namespace Zyan.Communication
 				{
 					if (_autoLoginOnExpiredSession)
 					{
-						if (_connection.Reconnect())
-							returnValue = _remoteDispatcher.Invoke(trackingID, _uniqueName, correlationSet, methodCallMessage.MethodName, genericArgs, paramTypes, methodCallMessage.Args);
-						else
-							throw;
+                        if (_connection.Reconnect())
+                        {
+                            object[] checkedArgs = InterceptDelegateParameters(methodCallMessage);
+
+                            returnValue = _connection.SendRemoteMethodCallMessage
+                                          (
+                                                trackingID,
+                                                _uniqueName,
+                                                correlationSet,
+                                                methodCallMessage.MethodName,
+                                                genericArgs,
+                                                paramTypes,
+                                                checkedArgs,
+                                                _connection.PrepareCallContext(_implicitTransactionTransfer)
+                                          );                            
+                        }
+                        else
+                            throw;
 					}
 					else
 					{
@@ -521,14 +549,14 @@ namespace Zyan.Communication
 				}
 
 				return new ReturnMessage(returnValue, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
-			}
-			catch (Exception ex)
-			{
-				if (_connection.ErrorHandlingEnabled)
-					throw;
-				else
-					return new ReturnMessage(ex, methodCallMessage);
-			}
+            //}
+            //catch (Exception ex)
+            //{
+            //    if (_connection.ErrorHandlingEnabled)
+            //        throw;
+            //    else
+            //        return new ReturnMessage(ex, methodCallMessage);
+            //}
 		}
 
 		/// <summary>
@@ -594,8 +622,8 @@ namespace Zyan.Communication
 					else
 					{
                         //TODO: Get rid of .NET Remoting call context.
-						//_connection.PrepareCallContext(false);
-						_connection.RemoteDispatcher.RemoveEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
+						//_connection.RemoteDispatcher.RemoveEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
+                        _connection.SendRemoveEventHandlerMessage(_interfaceType.FullName, correlationInfo, _uniqueName);
 					}
 				}
 			}

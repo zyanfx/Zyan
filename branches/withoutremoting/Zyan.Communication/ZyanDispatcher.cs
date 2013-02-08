@@ -427,9 +427,10 @@ namespace Zyan.Communication
 		/// <param name="methodName">Name of the invoked method</param>
 		/// <param name="genericArguments">Generic arguments of the invoked method</param>
 		/// <param name="paramTypes">Parameter types</param>
+        /// <param name="callContext">Call context data</param>
 		/// <param name="args">Parameter values</param>
 		/// <returns>Return value</returns>
-		public object Invoke(Guid trackingID, string interfaceName, List<DelegateCorrelationInfo> delegateCorrelationSet, string methodName, Type[] genericArguments, Type[] paramTypes, params object[] args)
+		public object Invoke(Guid trackingID, string interfaceName, List<DelegateCorrelationInfo> delegateCorrelationSet, string methodName, Type[] genericArguments, Type[] paramTypes, LogicalCallContextData callContext, params object[] args)
 		{
 			if (string.IsNullOrEmpty(interfaceName))
 				throw new ArgumentException(LanguageResource.ArgumentException_InterfaceNameMissing, "interfaceName");
@@ -448,14 +449,15 @@ namespace Zyan.Communication
 				MethodName = methodName,
 				GenericArguments = genericArguments,
 				ParamTypes = paramTypes,
-				Args = args
+				Args = args,
+                CallContextData = callContext
 			};
 
 			var beforeInvokeOccured = false;
 
 			try
 			{
-				Invoke_LoadCallContextData(details);
+				//Invoke_LoadCallContextData(details);
 				Invoke_SetSession(details);
 				Invoke_SetTransaction(details);
 
@@ -500,7 +502,8 @@ namespace Zyan.Communication
 		/// <param name="interfaceName">Name of the server component interface</param>
 		/// <param name="correlation">Correlation information</param>
 		/// <param name="uniqueName">Unique name of the server component instance (May left empty, if component isn´t registered with a unique name)</param>
-		public void AddEventHandler(string interfaceName, DelegateCorrelationInfo correlation, string uniqueName)
+		/// <param name="callContext">Call context data</param>
+        public void AddEventHandler(string interfaceName, DelegateCorrelationInfo correlation, string uniqueName, LogicalCallContextData callContext)
 		{
 			if (string.IsNullOrEmpty(interfaceName))
 				throw new ArgumentException(LanguageResource.ArgumentException_InterfaceNameMissing, "interfaceName");
@@ -514,7 +517,8 @@ namespace Zyan.Communication
 			var details = new InvocationDetails()
 			{
 				InterfaceName = interfaceName,
-				Registration = _host.ComponentRegistry[uniqueName]
+				Registration = _host.ComponentRegistry[uniqueName],
+                CallContextData = callContext
 			};
 
 			Invoke_LoadCallContextData(details);
@@ -535,7 +539,8 @@ namespace Zyan.Communication
 		/// <param name="interfaceName">Name of the server component interface</param>
 		/// <param name="correlation">Correlation information</param>
 		/// <param name="uniqueName">Unique name of the server component instance (May left empty, if component isn´t registered with a unique name)</param>
-		public void RemoveEventHandler(string interfaceName, DelegateCorrelationInfo correlation, string uniqueName)
+		/// <param name="callContext">Call context data</param>
+        public void RemoveEventHandler(string interfaceName, DelegateCorrelationInfo correlation, string uniqueName, LogicalCallContextData callContext)
 		{
 			if (string.IsNullOrEmpty(interfaceName))
 				throw new ArgumentException(LanguageResource.ArgumentException_InterfaceNameMissing, "interfaceName");
@@ -549,7 +554,8 @@ namespace Zyan.Communication
 			var details = new InvocationDetails()
 			{
 				InterfaceName = interfaceName,
-				Registration = _host.ComponentRegistry[uniqueName]
+				Registration = _host.ComponentRegistry[uniqueName],
+                CallContextData = callContext
 			};
 
 			Invoke_LoadCallContextData(details);
@@ -673,41 +679,41 @@ namespace Zyan.Communication
 			get { return _host.SessionManager.SessionAgeLimit; }
 		}
 
-		/// <summary>
-		/// Extends the lifetime of the current session and returs the current session age limit.
-		/// </summary>
-		/// <returns>Session age limit (in minutes)</returns>
-		public int RenewSession()
-		{
-			LogicalCallContextData data = CallContext.GetData("__ZyanContextData_" + _host.Name) as LogicalCallContextData;
+        ///// <summary>
+        ///// Extends the lifetime of the current session and returs the current session age limit.
+        ///// </summary>
+        ///// <returns>Session age limit (in minutes)</returns>
+        //public int RenewSession()
+        //{
+        //    LogicalCallContextData data = CallContext.GetData("__ZyanContextData_" + _host.Name) as LogicalCallContextData;
 
-			if (data != null)
-			{
-				if (data.Store.ContainsKey("sessionid"))
-				{
-					Guid sessionID = (Guid)data.Store["sessionid"];
+        //    if (data != null)
+        //    {
+        //        if (data.Store.ContainsKey("sessionid"))
+        //        {
+        //            Guid sessionID = (Guid)data.Store["sessionid"];
 
-					if (_host.SessionManager.ExistSession(sessionID))
-					{
-						ServerSession session = _host.SessionManager.GetSessionBySessionID(sessionID);
-						session.Timestamp = DateTime.Now;
+        //            if (_host.SessionManager.ExistSession(sessionID))
+        //            {
+        //                ServerSession session = _host.SessionManager.GetSessionBySessionID(sessionID);
+        //                session.Timestamp = DateTime.Now;
 
-						ServerSession.CurrentSession = session;
-					}
-					else
-					{
-						InvalidSessionException ex = new InvalidSessionException(string.Format("Sitzungsschlüssel '{0}' ist ungültig! Bitte melden Sie sich erneut am Server an.", sessionID.ToString()));
-						throw ex;
-					}
-				}
-			}
-			else
-			{
-				SecurityException ex = new SecurityException(LanguageResource.SecurityException_ContextInfoMissing);
-				throw ex;
-			}
-			return SessionAgeLimit;
-		}
+        //                ServerSession.CurrentSession = session;
+        //            }
+        //            else
+        //            {
+        //                InvalidSessionException ex = new InvalidSessionException(string.Format("Sitzungsschlüssel '{0}' ist ungültig! Bitte melden Sie sich erneut am Server an.", sessionID.ToString()));
+        //                throw ex;
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        SecurityException ex = new SecurityException(LanguageResource.SecurityException_ContextInfoMissing);
+        //        throw ex;
+        //    }
+        //    return SessionAgeLimit;
+        //}
 
 		#endregion
 
@@ -757,11 +763,13 @@ namespace Zyan.Communication
 		/// Called from client to send a heartbeat signal.
 		/// </summary>
 		/// <param name="sessionID">Client´s session key</param>
-		public void ReceiveClientHeartbeat(Guid sessionID)
+		/// <param name="callContext">Call context data</param>
+        public void ReceiveClientHeartbeat(Guid sessionID, LogicalCallContextData callContext)
 		{
 			// validate server session
 			var details = new InvocationDetails();
-			Invoke_LoadCallContextData(details);
+            details.CallContextData = callContext;
+			//Invoke_LoadCallContextData(details);
 			Invoke_SetSession(details);
 
 			// fire the heartbeat event

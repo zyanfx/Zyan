@@ -44,19 +44,9 @@ namespace Zyan.Communication.Protocols
 		protected Dictionary<string, object> _channelSettings = new Dictionary<string, object>();
 
         /// <summary>
-        /// List for building the client sink chain.
+        /// Delegate to factory method, which creates the transport adapter instance.
         /// </summary>
-        protected List<ISendPipelineStage> _sendPipeline = new List<ISendPipelineStage>();
-
-        /// <summary>
-        /// List for building the server sink chain.
-        /// </summary>
-        protected List<IReceivePipelineStage> _receivePipeline = new List<IReceivePipelineStage>();
-
-        /// <summary>
-        /// Delegate to factory method, which creates the .NET Remoting channel instance.
-        /// </summary>
-        protected Func<IDictionary, IZyanTransportChannel> _channelFactory = null;
+        protected Func<IDictionary, IClientTransportAdapter> _transportAdapterFactory = null;
 
 		/// <summary>
 		/// Creates a new instance of the ClientProtocolSetup class.
@@ -66,23 +56,23 @@ namespace Zyan.Communication.Protocols
 		/// <summary>
 		/// Creates a new instance of the ClientProtocolSetup class.
 		/// </summary>
-		/// <param name="channelFactory">Delegate to channel factory method</param>
-		public ClientProtocolSetup(Func<IDictionary, IZyanTransportChannel> channelFactory)
+		/// <param name="transportAdapterFactory">Delegate to transport adapter factory method</param>
+		public ClientProtocolSetup(Func<IDictionary, IClientTransportAdapter> transportAdapterFactory)
 		{
-			if (channelFactory == null)
-				throw new ArgumentNullException("channelFactory");
+			if (transportAdapterFactory == null)
+                throw new ArgumentNullException("transportAdapterFactory");
 
-			_channelFactory = channelFactory;
+			_transportAdapterFactory = transportAdapterFactory;
 		}
 
 		/// <summary>
 		/// Creates a new ClientProtocolSetup with a specified channel factory method.
 		/// </summary>
-		/// <param name="channelFactory">Delegate to channel factory method</param>
+		/// <param name="transportAdapterFactory">Delegate to transport adapter factory method</param>
 		/// <returns></returns>
-		public static IClientProtocolSetup WithChannel(Func<IDictionary, IZyanTransportChannel> channelFactory)
+		public static IClientProtocolSetup WithTransportAdapter(Func<IDictionary, IClientTransportAdapter> transportAdapterFactory)
 		{
-			return new ClientProtocolSetup(channelFactory);
+			return new ClientProtocolSetup(transportAdapterFactory);
 		}
 
 		/// <summary>
@@ -119,33 +109,23 @@ namespace Zyan.Communication.Protocols
 		/// Gets a dictionary with channel settings.
 		/// </summary>
 		public virtual Dictionary<string, object> ChannelSettings { get { return _channelSettings; } }
-
-        /// <summary>
-        /// Gets a list of all stages of the send pipeline.
-        /// </summary>
-        public virtual List<ISendPipelineStage> SendPipeline { get { return _sendPipeline; } }
-
-        /// <summary>
-        /// Gets a list of all stages of the receive pipeline.
-        /// </summary>
-        public virtual List<IReceivePipelineStage> ReceivePipeline { get { return _receivePipeline; } }
-
+               
 		/// <summary>
-		/// Creates and configures a Remoting channel.
+		/// Creates and configures a transport adapter.
 		/// </summary>
-		/// <returns>Remoting channel</returns>
-        public virtual IZyanTransportChannel CreateChannel()
+		/// <returns>Transport adapter</returns>
+        public virtual IClientTransportAdapter CreateTransportAdapter()
 		{
-			IZyanTransportChannel channel = TransportChannelManager.Instance.GetChannel(_channelName);
+			IClientTransportAdapter channel = ClientTransportAdapterManager.Instance.GetTransportAdapter(_channelName);
 
 			if (channel == null)
 			{
-				if (_channelFactory == null)
+				if (_transportAdapterFactory == null)
 					throw new ApplicationException(LanguageResource.ApplicationException_NoChannelFactorySpecified);
 
 				_channelSettings["name"] = _channelName;
 
-				channel = _channelFactory(_channelSettings);
+				channel = _transportAdapterFactory(_channelSettings);
 				return channel;
 			}
 			return channel;

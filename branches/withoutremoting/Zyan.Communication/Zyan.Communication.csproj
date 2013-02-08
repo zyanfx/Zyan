@@ -303,12 +303,14 @@
     <Compile Include="Threading\SimpleLockThreadPool.cs" />
     <Compile Include="Toolbox\TypeComparer.cs" />
     <Compile Include="Toolbox\TypeHelper.cs" />
-    <Compile Include="Transport\IReceivePipelineStage.cs" />
-    <Compile Include="Transport\ISendPipelineStage.cs" />
-    <Compile Include="Transport\IZyanRequestMessage.cs" />
-    <Compile Include="Transport\IZyanResponseMessage.cs" />
-    <Compile Include="Transport\IZyanTransportChannel.cs" />
-    <Compile Include="Transport\TransportChannelManager.cs" />
+    <Compile Include="Transport\IRequestMessage.cs" />
+    <Compile Include="Transport\IResponseMessage.cs" />
+    <Compile Include="Transport\IClientTransportAdapter.cs" />
+    <Compile Include="Transport\IServerTransportAdapter.cs" />
+    <Compile Include="Transport\ClientTransportAdapterManager.cs" />
+    <Compile Include="Transport\ServerTransportAdapterManager.cs" />
+    <Compile Include="Transport\RequestMessage.cs" />
+    <Compile Include="Transport\ResponseMessage.cs" />
     <Compile Include="Version.cs" />
     <Compile Include="ZyanComponentHost.cs" />
     <Compile Include="ZyanConnection.cs" />
@@ -357,9 +359,7 @@
   <ItemGroup>
     <Content Include="InterLinq\InterLinqNamespaceDoc.xml" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Transport\TcpDuplex\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>$(SolutionDir)..\..\tools\SnTools\sngen.bat $(SolutionDir)</PreBuildEvent>

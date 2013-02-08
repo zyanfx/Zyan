@@ -1,9 +1,7 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Communication", "Zyan.Communication\Zyan.Communication.csproj", "{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Tests", "Zyan.Tests\Zyan.Tests.csproj", "{6D0167F8-9611-410F-9212-3D8AE9FF95E4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E9FB7AE3-607B-418F-87F4-1D5A6983E412}"
 	ProjectSection(SolutionItems) = preProject
@@ -12,44 +10,40 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Zyan.vsmdi = Zyan.vsmdi
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{DD15B030-587C-4A27-840B-2D7615608FD9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Communication.WcfTransport", "Zyan.Communication.WcfTransport\Zyan.Communication.WcfTransport.csproj", "{0748CC96-50D0-4B85-9163-ED7B3F4039CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTest_DistributedEvents", "IntegrationTest_DistributedEvents\IntegrationTest_DistributedEvents.csproj", "{09360563-4EBA-460E-A1D4-D54B3B386066}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WcfExample", "WcfExample", "{F51BCF2F-3F3A-448B-96FF-D81BA2DB1864}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Communication.Fx3", "Zyan.Communication\Zyan.Communication.Fx3.csproj", "{260A24A8-69CF-4F36-8665-C6376F7BA16E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Examples.HelloWcfClient", "WcfExample\Zyan.Examples.HelloWcfClient\Zyan.Examples.HelloWcfClient.csproj", "{3D099643-E547-471C-87A8-AC01D1613AE4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Tests.NUnit", "Zyan.Tests\Zyan.Tests.NUnit.csproj", "{3E62B4CF-9BB5-48A9-8DEC-63A1DA88D258}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Examples.HelloWcfServer", "WcfExample\Zyan.Examples.HelloWcfServer\Zyan.Examples.HelloWcfServer.csproj", "{5BE17569-2F72-4DB4-B94F-11DCD2124615}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterLinq.UnitTests.Artefacts", "Zyan.Tests.InterLinq\Artefacts\InterLinq.UnitTests.Artefacts.csproj", "{DF5A0083-AB07-4E04-BA02-8D21ED866337}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterLinq.UnitTests.Server", "Zyan.Tests.InterLinq\Server\InterLinq.UnitTests.Server.csproj", "{F2C28EEA-A38F-4BDB-A599-29B38D5FFF66}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterLinq.UnitTests", "Zyan.Tests.InterLinq\UnitTests\InterLinq.UnitTests.csproj", "{52816D09-D5F2-470F-AB4E-DA2F9EA300FD}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests.InterLinq", "Tests.InterLinq", "{502B0A21-982C-48A4-81D7-6073B99194E0}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterLinq.UnitTests.NUnit", "Zyan.Tests.InterLinq\UnitTests\InterLinq.UnitTests.NUnit.csproj", "{37A20035-ABE1-44D1-901E-845157D85010}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Examples.HelloWcfShared", "WcfExample\Zyan.Examples.HelloWcfShared\Zyan.Examples.HelloWcfShared.csproj", "{C551BAE1-257A-4A52-8F16-281B97EC92AD}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 5
+		SccNumberOfProjects = 6
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs15
 		SccLocalPath0 = .
 		SccProjectUniqueName1 = Zyan.Communication\\Zyan.Communication.csproj
 		SccProjectName1 = Zyan.Communication
 		SccLocalPath1 = Zyan.Communication
-		SccProjectUniqueName2 = Zyan.Tests\\Zyan.Tests.csproj
-		SccProjectTopLevelParentUniqueName2 = Zyan.sln
-		SccProjectName2 = Zyan.Tests
-		SccLocalPath2 = Zyan.Tests
-		SccProjectUniqueName3 = IntegrationTest_DistributedEvents\\IntegrationTest_DistributedEvents.csproj
+		SccProjectUniqueName2 = Zyan.Communication.WcfTransport\\Zyan.Communication.WcfTransport.csproj
+		SccProjectName2 = Zyan.Communication.WcfTransport
+		SccLocalPath2 = Zyan.Communication.WcfTransport
+		SccProjectUniqueName3 = WcfExample\\Zyan.Examples.HelloWcfClient\\Zyan.Examples.HelloWcfClient.csproj
 		SccProjectTopLevelParentUniqueName3 = Zyan.sln
-		SccProjectName3 = IntegrationTest_DistributedEvents
-		SccLocalPath3 = IntegrationTest_DistributedEvents
-		SccProjectUniqueName4 = Zyan.Communication\\Zyan.Communication.Fx3.csproj
-		SccProjectName4 = Zyan.Communication
-		SccLocalPath4 = Zyan.Communication
+		SccProjectName3 = WcfExample/Zyan.Examples.HelloWcfClient
+		SccLocalPath3 = WcfExample\\Zyan.Examples.HelloWcfClient
+		SccProjectUniqueName4 = WcfExample\\Zyan.Examples.HelloWcfServer\\Zyan.Examples.HelloWcfServer.csproj
+		SccProjectTopLevelParentUniqueName4 = Zyan.sln
+		SccProjectName4 = WcfExample/Zyan.Examples.HelloWcfServer
+		SccLocalPath4 = WcfExample\\Zyan.Examples.HelloWcfServer
+		SccProjectUniqueName5 = WcfExample\\Zyan.Examples.HelloWcfShared\\Zyan.Examples.HelloWcfShared.csproj
+		SccProjectTopLevelParentUniqueName5 = Zyan.sln
+		SccProjectName5 = WcfExample/Zyan.Examples.HelloWcfShared
+		SccLocalPath5 = WcfExample\\Zyan.Examples.HelloWcfShared
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Zyan.vsmdi
@@ -69,61 +63,37 @@ Global
 		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Release|x64.ActiveCfg = Release|x64
 		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Release|x64.Build.0 = Release|x64
-		{6D0167F8-9611-410F-9212-3D8AE9FF95E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6D0167F8-9611-410F-9212-3D8AE9FF95E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6D0167F8-9611-410F-9212-3D8AE9FF95E4}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{6D0167F8-9611-410F-9212-3D8AE9FF95E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6D0167F8-9611-410F-9212-3D8AE9FF95E4}.Release|x64.ActiveCfg = Release|Any CPU
-		{09360563-4EBA-460E-A1D4-D54B3B386066}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{09360563-4EBA-460E-A1D4-D54B3B386066}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{09360563-4EBA-460E-A1D4-D54B3B386066}.Debug|x64.ActiveCfg = Debug|x86
-		{09360563-4EBA-460E-A1D4-D54B3B386066}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{09360563-4EBA-460E-A1D4-D54B3B386066}.Release|Any CPU.Build.0 = Release|Any CPU
-		{09360563-4EBA-460E-A1D4-D54B3B386066}.Release|x64.ActiveCfg = Release|x86
-		{260A24A8-69CF-4F36-8665-C6376F7BA16E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{260A24A8-69CF-4F36-8665-C6376F7BA16E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{260A24A8-69CF-4F36-8665-C6376F7BA16E}.Debug|x64.ActiveCfg = Debug|x64
-		{260A24A8-69CF-4F36-8665-C6376F7BA16E}.Debug|x64.Build.0 = Debug|x64
-		{260A24A8-69CF-4F36-8665-C6376F7BA16E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{260A24A8-69CF-4F36-8665-C6376F7BA16E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{260A24A8-69CF-4F36-8665-C6376F7BA16E}.Release|x64.ActiveCfg = Release|x64
-		{260A24A8-69CF-4F36-8665-C6376F7BA16E}.Release|x64.Build.0 = Release|x64
-		{3E62B4CF-9BB5-48A9-8DEC-63A1DA88D258}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3E62B4CF-9BB5-48A9-8DEC-63A1DA88D258}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3E62B4CF-9BB5-48A9-8DEC-63A1DA88D258}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{3E62B4CF-9BB5-48A9-8DEC-63A1DA88D258}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3E62B4CF-9BB5-48A9-8DEC-63A1DA88D258}.Release|x64.ActiveCfg = Release|Any CPU
-		{DF5A0083-AB07-4E04-BA02-8D21ED866337}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DF5A0083-AB07-4E04-BA02-8D21ED866337}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DF5A0083-AB07-4E04-BA02-8D21ED866337}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{DF5A0083-AB07-4E04-BA02-8D21ED866337}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DF5A0083-AB07-4E04-BA02-8D21ED866337}.Release|x64.ActiveCfg = Release|Any CPU
-		{F2C28EEA-A38F-4BDB-A599-29B38D5FFF66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F2C28EEA-A38F-4BDB-A599-29B38D5FFF66}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F2C28EEA-A38F-4BDB-A599-29B38D5FFF66}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{F2C28EEA-A38F-4BDB-A599-29B38D5FFF66}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F2C28EEA-A38F-4BDB-A599-29B38D5FFF66}.Release|x64.ActiveCfg = Release|Any CPU
-		{52816D09-D5F2-470F-AB4E-DA2F9EA300FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{52816D09-D5F2-470F-AB4E-DA2F9EA300FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{52816D09-D5F2-470F-AB4E-DA2F9EA300FD}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{52816D09-D5F2-470F-AB4E-DA2F9EA300FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{52816D09-D5F2-470F-AB4E-DA2F9EA300FD}.Release|x64.ActiveCfg = Release|Any CPU
-		{37A20035-ABE1-44D1-901E-845157D85010}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{37A20035-ABE1-44D1-901E-845157D85010}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{37A20035-ABE1-44D1-901E-845157D85010}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{37A20035-ABE1-44D1-901E-845157D85010}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{37A20035-ABE1-44D1-901E-845157D85010}.Release|x64.ActiveCfg = Release|Any CPU
+		{0748CC96-50D0-4B85-9163-ED7B3F4039CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0748CC96-50D0-4B85-9163-ED7B3F4039CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0748CC96-50D0-4B85-9163-ED7B3F4039CA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0748CC96-50D0-4B85-9163-ED7B3F4039CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0748CC96-50D0-4B85-9163-ED7B3F4039CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0748CC96-50D0-4B85-9163-ED7B3F4039CA}.Release|x64.ActiveCfg = Release|Any CPU
+		{3D099643-E547-471C-87A8-AC01D1613AE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D099643-E547-471C-87A8-AC01D1613AE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D099643-E547-471C-87A8-AC01D1613AE4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3D099643-E547-471C-87A8-AC01D1613AE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D099643-E547-471C-87A8-AC01D1613AE4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D099643-E547-471C-87A8-AC01D1613AE4}.Release|x64.ActiveCfg = Release|Any CPU
+		{5BE17569-2F72-4DB4-B94F-11DCD2124615}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BE17569-2F72-4DB4-B94F-11DCD2124615}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BE17569-2F72-4DB4-B94F-11DCD2124615}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5BE17569-2F72-4DB4-B94F-11DCD2124615}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BE17569-2F72-4DB4-B94F-11DCD2124615}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BE17569-2F72-4DB4-B94F-11DCD2124615}.Release|x64.ActiveCfg = Release|Any CPU
+		{C551BAE1-257A-4A52-8F16-281B97EC92AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C551BAE1-257A-4A52-8F16-281B97EC92AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C551BAE1-257A-4A52-8F16-281B97EC92AD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C551BAE1-257A-4A52-8F16-281B97EC92AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C551BAE1-257A-4A52-8F16-281B97EC92AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C551BAE1-257A-4A52-8F16-281B97EC92AD}.Release|x64.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{6D0167F8-9611-410F-9212-3D8AE9FF95E4} = {DD15B030-587C-4A27-840B-2D7615608FD9}
-		{09360563-4EBA-460E-A1D4-D54B3B386066} = {DD15B030-587C-4A27-840B-2D7615608FD9}
-		{3E62B4CF-9BB5-48A9-8DEC-63A1DA88D258} = {DD15B030-587C-4A27-840B-2D7615608FD9}
-		{F2C28EEA-A38F-4BDB-A599-29B38D5FFF66} = {502B0A21-982C-48A4-81D7-6073B99194E0}
-		{52816D09-D5F2-470F-AB4E-DA2F9EA300FD} = {502B0A21-982C-48A4-81D7-6073B99194E0}
-		{DF5A0083-AB07-4E04-BA02-8D21ED866337} = {502B0A21-982C-48A4-81D7-6073B99194E0}
-		{37A20035-ABE1-44D1-901E-845157D85010} = {502B0A21-982C-48A4-81D7-6073B99194E0}
+		{3D099643-E547-471C-87A8-AC01D1613AE4} = {F51BCF2F-3F3A-448B-96FF-D81BA2DB1864}
+		{5BE17569-2F72-4DB4-B94F-11DCD2124615} = {F51BCF2F-3F3A-448B-96FF-D81BA2DB1864}
+		{C551BAE1-257A-4A52-8F16-281B97EC92AD} = {F51BCF2F-3F3A-448B-96FF-D81BA2DB1864}
 	EndGlobalSection
 EndGlobal
