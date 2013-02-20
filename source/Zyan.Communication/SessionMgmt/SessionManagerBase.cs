@@ -46,9 +46,18 @@ namespace Zyan.Communication.SessionMgmt
 		/// <param name="timeStamp">Session time stamp.</param>
 		/// <param name="identity"><see cref="IIdentity"/> for the user to associate a new session with.</param>
 		/// <returns>New <see cref="ServerSession"/> instance associated with the current <see cref="ISessionManager"/> component.</returns>
-		protected virtual ServerSession CreateServerSession(Guid sessionID, DateTime timeStamp, IIdentity identity)
+		public virtual ServerSession CreateServerSession(Guid sessionID, DateTime timeStamp, IIdentity identity)
 		{
 			return new ServerSession(sessionID, timeStamp, identity, new SessionVariableAdapter(this, sessionID));
+		}
+
+		/// <summary>
+		/// Sets the current server session.
+		/// </summary>
+		/// <param name="session">The session.</param>
+		public void SetCurrentSession(ServerSession session)
+		{
+			ServerSession.CurrentSession = session;
 		}
 
 		/// <summary>

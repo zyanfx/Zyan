@@ -30,7 +30,7 @@ namespace Zyan.Tests
 	#endregion
 
 	/// <summary>
-	/// Test class for channel wrapper.
+	/// Test class for the local call context data store.
 	///</summary>
 	[TestClass]
 	public class LocalCallContextDataTests : MarshalByRefObject
