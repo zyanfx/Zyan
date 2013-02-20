@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Principal;
 
 namespace Zyan.Communication.SessionMgmt
 {
@@ -38,6 +39,21 @@ namespace Zyan.Communication.SessionMgmt
 		/// <param name="sessionID">Session unique identifier.</param>
 		/// <returns><see cref="ServerSession"/> or null, if session with the given identifier is not found.</returns>
 		ServerSession GetSessionBySessionID(Guid sessionID);
+
+		/// <summary>
+		/// Creates a new <see cref="ServerSession"/> with the given arguments.
+		/// </summary>
+		/// <param name="sessionID">Session unique identifier.</param>
+		/// <param name="timeStamp">Session time stamp.</param>
+		/// <param name="identity"><see cref="IIdentity"/> for the user to associate a new session with.</param>
+		/// <returns>New <see cref="ServerSession"/> instance associated with the current <see cref="ISessionManager"/> component.</returns>
+		ServerSession CreateServerSession(Guid sessionID, DateTime timeStamp, IIdentity identity);
+
+		/// <summary>
+		/// Sets the current server session.
+		/// </summary>
+		/// <param name="session">The session.</param>
+		void SetCurrentSession(ServerSession session);
 
 		/// <summary>
 		/// Stores the given <see cref="ServerSession"/> to the session list.

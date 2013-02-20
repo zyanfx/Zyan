@@ -43,6 +43,8 @@ namespace Zyan.Tests
 			void NonOneWayMethod(ref int value, Action callback);
 
 			void OneWayMethodWithException(Action callback);
+
+			void CheckServerSession(Action<Guid> callback);
 		}
 
 		/// <summary>
@@ -88,6 +90,13 @@ namespace Zyan.Tests
 					throw new ApplicationException("Something bad happened", ex);
 				}
 			}
+
+			[OneWay]
+			public void CheckServerSession(Action<Guid> callback)
+			{
+				var id = ServerSession.CurrentSession == null ? Guid.Empty : ServerSession.CurrentSession.SessionID;
+				callback(id);
+			}
 		}
 
 		#endregion
@@ -129,6 +138,29 @@ namespace Zyan.Tests
 		}
 
 		#endregion
+
+		[TestMethod]
+		public void OneWayMethodCallPreservesCurrentSession()
+		{
+			// check server session several times to make sure everything is ok
+			var proxy = ZyanConnection.CreateProxy<ISampleServer>();
+			var countdownEvent = new CountdownEvent(100);
+ 			var success = true;
+
+			// execute one-way method and compare current session id
+			for (int i = 0; i < countdownEvent.InitialCount; i++)
+			{
+				proxy.CheckServerSession(id =>
+				{
+					success = success && id == ZyanConnection.SessionID;
+					countdownEvent.Signal();
+				});
+			}
+
+			// wait a bit
+			Assert.IsTrue(countdownEvent.Wait(TimeSpan.FromSeconds(0.5)));
+			Assert.IsTrue(success);
+		}
 
 		[TestMethod]
 		public void OneWayMethodCallShouldReturnImmediatelly()

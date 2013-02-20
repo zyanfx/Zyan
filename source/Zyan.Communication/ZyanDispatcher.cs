@@ -230,7 +230,7 @@ namespace Zyan.Communication
 			// set current session
 			details.Session = _host.SessionManager.GetSessionBySessionID(sessionID);
 			details.Session.Timestamp = DateTime.Now;
-			ServerSession.CurrentSession = details.Session;
+			_host.SessionManager.SetCurrentSession(details.Session);
 			PutClientAddressToCurrentSession();
 		}
 
@@ -439,7 +439,7 @@ namespace Zyan.Communication
 				throw new ArgumentException(LanguageResource.ArgumentException_MethodNameMissing, "methodName");
 
 			// Reset session variable (May point to wrong session, if threadpool thread is reused)
-			ServerSession.CurrentSession = null;
+			_host.SessionManager.SetCurrentSession(null);
 
 			var details = new InvocationDetails()
 			{
@@ -595,7 +595,7 @@ namespace Zyan.Communication
 			if (!_host.SessionManager.ExistSession(sessionID))
 			{
 				// reset current session before authentication is complete
-				ServerSession.CurrentSession = null;
+				_host.SessionManager.SetCurrentSession(null);
 
 				AuthResponseMessage authResponse = _host.Authenticate(new AuthRequestMessage() { Credentials = credentials });
 				if (!authResponse.Success)
@@ -604,10 +604,9 @@ namespace Zyan.Communication
 					throw exception.PreserveStackTrace();
 				}
 
-				var sessionVariableAdapter = new SessionVariableAdapter(_host.SessionManager, sessionID);
-				var session = new ServerSession(sessionID, authResponse.AuthenticatedIdentity, sessionVariableAdapter);
+				var session = _host.SessionManager.CreateServerSession(sessionID, DateTime.Now, authResponse.AuthenticatedIdentity);
 				_host.SessionManager.StoreSession(session);
-				ServerSession.CurrentSession = session;
+				_host.SessionManager.SetCurrentSession(session);
 				PutClientAddressToCurrentSession();
 
 				_host.OnClientLoggedOn(new LoginEventArgs(LoginEventType.Logon, session.Identity, session.ClientAddress, session.Timestamp));
@@ -658,7 +657,7 @@ namespace Zyan.Communication
 			finally
 			{
 				// reset current session after the client is logged off
-				ServerSession.CurrentSession = null;
+				_host.SessionManager.SetCurrentSession(null);
 			}
 		}
 
@@ -732,7 +731,7 @@ namespace Zyan.Communication
 
 			// renew session
 			var session = _host.SessionManager.GetSessionBySessionID(sessionID);
-			ServerSession.CurrentSession = session;
+			_host.SessionManager.SetCurrentSession(session);
 			_host.SessionManager.RenewSession(session);
 			return SessionAgeLimit;
 		}
@@ -772,12 +771,8 @@ namespace Zyan.Communication
 			var eventHandler = ClientHeartbeatReceived;
 			if (eventHandler != null)
 			{
-				var currentSession = ServerSession.CurrentSession;
-				ThreadPool.QueueUserWorkItem(state =>
-				{
-					ServerSession.CurrentSession = currentSession;
-					eventHandler(this, e);
-				});
+				// the current session is preserved because it's a part of the LogicalCallContext
+				ThreadPool.QueueUserWorkItem(state => eventHandler(this, e));
 			}
 		}
 
