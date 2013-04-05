@@ -43,11 +43,19 @@ namespace Zyan.Communication.Protocols.Wrapper
 		/// Adds random portion to the given url.
 		/// </summary>
 		/// <param name="originalUrl">Remoting object url.</param>
+		/// <param name="channel">Remoting channel (optional).</param>
 		/// <returns>Randomized url.</returns>
-		public static string RandomizeUrl(string originalUrl)
+		public static string RandomizeUrl(string originalUrl, IChannel channel = null)
 		{
 			var num = Interlocked.Increment(ref counter);
-			return string.Format(UrlFormat, num, originalUrl);
+			var result = string.Format(UrlFormat, num, originalUrl);
+			var wrapperChannel = channel as ChannelWrapper;
+			if (wrapperChannel != null)
+			{
+				wrapperChannel.RegisterUrl(result);
+			}
+
+			return result;
 		}
 
 		/// <summary>
@@ -64,6 +72,16 @@ namespace Zyan.Communication.Protocols.Wrapper
 
 			return url.Substring(url.IndexOf(AnchorSymbol) + 1).Trim();
 		}
+
+		private void RegisterUrl(string result)
+		{
+			lock (registeredUrls)
+			{
+				registeredUrls.Add(result);
+			}
+		}
+
+		private HashSet<string> registeredUrls = new HashSet<string>();
 
 		public IChannel InnerChannel { get; private set; }
 
@@ -88,6 +106,13 @@ namespace Zyan.Communication.Protocols.Wrapper
 
 		public IMessageSink CreateMessageSink(string url, object remoteChannelData, out string objectURI)
 		{
+			// allow only registered urls
+			if (!registeredUrls.Contains(url))
+			{
+				objectURI = null;
+				return null;
+			}
+
 			var innerSink = InnerChannelSender.CreateMessageSink(NormalizeUrl(url), remoteChannelData, out objectURI);
 			if (innerSink != null)
 			{

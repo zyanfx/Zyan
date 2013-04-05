@@ -401,7 +401,9 @@ namespace Zyan.Communication
 				{
 					var serverUrl = _serverUrl;
 					if (AllowUrlRandomization)
-						serverUrl = ChannelWrapper.RandomizeUrl(_serverUrl);
+					{
+						serverUrl = ChannelWrapper.RandomizeUrl(_serverUrl, _remotingChannel);
+					}
 
 					_remoteDispatcher = (IZyanDispatcher)Activator.GetObject(typeof(IZyanDispatcher), serverUrl);
 				}

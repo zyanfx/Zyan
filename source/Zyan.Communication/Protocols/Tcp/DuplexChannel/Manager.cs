@@ -29,7 +29,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 	{
 		#region Uri Utilities
 
-		static readonly Regex regUrl = new Regex("tcpex://(?<server>[^/]+)/?(?<objectID>.*)", RegexOptions.Compiled);
+		static readonly Regex regUrl = new Regex("^tcpex://(?<server>[^/]+)/?(?<objectID>.*)", RegexOptions.Compiled);
 
 		public static string Parse(string url, out string objectID)
 		{
