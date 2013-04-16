@@ -18,19 +18,22 @@ namespace Zyan.Communication.Protocols.Wrapper
 		/// Creates channel wrapper aroung the given remoting channel.
 		/// </summary>
 		/// <param name="innerChannel">Inner remoting channel.</param>
+		/// <param name="channelName">The name of the channel.</param>
 		/// <returns><see cref="ChannelWrapper"/> supporting randomized urls.</returns>
-		public static IChannel WrapChannel(IChannel innerChannel)
+		public static IChannel WrapChannel(IChannel innerChannel, string channelName)
 		{
-			return new ChannelWrapper(innerChannel);
+			return new ChannelWrapper(innerChannel, channelName);
 		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ChannelWrapper"/> class.
 		/// </summary>
 		/// <param name="innerChannel">Inner remoting channel.</param>
-		private ChannelWrapper(IChannel innerChannel)
+		/// <param name="channelName">The name of the channel.</param>
+		private ChannelWrapper(IChannel innerChannel, string channelName)
 		{
 			InnerChannel = innerChannel;
+			ChannelName = string.IsNullOrEmpty(channelName) ? InnerChannel.ChannelName : channelName;
 		}
 
 		private const char AnchorSymbol = '#';
@@ -89,10 +92,7 @@ namespace Zyan.Communication.Protocols.Wrapper
 
 		private IChannelReceiver InnerChannelReceiver { get { return (IChannelReceiver)InnerChannel; } }
 
-		public string ChannelName
-		{
-			get { return InnerChannel.ChannelName; }
-		}
+		public string ChannelName { get; private set; }
 
 		public int ChannelPriority
 		{

@@ -28,5 +28,10 @@ namespace Zyan.Communication.Protocols
 		/// Gets a dictionary with channel settings.
 		/// </summary>
 		Dictionary<string, object> ChannelSettings { get; }
+
+		/// <summary>
+		/// Gets the name of the remoting channel.
+		/// </summary>
+		string ChannelName { get; }
 	}
 }

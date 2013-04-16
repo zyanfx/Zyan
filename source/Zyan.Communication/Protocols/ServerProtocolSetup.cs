@@ -87,6 +87,11 @@ namespace Zyan.Communication.Protocols
 		public virtual List<IServerChannelSinkProvider> ServerSinkChain { get { return _serverSinkChain; } }
 
 		/// <summary>
+		/// Gets the name of the remoting channel.
+		/// </summary>
+		public string ChannelName { get { return _channelName; } }
+
+		/// <summary>
 		/// Builds the client sink chain.
 		/// </summary>
 		/// <returns>First sink provider in sink chain</returns>
