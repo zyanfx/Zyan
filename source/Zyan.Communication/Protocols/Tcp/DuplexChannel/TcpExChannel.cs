@@ -239,7 +239,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 		internal string[] GetAddresses()
 		{
-			return Manager.GetAddresses(port, _channelID);
+			return Manager.GetAddresses(port, _channelID, true);
 		}
 
 		#endregion
@@ -392,7 +392,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				this.port = Manager.StartListening((int)data, this, _bindToAddress);
 				channelData = new TcpExChannelData(this);
 
-				foreach (string url in Manager.GetAddresses(this.port, Guid.Empty))
+				foreach (string url in Manager.GetAddresses(this.port, Guid.Empty, true))
 				{
 					Manager.BeginReadMessage(url, null, new AsyncCallback(messageSink.ReceiveMessage), url);
 				}

@@ -53,27 +53,20 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			else if (objectUri == "" || objectUri[0] != '/')
 				objectUri = "/" + objectUri;
 
-			ArrayList retVal = new ArrayList();
-
-			if (guid != Guid.Empty)
-				retVal.Add(string.Format("tcpex://{0}{1}", guid, objectUri));
-
-			string hostname = Dns.GetHostName();
-			IPHostEntry hostEntry = Dns.GetHostEntry(hostname);
-			if (port != 0)
+			var retVal = new List<string>();
+			foreach (var address in GetAddresses(port, guid, true))
 			{
-				foreach (IPAddress address in hostEntry.AddressList)
-					retVal.Add(string.Format("tcpex://{0}:{1}{2}", address, port, objectUri));
+				retVal.Add(string.Format("tcpex://{0}{1}", address, objectUri));
 			}
 
-			return (string[])retVal.ToArray(typeof(string));
+			return retVal.ToArray();
 		}
 
-		public static string[] GetAddresses(int port, Guid guid)
+		public static string[] GetAddresses(int port, Guid guid, bool includeGuid)
 		{
 			var addresses = new List<string>();
 
-			if (guid != Guid.Empty)
+			if (guid != Guid.Empty && includeGuid)
 				addresses.Add(guid.ToString());
 
 			if (port != 0)
