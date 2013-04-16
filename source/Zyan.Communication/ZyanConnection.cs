@@ -175,7 +175,7 @@ namespace Zyan.Communication
 			_remotingChannel = _protocolSetup.CreateChannel();
 			if (AllowUrlRandomization)
 			{
-				_remotingChannel = ChannelWrapper.WrapChannel(_remotingChannel);
+				_remotingChannel = ChannelWrapper.WrapChannel(_remotingChannel, _protocolSetup.ChannelName);
 			}
 
 			if (_remotingChannel != null)
@@ -184,6 +184,8 @@ namespace Zyan.Communication
 
 				if (registeredChannel == null)
 					ChannelServices.RegisterChannel(_remotingChannel, false);
+				else
+					_remotingChannel = registeredChannel;
 			}
 			else
 				throw new ApplicationException(LanguageResource.ApplicationException_NoChannelCreated);
