@@ -39,13 +39,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 			if (Port != 0)
 			{
-				Addresses = new List<string>();
-				IPHostEntry hostEntry = Dns.GetHostEntry(Dns.GetHostName());
-
-				foreach (IPAddress address in hostEntry.AddressList)
-				{
-					Addresses.Add(string.Format("{0}:{1}", address, Port));
-				}
+				Addresses = new List<string>(Manager.GetAddresses(Port, channel.ChannelID, false));
 			}
 		}
 		
