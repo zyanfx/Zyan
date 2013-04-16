@@ -1,26 +1,47 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Remoting.Messaging;
-using System.Text;
-using Zyan.Communication.Toolbox.Diagnostics;
+using System.Runtime.Serialization;
 
 namespace Zyan.Communication.Toolbox
 {
 	/// <summary>
 	/// Holds data for the logical call context.
-	/// Prevents data from leaving the current application domain.
+	/// Prevents the data from leaving the current application domain.
 	/// </summary>
 	[Serializable]
-	internal sealed class LocalCallContextData : ILogicalThreadAffinative
+	internal sealed class LocalCallContextData : ISerializable
 	{
 		private LocalCallContextData()
-		{ 
+		{
 		}
 
-		// prevent data from leaking to another application domain
-		[NonSerialized]
-		private object Value;
+		/// <summary>
+		/// Gets or sets the value stored in a LogicalCallContext.
+		/// </summary>
+		/// <remarks>
+		/// The data doesn't leak to another application domain.
+		/// </remarks>
+		private object Value { get; set; }
+
+		[ThreadStatic]
+		private static object threadStaticValue;
+
+		/// <summary>
+		/// Stores the instance data.
+		/// </summary>
+		/// <param name="info">Serialization info.</param>
+		/// <param name="context">Streaming context.</param>
+		void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			// instead of populating the SerializationInfo, we save the value to TLS before making the remote call.
+			threadStaticValue = Value;
+		}
+
+		public LocalCallContextData(SerializationInfo info, StreamingContext context)
+		{
+			// restore the value from TLS after making the remote call.
+			Value = threadStaticValue;
+		}
 
 		/// <summary>
 		/// Retrieves an object with the specified name from the call context.
@@ -41,7 +62,7 @@ namespace Zyan.Communication.Toolbox
 		/// <returns>The value of the object.</returns>
 		public static object GetData(string name)
 		{
-			var data = CallContext.GetData(name) as LocalCallContextData;
+			var data = CallContext.LogicalGetData(name) as LocalCallContextData;
 			if (data == null)
 			{
 				return null;
@@ -57,7 +78,7 @@ namespace Zyan.Communication.Toolbox
 		/// <param name="value">The value of the object.</param>
 		public static void SetData(string name, object value)
 		{
-			CallContext.SetData(name, new LocalCallContextData { Value = value });
+			CallContext.LogicalSetData(name, new LocalCallContextData { Value = value });
 		}
 	}
 }

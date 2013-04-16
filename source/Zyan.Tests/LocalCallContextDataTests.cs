@@ -212,6 +212,10 @@ namespace Zyan.Tests
 				// check if ordinal call context data is not accessible
 				dataAccessible = (bool)otherDomain.GetData(SlotName);
 				Assert.IsFalse(dataAccessible);
+
+				// check if the callback doesn't wipe out the data
+				dataAccessible = LocalCallContextData.GetData(SlotName) != null;
+				Assert.IsTrue(dataAccessible);
 			}
 			finally
 			{
