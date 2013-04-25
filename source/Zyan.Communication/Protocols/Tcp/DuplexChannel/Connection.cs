@@ -652,12 +652,22 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// <returns>true, if local, otherwise false</returns>
 		private bool IsLocalIP(IPAddress remoteAddress)
 		{
-			foreach (IPAddress address in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
+			try
 			{
-				if (address.Equals(remoteAddress))
-					return true;
+				foreach (var address in Manager.GetAddresses())
+				{
+					if (address.Equals(remoteAddress))
+						return true;
+				}
+
+				return false;
 			}
-			return false;
+			catch (Exception ex)
+			{
+				// transport sink shouldn't ever throw exceptions
+				Trace.WriteLine("IsLocalIP exception: {0}", ex);
+				return false;
+			}
 		}
 
 		/// <summary>
