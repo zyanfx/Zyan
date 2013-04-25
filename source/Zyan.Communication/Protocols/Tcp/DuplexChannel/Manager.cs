@@ -62,6 +62,11 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			return retVal.ToArray();
 		}
 
+		public static IPAddress[] GetAddresses()
+		{
+			return _addresses.Value.ToArray();
+		}
+
 		public static string[] GetAddresses(int port, Guid guid, bool includeGuid)
 		{
 			var addresses = new List<string>();
@@ -75,7 +80,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			return addresses.Distinct().ToArray();
 		}
 
-		private static Lazy<List<string>> _addresses = new Lazy<List<string>>(() =>
+		private static Lazy<List<IPAddress>> _addresses = new Lazy<List<IPAddress>>(() =>
 		{
 			// get loopback address
 			var addressFamily = DefaultAddressFamily;
@@ -93,7 +98,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			if (!addresses.Contains(loopback))
 				addresses.Add(loopback);
 
-			return addresses.Select(a => a.ToString()).ToList();
+			return addresses.ToList();
 
 		}, true);
 
