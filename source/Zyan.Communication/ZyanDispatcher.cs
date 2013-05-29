@@ -83,6 +83,8 @@ namespace Zyan.Communication
 					eventStub.AddHandler(correlationInfo.DelegateMemberName, dynamicWire.InDelegate);
 					wiringList.Add(correlationInfo.CorrelationID, dynamicWire.InDelegate);
 				}
+
+				ServerSession.CurrentSession.IncrementRemoteSubscriptionCounter();
 			}
 		}
 
@@ -244,6 +246,18 @@ namespace Zyan.Communication
 			var transaction = details.CallContextData.Store.ContainsKey("transaction") ? (Transaction)details.CallContextData.Store["transaction"] : null;
 			if (transaction != null)
 				details.Scope = new TransactionScope(transaction);
+		}
+
+		/// <summary>
+		/// Sets the remote subscription counter.
+		/// </summary>
+		/// <param name="details">The details.</param>
+		private void Invoke_SetRemoteSubscriptionCounter(InvocationDetails details)
+		{
+			if (details.CallContextData.Store != null && ServerSession.CurrentSession != null)
+			{
+				details.CallContextData.Store["subscriptions"] = ServerSession.CurrentSession.RemoteSubscriptionCounter;
+			}
 		}
 
 		/// <summary>
@@ -483,6 +497,7 @@ namespace Zyan.Communication
 			finally
 			{
 				Invoke_CompleteTransactionScope(details);
+				Invoke_SetRemoteSubscriptionCounter(details);
 				Invoke_CleanUp(details);
 			}
 
