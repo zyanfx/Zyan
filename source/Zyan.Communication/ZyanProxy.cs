@@ -170,7 +170,9 @@ namespace Zyan.Communication
 		private ReturnMessage HandleRemoteInvocation(IMethodCallMessage methodCallMessage, MethodInfo methodInfo)
 		{
 			_connection.PrepareCallContext(_implicitTransactionTransfer);
-			return InvokeRemoteMethod(methodCallMessage);
+			var returnMessage = InvokeRemoteMethod(methodCallMessage);
+			_connection.CheckRemoteSubscriptionCounter();
+			return returnMessage;
 		}
 
 		/// <summary>
@@ -325,7 +327,7 @@ namespace Zyan.Communication
 				return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
 			}
 
-			// This method doesn't represent event subscription
+			// This method doesn't represent event unsubscription
 			return null;
 		}
 
@@ -363,6 +365,7 @@ namespace Zyan.Communication
 
 			_connection.PrepareCallContext(false);
 			_connection.RemoteDispatcher.AddEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
+			_connection.IncrementSubscriptionCounter();
 		}
 
 		/// <summary>

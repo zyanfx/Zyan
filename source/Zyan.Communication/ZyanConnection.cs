@@ -52,6 +52,9 @@ namespace Zyan.Communication
 		// List of created proxies
 		private List<WeakReference> _proxies;
 
+		// Remote event subscriptions counter
+		private int _remoteSubscriptionCounter;
+
 		/// <summary>
 		/// Gets the URL of the remote server.
 		/// </summary>
@@ -263,6 +266,7 @@ namespace Zyan.Communication
 					data.Store.Add("transaction", transaction);
 				}
 			}
+
 			CallContext.SetData("__ZyanContextData_" + _componentHostName, data);
 		}
 
@@ -977,19 +981,57 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Reconnects to all remote events or delegates of any know proxy for this connection, after a server restart.
+		/// Reconnects to all remote events or delegates of any known proxy for this connection, after a server restart.
 		/// <remarks>
 		/// Caution! This method does not check, if the event handler registrations are truly lost (caused by a server restart).
 		/// </remarks>
 		/// </summary>
 		private void ReconnectRemoteEvents()
 		{
+			Interlocked.Exchange(ref _remoteSubscriptionCounter, 0);
+
 			foreach (var proxyRef in _proxies)
 			{
 				if (proxyRef.IsAlive)
 				{
 					var proxy = proxyRef.Target as ZyanProxy;
 					proxy.ReconnectRemoteEvents();
+				}
+			}
+		}
+
+		/// <summary>
+		/// Increments the subscription counter.
+		/// </summary>
+		internal void IncrementSubscriptionCounter()
+		{
+			Interlocked.Increment(ref _remoteSubscriptionCounter);
+		}
+
+		/// <summary>
+		/// Checks the remote subscription counter and reconnects remote events if needed.
+		/// </summary>
+		internal void CheckRemoteSubscriptionCounter()
+		{
+			var callContextData = CallContext.GetData("__ZyanContextData_" + _componentHostName) as LogicalCallContextData;
+			if (callContextData != null && callContextData.Store != null && callContextData.Store.ContainsKey("subscriptions"))
+			{
+				// if the server was restarted, is has less subscriptions than the client
+				var remoteCounter = Convert.ToInt32(callContextData.Store["subscriptions"]);
+				if (remoteCounter < _remoteSubscriptionCounter)
+				{
+					// restore subscriptions asynchronously
+					ThreadPool.QueueUserWorkItem(x =>
+					{
+						try
+						{
+							ReconnectRemoteEvents();
+						}
+						catch (Exception ex)
+						{
+							Trace.WriteLine("Error while restoring client subscriptions: {0}", ex);
+						}
+					});
 				}
 			}
 		}
