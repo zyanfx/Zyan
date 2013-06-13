@@ -61,10 +61,8 @@ namespace Zyan.Communication.Delegates
 		{
 			var bindingFlags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
 			DelegateHolders = new Dictionary<string, IDelegateHolder>();
-			EventProperties = InterfaceType.GetEvents(bindingFlags);
-			DelegateProperties = InterfaceType.GetProperties(bindingFlags)
-				.Where(p => typeof(Delegate).IsAssignableFrom(p.PropertyType))
-				.ToArray();
+			EventProperties = GetEvents(InterfaceType, bindingFlags).ToArray();
+			DelegateProperties = GetDelegateProperties(InterfaceType, bindingFlags).ToArray();
 
 			foreach (var eventProperty in EventProperties)
 			{
@@ -75,6 +73,44 @@ namespace Zyan.Communication.Delegates
 			{
 				DelegateHolders[delegateProperty.Name] = CreateDelegateHolder(delegateProperty.PropertyType);
 			}
+		}
+
+		private IEnumerable<Type> GetAllInterfaces(Type interfaceType)
+		{
+			if (interfaceType.IsInterface)
+			{
+				yield return interfaceType;
+			}
+
+			// Passing BindingFlags.FlattenHierarchy to one of the Type.GetXXX methods, such as Type.GetMembers,
+			// will not return inherited interface members when you are querying on an interface type itself.
+			// To get the inherited members, you need to query each implemented interface for its members.
+			var inheritedInterfaces =
+				from inheritedInterface in interfaceType.GetInterfaces()
+				from type in GetAllInterfaces(inheritedInterface)
+				select type;
+
+			foreach (var type in inheritedInterfaces)
+			{
+				yield return type;
+			}
+		}
+
+		private IEnumerable<EventInfo> GetEvents(Type interfaceType, BindingFlags flags)
+		{
+			return
+				from type in GetAllInterfaces(interfaceType)
+				from ev in type.GetEvents(flags)
+				select ev;
+		}
+
+		private IEnumerable<PropertyInfo> GetDelegateProperties(Type interfaceType, BindingFlags flags)
+		{
+			return
+				from type in GetAllInterfaces(interfaceType)
+				from prop in type.GetProperties(flags)
+				where typeof(Delegate).IsAssignableFrom(prop.PropertyType)
+				select prop;
 		}
 
 		private static IDelegateHolder CreateDelegateHolder(Type delegateType)

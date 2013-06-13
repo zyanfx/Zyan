@@ -49,6 +49,18 @@ namespace Zyan.Tests
 			int SimpleEventHandlerCount { get; }
 		}
 
+		public interface ISampleDescendant1 : ISampleInterface
+		{
+			event EventHandler NewEvent;
+
+			Action NewDelegate { get; set; }
+		}
+
+		public interface ISampleDescendant2 : ISampleDescendant1, ISampleInterface
+		{
+			event EventHandler<CancelEventArgs> NewCancelEvent;
+		}
+
 		public class SampleService : ISampleInterface
 		{
 			public string FireHandlers(int argument)
@@ -121,6 +133,19 @@ namespace Zyan.Tests
 		public void EventStubContainsEventsAndDelegates()
 		{
 			var eventStub = new EventStub(typeof(ISampleInterface));
+			Assert.IsNotNull(eventStub["SimpleEvent"]);
+			Assert.IsNotNull(eventStub["CancelEvent"]);
+			Assert.IsNotNull(eventStub["ActionDelegate"]);
+			Assert.IsNotNull(eventStub["FuncDelegate"]);
+		}
+
+		[TestMethod]
+		public void EventStubContainsInheritedEventsAndDelegates()
+		{
+			var eventStub = new EventStub(typeof(ISampleDescendant2));
+			Assert.IsNotNull(eventStub["NewCancelEvent"]);
+			Assert.IsNotNull(eventStub["NewEvent"]);
+			Assert.IsNotNull(eventStub["NewDelegate"]);
 			Assert.IsNotNull(eventStub["SimpleEvent"]);
 			Assert.IsNotNull(eventStub["CancelEvent"]);
 			Assert.IsNotNull(eventStub["ActionDelegate"]);
