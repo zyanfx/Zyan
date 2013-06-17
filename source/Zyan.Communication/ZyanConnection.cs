@@ -52,6 +52,25 @@ namespace Zyan.Communication
 		// List of created proxies
 		private List<WeakReference> _proxies;
 
+		/// <summary>
+		/// Gets the alive proxies.
+		/// </summary>
+		private IEnumerable<ZyanProxy> AliveProxies
+		{
+			get
+			{
+				if (_proxies == null)
+				{
+					return new ZyanProxy[0];
+				}
+
+				lock (_proxies)
+				{
+					return _proxies.Where(p => p.IsAlive).Select(p => p.Target as ZyanProxy).Where(p => p != null).ToArray();
+				}
+			}
+		}
+
 		// Remote event subscriptions counter
 		private int _remoteSubscriptionCounter;
 
@@ -158,7 +177,6 @@ namespace Zyan.Communication
 			}
 
 			_proxies = new List<WeakReference>();
-
 			_protocolSetup = protocolSetup;
 			_sessionID = Guid.NewGuid();
 			_serverUrl = serverUrl;
@@ -625,16 +643,9 @@ namespace Zyan.Communication
 				}
 				try
 				{
-					if (_proxies != null)
+					foreach (var zyanProxy in AliveProxies)
 					{
-						foreach (var proxyReference in _proxies)
-						{
-							if (proxyReference.IsAlive)
-							{
-								var proxy = proxyReference.Target as ZyanProxy;
-								proxy.RemoveAllRemoteEventHandlers();
-							}
-						}
+						zyanProxy.RemoveAllRemoteEventHandlers();
 					}
 					RemoteDispatcher.Logoff(_sessionID);
 				}
@@ -990,13 +1001,9 @@ namespace Zyan.Communication
 		{
 			Interlocked.Exchange(ref _remoteSubscriptionCounter, 0);
 
-			foreach (var proxyRef in _proxies)
+			foreach (var zyanProxy in AliveProxies)
 			{
-				if (proxyRef.IsAlive)
-				{
-					var proxy = proxyRef.Target as ZyanProxy;
-					proxy.ReconnectRemoteEvents();
-				}
+				zyanProxy.ReconnectRemoteEvents();
 			}
 		}
 
