@@ -145,6 +145,7 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Gets or sets a value indicating whether legacy blocking events raising mode is enabled.
 		/// </summary>
+		[Obsolete("Use ZyanSettings.LegacyBlockingEvents static property instead.")]
 		public static bool LegacyBlockingEvents { get; set; }
 
 		private ComponentCatalog _catalog = null;
@@ -354,6 +355,21 @@ namespace Zyan.Communication
 		public event EventHandler<InvokeCanceledEventArgs> InvokeRejected;
 
 		/// <summary>
+		/// Occurs when a client subscribes to a component's event.
+		/// </summary>
+		public event EventHandler<SubscriptionEventArgs> SubscriptionAdded;
+
+		/// <summary>
+		/// Occurs when a client unsubscribes to a component's event.
+		/// </summary>
+		public event EventHandler<SubscriptionEventArgs> SubscriptionRemoved;
+
+		/// <summary>
+		/// Occurs when a component cancels the subscription due to exceptions thrown by the client's event handler.
+		/// </summary>
+		public event EventHandler<SubscriptionEventArgs> SubscriptionCanceled;
+
+		/// <summary>
 		/// Checks whether the BeforeInvoke event has subscriptions.
 		/// </summary>
 		/// <returns>True, if subsciptions exist, otherwise, false.</returns>
@@ -395,8 +411,11 @@ namespace Zyan.Communication
 		/// <param name="e">Event arguments.</param>
 		protected internal virtual void OnBeforeInvoke(BeforeInvokeEventArgs e)
 		{
-			if (BeforeInvoke != null)
-				BeforeInvoke(this, e);
+			var beforeInvoke = BeforeInvoke;
+			if (beforeInvoke != null)
+			{
+				beforeInvoke(this, e);
+			}
 		}
 
 		/// <summary>
@@ -405,8 +424,11 @@ namespace Zyan.Communication
 		/// <param name="e">Event arguments.</param>
 		protected internal virtual void OnAfterInvoke(AfterInvokeEventArgs e)
 		{
-			if (AfterInvoke != null)
-				AfterInvoke(this, e);
+			var afterInvoke = AfterInvoke;
+			if (afterInvoke != null)
+			{
+				afterInvoke(this, e);
+			}
 		}
 
 		/// <summary>
@@ -415,8 +437,11 @@ namespace Zyan.Communication
 		/// <param name="e">Event arguments.</param>
 		protected internal virtual void OnInvokeCanceled(InvokeCanceledEventArgs e)
 		{
-			if (InvokeCanceled != null)
+			var invokeCanceled = InvokeCanceled;
+			if (invokeCanceled != null)
+			{
 				InvokeCanceled(this, e);
+			}
 		}
 
 		/// <summary>
@@ -425,8 +450,50 @@ namespace Zyan.Communication
 		/// <param name="e">Event arguments</param>
 		protected internal virtual void OnInvokeRejected(InvokeCanceledEventArgs e)
 		{
-			if (InvokeRejected != null)
-				InvokeRejected(this, e);
+			var invokeRejected = InvokeRejected;
+			if (invokeRejected != null)
+			{
+				invokeRejected(this, e);
+			}
+		}
+
+		/// <summary>
+		/// Raises the <see cref="E:SubscriptionAdded" /> event.
+		/// </summary>
+		/// <param name="e">The <see cref="SubscriptionEventArgs"/> instance containing the event data.</param>
+		protected internal virtual void OnSubscriptionAdded(SubscriptionEventArgs e)
+		{
+			var subscriptionAdded = SubscriptionAdded;
+			if (subscriptionAdded != null)
+			{
+				subscriptionAdded(this, e);
+			}
+		}
+
+		/// <summary>
+		/// Raises the <see cref="E:SubscriptionRemoved" /> event.
+		/// </summary>
+		/// <param name="e">The <see cref="SubscriptionEventArgs"/> instance containing the event data.</param>
+		protected internal virtual void OnSubscriptionRemoved(SubscriptionEventArgs e)
+		{
+			var subscriptionRemoved = SubscriptionRemoved;
+			if (subscriptionRemoved != null)
+			{
+				subscriptionRemoved(this, e);
+			}
+		}
+
+		/// <summary>
+		/// Raises the <see cref="E:SubscriptionCanceled" /> event.
+		/// </summary>
+		/// <param name="e">The <see cref="SubscriptionEventArgs"/> instance containing the event data.</param>
+		protected internal virtual void OnSubscriptionCanceled(SubscriptionEventArgs e)
+		{
+			var subscriptionCanceled = SubscriptionCanceled;
+			if (subscriptionCanceled != null)
+			{
+				subscriptionCanceled(this, e);
+			}
 		}
 
 		#endregion

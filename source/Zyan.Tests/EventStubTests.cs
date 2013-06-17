@@ -124,7 +124,7 @@ namespace Zyan.Tests
 		[ClassInitialize]
 		public static void StartServer(TestContext ctx)
 		{
-			ZyanComponentHost.LegacyBlockingEvents = true;
+			ZyanSettings.LegacyBlockingEvents = true;
 		}
 
 		#endregion

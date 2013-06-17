@@ -86,7 +86,8 @@ namespace Zyan.Tests
 		[ClassInitialize]
 		public static void StartServer(TestContext ctx)
 		{
-			ZyanComponentHost.LegacyBlockingEvents = true;
+			ZyanSettings.LegacyBlockingEvents = true;
+			ZyanSettings.LegacyUnprotectedEventHandlers = true;
 
 			var serverSetup = new NullServerProtocolSetup(2345);
 			ZyanHost = new ZyanComponentHost("EventsServer", serverSetup);
@@ -105,6 +106,60 @@ namespace Zyan.Tests
 		}
 
 		#endregion
+
+		[TestMethod]
+		public void ZyanHostSubscriptionRelatedEventsAreRaised()
+		{
+			// set up server-side event handlers
+			var subscriptionAdded = false;
+			ZyanHost.SubscriptionAdded += (s, e) => subscriptionAdded = true;
+
+			var subscriptionRemoved = false;
+			ZyanHost.SubscriptionRemoved += (s, e) => subscriptionRemoved = true;
+
+			var subscriptionCanceled = false;
+			var clientSideException = default(Exception);
+			ZyanHost.SubscriptionCanceled += (s, e) =>
+			{
+				subscriptionCanceled = true;
+				clientSideException = e.Exception;
+			};
+
+			// set up client event handler
+			var handled = false;
+			var message = "Secret message";
+			var eventHandler = new EventHandler((s, e) =>
+			{
+				if (handled)
+				{
+					handled = false;
+					throw new InvalidOperationException(message);
+				}
+
+				handled = true;
+			});
+
+			// create proxy, attach event handler
+			var proxy = ZyanConnection.CreateProxy<ISampleServer>("Singleton");
+			proxy.TestEvent += eventHandler;
+			Assert.IsTrue(subscriptionAdded);
+
+			// raise the event
+			proxy.RaiseTestEvent();
+			Assert.IsTrue(handled);
+
+			// detach event handler
+			proxy.TestEvent -= eventHandler;
+			Assert.IsTrue(subscriptionRemoved);
+
+			// reattach event handler, raise an event, catch the exception and unsubscribe automatically
+			proxy.TestEvent += eventHandler;
+			proxy.RaiseTestEvent();
+			Assert.IsFalse(handled);
+			Assert.IsTrue(subscriptionCanceled);
+			Assert.IsNotNull(clientSideException);
+			Assert.AreEqual(message, clientSideException.Message);
+		}
 
 		[TestMethod]
 		public void ExceptionInEventHandlerCancelsSubscription()

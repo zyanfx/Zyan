@@ -268,6 +268,7 @@
     <Compile Include="SessionMgmt\SessionManagerBase.cs" />
     <Compile Include="SessionMgmt\SessionVariableAdapter.cs" />
     <Compile Include="SessionMgmt\SqlSessionManager.cs" />
+    <Compile Include="SubscriptionEventArgs.cs" />
     <Compile Include="Threading\ClrThreadPool.cs" />
     <Compile Include="Threading\IThreadPool.cs" />
     <Compile Include="Threading\IThreadPoolExtensions.cs" />
@@ -313,6 +314,7 @@
     <Compile Include="Toolbox\Asynchronizer.cs" />
     <Compile Include="Toolbox\SyncContextSwitcher.cs" />
     <Compile Include="Toolbox\TransactionStarter.cs" />
+    <Compile Include="ZyanSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="LanguageResource.resx">

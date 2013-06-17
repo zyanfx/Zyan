@@ -27,15 +27,15 @@ namespace Zyan.Communication
 	{
 		#region Configuration
 
-		static ZyanConnection()
-		{
-			AllowUrlRandomization = true;
-		}
-
 		/// <summary>
 		/// Enables or disables URL randomization to work around Remoting Identity caching.
 		/// </summary>
-		public static bool AllowUrlRandomization { get; set; }
+		[Obsolete("Use ZyanSettings.DisableUrlRandomization property instead.")]
+		public static bool AllowUrlRandomization
+		{
+			get { return !ZyanSettings.DisableUrlRandomization; }
+			set { ZyanSettings.DisableUrlRandomization = !value; }
+		}
 
 		// URL of server
 		private string _serverUrl = string.Empty;
@@ -176,7 +176,7 @@ namespace Zyan.Communication
 			_componentHostName = addressParts[addressParts.Length - 1];
 
 			_remotingChannel = _protocolSetup.CreateChannel();
-			if (AllowUrlRandomization)
+			if (!ZyanSettings.DisableUrlRandomization)
 			{
 				_remotingChannel = ChannelWrapper.WrapChannel(_remotingChannel, _protocolSetup.ChannelName);
 			}
@@ -406,7 +406,7 @@ namespace Zyan.Communication
 				if (_remoteDispatcher == null)
 				{
 					var serverUrl = _serverUrl;
-					if (AllowUrlRandomization)
+					if (!ZyanSettings.DisableUrlRandomization)
 					{
 						serverUrl = ChannelWrapper.RandomizeUrl(_serverUrl, _remotingChannel);
 					}

@@ -19,7 +19,7 @@ namespace Zyan.Communication.Delegates
 		/// <summary>
 		/// Gets or sets the method to cancel subscription.
 		/// </summary>
-		public Action CancelSubscription { get; set; }
+		public Action<Exception> CancelSubscription { get; set; }
 
 		/// <summary>
 		/// Gets or sets the event filter.
@@ -49,7 +49,14 @@ namespace Zyan.Communication.Delegates
 				// unsubscribe
 				if (CancelSubscription != null)
 				{
-					CancelSubscription();
+					// skip meaningless TargetInvocationException
+					var innerException = ex;
+					if (ex is TargetInvocationException)
+					{
+						innerException = ex.InnerException;
+					}
+
+					CancelSubscription(innerException);
 				}
 
 				// log diagnostic message

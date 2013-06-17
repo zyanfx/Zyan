@@ -97,7 +97,7 @@ namespace Zyan.Tests
 		[ClassInitialize]
 		public static void StartServer(TestContext ctx)
 		{
-			ZyanConnection.AllowUrlRandomization = false;
+			ZyanSettings.DisableUrlRandomization = true;
 
 			var serverSetup = new IpcBinaryServerProtocolSetup("ZyanProxyTest");
 			ZyanHost = new ZyanComponentHost("ZyanProxyServer", serverSetup);
