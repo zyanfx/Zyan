@@ -257,7 +257,7 @@ namespace IntegrationTest_DistributedEvents
 			_nullChannelHost = new ZyanComponentHost("NullEventTest", nullChannelProtocol, _catalog);
 
 			// use legacy blocking events mode because we check the handlers synchronously
-			ZyanComponentHost.LegacyBlockingEvents = true;
+			ZyanSettings.LegacyBlockingEvents = true;
 		}
 
 		public void Dispose()

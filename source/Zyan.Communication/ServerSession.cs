@@ -97,6 +97,14 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
+		/// Decrements the remote subscription counter.
+		/// </summary>
+		internal void DecrementRemoteSubscriptionCounter()
+		{
+ 			Interlocked.Decrement(ref _remoteSubscriptionCounter);
+		}
+
+		/// <summary>
 		/// Gets the session of the current logical server thread.
 		/// </summary>
 		/// <remarks>

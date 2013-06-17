@@ -235,7 +235,7 @@ namespace Zyan.Tests
 		[ClassInitialize]
 		public static void StartServer(TestContext ctx)
 		{
-			ZyanComponentHost.LegacyBlockingEvents = true;
+			ZyanSettings.LegacyBlockingEvents = true;
 
 			var serverSetup = new NullServerProtocolSetup(4567);
 			ZyanHost = new ZyanComponentHost("EventFilterServer", serverSetup);

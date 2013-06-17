@@ -176,7 +176,7 @@ namespace Zyan.Communication.Delegates
 			private object DynamicInvoke(object[] arguments)
 			{
 				// run in legacy blocking mode
-				if (ZyanComponentHost.LegacyBlockingEvents)
+				if (ZyanSettings.LegacyBlockingEvents)
 				{
 					return Delegate.SafeDynamicInvoke(arguments) ?? DefaultReturnValue;
 				}
