@@ -216,6 +216,7 @@
     <Compile Include="Protocols\CustomServerProtocolSetup.cs" />
     <Compile Include="Protocols\Http\HttpCustomClientProtocolSetup.cs" />
     <Compile Include="Protocols\Http\HttpCustomServerProtocolSetup.cs" />
+    <Compile Include="Protocols\IConnectionNotification.cs" />
     <Compile Include="Protocols\Ipc\IpcBinaryClientProtocolSetup.cs" />
     <Compile Include="Protocols\Ipc\IpcBinaryServerProtocolSetup.cs" />
     <Compile Include="Protocols\Null\NullChannel.cs" />

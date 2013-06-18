@@ -211,6 +211,12 @@ namespace Zyan.Communication
 			else
 				throw new ApplicationException(LanguageResource.ApplicationException_NoChannelCreated);
 
+			var connectionNotification = _remotingChannel as IConnectionNotification;
+			if (connectionNotification != null)
+			{
+				connectionNotification.ConnectionEstablished += Channel_ConnectionEstablished;
+			}
+
 			string channelName = _remotingChannel.ChannelName;
 
 			_subscriptions = new Dictionary<Guid, NotificationReceiver>();
@@ -667,6 +673,11 @@ namespace Zyan.Communication
 				}
 				if (_remotingChannel != null)
 				{
+					// unsubscribe from connection notifications
+					var connectionNotification = _remotingChannel as IConnectionNotification;
+					if (connectionNotification != null)
+						connectionNotification.ConnectionEstablished -= Channel_ConnectionEstablished;
+
 					// unregister remoting channel
 					var registeredChannel = ChannelServices.GetChannel(_remotingChannel.ChannelName);
 					if (registeredChannel != null && registeredChannel == _remotingChannel)
@@ -1040,6 +1051,15 @@ namespace Zyan.Communication
 						}
 					});
 				}
+			}
+		}
+
+		private void Channel_ConnectionEstablished(object sender, EventArgs e)
+		{
+			// restore subscriptions if necessary
+			if (_remoteSubscriptionCounter > 0)
+			{
+				ReconnectRemoteEvents();
 			}
 		}
 

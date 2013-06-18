@@ -98,6 +98,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 						_connections.Add(address, connection); // This most often happens when using the loopback address
 
 					Manager.StartListening(connection);
+					channel.OnConnectionEstablished(EventArgs.Empty);
 				}
 				catch (DuplicateConnectionException ex)
 				{
