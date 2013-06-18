@@ -12,7 +12,7 @@ namespace Zyan.Communication.Protocols.Wrapper
 	/// <summary>
 	/// Wraps up IChannel instance to implement custom URI processing.
 	/// </summary>
-	internal class ChannelWrapper : IChannel, IChannelSender, IChannelReceiver, IDisposable
+	internal class ChannelWrapper : IChannel, IChannelSender, IChannelReceiver, IConnectionNotification, IDisposable
 	{
 		/// <summary>
 		/// Creates channel wrapper aroung the given remoting channel.
@@ -157,6 +157,27 @@ namespace Zyan.Communication.Protocols.Wrapper
 			catch (Exception ex)
 			{
 				Trace.WriteLine("Unexpected exception of type {0} while disposing ChannelWrapper: {1}", ex.GetType(), ex.Message);
+			}
+		}
+
+		public event EventHandler ConnectionEstablished
+		{
+			add
+			{
+				var cn = InnerChannel as IConnectionNotification;
+				if (cn != null)
+				{
+					cn.ConnectionEstablished += value;
+				}
+			}
+
+			remove
+			{
+				var cn = InnerChannel as IConnectionNotification;
+				if (cn != null)
+				{
+					cn.ConnectionEstablished -= value;
+				}
 			}
 		}
 	}

@@ -33,7 +33,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 	/// <item><term>priority</term><description>The priority of the channel.</description></item>
 	/// </list>
 	/// </remarks>
-	public class TcpExChannel : IChannel, IChannelSender, IChannelReceiver, IDisposable
+	public class TcpExChannel : IChannel, IChannelSender, IChannelReceiver, IConnectionNotification, IDisposable
 	{
 		private int port = 0;
 		private int priority;
@@ -433,6 +433,28 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		public object ChannelData
 		{
 			get { return channelData; }
+		}
+
+		#endregion
+
+		#region Implementation of IConnectionNotification
+
+		/// <summary>
+		/// Occurs when connection is established or restored.
+		/// </summary>
+		public event EventHandler ConnectionEstablished;
+
+		/// <summary>
+		/// Raises the <see cref="E:ConnectionEstablished" /> event.
+		/// </summary>
+		/// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+		protected internal void OnConnectionEstablished(EventArgs e)
+		{
+			var connectionEstablished = ConnectionEstablished;
+			if (connectionEstablished != null)
+			{
+				ConnectionEstablished(this, e);
+			}
 		}
 
 		#endregion
