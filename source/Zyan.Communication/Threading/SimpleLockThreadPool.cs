@@ -59,9 +59,11 @@ namespace Zyan.Communication.Threading
 			m_concurrencyLevel = concurrencyLevel;
 			m_flowExecutionContext = flowExecutionContext;
 
+#if !XAMARIN
 			// If suppressing flow, we need to demand permissions.
 			if (!flowExecutionContext)
 				new SecurityPermission(SecurityPermissionFlag.Infrastructure).Demand();
+#endif
 		}
 
 		/// <summary>

@@ -10,6 +10,11 @@ using Zyan.Communication.Protocols.Tcp;
 using Zyan.Communication.Security;
 using Zyan.Communication.SessionMgmt;
 using Zyan.InterLinq.Expressions;
+#if !XAMARIN
+using DefaultServerProtocolSetup = Zyan.Communication.Protocols.Tcp.TcpBinaryServerProtocolSetup;
+#else
+using DefaultServerProtocolSetup = Zyan.Communication.Protocols.Tcp.TcpDuplexServerProtocolSetup;
+#endif
 
 namespace Zyan.Communication
 {
@@ -26,7 +31,7 @@ namespace Zyan.Communication
 		/// <param name="name">The name of the component host.</param>
 		/// <param name="tcpPort">The TCP port.</param>
 		public ZyanComponentHost(string name, int tcpPort)
-			: this(name, new TcpBinaryServerProtocolSetup(tcpPort), new InProcSessionManager(), new ComponentCatalog(true))
+			: this(name, new DefaultServerProtocolSetup(tcpPort), new InProcSessionManager(), new ComponentCatalog(true))
 		{
 		}
 
@@ -37,7 +42,7 @@ namespace Zyan.Communication
 		/// <param name="tcpPort">The TCP port.</param>
 		/// <param name="catalog">The component catalog.</param>
 		public ZyanComponentHost(string name, int tcpPort, ComponentCatalog catalog)
-			: this(name, new TcpBinaryServerProtocolSetup(tcpPort), new InProcSessionManager(), catalog)
+			: this(name, new DefaultServerProtocolSetup(tcpPort), new InProcSessionManager(), catalog)
 		{
 		}
 

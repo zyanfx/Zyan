@@ -25,10 +25,12 @@ namespace Zyan.Communication.Protocols
 			DefaultClientProtocols = new Dictionary<string, Lazy<IClientProtocolSetup>>
 			{
 				{ "tcpex://", new Lazy<IClientProtocolSetup>(() => new TcpDuplexClientProtocolSetup(), true) },
+				{ "null://", new Lazy<IClientProtocolSetup>(() => new NullClientProtocolSetup(), true) },
+#if !XAMARIN
 				{ "tcp://", new Lazy<IClientProtocolSetup>(() => new TcpBinaryClientProtocolSetup(), true) },
 				{ "ipc://", new Lazy<IClientProtocolSetup>(() => new IpcBinaryClientProtocolSetup(), true) },
 				{ "http://", new Lazy<IClientProtocolSetup>(() => new HttpCustomClientProtocolSetup(), true) },
-				{ "null://", new Lazy<IClientProtocolSetup>(() => new NullClientProtocolSetup(), true) }
+#endif
 			};
 		}
 
