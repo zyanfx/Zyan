@@ -92,6 +92,16 @@ namespace Zyan.Communication.Protocols.Tcp
 		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
 		/// </summary>
 		/// <param name="tcpPort">TCP port number</param>
+		public TcpDuplexServerProtocolSetup(int tcpPort)
+			: this()
+		{
+			TcpPort = tcpPort;
+		}
+
+		/// <summary>
+		/// Creates a new instance of the TcpDuplexServerProtocolSetup class.
+		/// </summary>
+		/// <param name="tcpPort">TCP port number</param>
 		/// <param name="authProvider">Authentication provider</param>
 		public TcpDuplexServerProtocolSetup(int tcpPort, IAuthenticationProvider authProvider)
 			: this()
