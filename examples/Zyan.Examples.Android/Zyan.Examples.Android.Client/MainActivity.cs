@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Runtime;
@@ -21,21 +22,60 @@ namespace Zyan.Examples.Android.Client
 			// Set our view from the "main" layout resource
 			SetContentView (Resource.Layout.Main);
 
-			// Get our button from the layout resource,
-			// and attach an event to it
+			EditText serverEditText = FindViewById<EditText> (Resource.Id.serverEditText);
 			Button button = FindViewById<Button> (Resource.Id.myButton);
-			
-			button.Click += delegate
+			TextView responseView = FindViewById<TextView> (Resource.Id.responseView);
+
+			button.Click += async (sender, e) =>
 			{
-				var protocol = new TcpDuplexClientProtocolSetup(false); // true);
-				using (var conn = new ZyanConnection("tcpex://192.168.254.104:12345/Sample", protocol))
-				{
-					var proxy = conn.CreateProxy<ISampleService>();
-					button.Text = proxy.GetRandomString();
-				}
+				serverEditText.Enabled = false;
+				ServerAddress = serverEditText.Text;
+				responseView.Text = "...";
+				responseView.Text = await Task.Factory.StartNew(() => SampleService.GetRandomString());
 			};
+		}
+
+		private string ServerAddress { get; set; }
+
+		private ISampleService sampleService;
+
+		private ISampleService SampleService
+		{
+			get
+			{
+				if (sampleService == null)
+				{
+					sampleService = ZyanConnection.CreateProxy<ISampleService> ();
+				}
+
+				return sampleService;
+			}
+		}
+
+		private ZyanConnection zyanConnection;
+
+		private ZyanConnection ZyanConnection
+		{
+			get
+			{
+				if (zyanConnection == null)
+				{
+					zyanConnection = new ZyanConnection("tcpex://" + ServerAddress + ":12345/Sample");
+				}
+
+				return zyanConnection;
+			}
+		}
+
+		protected override void Dispose (bool disposing)
+		{
+			base.Dispose (disposing);
+
+			if (zyanConnection != null)
+			{
+				zyanConnection.Dispose();
+				zyanConnection = null;
+			}
 		}
 	}
 }
-
-
