@@ -1,19 +1,5 @@
 using System;
 
-namespace System.Diagnostics
-{
-	internal static class Trace
-	{
-		public static void Write(params object[] values)
-		{ 
-		}
-
-		public static void WriteLine(params object[] values)
-		{
-		}
-	}
-}
-
 namespace System.ServiceModel
 {
 	internal class ServiceContractAttribute : Attribute

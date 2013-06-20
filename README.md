@@ -11,19 +11,23 @@
 
 ### Easy to use
 
-Zyan is very easy to learn and use. It provides clean intuitive API for hosting and accessing remote components.
+Zyan is very easy to learn and use. It provides clean intuitive API (see examples below) for hosting and accessing remote components.
+
+### Supports desktop and mobile
+
+Zyan runs on Windows, Linux, MacOS and Android platforms supporting .[NET 4.x](http://www.microsoft.com/net), [Mono 2.10+](http://mono-project.com) or [Mono for Android 4.7+](http://xamarin.com/monoforandroid) frameworks.
 
 ### Compact and secure
 
-Supports transparent realtime traffic compression and encryption. Doesn't require digital certificates, supports Windows and Linux platforms.
+Supports transparent realtime traffic compression and encryption, even on mobile devices. Doesn't require digital certificates.
 
 ### Unobtrusive
 
-All you need is plain .NET classes and interfaces: no MarshalByRefObjects, no ServiceContract attributes are necessary (more details).
+All you need is plain .NET classes and interfaces: no ServiceContract/OperationContract attributes, no MarshalByRefObjects are necessary.
 
 ### Multiprotocol
 
-Supports TCP, HTTP and Named pipes. Extensibility model allows plugging any custom transport protocols.
+Supports TCP, HTTP and Named pipes natively on most platforms. Extensibility model allows plugging any custom transport protocols.
 
 ### Full duplex TCP
 
@@ -51,7 +55,7 @@ Zyan code is extensively covered with unit tests and integrational tests. Integr
 
 ### Enterprise ready
 
-Zyan Framework is used in commercial enterprise applications. Check out the «Who uses Zyan Communication Framework» section.
+Zyan Framework is used in commercial enterprise applications. Check out the *Who uses Zyan Communication Framework* section of the website.
 
 ### Absolutely free
 
@@ -87,7 +91,7 @@ proxy.SayHello("HelloWorld");
 * You don't have to decorate your interfaces with ServiceContract and OperationContract attributes: every method is a part of the contract.
 * You can use overloaded methods, which isn't possible with WCF. Service contracts produce WSDL, which doesn't support method overloading (all operations must be uniquely named).
 * You can call methods with generic parameters, which is also impossible with WCF. What's worse, these constraints cannot be validated at compile-time, so malformed WCF contracts throw exceptions at runtime.
-* There is no need to create separate callback contract for the duplex communication — just pass in a delegate as an argument to the remote method, or subscribe to a remote event using familiar syntax.
+* There is no need to create separate callback contract for the duplex communication -- just pass in a delegate as an argument to the remote method, or subscribe to a remote event using familiar syntax.
 * You are not forced to specify component activation mode using attributes at compile time. ZyanComponentHost can be configured to activate any component in a single-call (default) or a singleton mode.
 
 ## Why is it better than .NET Remoting?
