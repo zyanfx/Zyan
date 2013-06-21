@@ -22,18 +22,25 @@ namespace Zyan.Examples.Android.Client
 			// Set our view from the "main" layout resource
 			SetContentView (Resource.Layout.Main);
 
-			EditText serverEditText = FindViewById<EditText> (Resource.Id.serverEditText);
-			Button button = FindViewById<Button> (Resource.Id.myButton);
-			TextView responseView = FindViewById<TextView> (Resource.Id.responseView);
+			EditText serverEditText = FindViewById<EditText>(Resource.Id.serverEditText);
+			Button button = FindViewById<Button>(Resource.Id.myButton);
+			TextView responseView = FindViewById<TextView>(Resource.Id.responseView);
+			EventTextView = FindViewById<TextView>(Resource.Id.eventTextView);
 
 			button.Click += async (sender, e) =>
 			{
+				// prepare UI
 				serverEditText.Enabled = false;
 				ServerAddress = serverEditText.Text;
 				responseView.Text = "...";
+				EventTextView.Text = string.Empty;
+
+				// execute remote call
 				responseView.Text = await Task.Factory.StartNew(() => SampleService.GetRandomString());
 			};
 		}
+
+		private TextView EventTextView { get; set; }
 
 		private string ServerAddress { get; set; }
 
@@ -61,6 +68,10 @@ namespace Zyan.Examples.Android.Client
 				if (zyanConnection == null)
 				{
 					zyanConnection = new ZyanConnection("tcpex://" + ServerAddress + ":12345/Sample");
+					SampleService.RandomEvent += (sender, e) =>
+					{
+						RunOnUiThread(() => EventTextView.Text = "Random event occured!");
+					};
 				}
 
 				return zyanConnection;

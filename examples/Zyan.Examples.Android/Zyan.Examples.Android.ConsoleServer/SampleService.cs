@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using System.Threading;
 using Zyan.Examples.Android.Shared;
 
 namespace Zyan.Examples.Android.ConsoleServer
@@ -20,10 +21,28 @@ namespace Zyan.Examples.Android.ConsoleServer
 				sb.Append(c);
 			}
 
+			if (rnd.Next(10) < 3)
+			{
+				OnRandomEvent(EventArgs.Empty);
+			}
+
 			Console.WriteLine("Returning: {0}", sb);
 			return sb.ToString();
 		}
-	}
 
+		public event EventHandler RandomEvent;
+
+		private void OnRandomEvent(EventArgs e)
+		{
+			var randomEvent = RandomEvent;
+			if (randomEvent != null)
+			{
+				// simulate asynchronous event
+				Thread.Sleep(TimeSpan.FromSeconds(1 + rnd.Next(5)));
+				Console.WriteLine("Generating random event...");
+				randomEvent(null, e);
+			}
+		}
+	}
 }
 

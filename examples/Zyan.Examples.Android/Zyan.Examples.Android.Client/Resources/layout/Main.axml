@@ -18,4 +18,10 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/responseView" />
+    <TextView
+        android:text="Make sure server IP address is correct!"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/eventTextView" />
 </LinearLayout>

@@ -29,7 +29,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="Zyan.Communication">
-      <HintPath>..\..\..\bin\DebugAndroid\Zyan.Communication.dll</HintPath>
+      <HintPath>..\..\..\bin\Debug\Zyan.Communication.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
