@@ -203,7 +203,7 @@ namespace Zyan.Communication
 		/// <returns></returns>
 		private IPAddress GetCallingClientIPAddress()
 		{
-			return CallContext.GetData("Zyan_ClientAddress") as IPAddress; ;
+			return CallContext.GetData("Zyan_ClientAddress") as IPAddress;
 		}
 
 		/// <summary>
