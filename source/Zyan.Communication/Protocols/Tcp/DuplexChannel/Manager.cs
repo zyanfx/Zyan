@@ -85,20 +85,30 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			// get loopback address
 			var addressFamily = DefaultAddressFamily;
 			var loopback = addressFamily == AddressFamily.InterNetwork ? IPAddress.Loopback : IPAddress.IPv6Loopback;
+			List<IPAddress> addresses;
 
-			// GetAllNetworkInterfaces() may be slow, so execute it once and cache results
-			var query =
-				from nic in NetworkInterface.GetAllNetworkInterfaces()
-				from ua in GetUnicastAddresses(nic.GetIPProperties())
-				where ua.AddressFamily == addressFamily
-				select ua;
+			try
+			{
+				// GetAllNetworkInterfaces() may be slow, so execute it once and cache results
+				var query =
+					from nic in NetworkInterface.GetAllNetworkInterfaces()
+					from ua in GetUnicastAddresses(nic.GetIPProperties())
+					where ua.AddressFamily == addressFamily
+					select ua;
+				addresses = query.ToList();
+			}
+			catch
+			{
+ 				// GetAllNetworkInterfaces might fail on Linux and will fail on Android due to this bug:
+				// https://bugzilla.xamarin.com/show_bug.cgi?id=1969
+				addresses = Dns.GetHostAddresses(Dns.GetHostName()).ToList();
+			}
 
 			// Mono framework doesn't include loopback address
-			var addresses = query.ToList();
 			if (!addresses.Contains(loopback))
 				addresses.Add(loopback);
 
-			return addresses.ToList();
+			return addresses;
 
 		}, true);
 

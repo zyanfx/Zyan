@@ -95,6 +95,7 @@
     <Compile Include="RecreateClientConnectionTests.cs" />
     <Compile Include="SafeDynamicInvokerTests.cs" />
     <Compile Include="StreamTests.cs" />
+    <Compile Include="TransportHeaderWrapperTests.cs" />
     <Compile Include="TypeHelperTests.cs" />
     <Compile Include="ZyanProxyTests.cs" />
   </ItemGroup>

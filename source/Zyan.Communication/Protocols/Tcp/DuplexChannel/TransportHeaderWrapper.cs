@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -37,8 +38,17 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 			foreach (DictionaryEntry entry in headers)
 			{
-				keys.Add(entry.Key);
-				values.Add(entry.Value);
+				var key = entry.Key;
+				var value = entry.Value;
+
+				// work around IPAddress serialization MonoDroid interoperability issue
+				if (key != null && key.ToString() == CommonTransportKeys.IPAddress)
+				{
+					value = entry.Value.ToString();
+				}
+
+				keys.Add(key);
+				values.Add(value);
 			}
 
 			Keys = keys.ToArray();
@@ -53,7 +63,16 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 				for (int i = 0; i < Math.Min(Keys.Length, Values.Length); i++)
 				{
-					headers[Keys[i]] = Values[i];
+					var key = Keys[i];
+					var value = Values[i];
+
+					// work around IPAddress serialization MonoDroid interoperability issue
+					if (key != null && value != null && key.ToString() == CommonTransportKeys.IPAddress)
+					{
+						value = IPAddress.Parse(value.ToString());
+					}
+
+					headers[key] = value;
 				}
 
 				return headers;

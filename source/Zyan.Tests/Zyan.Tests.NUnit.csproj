@@ -46,6 +46,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -81,6 +82,7 @@
     <Compile Include="RecreateClientConnectionTests.cs" />
     <Compile Include="SafeDynamicInvokerTests.cs" />
     <Compile Include="StreamTests.cs" />
+    <Compile Include="TransportHeaderWrapperTests.cs" />
     <Compile Include="TypeHelperTests.cs" />
     <Compile Include="ZyanProxyTests.cs" />
   </ItemGroup>
