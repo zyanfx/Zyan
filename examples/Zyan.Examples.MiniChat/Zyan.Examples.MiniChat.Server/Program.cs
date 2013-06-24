@@ -16,9 +16,7 @@ namespace Zyan.Examples.MiniChat.Server
 
 		static void Main(string[] args)
 		{
-            ZyanComponentHost.LegacyBlockingEvents = true;
-
-            ActiveNicknames = new List<string>();
+			ActiveNicknames = new List<string>();
 
 			TcpDuplexServerProtocolSetup protocol = new TcpDuplexServerProtocolSetup(Properties.Settings.Default.TcpPort, new NicknameAuthProvider(), true);
 
