@@ -23,7 +23,7 @@ namespace Zyan.Examples.Android.ConsoleServer
 
 			if (rnd.Next(10) < 3)
 			{
-				OnRandomEvent(EventArgs.Empty);
+				ThreadPool.QueueUserWorkItem(x => OnRandomEvent(EventArgs.Empty));
 			}
 
 			Console.WriteLine("Returning: {0}", sb);
