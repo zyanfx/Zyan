@@ -219,8 +219,6 @@ namespace Zyan.Communication
 
 			string channelName = _remotingChannel.ChannelName;
 
-			_subscriptions = new Dictionary<Guid, NotificationReceiver>();
-
 			if (credentials != null && credentials.Count == 0)
 				credentials = null;
 
@@ -514,58 +512,6 @@ namespace Zyan.Communication
 		{
 			if (InvokeCanceled != null)
 				InvokeCanceled(this, e);
-		}
-
-		#endregion
-
-		#region Notification (old NotificationService feature)
-
-		// Repository for event subscriptions (NotficationService)
-		private volatile Dictionary<Guid, NotificationReceiver> _subscriptions = null;
-
-		// Object for thread synchronization of event subscriptions
-		private object _subscriptionsLockObject = new object();
-
-		/// <summary>
-		/// Subscribes for receiving notifications of a specified event.
-		/// </summary>
-		/// <param name="eventName">Event name</param>
-		/// <param name="handler">Client side event handler</param>
-		/// <returns>Unique subscription ID</returns>
-		[Obsolete("The NotificationService feature may not be supported in future Zyan versions. Please use remote delegates to create your notification system.", false)]
-		public Guid SubscribeEvent(string eventName, EventHandler<NotificationEventArgs> handler)
-		{
-			NotificationReceiver receiver = new NotificationReceiver(eventName, handler);
-			RemoteDispatcher.Subscribe(eventName, receiver.FireNotifyEvent);
-
-			Guid subscriptionID = Guid.NewGuid();
-
-			lock (_subscriptionsLockObject)
-			{
-				_subscriptions.Add(subscriptionID, receiver);
-			}
-			return subscriptionID;
-		}
-
-		/// <summary>
-		/// Unsubscribe for receiving notifications of a specified event.
-		/// </summary>
-		/// <param name="subscriptionID">Unique subscription ID</param>
-		[Obsolete("The NotificationService feature may not be supported in future Zyan versions. Please use remote delegates to create your notification system.")]
-		public void UnsubscribeEvent(Guid subscriptionID)
-		{
-			lock (_subscriptionsLockObject)
-			{
-				if (_subscriptions.ContainsKey(subscriptionID))
-				{
-					NotificationReceiver receiver = _subscriptions[subscriptionID];
-					RemoteDispatcher.Unsubscribe(receiver.EventName, receiver.FireNotifyEvent);
-
-					_subscriptions.Remove(subscriptionID);
-
-					receiver.Dispose();
-				}
-			}
 		}
 
 		#endregion

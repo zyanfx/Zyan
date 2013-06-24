@@ -709,42 +709,6 @@ namespace Zyan.Communication
 
 		#endregion
 
-		#region Notification (old NotificationService feature)
-
-#pragma warning disable 612
-
-		/// <summary>
-		/// Subscribe to a specified NotificationService event.
-		/// </summary>
-		/// <param name="eventName">Event name</param>
-		/// <param name="handler">Delegate to client side event handler</param>
-		[Obsolete("The NotificationService feature may not be supported in future Zyan versions. Please use remote delegates to create your notification system.", false)]
-		public void Subscribe(string eventName, EventHandler<NotificationEventArgs> handler)
-		{
-			if (!_host.IsNotificationServiceRunning)
-				throw new ApplicationException(LanguageResource.ApplicationException_NotificationServiceNotRunning);
-
-			_host.NotificationService.Subscribe(eventName, handler);
-		}
-
-		/// <summary>
-		/// Unsubscribe from a specified NotificationService event.
-		/// </summary>
-		/// <param name="eventName">Event name</param>
-		/// <param name="handler">Delegate to client side event handler</param>
-		[Obsolete("The NotificationService feature may not be supported in future Zyan versions. Please use remote delegates to create your notification system.", false)]
-		public void Unsubscribe(string eventName, EventHandler<NotificationEventArgs> handler)
-		{
-			if (!_host.IsNotificationServiceRunning)
-				throw new ApplicationException(LanguageResource.ApplicationException_NotificationServiceNotRunning);
-
-			_host.NotificationService.Unsubscribe(eventName, handler);
-		}
-
-#pragma warning restore 612
-
-		#endregion
-
 		#region Session management
 
 		/// <summary>
