@@ -52,20 +52,6 @@ namespace Zyan.Communication
 		bool ExistSession(Guid sessionID);
 
 		/// <summary>
-		/// Subscribe to a specified NotificationService event.
-		/// </summary>
-		/// <param name="eventName">Event name</param>
-		/// <param name="handler">Delegate to client side event handler</param>
-		void Subscribe(string eventName, EventHandler<NotificationEventArgs> handler);
-
-		/// <summary>
-		/// Unsubscribe from a specified NotificationService event.
-		/// </summary>
-		/// <param name="eventName">Event name</param>
-		/// <param name="handler">Delegate to client side event handler</param>
-		void Unsubscribe(string eventName, EventHandler<NotificationEventArgs> handler);
-
-		/// <summary>
 		/// Gets the maximum sesseion age (in minutes).
 		/// </summary>
 		int SessionAgeLimit
