@@ -4,9 +4,14 @@ using System.ComponentModel.Composition;
 namespace Zyan.Communication.Composition
 {
 	/// <summary>
-	/// Specifies that a type is a component that can be published by Zyan
+	/// Specifies that a type is a component that can be published by Zyan.
 	/// </summary>
-	[MetadataAttribute, AttributeUsage(AttributeTargets.Class, Inherited = false)]
+	/// <remarks>
+	/// You cannot decorate a class with multiple ZyanComponent attributes
+	/// because MEF will attach all metadata to all exports.
+	/// For more details, refer to: https://zyan.codeplex.com/workitem/2059
+	/// </remarks>
+	[MetadataAttribute, AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 	public class ZyanComponentAttribute : ExportAttribute
 	{
 		/// <summary>
