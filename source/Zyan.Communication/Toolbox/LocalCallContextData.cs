@@ -9,7 +9,7 @@ namespace Zyan.Communication.Toolbox
 	/// Prevents the data from leaving the current application domain.
 	/// </summary>
 	[Serializable]
-	internal sealed class LocalCallContextData : ISerializable
+	internal sealed class LocalCallContextData : ISerializable, ILogicalThreadAffinative
 	{
 		private LocalCallContextData()
 		{
@@ -62,7 +62,7 @@ namespace Zyan.Communication.Toolbox
 		/// <returns>The value of the object.</returns>
 		public static object GetData(string name)
 		{
-			var data = CallContext.LogicalGetData(name) as LocalCallContextData;
+			var data = CallContext.GetData(name) as LocalCallContextData;
 			if (data == null)
 			{
 				return null;
@@ -78,7 +78,7 @@ namespace Zyan.Communication.Toolbox
 		/// <param name="value">The value of the object.</param>
 		public static void SetData(string name, object value)
 		{
-			CallContext.LogicalSetData(name, new LocalCallContextData { Value = value });
+			CallContext.SetData(name, new LocalCallContextData { Value = value });
 		}
 	}
 }
