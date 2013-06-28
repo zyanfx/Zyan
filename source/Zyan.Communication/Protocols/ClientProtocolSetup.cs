@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
+using System.Text.RegularExpressions;
 using Zyan.Communication.Protocols.Http;
 using Zyan.Communication.Protocols.Ipc;
 using Zyan.Communication.Protocols.Null;
@@ -217,6 +218,35 @@ namespace Zyan.Communication.Protocols
 				return channel;
 			}
 			return channel;
+		}
+
+		/// <summary>
+		/// Formats the connection URL for this protocol.
+		/// </summary>
+		/// <param name="parts">The parts of the url, such as server name, port, etc.</param>
+		/// <returns>
+		/// Formatted URL supported by the protocol.
+		/// </returns>
+		string IClientProtocolSetup.FormatUrl(params object[] parts)
+		{
+			throw new NotSupportedException();
+		}
+
+		static readonly Regex UrlRegex = new Regex(@"^\w+://([^/]+:\d+)/(.+)", RegexOptions.Compiled);
+
+		/// <summary>
+		/// Checks whether the given URL is valid for this protocol.
+		/// </summary>
+		/// <param name="url">The URL to check.</param>
+		/// <returns>
+		/// True, if the URL is supported by the protocol, otherwise, False.
+		/// </returns>
+		public virtual bool IsUrlValid(string url)
+		{
+			if (string.IsNullOrEmpty(url))
+				return false;
+
+			return UrlRegex.IsMatch(url);
 		}
 	}
 }

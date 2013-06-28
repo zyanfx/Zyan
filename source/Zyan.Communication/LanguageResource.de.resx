@@ -288,4 +288,7 @@
   <data name="ArgumentException_UnsupportedEncryptionAlgorithm" xml:space="preserve">
     <value>Der angegeben Verschlüsselungsalgorithmus '{0}' wird nicht unterstützt. Bitte geben Sie einen der folgende Algorithmen an: '3DES', 'DES', 'RIJNDAEL' oder 'RC2'.</value>
   </data>
+  <data name="ArgumentException_ServerUrlIsInvalid" xml:space="preserve">
+    <value>Server-URL ist ungültig. Verwenden Sie die FormatUrl Methode des Client-Protokoll-Setup-Klasse, um eine gültige URL für das ausgewählte Protokoll zu erstellen.</value>
+  </data>
 </root>

@@ -176,6 +176,9 @@ namespace Zyan.Communication
 					throw new ArgumentNullException("protocolSetup");
 			}
 
+			if (!protocolSetup.IsUrlValid(serverUrl))
+				throw new ArgumentException(LanguageResource.ArgumentException_ServerUrlIsInvalid, "serverUrl");
+
 			_proxies = new List<WeakReference>();
 			_protocolSetup = protocolSetup;
 			_sessionID = Guid.NewGuid();

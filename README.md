@@ -15,7 +15,7 @@ Zyan is very easy to learn and use. It provides clean intuitive API (see example
 
 ### Supports desktop and mobile
 
-Zyan runs on Windows, Linux, MacOS and Android platforms supporting .[NET 4.x](http://www.microsoft.com/net), [Mono 2.10+](http://mono-project.com) or [Mono for Android 4.7+](http://xamarin.com/monoforandroid) frameworks.
+Zyan runs on Windows, Linux, MacOS and Android platforms supporting [Microsoft .NET 3.5+](http://www.microsoft.com/net), [Mono 2.10+](http://mono-project.com) or [Mono for Android 4.7+](http://xamarin.com/monoforandroid) frameworks.
 
 ### Compact and secure
 
@@ -33,14 +33,6 @@ Supports TCP, HTTP and Named pipes natively on most platforms. Extensibility mod
 
 Supports bidirectional TCP communication through client-side NAT and firewalls.
 
-### Supports duck typing
-
-Zyan is able to host component that matches an interface, but doesn't implement it.
-
-### Supports events
-
-Distributed events are as easy as button_Click in Windows Forms applications. Distributed Event-Based Components (EBC) are supported out-of-the-box.
-
 ### LINQ-enabled
 
 Supports LINQ queries to the remote components. Allows passing serialized LINQ expressions over network and generating anonymous classes on demand.
@@ -49,6 +41,14 @@ Supports LINQ queries to the remote components. Allows passing serialized LINQ e
 
 Plug in custom transport protocols, session manager, authentication provider, and more. Build loosely coupled client-server systems using Zyan and MEF.
 
+### Supports events
+
+Distributed events are as easy as button_Click in Windows Forms applications. Distributed Event-Based Components (EBC) are supported out-of-the-box.
+
+### Supports duck typing
+
+Zyan is able to host component that matches an interface, but doesn't implement it.
+
 ### Unit tested
 
 Zyan code is extensively covered with unit tests and integrational tests. Integrational tests are executed on Windows and Linux using Mono.
@@ -56,6 +56,14 @@ Zyan code is extensively covered with unit tests and integrational tests. Integr
 ### Enterprise ready
 
 Zyan Framework is used in commercial enterprise applications. Check out the *Who uses Zyan Communication Framework* section of the website.
+
+### Well-documented
+
+Comprehensive documentation covers all aspects of Zyan API. Check out source code repository for several example application.
+
+### Actively supported
+
+Our community provides free technical support in English, German and Russian. Most of your questions are answered within hours!
 
 ### Absolutely free
 
@@ -82,8 +90,11 @@ var connection = new ZyanConnection("tcp://localhost:8080/ZyanDemo");
 // Create HelloWorldService proxy
 var proxy = connection.CreateProxy<IHelloWorldService>();
  
-// Invoke method
+// Invoke a method
 proxy.SayHello("HelloWorld");
+
+// Subscribe to a remote event
+proxy.MyEvent += (sender, e) => Console.WriteLine("Hi!");
 ```
 
 ## Why is it better than WCF?

@@ -1,19 +1,20 @@
 ﻿using System;
+using System.Collections;
 using System.Net.Security;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Ipc;
-using System.Security.Principal;
-using Zyan.Communication.Toolbox;
-using System.Collections;
 using System.Runtime.Serialization.Formatters;
+using System.Security.Principal;
+using System.Text.RegularExpressions;
+using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication.Protocols.Ipc
 {
 	/// <summary>
 	/// Client protocol setup for inter process communication via Named Pipes.
 	/// </summary>
-	public class IpcBinaryClientProtocolSetup : ClientProtocolSetup
+	public class IpcBinaryClientProtocolSetup : ClientProtocolSetup, IClientProtocolSetup
 	{
 		private bool _useWindowsSecurity = false;
 		private TokenImpersonationLevel _impersonationLevel = TokenImpersonationLevel.Identification;
@@ -69,6 +70,51 @@ namespace Zyan.Communication.Protocols.Ipc
 
 			ClientSinkChain.Add(new BinaryClientFormatterSinkProvider(formatterSettings, null));
 			ServerSinkChain.Add(new BinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
+		}
+
+		/// <summary>
+		/// Formats the connection URL for this protocol.
+		/// </summary>
+		/// <param name="portName">The port name (valid filename required).</param>
+		/// <param name="zyanHostName">Name of the zyan host.</param>
+		/// <returns>
+		/// Formatted URL supported by the protocol.
+		/// </returns>
+		public string FormatUrl(string portName, string zyanHostName)
+		{
+			return (this as IClientProtocolSetup).FormatUrl(portName, zyanHostName);
+		}
+
+		/// <summary>
+		/// Formats the connection URL for this protocol.
+		/// </summary>
+		/// <param name="parts">The parts of the url, such as server name, port, etc.</param>
+		/// <returns>
+		/// Formatted URL supported by the protocol.
+		/// </returns>
+		string IClientProtocolSetup.FormatUrl(params object[] parts)
+		{
+			if (parts == null || parts.Length < 2)
+				throw new ArgumentException(GetType().Name + " requires two arguments for URL: port name and ZyanHost name.");
+
+			return string.Format("ipc://{0}/{1}", parts);
+		}
+
+		static readonly Regex UrlRegex = new Regex(@"^ipc://([^/]+)/(.+)", RegexOptions.Compiled);
+
+		/// <summary>
+		/// Checks whether the given URL is valid for this protocol.
+		/// </summary>
+		/// <param name="url">The URL to check.</param>
+		/// <returns>
+		/// True, if the URL is supported by the protocol, otherwise, False.
+		/// </returns>
+		public override bool IsUrlValid(string url)
+		{
+			if (string.IsNullOrEmpty(url))
+				return false;
+
+			return UrlRegex.IsMatch(url);
 		}
 
 		/// <summary>

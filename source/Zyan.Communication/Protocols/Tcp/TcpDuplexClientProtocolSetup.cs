@@ -1,19 +1,17 @@
 ﻿using System;
+using System.Collections;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Serialization.Formatters;
-using Zyan.Communication.ChannelSinks.Encryption;
-using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp.DuplexChannel;
 using Zyan.Communication.Toolbox;
-using System.Collections;
 
 namespace Zyan.Communication.Protocols.Tcp
 {
 	/// <summary>
 	/// Client protocol setup for bi-directional TCP communication with support for user defined authentication and security.
 	/// </summary>
-	public class TcpDuplexClientProtocolSetup : CustomClientProtocolSetup
+	public class TcpDuplexClientProtocolSetup : CustomClientProtocolSetup, IClientProtocolSetup
 	{
 		private bool _tcpKeepAliveEnabled = true;
 		private ulong _tcpKeepAliveTime = 30000;
@@ -405,6 +403,47 @@ namespace Zyan.Communication.Protocols.Tcp
 			TcpKeepAliveEnabled = keepAlive;
 			TcpKeepAliveTime = keepAliveTime;
 			TcpKeepAliveInterval = KeepAliveInterval;
+		}
+
+		/// <summary>
+		/// Formats the connection URL for this protocol.
+		/// </summary>
+		/// <param name="serverAddress">The server address.</param>
+		/// <param name="portNumber">The port number.</param>
+		/// <param name="zyanHostName">Name of the zyan host.</param>
+		/// <returns>
+		/// Formatted URL supported by the protocol.
+		/// </returns>
+		public string FormatUrl(string serverAddress, int portNumber, string zyanHostName)
+		{
+			return (this as IClientProtocolSetup).FormatUrl(serverAddress, portNumber, zyanHostName);
+		}
+
+		/// <summary>
+		/// Formats the connection URL for this protocol.
+		/// </summary>
+		/// <param name="parts">The parts of the url, such as server name, port, etc.</param>
+		/// <returns>
+		/// Formatted URL supported by the protocol.
+		/// </returns>
+		string IClientProtocolSetup.FormatUrl(params object[] parts)
+		{
+			if (parts == null || parts.Length < 3)
+				throw new ArgumentException(GetType().Name + " requires three arguments for URL: server address, port number and ZyanHost name.");
+
+			return string.Format("tcpex://{0}:{1}/{2}", parts);
+		}
+
+		/// <summary>
+		/// Checks whether the given URL is valid for this protocol.
+		/// </summary>
+		/// <param name="url">The URL to check.</param>
+		/// <returns>
+		/// True, if the URL is supported by the protocol, otherwise, False.
+		/// </returns>
+		public override bool IsUrlValid(string url)
+		{
+			return base.IsUrlValid(url) && url.StartsWith("tcpex");
 		}
 
 		/// <summary>
