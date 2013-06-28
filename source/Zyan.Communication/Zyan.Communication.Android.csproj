@@ -21,6 +21,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\bin\DebugAndroid\</OutputPath>
+    <BaseIntermediateOutputPath>obj.Android</BaseIntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE;XAMARIN</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -30,6 +31,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
     <OutputPath>..\..\bin\ReleaseAndroid\</OutputPath>
+    <BaseIntermediateOutputPath>obj.Android</BaseIntermediateOutputPath>
     <DefineConstants>TRACE;XAMARIN</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>

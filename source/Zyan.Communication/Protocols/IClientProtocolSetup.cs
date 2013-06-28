@@ -33,5 +33,23 @@ namespace Zyan.Communication.Protocols
 		/// Gets the name of the remoting channel.
 		/// </summary>
 		string ChannelName { get; }
+
+		/// <summary>
+		/// Formats the connection URL for this protocol.
+		/// </summary>
+		/// <param name="parts">The parts of the url, such as server name, port, etc.</param>
+		/// <returns>
+		/// Formatted URL supported by the protocol.
+		/// </returns>
+		string FormatUrl(params object[] parts);
+
+		/// <summary>
+		/// Checks whether the given URL is valid for this protocol.
+		/// </summary>
+		/// <param name="url">The URL to check.</param>
+		/// <returns>
+		/// True, if the URL is supported by the protocol, otherwise, False.
+		/// </returns>
+		bool IsUrlValid(string url);
 	}
 }

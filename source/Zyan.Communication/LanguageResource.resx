@@ -148,7 +148,7 @@
     <value>Method name missing.</value>
   </data>
   <data name="ArgumentException_ServerUrlMissing" xml:space="preserve">
-    <value>Server URL missing.</value>
+    <value>Server URL is missing.</value>
   </data>
   <data name="ArgumentException_TypeIsNotAClass" xml:space="preserve">
     <value>The provided implementation type is not a class.</value>
@@ -287,5 +287,8 @@
   </data>
   <data name="ArgumentException_UnsupportedEncryptionAlgorithm" xml:space="preserve">
     <value>The specified encryption algorithm '{0}' is not supported. Use one of the following algorithms: '3DES', 'DES', 'RIJNDAEL' or 'RC2'.</value>
+  </data>
+  <data name="ArgumentException_ServerUrlIsInvalid" xml:space="preserve">
+    <value>Server URL is invalid. Use the FormatUrl method of the client protocol setup class to create a valid URL for the selected protocol.</value>
   </data>
 </root>

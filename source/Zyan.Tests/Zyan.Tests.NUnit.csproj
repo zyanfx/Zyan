@@ -79,6 +79,7 @@
     <Compile Include="Misc\SampleObjectSource.cs" />
     <Compile Include="OneWayTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ProtocolUrlTests.cs" />
     <Compile Include="RecreateClientConnectionTests.cs" />
     <Compile Include="SafeDynamicInvokerTests.cs" />
     <Compile Include="StreamTests.cs" />
