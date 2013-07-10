@@ -10,7 +10,7 @@ namespace Zyan.Examples.Android.ConsoleServer
 	{
 		public static void Main(string[] args)
 		{
-			var protocol = new TcpDuplexServerProtocolSetup (12345, new NullAuthenticationProvider (), true);
+			var protocol = new TcpDuplexServerProtocolSetup(12345, new NullAuthenticationProvider(), true);
 			using (var host = new ZyanComponentHost("Sample", protocol))
 			{
 				host.RegisterComponent<ISampleService, SampleService>();

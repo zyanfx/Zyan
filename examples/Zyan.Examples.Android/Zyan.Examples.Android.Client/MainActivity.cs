@@ -12,15 +12,15 @@ using Zyan.Examples.Android.Shared;
 
 namespace Zyan.Examples.Android.Client
 {
-	[Activity (Label = "Zyan.Examples.Android.Client", MainLauncher = true)]
+	[Activity (Label = "Zyan.Examples.Android", MainLauncher = true)]
 	public class Activity1 : Activity
 	{
-		protected override void OnCreate (Bundle bundle)
+		protected override void OnCreate(Bundle bundle)
 		{
-			base.OnCreate (bundle);
+			base.OnCreate(bundle);
 
 			// Set our view from the "main" layout resource
-			SetContentView (Resource.Layout.Main);
+			SetContentView(Resource.Layout.Main);
 
 			EditText serverEditText = FindViewById<EditText>(Resource.Id.serverEditText);
 			Button button = FindViewById<Button>(Resource.Id.myButton);
@@ -52,7 +52,7 @@ namespace Zyan.Examples.Android.Client
 			{
 				if (sampleService == null)
 				{
-					sampleService = ZyanConnection.CreateProxy<ISampleService> ();
+					sampleService = ZyanConnection.CreateProxy<ISampleService>();
 				}
 
 				return sampleService;
@@ -67,20 +67,24 @@ namespace Zyan.Examples.Android.Client
 			{
 				if (zyanConnection == null)
 				{
+					RunOnUiThread(() => EventTextView.Text = "Establishing secure connection...");
+
 					zyanConnection = new ZyanConnection("tcpex://" + ServerAddress + ":12345/Sample");
 					SampleService.RandomEvent += (sender, e) =>
 					{
-						RunOnUiThread(() => EventTextView.Text = "Random event occured!");
+						RunOnUiThread(() => Toast.MakeText(this, "Random event: " + DateTime.Now.ToString("mm:ss"), ToastLength.Short).Show());
 					};
+
+					RunOnUiThread(() => EventTextView.Text = string.Empty);
 				}
 
 				return zyanConnection;
 			}
 		}
 
-		protected override void Dispose (bool disposing)
+		protected override void Dispose(bool disposing)
 		{
-			base.Dispose (disposing);
+			base.Dispose(disposing);
 
 			if (zyanConnection != null)
 			{
