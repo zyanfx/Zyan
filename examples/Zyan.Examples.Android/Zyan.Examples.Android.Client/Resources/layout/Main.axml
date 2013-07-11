@@ -4,10 +4,38 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
     <EditText
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/serverEditText"
-        android:text="192.168.254.104" />
+        android:text="192.168.254.104"
+        android:gravity="left" />
+    <LinearLayout
+        android:orientation="horizontal"
+        android:minWidth="25px"
+        android:minHeight="25px"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/linearLayout1"
+        android:gravity="left">
+        <Button
+            android:text="Connect"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:id="@+id/connectButton"
+            android:paddingRight="20dp"
+            android:paddingLeft="20dp" />
+        <Button
+            android:text="Disconnect"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:id="@+id/disconnectButton" />
+    </LinearLayout>
+    <TextView
+        android:text="Enter server address and tap Connect."
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_width="fill_parent"
+        android:layout_height="37.3dp"
+        android:id="@+id/statusTextView" />
     <Button
         android:id="@+id/myButton"
         android:layout_width="fill_parent"
@@ -18,10 +46,4 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/responseView" />
-    <TextView
-        android:text="Make sure server IP address is correct!"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/eventTextView" />
 </LinearLayout>

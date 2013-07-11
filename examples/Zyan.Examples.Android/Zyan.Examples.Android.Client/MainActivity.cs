@@ -12,8 +12,11 @@ using Zyan.Examples.Android.Shared;
 
 namespace Zyan.Examples.Android.Client
 {
-	[Activity (Label = "Zyan.Examples.Android", MainLauncher = true)]
-	public class Activity1 : Activity
+	/// <summary>
+	/// Main activity of the application.
+	/// </summary>
+	[Activity(Label = "Zyan.Examples.Android", MainLauncher = true)]
+	public class MainActivity : Activity
 	{
 		protected override void OnCreate(Bundle bundle)
 		{
@@ -22,27 +25,79 @@ namespace Zyan.Examples.Android.Client
 			// Set our view from the "main" layout resource
 			SetContentView(Resource.Layout.Main);
 
-			EditText serverEditText = FindViewById<EditText>(Resource.Id.serverEditText);
-			Button button = FindViewById<Button>(Resource.Id.myButton);
-			TextView responseView = FindViewById<TextView>(Resource.Id.responseView);
-			EventTextView = FindViewById<TextView>(Resource.Id.eventTextView);
+			// get the reference to our custom application 
+			App = Application as ZyanApplication;
 
-			button.Click += async (sender, e) =>
+			// initialize controls
+			var serverEditText = FindViewById<EditText>(Resource.Id.serverEditText);
+			var responseView = FindViewById<TextView>(Resource.Id.responseView);
+			var statusTextView = FindViewById<TextView>(Resource.Id.statusTextView);
+			var connectButton = FindViewById<Button>(Resource.Id.connectButton);
+			var disconnectButton = FindViewById<Button>(Resource.Id.disconnectButton);
+			var queryButton = FindViewById<Button>(Resource.Id.myButton);
+
+			// enable or disable buttons
+			var connected = App.ZyanConnection != null;
+			serverEditText.Enabled = !connected;
+			connectButton.Enabled = !connected;
+			disconnectButton.Enabled = connected;
+			queryButton.Enabled = connected;
+			if (connected)
 			{
-				// prepare UI
+				statusTextView.Text = "Connected to: " + ZyanConnection.ServerUrl;
+			}
+
+			// add event handlers
+			connectButton.Click += async (sender, e) => 
+			{
+				connectButton.Enabled = false;
 				serverEditText.Enabled = false;
 				ServerAddress = serverEditText.Text;
-				responseView.Text = "...";
-				EventTextView.Text = string.Empty;
 
-				// execute remote call
+				statusTextView.Text = "Connecting to server...";
+				var address = await RunAsync(() => ZyanConnection.ServerUrl);
+				statusTextView.Text = "Connected to: " + address;
+				disconnectButton.Enabled = true;
+				queryButton.Enabled = true;
+			};
+
+			disconnectButton.Click += (sender, e) => 
+			{
+				serverEditText.Enabled = true;
+				connectButton.Enabled = true;
+				queryButton.Enabled = false;
+				disconnectButton.Enabled = false;
+				if (App.ZyanConnection != null)
+				{
+					App.ZyanConnection.Dispose();
+					App.ZyanConnection = null;
+				}
+			};
+
+			queryButton.Click += async (sender, e) =>
+			{
+				responseView.Text = "...";
 				responseView.Text = await Task.Factory.StartNew(() => SampleService.GetRandomString());
 			};
 		}
 
-		private TextView EventTextView { get; set; }
+		private ZyanApplication App { get; set; }
 
 		private string ServerAddress { get; set; }
+
+		private ZyanConnection ZyanConnection
+		{
+			get
+			{
+				if (App.ZyanConnection == null)
+				{
+					ShowToast("Establishing shared secure connection...");
+					App.ZyanConnection = new ZyanConnection("tcpex://" + ServerAddress + ":12345/Sample");
+				}
+
+				return App.ZyanConnection;
+			}
+		}
 
 		private ISampleService sampleService;
 
@@ -53,43 +108,45 @@ namespace Zyan.Examples.Android.Client
 				if (sampleService == null)
 				{
 					sampleService = ZyanConnection.CreateProxy<ISampleService>();
+
+					// subscribe to remote event
+					SampleService.RandomEvent += SampleService_OnRandomEvent;
+					OnDestroyHandlers += () =>
+					{
+						// unsubscribe from remote event when OnDestroy is called to prevent the activity leak 
+						SampleService.RandomEvent -= SampleService_OnRandomEvent;
+					};
 				}
 
 				return sampleService;
 			}
 		}
 
-		private ZyanConnection zyanConnection;
-
-		private ZyanConnection ZyanConnection
+		private Task<T> RunAsync<T>(Func<T> func)
 		{
-			get
-			{
-				if (zyanConnection == null)
-				{
-					RunOnUiThread(() => EventTextView.Text = "Establishing secure connection...");
-
-					zyanConnection = new ZyanConnection("tcpex://" + ServerAddress + ":12345/Sample");
-					SampleService.RandomEvent += (sender, e) =>
-					{
-						RunOnUiThread(() => Toast.MakeText(this, "Random event: " + DateTime.Now.ToString("mm:ss"), ToastLength.Short).Show());
-					};
-
-					RunOnUiThread(() => EventTextView.Text = string.Empty);
-				}
-
-				return zyanConnection;
-			}
+			return Task.Factory.StartNew(func);
 		}
 
-		protected override void Dispose(bool disposing)
+		private void ShowToast(string text, ToastLength length = ToastLength.Long)
 		{
-			base.Dispose(disposing);
+			RunOnUiThread(() => Toast.MakeText(this, text, length).Show());
+		}
 
-			if (zyanConnection != null)
+		private void SampleService_OnRandomEvent(object sender, EventArgs args)
+		{
+			ShowToast("Random event: " + DateTime.Now.ToString("mm:ss"), ToastLength.Short);
+		}
+
+		private Action OnDestroyHandlers { get; set; }
+
+		protected override void OnDestroy()
+		{
+			base.OnDestroy();
+
+			var handlers = OnDestroyHandlers;
+			if (handlers != null)
 			{
-				zyanConnection.Dispose();
-				zyanConnection = null;
+				handlers();
 			}
 		}
 	}
