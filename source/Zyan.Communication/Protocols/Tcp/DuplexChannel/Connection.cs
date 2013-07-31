@@ -641,8 +641,13 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		{
 			get
 			{
-				IPAddress address = ((IPEndPoint)_socket.RemoteEndPoint).Address;
-				return IPAddress.IsLoopback(address) || IsLocalIP(address);
+				if (_socket != null && _socket.RemoteEndPoint != null)
+				{
+					var address = ((IPEndPoint)_socket.RemoteEndPoint).Address;
+					return IPAddress.IsLoopback(address) || IsLocalIP(address);
+				}
+
+				return false;
 			}
 		}
 
