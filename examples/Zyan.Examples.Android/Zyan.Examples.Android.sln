@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Examples.Android.Client", "Zyan.Examples.Android.Client\Zyan.Examples.Android.Client.csproj", "{A4203081-966A-4E9C-9AA1-9A4BCC3BD935}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Examples.Android.Shared", "Zyan.Examples.Android.Shared\Zyan.Examples.Android.Shared.csproj", "{3C63D711-9A47-4FD5-9740-5B31DCC21A8C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Examples.Android.ConsoleServer", "Zyan.Examples.Android.ConsoleServer\Zyan.Examples.Android.ConsoleServer.csproj", "{0EABDF90-ED81-49E2-B153-D5B02E1B6D27}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0EABDF90-ED81-49E2-B153-D5B02E1B6D27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EABDF90-ED81-49E2-B153-D5B02E1B6D27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EABDF90-ED81-49E2-B153-D5B02E1B6D27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EABDF90-ED81-49E2-B153-D5B02E1B6D27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C63D711-9A47-4FD5-9740-5B31DCC21A8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C63D711-9A47-4FD5-9740-5B31DCC21A8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C63D711-9A47-4FD5-9740-5B31DCC21A8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C63D711-9A47-4FD5-9740-5B31DCC21A8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4203081-966A-4E9C-9AA1-9A4BCC3BD935}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4203081-966A-4E9C-9AA1-9A4BCC3BD935}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4203081-966A-4E9C-9AA1-9A4BCC3BD935}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4203081-966A-4E9C-9AA1-9A4BCC3BD935}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Zyan.Examples.Android.Client\Zyan.Examples.Android.Client.csproj
+	EndGlobalSection
+EndGlobal
