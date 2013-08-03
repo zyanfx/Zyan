@@ -69,34 +69,6 @@ Our community provides free technical support in English, German and Russian. Mo
 
 Zyan is distributed under the terms of MIT license. It can be used in any applications, including closed-source and commercial.
 
-## What does the application code look like?
-
-### Server-side
-
-``` C#
-// Create component host named "ZyanDemo" and bind to TCP port 8080
-var host = new ZyanComponentHost("ZyanDemo", 8080);
- 
-// Register component type and interface
-host.RegisterComponent<IHelloWorldService, HelloWordService>();
-```
-
-### Client-side
-
-``` C#
-// Connect to server
-var connection = new ZyanConnection("tcp://localhost:8080/ZyanDemo");
- 
-// Create HelloWorldService proxy
-var proxy = connection.CreateProxy<IHelloWorldService>();
- 
-// Invoke a method
-proxy.SayHello("HelloWorld");
-
-// Subscribe to a remote event
-proxy.MyEvent += (sender, e) => Console.WriteLine("Hi!");
-```
-
 ## Why is it better than WCF?
 
 * You don't have to decorate your interfaces with ServiceContract and OperationContract attributes: every method is a part of the contract.
