@@ -145,6 +145,7 @@ namespace Zyan.Communication.Threading
 						for (int i = 0; i < m_threads.Length; i++)
 						{
 							m_threads[i] = new Thread(DispatchLoop);
+							m_threads[i].IsBackground = true;
 							m_threads[i].Start();
 						}
 					}
