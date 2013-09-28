@@ -62,5 +62,5 @@ proxy.MyEvent += (sender, e) => Console.WriteLine("Hi!");
 ## Sample Applications
 
 * [Zyan Code Samples](https://zyan.codeplex.com/SourceControl/latest#examples/Zyan.Examples.Android/Zyan.Examples.Android.ConsoleServer/Program.cs)
-* [Zyan Drench at CodePlex](https://drench.codeplex.com) and [GitHub](https://github.com/yallie/drench)
-* [Zyan Drench at Google Play](https://play.google.com/store/apps/details?id=yallie.Zyan.Drench)
+* [Zyan Drench at CodeProject](http://www.codeproject.com/Articles/631666/Zyan-Drench-A-Game-for-Android-with-Wifi-Support), [CodePlex](https://drench.codeplex.com) and [GitHub](https://github.com/yallie/drench)
+* [Zyan Drench at Google Play](https://play.google.com/store/apps/details?id=yallie.Zyan.Drench) and [Amazon](http://www.amazon.com/gp/product/B00E9GH0KY)
