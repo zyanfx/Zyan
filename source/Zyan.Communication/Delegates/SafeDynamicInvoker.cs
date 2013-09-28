@@ -227,6 +227,12 @@ namespace Zyan.Communication.Delegates
 					throw new ArgumentNullException("value");
 				}
 
+				if (threadPool != null)
+				{
+					threadPool.Dispose();
+					threadPool = null;
+				}
+
 				threadPool = value;
 			}
 		}
