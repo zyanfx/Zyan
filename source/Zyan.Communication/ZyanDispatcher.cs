@@ -642,8 +642,12 @@ namespace Zyan.Communication
 			{
 				// reset current session before authentication is complete
 				_host.SessionManager.SetCurrentSession(null);
+				var authResponse = _host.Authenticate(new AuthRequestMessage
+				{
+					Credentials = credentials,
+					ClientAddress = GetCallingClientIPAddress().ToString()
+				});
 
-				AuthResponseMessage authResponse = _host.Authenticate(new AuthRequestMessage() { Credentials = credentials });
 				if (!authResponse.Success)
 				{
 					var exception = authResponse.Exception ?? new SecurityException(authResponse.ErrorMessage);
