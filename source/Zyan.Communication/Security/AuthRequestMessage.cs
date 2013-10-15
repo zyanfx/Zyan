@@ -33,5 +33,10 @@ namespace Zyan.Communication.Security
 		/// Gets or sets user's credentials.
 		/// </summary>
 		public Hashtable Credentials { get; set; }
+
+		/// <summary>
+		/// Gets or sets the IP Address of the calling client.
+		/// </summary>
+		public string ClientAddress { get; set; }
 	}
 }
