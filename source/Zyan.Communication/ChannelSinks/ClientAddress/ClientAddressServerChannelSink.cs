@@ -8,6 +8,8 @@ namespace Zyan.Communication.ChannelSinks.ClientAddress
 {
 	internal class ClientAddressServerChannelSink : BaseChannelObjectWithProperties, IServerChannelSink, IChannelSinkBase
 	{
+		public const string CallContextSlotName = "Zyan_ClientAddress";
+		 
 		private IServerChannelSink _nextSink;
 
 		public ClientAddressServerChannelSink(IServerChannelSink next)
@@ -24,7 +26,7 @@ namespace Zyan.Communication.ChannelSinks.ClientAddress
 		public void AsyncProcessResponse(IServerResponseChannelSinkStack sinkStack, Object state, IMessage message, ITransportHeaders headers, Stream stream)
 		{
 			IPAddress ip = headers[CommonTransportKeys.IPAddress] as IPAddress;
-			CallContext.SetData("Zyan_ClientAddress", ip);
+			CallContext.SetData(CallContextSlotName, ip);
 			sinkStack.AsyncProcessResponse(message, headers, stream);
 		}
 
@@ -38,7 +40,7 @@ namespace Zyan.Communication.ChannelSinks.ClientAddress
 			if (_nextSink != null)
 			{
 				IPAddress ip = requestHeaders[CommonTransportKeys.IPAddress] as IPAddress;
-				CallContext.SetData("Zyan_ClientAddress", ip);
+				CallContext.SetData(CallContextSlotName, ip);
 				ServerProcessing spres = _nextSink.ProcessMessage(sinkStack, requestMsg, requestHeaders, requestStream, out responseMsg, out responseHeaders, out responseStream);
 				return spres;
 			}
