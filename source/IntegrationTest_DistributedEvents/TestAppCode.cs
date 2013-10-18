@@ -31,6 +31,9 @@ namespace IntegrationTest_DistributedEvents
 
 		public void DoSomething()
 		{
+			Console.WriteLine("[Server]: CurrentSession {0} null", ServerSession.CurrentSession != null ? "!=" : "==");
+			Console.WriteLine("[Server]: ClientAddress == {0}", ServerSession.CurrentSession.ClientAddress);
+
 			if (Out_Callback != null)
 				Out_Callback(DateTime.Now.ToString());
 		}

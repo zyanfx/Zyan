@@ -1,5 +1,4 @@
-﻿
-namespace Zyan.Communication.Protocols.Null
+﻿namespace Zyan.Communication.Protocols.Null
 {
 	/// <summary>
 	/// <see cref="IServerProtocolSetup"/> implementation for the <see cref="NullChannel"/>.

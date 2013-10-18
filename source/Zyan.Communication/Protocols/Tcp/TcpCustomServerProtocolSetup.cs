@@ -3,6 +3,7 @@ using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Serialization.Formatters;
+using Zyan.Communication.ChannelSinks.ClientAddress;
 using Zyan.Communication.ChannelSinks.Encryption;
 using Zyan.Communication.Security;
 using Zyan.Communication.Toolbox;
@@ -54,6 +55,7 @@ namespace Zyan.Communication.Protocols.Tcp
 
 			ClientSinkChain.Add(new BinaryClientFormatterSinkProvider(formatterSettings, null));
 			ServerSinkChain.Add(new BinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
+			ServerSinkChain.Add(new ClientAddressServerChannelSinkProvider());
 		}
 
 		/// <summary>

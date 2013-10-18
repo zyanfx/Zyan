@@ -1,9 +1,11 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using IDictionary = System.Collections.IDictionary;
+using ClientAddressSink = Zyan.Communication.ChannelSinks.ClientAddress.ClientAddressServerChannelSink;
 
 namespace Zyan.Communication.Protocols.Null
 {
@@ -109,6 +111,10 @@ namespace Zyan.Communication.Protocols.Null
 			objectUri = objectUri ?? url;
 			requestMessage.RequestHeaders[CommonTransportKeys.RequestUri] = objectUri;
 			requestMessage.Message.Properties["__Uri"] = objectUri;
+
+			// add client address property for compatibility
+			var callContext = requestMessage.Message.Properties["__CallContext"] as LogicalCallContext;
+			callContext.SetData(ClientAddressSink.CallContextSlotName, IPAddress.Loopback);
 
 			IMessage responseMsg;
 			ITransportHeaders responseHeaders;

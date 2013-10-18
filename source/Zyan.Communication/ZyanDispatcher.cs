@@ -7,6 +7,7 @@ using System.Security;
 using System.Security.Principal;
 using System.Threading;
 using System.Transactions;
+using Zyan.Communication.ChannelSinks.ClientAddress;
 using Zyan.Communication.Delegates;
 using Zyan.Communication.Notification;
 using Zyan.Communication.Security;
@@ -203,7 +204,7 @@ namespace Zyan.Communication
 		/// <returns></returns>
 		private IPAddress GetCallingClientIPAddress()
 		{
-			return CallContext.GetData("Zyan_ClientAddress") as IPAddress;
+			return CallContext.GetData(ClientAddressServerChannelSink.CallContextSlotName) as IPAddress;
 		}
 
 		/// <summary>
@@ -642,10 +643,11 @@ namespace Zyan.Communication
 			{
 				// reset current session before authentication is complete
 				_host.SessionManager.SetCurrentSession(null);
+				var clientAddress = GetCallingClientIPAddress();
 				var authResponse = _host.Authenticate(new AuthRequestMessage
 				{
 					Credentials = credentials,
-					ClientAddress = GetCallingClientIPAddress().ToString()
+					ClientAddress = clientAddress != null ? clientAddress.ToString() : string.Empty
 				});
 
 				if (!authResponse.Success)
