@@ -143,9 +143,7 @@ namespace Zyan.Tests
 		{
 			var serverSetup = new IpcBinaryServerProtocolSetup("StreamsTest");
 			ZyanHost = new ZyanComponentHost("SampleStreamServer", serverSetup);
-
 			ZyanHost.RegisterComponent<IStreamService, StreamService>();
-
 			ZyanConnection = new ZyanConnection("ipc://StreamsTest/SampleStreamServer");
 		}
 

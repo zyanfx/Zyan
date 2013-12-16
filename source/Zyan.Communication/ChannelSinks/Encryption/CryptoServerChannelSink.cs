@@ -205,28 +205,28 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 		/// <summary>
 		/// Erzeugt eine leere Antwortnachricht.
 		/// </summary>
-        /// <param name="sinkStack">Aufrufstapel der Kanalsenken</param>
-        /// <param name="requestMsg">Anfrage-nachricht</param>
-        /// <param name="requestHeaders">Anfrage-Header</param>
-        /// <param name="requestStream">Anfrage-Datenstrom</param>
-		/// <param name="transactionStage">Art des aktuellen Transaktionsschritts</param>        
+		/// <param name="sinkStack">Aufrufstapel der Kanalsenken</param>
+		/// <param name="requestMsg">Anfrage-nachricht</param>
+		/// <param name="requestHeaders">Anfrage-Header</param>
+		/// <param name="requestStream">Anfrage-Datenstrom</param>
+		/// <param name="transactionStage">Art des aktuellen Transaktionsschritts</param>
 		/// <param name="responseMsg">Antwort-Nachricht</param>
 		/// <param name="responseHeaders">Antwort-Header</param>
 		/// <param name="responseStream">Antwort-Datenstrom</param>
 		/// <returns>Verarbeitungsstatus</returns>
 		private ServerProcessing SendEmptyToClient(IServerChannelSinkStack sinkStack, IMessage requestMsg, ITransportHeaders requestHeaders, Stream requestStream, SecureTransactionStage transactionStage, out IMessage responseMsg, out ITransportHeaders responseHeaders, out Stream responseStream)
-		{	
+		{
 			responseMsg = null;
-            requestStream = new MemoryStream();
+			requestStream = new MemoryStream();
 			responseStream = new MemoryStream();
-			
-            responseHeaders = new TransportHeaders();			
+
+			responseHeaders = new TransportHeaders();
 			responseHeaders[CommonHeaderNames.SECURE_TRANSACTION_STATE] = ((int)transactionStage).ToString();
 
-            ServerProcessing processingResult = _next.ProcessMessage(sinkStack, requestMsg, requestHeaders, requestStream, out responseMsg, out responseHeaders, out responseStream);
-            return processingResult;
+			ServerProcessing processingResult = _next.ProcessMessage(sinkStack, requestMsg, requestHeaders, requestStream, out responseMsg, out responseHeaders, out responseStream);
+			return processingResult;
 		}
-        
+
 		/// <summary>
 		/// Verarbeitet eine einzele Clientanfrage
 		/// </summary>
@@ -258,60 +258,60 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 			// Variable für Verarbeitungsstatus
 			ServerProcessing processingResult;
 
-            try
-            {
-                // Aktuellen Transaktionsschritt auswerten
-                switch (transactionStage)
-                {
-                    case SecureTransactionStage.SendingPublicKey: // Client sendet den öffentlichen Schlüssel an den Server
+			try
+			{
+				// Aktuellen Transaktionsschritt auswerten
+				switch (transactionStage)
+				{
+					case SecureTransactionStage.SendingPublicKey: // Client sendet den öffentlichen Schlüssel an den Server
 
-                        // Gemeinsamen Schlüssel erzeugen und mit dem öffentlichen Schlüssel des Clients verschlüsseln
-                        processingResult = MakeSharedKey(transactID, requestHeaders, out responseMsg, out responseHeaders, out responseStream);
+						// Gemeinsamen Schlüssel erzeugen und mit dem öffentlichen Schlüssel des Clients verschlüsseln
+						processingResult = MakeSharedKey(transactID, requestHeaders, out responseMsg, out responseHeaders, out responseStream);
 
-                        break;
+						break;
 
-                    case SecureTransactionStage.SendingEncryptedMessage: // Client sendet die verschlüsselte Anfragenachricht an den Server
+					case SecureTransactionStage.SendingEncryptedMessage: // Client sendet die verschlüsselte Anfragenachricht an den Server
 
-                        // Wenn die Sicherheitstransaktionskennung des Clients bekannt ist ...
-                        if (IsExistingSecurityTransaction(transactID))
-                            // Verschlüsselte Nachricht verarbeiten
-                            processingResult = ProcessEncryptedMessage(transactID, sinkStack, requestMsg, requestHeaders, requestStream, out responseMsg, out responseHeaders, out responseStream);
-                        else                            
-                            throw new CryptoRemotingException(string.Format(LanguageResource.CryptoRemotingException_InvalidClientRequest, SecureTransactionStage.UnknownTransactionID));
-                            
-                        break;
+						// Wenn die Sicherheitstransaktionskennung des Clients bekannt ist ...
+						if (IsExistingSecurityTransaction(transactID))
+							// Verschlüsselte Nachricht verarbeiten
+							processingResult = ProcessEncryptedMessage(transactID, sinkStack, requestMsg, requestHeaders, requestStream, out responseMsg, out responseHeaders, out responseStream);
+						else
+							throw new CryptoRemotingException(string.Format(LanguageResource.CryptoRemotingException_InvalidClientRequest, SecureTransactionStage.UnknownTransactionID));
 
-                    case SecureTransactionStage.Uninitialized: // Uninizialisiert, noch nichts geschehen
+						break;
 
-                        // Wenn für diesen Client Verschlüsselung nicht zwingend notwendig ist ...
-                        if (!RequireEncryption(clientAddress))
-                            // Nachricht gleich an die nächste Senke zur Weiterverarbeitung übergeben
-                            processingResult = _next.ProcessMessage(sinkStack, requestMsg, requestHeaders, requestStream, out responseMsg, out responseHeaders, out responseStream);
-                        else
-                            throw new CryptoRemotingException(LanguageResource.CryptoRemotingException_ServerRequiresEncryption);
-                        
-                        break;
+					case SecureTransactionStage.Uninitialized: // Uninizialisiert, noch nichts geschehen
 
-                    default:
-                        
-                        throw new CryptoRemotingException(string.Format(LanguageResource.CryptoRemotingException_InvalidClientRequest, transactionStage));
-                }
-            }
-            catch (CryptoRemotingException)
-            {   
-                processingResult = SendEmptyToClient
-                                    (
-                                        sinkStack,
-                                        requestMsg,
-                                        requestHeaders,
-                                        requestStream,
-                                        transactionStage,                                        
-                                        out responseMsg,
-                                        out responseHeaders,
-                                        out responseStream
-                                    );
-                requestMsg = null;
-            }
+						// Wenn für diesen Client Verschlüsselung nicht zwingend notwendig ist ...
+						if (!RequireEncryption(clientAddress))
+							// Nachricht gleich an die nächste Senke zur Weiterverarbeitung übergeben
+							processingResult = _next.ProcessMessage(sinkStack, requestMsg, requestHeaders, requestStream, out responseMsg, out responseHeaders, out responseStream);
+						else
+							throw new CryptoRemotingException(LanguageResource.CryptoRemotingException_ServerRequiresEncryption);
+
+						break;
+
+					default:
+
+						throw new CryptoRemotingException(string.Format(LanguageResource.CryptoRemotingException_InvalidClientRequest, transactionStage));
+				}
+			}
+			catch (CryptoRemotingException)
+			{
+				processingResult = SendEmptyToClient
+									(
+										sinkStack,
+										requestMsg,
+										requestHeaders,
+										requestStream,
+										transactionStage,
+										out responseMsg,
+										out responseHeaders,
+										out responseStream
+									);
+				requestMsg = null;
+			}
 			// Aktuelle Senke wieder vom Senkenstapel runternehmen
 			sinkStack.Pop(this);
 
@@ -319,20 +319,20 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 			return processingResult;
 		}
 
-        private IServerChannelSink GetFormatter(IServerChannelSink sink)
-        {
-            var nextSink = sink.NextChannelSink;
-            
-            if (nextSink==null)
-                return null;
-            
-            var sinkType = nextSink.GetType();
+		private IServerChannelSink GetFormatter(IServerChannelSink sink)
+		{
+			var nextSink = sink.NextChannelSink;
 
-            if (sinkType.Name.Contains("FormatterSink"))
-                return nextSink;
-            else
-                return GetFormatter(nextSink);
-        }
+			if (nextSink == null)
+				return null;
+
+			var sinkType = nextSink.GetType();
+
+			if (sinkType.Name.Contains("FormatterSink"))
+				return nextSink;
+			else
+				return GetFormatter(nextSink);
+		}
 
 		/// <summary>
 		/// Prüft, ob für die Kommunikation mit einem bestimmten Client zwingend Verschlüsselung erforderlich ist, oder nicht.

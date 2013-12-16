@@ -106,8 +106,8 @@ namespace Zyan.Communication.Protocols.Wrapper
 
 		public IMessageSink CreateMessageSink(string url, object remoteChannelData, out string objectURI)
 		{
-			// allow only registered urls
-			if (!registeredUrls.Contains(url))
+			// if url is specified, allow only registered urls
+			if (!string.IsNullOrEmpty(url) && !registeredUrls.Contains(url))
 			{
 				objectURI = null;
 				return null;
