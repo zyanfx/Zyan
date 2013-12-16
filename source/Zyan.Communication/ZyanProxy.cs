@@ -277,7 +277,10 @@ namespace Zyan.Communication
 				AddRemoteEventHandler(correlationInfo);
 
 				// Save delegate correlation info
-				_delegateCorrelationSet.Add(correlationInfo);
+				lock (_delegateCorrelationSet)
+				{
+					_delegateCorrelationSet.Add(correlationInfo);
+				}
 
 				return new ReturnMessage(null, null, 0, methodCallMessage.LogicalCallContext, methodCallMessage);
 			}
@@ -310,8 +313,15 @@ namespace Zyan.Communication
 
 				if (_delegateCorrelationSet.Count > 0)
 				{
+					// copy delegates
+					IEnumerable<DelegateCorrelationInfo> correlationSet;
+					lock (_delegateCorrelationSet)
+					{
+						correlationSet = _delegateCorrelationSet.ToArray();
+					}
+
 					var found = (
-						from correlationInfo in _delegateCorrelationSet.ToArray()
+						from correlationInfo in correlationSet
 						where correlationInfo.DelegateMemberName.Equals(propertyName) && correlationInfo.ClientDelegateInterceptor.ClientDelegate.Equals(inputMessage)
 						select correlationInfo).FirstOrDefault();
 
@@ -320,7 +330,10 @@ namespace Zyan.Communication
 						RemoveRemoteEventHandler(found);
 
 						// Remove delegate correlation info
-						_delegateCorrelationSet.Remove(found);
+						lock (_delegateCorrelationSet)
+						{
+							_delegateCorrelationSet.Remove(found);
+						}
 					}
 				}
 
@@ -389,7 +402,14 @@ namespace Zyan.Communication
 		/// </summary>
 		internal void ReconnectRemoteEvents()
 		{
-			foreach (var correlationInfo in _delegateCorrelationSet)
+			// copy delegates
+			IEnumerable<DelegateCorrelationInfo> correlationSet;
+			lock (_delegateCorrelationSet)
+			{
+				correlationSet = _delegateCorrelationSet.ToArray();
+			}
+
+			foreach (var correlationInfo in correlationSet)
 			{
 				AddRemoteEventHandler(correlationInfo);
 			}
@@ -585,16 +605,24 @@ namespace Zyan.Communication
 
 			if (_delegateCorrelationSet.Count > 0)
 			{
-				for (int i = _delegateCorrelationSet.Count - 1; i >= 0; i--)
+				// copy delegates
+				IEnumerable<DelegateCorrelationInfo> correlationSet;
+				lock (_delegateCorrelationSet)
 				{
-					var correlationInfo = _delegateCorrelationSet[i];
+					correlationSet = _delegateCorrelationSet.ToArray();
+				}
 
-					if (_activationType == ActivationType.SingleCall)
-						_delegateCorrelationSet.Remove(correlationInfo);
-					else
+				foreach (var correlationInfo in correlationSet)
+				{
+					if (_activationType == ActivationType.Singleton)
 					{
 						_connection.PrepareCallContext(false);
 						_connection.RemoteDispatcher.RemoveEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
+					}
+
+					lock (_delegateCorrelationSet)
+					{
+						_delegateCorrelationSet.Remove(correlationInfo);
 					}
 				}
 			}
