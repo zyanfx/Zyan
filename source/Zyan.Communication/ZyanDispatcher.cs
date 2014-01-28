@@ -575,6 +575,7 @@ namespace Zyan.Communication
 			};
 
 			CreateClientServerWires(details.Type, details.Registration.EventStub, correlationSet, details.Registration.EventWirings);
+			Invoke_CleanUp(details);
 		}
 
 		/// <summary>
@@ -610,6 +611,7 @@ namespace Zyan.Communication
 			};
 
 			RemoveClientServerWires(details.Type, details.Registration.EventStub, correlationSet, details.Registration.EventWirings);
+			Invoke_CleanUp(details);
 		}
 
 		#endregion
