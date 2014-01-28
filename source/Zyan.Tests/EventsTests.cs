@@ -44,6 +44,10 @@ namespace Zyan.Tests
 			event EventHandler TestEvent;
 
 			void RaiseTestEvent(EventArgs args = null);
+
+			event EventHandler StaticEvent;
+
+			void RaiseStaticEvent(EventArgs args = null);
 		}
 
 		/// <summary>
@@ -58,6 +62,22 @@ namespace Zyan.Tests
 				if (TestEvent != null)
 				{
 					TestEvent(null, args);
+				}
+			}
+
+			public event EventHandler StaticEvent
+			{
+ 				add { staticEvent += value; }
+				remove { staticEvent -= value; }
+			}
+
+			private EventHandler staticEvent;
+
+			public void RaiseStaticEvent(EventArgs args)
+			{
+				if (staticEvent != null)
+				{
+					staticEvent(null, args);
 				}
 			}
 		}
@@ -326,6 +346,32 @@ namespace Zyan.Tests
 				Assert.IsTrue(proxy2handled);
 				Assert.IsFalse(proxy3handled);
 			}
+		}
+
+		[TestMethod]
+		public void SubscriptionUnsubscription_UsingStaticEvents()
+		{
+			var counter = 0;
+			var eventHandler = new EventHandler((s, e) => counter++);
+
+			var proxy = ZyanConnection.CreateProxy<ISampleServer>("SingleCall");
+			proxy.StaticEvent += eventHandler;
+			Assert.AreEqual(0, counter);
+
+			proxy.RaiseStaticEvent();
+			Assert.AreEqual(1, counter);
+
+			proxy.StaticEvent -= eventHandler; // unsubscription #1
+			proxy.RaiseStaticEvent();
+			Assert.AreEqual(1, counter);
+
+			proxy.StaticEvent += eventHandler;
+			proxy.RaiseStaticEvent();
+			Assert.AreEqual(2, counter);
+
+			proxy.StaticEvent -= eventHandler; // unsubscription #2
+			proxy.RaiseStaticEvent();
+			Assert.AreEqual(2, counter);
 		}
 
 		[TestMethod]
