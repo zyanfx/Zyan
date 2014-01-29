@@ -54,48 +54,54 @@ namespace Zyan.Communication
 			if (delegateCorrelationSet == null)
 				return;
 
+			var currentSession = ServerSession.CurrentSession;
+			if (currentSession == null)
+				throw new InvalidSessionException(string.Format(LanguageResource.InvalidSessionException_SessionIDInvalid, "(null)"));
+
 			foreach (var correlationInfo in delegateCorrelationSet)
 			{
 				if (wiringList.ContainsKey(correlationInfo.CorrelationID))
 					continue;
 
-				var currentSession = ServerSession.CurrentSession;
-				if (currentSession == null)
-					throw new InvalidSessionException(string.Format(LanguageResource.InvalidSessionException_SessionIDInvalid, "(null)"));
-
 				var dynamicWire = DynamicWireFactory.CreateDynamicWire(type, correlationInfo.DelegateMemberName, correlationInfo.IsEvent);
 				dynamicWire.Interceptor = correlationInfo.ClientDelegateInterceptor;
 
-				if (correlationInfo.IsEvent)
+				lock (wiringList)
 				{
-					var dynamicEventWire = (DynamicEventWireBase)dynamicWire;
-					dynamicEventWire.EventFilter = correlationInfo.EventFilter;
+					if (wiringList.ContainsKey(correlationInfo.CorrelationID))
+						continue;
 
-					// add session validation handler and unsubscription callback
-					var sessionId = currentSession.SessionID;
-					var sessionManager = _host.SessionManager;
-					dynamicEventWire.ValidateSession = () => sessionManager.ExistSession(sessionId);
-					dynamicEventWire.CancelSubscription = ex =>
+					if (correlationInfo.IsEvent)
 					{
-						eventStub.RemoveHandler(correlationInfo.DelegateMemberName, dynamicEventWire.InDelegate);
-						wiringList.Remove(correlationInfo.CorrelationID);
-						currentSession.DecrementRemoteSubscriptionCounter();
-						_host.OnSubscriptionCanceled(new SubscriptionEventArgs
-						{
-							ComponentType = type,
-							DelegateMemberName = correlationInfo.DelegateMemberName,
-							CorrelationID = correlationInfo.CorrelationID,
-							Exception = ex
-						});
-					};
+						var dynamicEventWire = (DynamicEventWireBase)dynamicWire;
+						dynamicEventWire.EventFilter = correlationInfo.EventFilter;
 
-					eventStub.AddHandler(correlationInfo.DelegateMemberName, dynamicEventWire.InDelegate);
-					wiringList.Add(correlationInfo.CorrelationID, dynamicEventWire.InDelegate);
-				}
-				else
-				{
-					eventStub.AddHandler(correlationInfo.DelegateMemberName, dynamicWire.InDelegate);
-					wiringList.Add(correlationInfo.CorrelationID, dynamicWire.InDelegate);
+						// add session validation handler and unsubscription callback
+						var sessionId = currentSession.SessionID;
+						var sessionManager = _host.SessionManager;
+						dynamicEventWire.ValidateSession = () => sessionManager.ExistSession(sessionId);
+						dynamicEventWire.CancelSubscription = ex =>
+						{
+							eventStub.RemoveHandler(correlationInfo.DelegateMemberName, dynamicEventWire.InDelegate);
+							wiringList.Remove(correlationInfo.CorrelationID);
+							currentSession.DecrementRemoteSubscriptionCounter();
+							_host.OnSubscriptionCanceled(new SubscriptionEventArgs
+							{
+								ComponentType = type,
+								DelegateMemberName = correlationInfo.DelegateMemberName,
+								CorrelationID = correlationInfo.CorrelationID,
+								Exception = ex
+							});
+						};
+
+						eventStub.AddHandler(correlationInfo.DelegateMemberName, dynamicEventWire.InDelegate);
+						wiringList.Add(correlationInfo.CorrelationID, dynamicEventWire.InDelegate);
+					}
+					else
+					{
+						eventStub.AddHandler(correlationInfo.DelegateMemberName, dynamicWire.InDelegate);
+						wiringList.Add(correlationInfo.CorrelationID, dynamicWire.InDelegate);
+					}
 				}
 
 				currentSession.IncrementRemoteSubscriptionCounter();
@@ -125,12 +131,18 @@ namespace Zyan.Communication
 			{
 				if (wiringList.ContainsKey(correlationInfo.CorrelationID))
 				{
-					var dynamicWireDelegate = wiringList[correlationInfo.CorrelationID];
-					eventStub.RemoveHandler(correlationInfo.DelegateMemberName, dynamicWireDelegate);
-					wiringList.Remove(correlationInfo.CorrelationID);
-					if (currentSession != null)
+					lock (wiringList)
 					{
-						currentSession.DecrementRemoteSubscriptionCounter();
+						if (!wiringList.ContainsKey(correlationInfo.CorrelationID))
+							continue;
+
+						var dynamicWireDelegate = wiringList[correlationInfo.CorrelationID];
+						eventStub.RemoveHandler(correlationInfo.DelegateMemberName, dynamicWireDelegate);
+						wiringList.Remove(correlationInfo.CorrelationID);
+						if (currentSession != null)
+						{
+							currentSession.DecrementRemoteSubscriptionCounter();
+						}
 					}
 
 					_host.OnSubscriptionRemoved(new SubscriptionEventArgs

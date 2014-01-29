@@ -127,16 +127,30 @@ namespace Zyan.Communication.Delegates
 		}
 
 		/// <summary>
-		/// Non-generic interface for a private delegate holder class.
+		/// Non-generic interface for the private generic delegate holder class.
 		/// </summary>
-		private interface IDelegateHolder
+		public interface IDelegateHolder
 		{
+			/// <summary>
+			/// Gets the invocation delegate.
+			/// </summary>
 			Delegate InvocationDelegate { get; }
 
+			/// <summary>
+			/// Adds the handler.
+			/// </summary>
+			/// <param name="handler">The handler.</param>
 			void AddHandler(Delegate handler);
 
+			/// <summary>
+			/// Removes the handler.
+			/// </summary>
+			/// <param name="handler">The handler.</param>
 			void RemoveHandler(Delegate handler);
 
+			/// <summary>
+			/// Gets the handler count.
+			/// </summary>
 			int HandlerCount { get; }
 		}
 

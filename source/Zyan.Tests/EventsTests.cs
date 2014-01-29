@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using Zyan.Communication;
@@ -53,7 +54,8 @@ namespace Zyan.Tests
 		/// <summary>
 		/// Sample server implementation
 		/// </summary>
-		public class SampleServer : ISampleServer
+		/// <typeparam name="T">Dummy type parameter allows separating static fields.</typeparam>
+		public class SampleServer<T> : ISampleServer
 		{
 			public event EventHandler TestEvent;
 
@@ -67,17 +69,63 @@ namespace Zyan.Tests
 
 			public event EventHandler StaticEvent
 			{
- 				add { staticEvent += value; }
-				remove { staticEvent -= value; }
+ 				add { eventStorage.AddHandler(value); }
+				remove { eventStorage.RemoveHandler(value); }
 			}
 
-			private EventHandler staticEvent;
+			private static StaticEventStorage<EventHandler> eventStorage = new StaticEventStorage<EventHandler>();
 
 			public void RaiseStaticEvent(EventArgs args)
 			{
-				if (staticEvent != null)
+				var invoke = eventStorage.Invoke;
+				invoke(null, args);
+			}
+		}
+
+		/// <summary>
+		/// Helper class that protects against several subsequent EventStub.WireTo(object) calls.
+		/// </summary>
+		/// <typeparam name="TDelegate">The type of the delegate.</typeparam>
+		private class StaticEventStorage<TDelegate>
+		{
+			private object padlock = new object();
+
+			private bool eventStubAttached;
+
+			private TDelegate eventStorage = EmptyDelegateFactory.CreateEmptyDelegate<TDelegate>();
+
+			public TDelegate Invoke { get { return eventStorage; } }
+
+			public void AddHandler(TDelegate eventHandler)
+			{
+				lock (padlock)
 				{
-					staticEvent(null, args);
+					var handler = (Delegate)(object)eventHandler;
+					if (handler.Target is EventStub.IDelegateHolder)
+					{
+						if (eventStubAttached)
+						{
+							return;
+						}
+
+						eventStubAttached = true;
+					}
+
+					eventStorage = (TDelegate)(object)Delegate.Combine((Delegate)(object)eventStorage, handler);
+				}
+			}
+
+			public void RemoveHandler(TDelegate eventHandler)
+			{
+				lock (padlock)
+				{
+					var handler = (Delegate)(object)eventHandler;
+					if (handler.Target is EventStub.IDelegateHolder)
+					{
+						return;
+					}
+
+					eventStorage = (TDelegate)(object)Delegate.Remove((Delegate)(object)eventStorage, handler);
 				}
 			}
 		}
@@ -111,9 +159,9 @@ namespace Zyan.Tests
 
 			var serverSetup = new NullServerProtocolSetup(2345);
 			ZyanHost = new ZyanComponentHost("EventsServer", serverSetup);
-			ZyanHost.RegisterComponent<ISampleServer, SampleServer>("Singleton", ActivationType.Singleton);
-			ZyanHost.RegisterComponent<ISampleServer, SampleServer>("SingleCall", ActivationType.SingleCall);
-			ZyanHost.RegisterComponent<ISampleServer, SampleServer>("SingletonExternal", new SampleServer());
+			ZyanHost.RegisterComponent<ISampleServer, SampleServer<int>>("Singleton", ActivationType.Singleton);
+			ZyanHost.RegisterComponent<ISampleServer, SampleServer<byte>>("SingleCall", ActivationType.SingleCall);
+			ZyanHost.RegisterComponent<ISampleServer, SampleServer<char>>("SingletonExternal", new SampleServer<char>());
 
 			ZyanConnection = new ZyanConnection("null://NullChannel:2345/EventsServer");
 		}
