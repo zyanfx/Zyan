@@ -226,6 +226,11 @@ namespace Zyan.Tests
 			Assert.IsFalse(handled);
 			Assert.IsTrue(subscriptionCanceled);
 			Assert.IsNotNull(clientSideException);
+
+			// skip TargetInvocationException, if applicable
+			while (clientSideException.InnerException != null)
+				clientSideException = clientSideException.InnerException;
+
 			Assert.AreEqual(message, clientSideException.Message);
 		}
 

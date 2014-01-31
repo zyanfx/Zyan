@@ -26,19 +26,22 @@ namespace Zyan.Communication.Security
 
 			try
 			{
-				bool success = WindowsSecurityTools.LogonUser(
-					   username,
-					   domain,
-					   password,
-					   WindowsSecurityTools.LogonType.LOGON32_LOGON_NETWORK,
-					   WindowsSecurityTools.ProviderType.LOGON32_PROVIDER_DEFAULT,
-					   out token) != 0;
+				var success = WindowsSecurityTools.LogonUser(
+					username,
+					domain,
+					password,
+					WindowsSecurityTools.LogonType.LOGON32_LOGON_NETWORK,
+					WindowsSecurityTools.ProviderType.LOGON32_PROVIDER_DEFAULT,
+					out token) != 0;
 
 				if (success && token != IntPtr.Zero)
 				{
-					WindowsIdentity identity = new WindowsIdentity(token);
-					return identity.IsAuthenticated && !(identity.IsGuest || identity.IsAnonymous);
+					using (var identity = new WindowsIdentity(token))
+					{
+						return identity.IsAuthenticated && !(identity.IsGuest || identity.IsAnonymous);
+					}
 				}
+
 				return false;
 			}
 			finally

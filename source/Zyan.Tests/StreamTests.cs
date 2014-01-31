@@ -161,61 +161,66 @@ namespace Zyan.Tests
 		public void ReadRemoteMemoryStream()
 		{
 			var proxy = ZyanConnection.CreateProxy<IStreamService>();
-			var stream = proxy.OpenRead();
+			using (var stream = proxy.OpenRead())
+			{
+				var result = new byte[(int)stream.Length];
+				stream.Read(result, 0, result.Length);
 
-			var result = new byte[(int)stream.Length];
-			stream.Read(result, 0, result.Length);
-
-			Assert.IsTrue(StreamService.SampleData.SequenceEqual(result));
+				Assert.IsTrue(StreamService.SampleData.SequenceEqual(result));
+			}
 		}
 
 		[TestMethod]
 		public void ReadWriteRemoteMemoryStream()
 		{
 			var proxy = ZyanConnection.CreateProxy<IStreamService>();
-			var stream = proxy.Create();
+			using (var stream = proxy.Create())
+			{
+				// write data to server
+				var result = new byte[StreamService.SampleData.Length];
+				stream.Write(StreamService.SampleData, 0, result.Length);
+				Assert.IsFalse(StreamService.SampleData.SequenceEqual(result));
 
-			// write data to server
-			var result = new byte[StreamService.SampleData.Length];
-			stream.Write(StreamService.SampleData, 0, result.Length);
-			Assert.IsFalse(StreamService.SampleData.SequenceEqual(result));
-
-			// read data from server
-			stream.Position = 0;
-			stream.Read(result, 0, result.Length);
-			Assert.IsTrue(StreamService.SampleData.SequenceEqual(result));
+				// read data from server
+				stream.Position = 0;
+				stream.Read(result, 0, result.Length);
+				Assert.IsTrue(StreamService.SampleData.SequenceEqual(result));
+			}
 		}
 
 		[TestMethod]
 		public void ReadWriteRemoteMemoryStreamViaBinaryReaderAndWriter()
 		{
 			var proxy = ZyanConnection.CreateProxy<IStreamService>();
-			var stream = proxy.OpenRead();
+			using (var stream = proxy.OpenRead())
+			{
+				// read via BinaryReader
+				var result = new BinaryReader(stream).ReadBytes((int)stream.Length);
+				Assert.IsTrue(StreamService.SampleData.SequenceEqual(result));
 
-			// read via BinaryReader
-			var result = new BinaryReader(stream).ReadBytes((int)stream.Length);
-			Assert.IsTrue(StreamService.SampleData.SequenceEqual(result));
+				// write via BinaryWriter
+				using (var stream2 = proxy.Create())
+				{
+					new BinaryWriter(stream2).Write(result);
 
-			// write via BinaryWriter
-			stream = proxy.Create();
-			new BinaryWriter(stream).Write(result);
-
-			// read again via BinaryReader
-			stream.Position = 0;
-			result = new BinaryReader(stream).ReadBytes((int)stream.Length);
-			Assert.IsTrue(StreamService.SampleData.SequenceEqual(result));
+					// read again via BinaryReader
+					stream2.Position = 0;
+					result = new BinaryReader(stream2).ReadBytes((int)stream2.Length);
+					Assert.IsTrue(StreamService.SampleData.SequenceEqual(result));
+				}
+			}
 		}
 
 		[TestMethod]
 		public void RemoteCopyMemoryStream()
 		{
 			var proxy = ZyanConnection.CreateProxy<IStreamService>();
-			var stream = proxy.CopyData(new MemoryStream(StreamService.SampleData));
-
-			var result = new byte[(int)stream.Length];
-			stream.Read(result, 0, result.Length);
-
-			Assert.IsTrue(StreamService.SampleData.SequenceEqual(result));
+			using (var stream = proxy.CopyData(new MemoryStream(StreamService.SampleData)))
+			{
+				var result = new byte[(int)stream.Length];
+				stream.Read(result, 0, result.Length);
+				Assert.IsTrue(StreamService.SampleData.SequenceEqual(result));
+			}
 		}
 
 		[TestMethod]
@@ -225,10 +230,37 @@ namespace Zyan.Tests
 			var outputName = "TempFile" + Guid.NewGuid();
 
 			var proxy = ZyanConnection.CreateProxy<IStreamService>();
-			var input = proxy.OpenRead(inputName);
-			var output = File.Create(outputName);
+			using (var input = proxy.OpenRead(inputName))
+			using (var output = File.Create(outputName))
+			{
+				try
+				{
+					// copy data
+					input.CopyTo(output);
+					input.Close();
+					output.Close();
 
-			try
+					// validate data locally
+					var inputData = File.ReadAllBytes(inputName);
+					var outputData = File.ReadAllBytes(outputName);
+					Assert.IsTrue(inputData.SequenceEqual(outputData));
+				}
+				finally
+				{
+					File.Delete(outputName);
+				}
+			}
+		}
+
+		[TestMethod]
+		public void CopyLocalFileStreamToRemoteFileStream()
+		{
+			var inputName = typeof(StreamTests).Assembly.Location;
+			var outputName = "TempFile" + Guid.NewGuid();
+
+			var proxy = ZyanConnection.CreateProxy<IStreamService>();
+			using (var input = File.OpenRead(inputName))
+			using (var output = proxy.Create(outputName))
 			{
 				// copy data
 				input.CopyTo(output);
@@ -240,31 +272,6 @@ namespace Zyan.Tests
 				var outputData = File.ReadAllBytes(outputName);
 				Assert.IsTrue(inputData.SequenceEqual(outputData));
 			}
-			finally
-			{
-				File.Delete(outputName);
-			}
-		}
-
-		[TestMethod]
-		public void CopyLocalFileStreamToRemoteFileStream()
-		{
-			var inputName = typeof(StreamTests).Assembly.Location;
-			var outputName = "TempFile" + Guid.NewGuid();
-
-			var proxy = ZyanConnection.CreateProxy<IStreamService>();
-			var input = File.OpenRead(inputName);
-			var output = proxy.Create(outputName);
-
-			// copy data
-			input.CopyTo(output);
-			input.Close();
-			output.Close();
-
-			// validate data locally
-			var inputData = File.ReadAllBytes(inputName);
-			var outputData = File.ReadAllBytes(outputName);
-			Assert.IsTrue(inputData.SequenceEqual(outputData));
 		}
 
 		[TestMethod]
@@ -274,18 +281,19 @@ namespace Zyan.Tests
 			var outputName = "TempFile" + Guid.NewGuid();
 
 			var proxy = ZyanConnection.CreateProxy<IStreamService>();
-			var input = proxy.OpenRead(inputName);
-			var output = proxy.Create(outputName);
+			using (var input = proxy.OpenRead(inputName))
+			using (var output = proxy.Create(outputName))
+			{
+				// copy data
+				input.CopyTo(output);
+				input.Close();
+				output.Close();
 
-			// copy data
-			input.CopyTo(output);
-			input.Close();
-			output.Close();
-
-			// validate data locally
-			var inputData = File.ReadAllBytes(inputName);
-			var outputData = File.ReadAllBytes(outputName);
-			Assert.IsTrue(inputData.SequenceEqual(outputData));
+				// validate data locally
+				var inputData = File.ReadAllBytes(inputName);
+				var outputData = File.ReadAllBytes(outputName);
+				Assert.IsTrue(inputData.SequenceEqual(outputData));
+			}
 		}
 
 		[TestMethod]
@@ -295,24 +303,25 @@ namespace Zyan.Tests
 			var outputName = "TempFile" + Guid.NewGuid();
 
 			var proxy = ZyanConnection.CreateProxy<IStreamService>();
-			var input = File.OpenRead(inputName);
-			var output = File.Create(outputName);
-
-			try
+			using (var input = File.OpenRead(inputName))
+			using (var output = File.Create(outputName))
 			{
-				// copy data
-				proxy.CopyData(input, output);
-				input.Close();
-				output.Close();
+				try
+				{
+					// copy data
+					proxy.CopyData(input, output);
+					input.Close();
+					output.Close();
 
-				// validate data locally
-				var inputData = File.ReadAllBytes(inputName);
-				var outputData = File.ReadAllBytes(outputName);
-				Assert.IsTrue(inputData.SequenceEqual(outputData));
-			}
-			finally
-			{
-				File.Delete(outputName);
+					// validate data locally
+					var inputData = File.ReadAllBytes(inputName);
+					var outputData = File.ReadAllBytes(outputName);
+					Assert.IsTrue(inputData.SequenceEqual(outputData));
+				}
+				finally
+				{
+					File.Delete(outputName);
+				}
 			}
 		}
 	}

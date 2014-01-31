@@ -563,24 +563,19 @@ namespace Zyan.Communication
 				OnDisposing(new EventArgs());
 
 				_isDisposed = true;
-
 				_hosts.Remove(this);
 
 				StopListening();
-
-				if (_dispatcher != null)
-					_dispatcher = null;
 
 				if (_sessionManager != null)
 				{
 					_sessionManager.Dispose();
 					_sessionManager = null;
 				}
-				if (this.Authenticate != null)
-					this.Authenticate = null;
 
-				if (_authProvider != null)
-					_authProvider = null;
+				_dispatcher = null;
+				Authenticate = null;
+				_authProvider = null;
 
 				if (_catalog != null)
 				{
