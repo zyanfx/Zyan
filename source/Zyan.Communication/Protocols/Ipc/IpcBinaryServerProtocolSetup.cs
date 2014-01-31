@@ -15,7 +15,7 @@ namespace Zyan.Communication.Protocols.Ipc
 	/// <summary>
 	/// Server protocol setup for inter process communication via Named Pipes.
 	/// </summary>
-	public class IpcBinaryServerProtocolSetup : ServerProtocolSetup
+	public sealed class IpcBinaryServerProtocolSetup : ServerProtocolSetup
 	{
 		private string _portName = string.Empty;
 		private bool _useWindowsSecurity = false;

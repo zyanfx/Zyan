@@ -13,6 +13,8 @@ namespace Zyan.InterLinq.Types.Anonymous
 
 		private static DynamicAssemblyHolder instance;
 
+		private static object padlock = new object();
+
 		/// <summary>
 		/// Singleton instance of the <see cref="DynamicAssemblyHolder"/>.
 		/// </summary>
@@ -22,7 +24,7 @@ namespace Zyan.InterLinq.Types.Anonymous
 			{
 				if (instance == null)
 				{
-					lock (typeof(DynamicAssemblyHolder))
+					lock (padlock)
 					{
 						if (instance == null)
 						{
@@ -57,7 +59,10 @@ namespace Zyan.InterLinq.Types.Anonymous
 		/// <summary>
 		/// Private constructor to avoid external instantiation.
 		/// </summary>
-		private DynamicAssemblyHolder() { }
+		private DynamicAssemblyHolder()
+		{
+		}
+
 		/// <summary>
 		/// Initializes the <see cref="DynamicAssemblyHolder"/>.
 		/// </summary>
@@ -68,17 +73,16 @@ namespace Zyan.InterLinq.Types.Anonymous
 
 			// create a new dynamic assembly
 			AssemblyName an = new AssemblyName
-								  {
-									  Name = "InterLinq.Types.Anonymous.Assembly",
-									  Version = new Version("1.0.0.0")
-								  };
+			{
+				Name = "InterLinq.Types.Anonymous.Assembly",
+				Version = new Version("1.0.0.0")
+			};
 
-			assembly = ad.DefineDynamicAssembly(
-			 an, AssemblyBuilderAccess.Run);
+			assembly = ad.DefineDynamicAssembly(an, AssemblyBuilderAccess.Run);
 
 			// create a new module to hold code in the assembly
 			ModuleBuilder = assembly.GetDynamicModule("InterLinq.Types.Anonymous.Module") ??
-							assembly.DefineDynamicModule("InterLinq.Types.Anonymous.Module");
+				assembly.DefineDynamicModule("InterLinq.Types.Anonymous.Module");
 		}
 
 		#endregion

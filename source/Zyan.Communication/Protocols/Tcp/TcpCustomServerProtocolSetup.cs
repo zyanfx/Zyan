@@ -14,7 +14,7 @@ namespace Zyan.Communication.Protocols.Tcp
 	/// <summary>
 	/// Server protocol setup for TCP communication with support for user defined authentication and security.
 	/// </summary>
-	public class TcpCustomServerProtocolSetup : CustomServerProtocolSetup
+	public sealed class TcpCustomServerProtocolSetup : CustomServerProtocolSetup
 	{
 		private int _tcpPort = 0;
 

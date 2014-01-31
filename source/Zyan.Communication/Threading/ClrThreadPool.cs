@@ -6,7 +6,7 @@ namespace Zyan.Communication.Threading
 	/// <summary>
 	/// Built-in CLR thread pool implementation of the <see cref="IThreadPool"/> interface.
 	/// </summary>
-	public class ClrThreadPool : IThreadPool
+	public sealed class ClrThreadPool : IThreadPool
 	{
 		/// <summary>
 		/// Queues a method for the execution, and specifies an object to be used by the method.

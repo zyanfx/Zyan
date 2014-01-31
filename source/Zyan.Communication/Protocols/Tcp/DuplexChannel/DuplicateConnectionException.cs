@@ -5,6 +5,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 	/// <summary>
 	/// This exception should be thrown, when an attempt to create a duplicate connection is detected.
 	/// </summary>
+	[Serializable]
 	internal class DuplicateConnectionException : Exception
 	{
 		/// <summary>

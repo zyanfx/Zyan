@@ -11,7 +11,7 @@ namespace Zyan.Communication.Protocols.Tcp
 	/// <summary>
 	/// Client protocol setup for bi-directional TCP communication with support for user defined authentication and security.
 	/// </summary>
-	public class TcpDuplexClientProtocolSetup : CustomClientProtocolSetup, IClientProtocolSetup
+	public sealed class TcpDuplexClientProtocolSetup : CustomClientProtocolSetup, IClientProtocolSetup
 	{
 		private bool _tcpKeepAliveEnabled = true;
 		private ulong _tcpKeepAliveTime = 30000;

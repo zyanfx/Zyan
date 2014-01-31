@@ -14,7 +14,7 @@ namespace Zyan.Communication.Protocols.Tcp
 	/// <summary>
 	/// Server protocol setup for bi-directional TCP communication with support for user defined authentication and security.
 	/// </summary>
-	public class TcpDuplexServerProtocolSetup : CustomServerProtocolSetup
+	public sealed class TcpDuplexServerProtocolSetup : CustomServerProtocolSetup
 	{
 		private int _tcpPort = 0;
 		private bool _tcpKeepAliveEnabled = true;
@@ -430,24 +430,6 @@ namespace Zyan.Communication.Protocols.Tcp
 			}
 
 			return channel;
-		}
-
-		/// <summary>
-		/// Gets or sets the Authentication Provider to be used.
-		/// </summary>
-		public override IAuthenticationProvider AuthenticationProvider
-		{
-			get
-			{
-				return _authProvider;
-			}
-			set
-			{
-				if (value == null)
-					_authProvider = new NullAuthenticationProvider();
-				else
-					_authProvider = value;
-			}
 		}
 
 		#region Versioning settings

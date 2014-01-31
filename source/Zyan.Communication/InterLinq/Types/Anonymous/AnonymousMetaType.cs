@@ -15,7 +15,7 @@ namespace Zyan.InterLinq.Types.Anonymous
 	/// </summary>
 	[Serializable]
 	[DataContract]
-	public class AnonymousMetaType : InterLinqType
+	public sealed class AnonymousMetaType : InterLinqType
 	{
 		#region Properties
 

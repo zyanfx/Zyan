@@ -11,7 +11,7 @@ namespace Zyan.Communication.Protocols.Tcp
 	/// <summary>
 	/// Client protocol setup for TCP communication with support for user defined authentication and security.
 	/// </summary>
-	public class TcpCustomClientProtocolSetup : CustomClientProtocolSetup, IClientProtocolSetup
+	public sealed class TcpCustomClientProtocolSetup : CustomClientProtocolSetup, IClientProtocolSetup
 	{
 		/// <summary>
 		/// Creates a new instance of the TcpCustomClientProtocolSetup class.

@@ -14,7 +14,7 @@ namespace Zyan.Communication.Protocols.Http
 	/// <summary>
 	/// Server protocol setup für HTTP communication with support for user defined authentication and security.
 	/// </summary>
-	public class HttpCustomServerProtocolSetup : CustomServerProtocolSetup
+	public sealed class HttpCustomServerProtocolSetup : CustomServerProtocolSetup
 	{
 		private int _httpPort = 0;
 
@@ -215,24 +215,6 @@ namespace Zyan.Communication.Protocols.Http
 			}
 
 			return channel;
-		}
-
-		/// <summary>
-		/// Gets or sets the authentication provider.
-		/// </summary>
-		public override IAuthenticationProvider AuthenticationProvider
-		{
-			get
-			{
-				return _authProvider;
-			}
-			set
-			{
-				if (value == null)
-					_authProvider = new NullAuthenticationProvider();
-				else
-					_authProvider = value;
-			}
 		}
 
 		#region Versioning settings

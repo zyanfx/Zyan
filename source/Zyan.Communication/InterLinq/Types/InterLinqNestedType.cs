@@ -13,7 +13,7 @@ namespace Zyan.InterLinq.Types
 	/// <seealso cref="Type"/>
 	[Serializable]
 	[DataContract]
-	public class InterLinqNestedType : InterLinqType
+	public sealed class InterLinqNestedType : InterLinqType
 	{
 		#region Properties
 

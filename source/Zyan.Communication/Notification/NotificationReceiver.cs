@@ -5,7 +5,7 @@ namespace Zyan.Communication.Notification
 	/// <summary>
 	/// Clientseitige Empfangsvorrichtung für Benachrichtigungen vom Server.
 	/// </summary>
-	public class NotificationReceiver : MarshalByRefObject, IDisposable
+	public sealed class NotificationReceiver : MarshalByRefObject, IDisposable
 	{
 		/// <summary>
 		/// Ereignis: Bei Benachrichtigung vom Server.

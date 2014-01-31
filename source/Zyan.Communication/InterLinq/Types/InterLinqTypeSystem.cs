@@ -15,6 +15,9 @@ namespace Zyan.InterLinq.Types
 		#region Singleton
 
 		private static InterLinqTypeSystem instance;
+
+		private static object padlock = new object();
+
 		/// <summary>
 		/// Gets an instance of the <see cref="InterLinqTypeSystem"/>.
 		/// </summary>
@@ -24,7 +27,7 @@ namespace Zyan.InterLinq.Types
 			{
 				if (instance == null)
 				{
-					lock (typeof(InterLinqTypeSystem))
+					lock (padlock)
 					{
 						if (instance == null)
 						{

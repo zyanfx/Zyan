@@ -13,7 +13,7 @@ namespace Zyan.Communication.Protocols.Tcp
 	/// <summary>
 	/// Client protocol setup for TCP communication with support for Windows authentication and security.
 	/// </summary>
-	public class TcpBinaryClientProtocolSetup : ClientProtocolSetup, IClientProtocolSetup
+	public sealed class TcpBinaryClientProtocolSetup : ClientProtocolSetup, IClientProtocolSetup
 	{
 		private bool _useWindowsSecurity = false;
 		private TokenImpersonationLevel _impersonationLevel = TokenImpersonationLevel.Identification;
