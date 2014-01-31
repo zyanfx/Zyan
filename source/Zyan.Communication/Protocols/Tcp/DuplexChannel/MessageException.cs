@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
@@ -6,6 +7,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 	/// <summary>
 	/// Should be thrown when problems with sending or receiving a message occur.
 	/// </summary>
+	[SuppressMessage("Microsoft.Usage", "CA2237:MarkISerializableTypesWithSerializable")]
 	public class MessageException : IOException
 	{
 		/// <summary>

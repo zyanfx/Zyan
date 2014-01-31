@@ -14,7 +14,7 @@ namespace Zyan.Communication.Protocols.Ipc
 	/// <summary>
 	/// Client protocol setup for inter process communication via Named Pipes.
 	/// </summary>
-	public class IpcBinaryClientProtocolSetup : ClientProtocolSetup, IClientProtocolSetup
+	public sealed class IpcBinaryClientProtocolSetup : ClientProtocolSetup, IClientProtocolSetup
 	{
 		private bool _useWindowsSecurity = false;
 		private TokenImpersonationLevel _impersonationLevel = TokenImpersonationLevel.Identification;

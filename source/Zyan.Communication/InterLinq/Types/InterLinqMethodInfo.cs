@@ -14,7 +14,7 @@ namespace Zyan.InterLinq.Types
 	/// <seealso cref="MethodInfo"/>
 	[Serializable]
 	[DataContract]
-	public class InterLinqMethodInfo : InterLinqMethodBase
+	public sealed class InterLinqMethodInfo : InterLinqMethodBase
 	{
 		#region Properties
 

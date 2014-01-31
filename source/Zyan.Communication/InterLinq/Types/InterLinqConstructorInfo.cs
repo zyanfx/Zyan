@@ -13,7 +13,7 @@ namespace Zyan.InterLinq.Types
 	/// <seealso cref="ConstructorInfo"/>
 	[Serializable]
 	[DataContract]
-	public class InterLinqConstructorInfo : InterLinqMethodBase
+	public sealed class InterLinqConstructorInfo : InterLinqMethodBase
 	{
 		#region Properties
 

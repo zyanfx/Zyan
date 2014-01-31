@@ -90,14 +90,15 @@ namespace Zyan.InterLinq.Communication.Wcf
 		/// <summary>
 		/// Disposes the Service Instance.
 		/// </summary>
-		public override void Dispose()
+		protected override void Dispose(bool disposing)
 		{
-			if (host != null)
+			if (host != null && disposing)
 			{
 				host.Close();
 				host = null;
 			}
-			base.Dispose();
+
+			base.Dispose(disposing);
 		}
 
 		/// <summary>

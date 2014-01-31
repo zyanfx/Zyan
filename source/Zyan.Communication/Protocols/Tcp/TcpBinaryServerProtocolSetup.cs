@@ -15,7 +15,7 @@ namespace Zyan.Communication.Protocols.Tcp
 	/// <summary>
 	/// Server protocol setup for TCP communication with support for Windows authentication and security.
 	/// </summary>
-	public class TcpBinaryServerProtocolSetup : ServerProtocolSetup
+	public sealed class TcpBinaryServerProtocolSetup : ServerProtocolSetup
 	{
 		private int _tcpPort = 0;
 		private bool _useWindowsSecurity = false;

@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.SqlClient;
 using System.Data.SqlTypes;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Principal;
@@ -60,6 +61,7 @@ namespace Zyan.Communication.SessionMgmt
 		/// <param name="schema">SQL Server schema (e.g. dbo)</param>
 		/// <param name="tableName">The name of the table.</param>
 		/// <returns>True, if the table exists, otherwise, false.</returns>
+		[SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
 		private bool ExistSqlTable(string schema, string tableName)
 		{
 			using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead }))
@@ -100,6 +102,7 @@ namespace Zyan.Communication.SessionMgmt
 		/// <summary>
 		/// Ensures that the session table exists in the SQL Server database.
 		/// </summary>
+		[SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
 		private void EnsureSessionTableCreated()
 		{
 			using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead }))
@@ -138,6 +141,7 @@ namespace Zyan.Communication.SessionMgmt
 		/// <summary>
 		/// Ensures that the variable table exists in SQL Server database.
 		/// </summary>
+		[SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
 		private void EnsureVariablesTableCreated()
 		{
 			using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead }))
@@ -175,6 +179,7 @@ namespace Zyan.Communication.SessionMgmt
 		/// </summary>
 		/// <param name="sessionID">Session identity.</param>
 		/// <returns>Session instance.</returns>
+		[SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
 		private ServerSession GetSessionFromSqlServer(Guid sessionID)
 		{
 			using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead }))
@@ -234,6 +239,7 @@ namespace Zyan.Communication.SessionMgmt
 		/// <param name="sessionID">Session identity.</param>
 		/// <param name="variableName">The name of the variable.</param>
 		/// <returns>The value of the variable</returns>
+		[SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
 		private object GetVariableFromSqlServer(Guid sessionID, string variableName)
 		{
 			using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead }))
@@ -301,6 +307,7 @@ namespace Zyan.Communication.SessionMgmt
 		/// <param name="sessionID">Session identity.</param>
 		/// <param name="variableName">The name of the variable.</param>
 		/// <param name="variableValue">The value of the variable</param>
+		[SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
 		private void SetVariableOnSqlServer(Guid sessionID, string variableName, object variableValue)
 		{
 			using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead }))
@@ -358,6 +365,7 @@ namespace Zyan.Communication.SessionMgmt
 		/// </summary>
 		/// <param name="sessionID">Session identity.</param>
 		/// <returns>True, if the session exists, otherwise, false.</returns>
+		[SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
 		private bool ExistSessionOnSqlServer(Guid sessionID)
 		{
 			using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead }))
@@ -400,6 +408,7 @@ namespace Zyan.Communication.SessionMgmt
 		/// Stores a session in the SQL Server database.
 		/// </summary>
 		/// <param name="session">The <see cref="ServerSession"/> to store.</param>
+		[SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
 		private void StoreSessionOnSqlServer(ServerSession session)
 		{
 			using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead }))
@@ -435,6 +444,7 @@ namespace Zyan.Communication.SessionMgmt
 		/// Updates a session in the SQL Server database.
 		/// </summary>
 		/// <param name="session">The <see cref="ServerSession"/> to update.</param>
+		[SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
 		private void RenewSessionOnSqlServer(ServerSession session)
 		{
 			using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead }))
@@ -464,6 +474,7 @@ namespace Zyan.Communication.SessionMgmt
 		/// Deletes the given session from the SQL Server database.
 		/// </summary>
 		/// <param name="sessionID">Session identity.</param>
+		[SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
 		private void RemoveSessionFromSqlServer(Guid sessionID)
 		{
 			using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead }))
@@ -491,6 +502,7 @@ namespace Zyan.Communication.SessionMgmt
 		/// <summary>
 		/// Removes expired sessions from the SQL Server database.
 		/// </summary>
+		[SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
 		private void SweepExpiredSessionsFromSqlServer()
 		{
 			using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions() { IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead }))

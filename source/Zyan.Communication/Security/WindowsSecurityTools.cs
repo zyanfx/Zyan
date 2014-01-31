@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace Zyan.Communication.Security
@@ -6,15 +7,17 @@ namespace Zyan.Communication.Security
 	internal class WindowsSecurityTools
 	{
 		[DllImport("advapi32.dll")]
+		[SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
 		internal static extern int LogonUser(
-				string lpszUsername,
-				string lpszDomain,
-				string lpszPassword,
-				LogonType dwLogonType,
-				ProviderType dwLogonProvider,
-				out IntPtr phToken);
+			string lpszUsername,
+			string lpszDomain,
+			string lpszPassword,
+			LogonType dwLogonType,
+			ProviderType dwLogonProvider,
+			out IntPtr phToken);
 
 		[DllImport("kernel32.dll")]
+		[SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
 		internal static extern bool CloseHandle(IntPtr phToken);
 
 		internal enum LogonType

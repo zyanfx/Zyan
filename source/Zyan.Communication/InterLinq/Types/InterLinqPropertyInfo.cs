@@ -12,7 +12,7 @@ namespace Zyan.InterLinq.Types
 	/// <seealso cref="PropertyInfo"/>
 	[Serializable]
 	[DataContract]
-	public class InterLinqPropertyInfo : InterLinqMemberInfo
+	public sealed class InterLinqPropertyInfo : InterLinqMemberInfo
 	{
 		#region Properties
 

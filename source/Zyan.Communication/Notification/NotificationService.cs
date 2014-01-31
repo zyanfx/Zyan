@@ -102,10 +102,10 @@ namespace Zyan.Communication.Notification
 						// Aufrufliste des Ereignisses abrufen
 						invocationList = _subscriptions[eventName].GetInvocationList();
 					}
-					catch (MemberAccessException ex)
+					catch (MemberAccessException)
 					{
 						// Ausnahme weiterwerfen
-						throw ex;
+						throw;
 					}
 					// Wenn die Aufrufliste abgerufen werden konnte ...
 					if (invocationList != null)

@@ -3,7 +3,7 @@
 	/// <summary>
 	/// <see cref="IServerProtocolSetup"/> implementation for the <see cref="NullChannel"/>.
 	/// </summary>
-	public class NullServerProtocolSetup : ServerProtocolSetup
+	public sealed class NullServerProtocolSetup : ServerProtocolSetup
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="NullServerProtocolSetup"/> class.

@@ -12,7 +12,7 @@ namespace Zyan.Communication.Threading
 	/// Written by Joe Duffy as a part of the «Building a custom thread pool» series:
 	/// http://www.bluebytesoftware.com/blog/2008/07/29/BuildingACustomThreadPoolSeriesPart1.aspx
 	/// </remarks>
-	public class SimpleLockThreadPool : IThreadPool
+	public sealed class SimpleLockThreadPool : IThreadPool
 	{
 		// Constructors--
 		// Two things may be specified:

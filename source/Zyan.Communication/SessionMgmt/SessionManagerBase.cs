@@ -87,7 +87,7 @@ namespace Zyan.Communication.SessionMgmt
 		/// Release allocated resources.
 		/// </summary>
 		/// <param name="disposing">True, if the Dispose() method was called by user code.</param>
-		public virtual void Dispose(bool disposing)
+		protected virtual void Dispose(bool disposing)
 		{
 			if (disposing)
 			{
@@ -186,7 +186,7 @@ namespace Zyan.Communication.SessionMgmt
 		/// </summary>
 		protected virtual IEnumerable<ServerSession> AllSessions
 		{
-			get { throw new NotImplementedException(); }
+			get { return new ServerSession[0]; }
 		}
 
 		#region Abstract methods

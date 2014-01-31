@@ -12,7 +12,7 @@ namespace Zyan.Communication.Protocols.Http
 	/// <summary>
 	/// Client protocol setup for HTTP communication with support for user defined authentication and security.
 	/// </summary>
-	public class HttpCustomClientProtocolSetup : CustomClientProtocolSetup, IClientProtocolSetup
+	public sealed class HttpCustomClientProtocolSetup : CustomClientProtocolSetup, IClientProtocolSetup
 	{
 		/// <summary>
 		/// Creates a new instance of the HttpCustomClientProtocolSetup class.

@@ -6,7 +6,7 @@ namespace Zyan.Communication.Protocols.Null
 	/// <summary>
 	/// <see cref="IClientProtocolSetup"/> implementation for the <see cref="NullChannel"/>.
 	/// </summary>
-	public class NullClientProtocolSetup : ClientProtocolSetup, IClientProtocolSetup
+	public sealed class NullClientProtocolSetup : ClientProtocolSetup, IClientProtocolSetup
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="NullClientProtocolSetup"/> class.
