@@ -187,11 +187,12 @@ namespace Zyan.Tests
 
 			var subscriptionCanceled = false;
 			var clientSideException = default(Exception);
-			ZyanHost.SubscriptionCanceled += (s, e) =>
+			var canceledHandler = new EventHandler<SubscriptionEventArgs>((s, e) =>
 			{
 				subscriptionCanceled = true;
 				clientSideException = e.Exception;
-			};
+			});
+			ZyanHost.SubscriptionCanceled += canceledHandler;
 
 			// set up client event handler
 			var handled = false;
@@ -201,7 +202,7 @@ namespace Zyan.Tests
 				if (handled)
 				{
 					handled = false;
-					throw new InvalidOperationException(message);
+					throw new Exception(message);
 				}
 
 				handled = true;
@@ -226,12 +227,10 @@ namespace Zyan.Tests
 			Assert.IsFalse(handled);
 			Assert.IsTrue(subscriptionCanceled);
 			Assert.IsNotNull(clientSideException);
-
-			// skip TargetInvocationException, if applicable
-			while (clientSideException.InnerException != null)
-				clientSideException = clientSideException.InnerException;
-
 			Assert.AreEqual(message, clientSideException.Message);
+
+			// detach event handler
+			ZyanHost.SubscriptionCanceled -= canceledHandler;
 		}
 
 		[TestMethod]
