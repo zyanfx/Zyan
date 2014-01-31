@@ -99,6 +99,8 @@ namespace Zyan.Tests
 
 		static ZyanConnection ZyanConnection { get; set; }
 
+		static DataWrapper DataWrapper { get; set; }
+
 		[ClassInitializeNonStatic]
 		public void Initialize()
 		{
@@ -122,7 +124,7 @@ namespace Zyan.Tests
 			ZyanHost.RegisterComponent<IObjectSource, SampleObjectSource>("Sample1", new SampleObjectSource(new[] { "this", "is", "an", "example" }));
 			ZyanHost.RegisterComponent<IObjectSource, SampleObjectSource>("Sample6");
 			ZyanHost.RegisterComponent<IObjectSource, SampleObjectSource>("Sample7", ActivationType.SingleCall);
-			ZyanHost.RegisterComponent<IEntitySource, DataWrapper>("DbSample", new DataWrapper());
+			ZyanHost.RegisterComponent<IEntitySource, DataWrapper>("DbSample", DataWrapper = new DataWrapper());
 
 			ZyanConnection = new ZyanConnection("null://NullChannel:5432/SampleQueryableServer");
 		}
@@ -132,6 +134,7 @@ namespace Zyan.Tests
 		{
 			ZyanConnection.Dispose();
 			ZyanHost.Dispose();
+			DataWrapper.Dispose();
 		}
 
 		#endregion

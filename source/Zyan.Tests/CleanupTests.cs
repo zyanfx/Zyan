@@ -147,21 +147,22 @@ namespace Zyan.Tests
 		{
 			// this component instance is externally-owned
 			var disposed = false;
-			var immortalServer = new DisposableComponent { Handler = () => disposed = true };
+			using (var immortalServer = new DisposableComponent { Handler = () => disposed = true })
+			using (var cat = new ComponentCatalog())
+			{
+				cat.RegisterComponent<ISampleComponent, DisposableComponent>(immortalServer);
+				Assert.IsFalse(disposed);
 
-			var cat = new ComponentCatalog();
-			cat.RegisterComponent<ISampleComponent, DisposableComponent>(immortalServer);
-			Assert.IsFalse(disposed);
+				var instance = cat.GetComponent<ISampleComponent>();
+				AssertEx.IsInstanceOf<DisposableComponent>(instance);
 
-			var instance = cat.GetComponent<ISampleComponent>();
-			AssertEx.IsInstanceOf<DisposableComponent>(instance);
+				var reg = cat.GetRegistration(typeof(ISampleComponent));
+				cat.CleanUpComponentInstance(reg, instance);
+				Assert.IsFalse(disposed);
 
-			var reg = cat.GetRegistration(typeof(ISampleComponent));
-			cat.CleanUpComponentInstance(reg, instance);
-			Assert.IsFalse(disposed);
-
-			immortalServer.Dispose();
-			Assert.IsTrue(disposed);
+				immortalServer.Dispose();
+				Assert.IsTrue(disposed);
+			}
 		}
 
 		//=============================================
@@ -288,17 +289,17 @@ namespace Zyan.Tests
 			var server = new ReleasableComponent { Handler = () => disposed = true };
 			Assert.IsFalse(disposed);
 
-			var catalog = new ComponentCatalog();
 			var serverSetup = new IpcBinaryServerProtocolSetup("CleanupTest2");
+			using (var catalog = new ComponentCatalog())
 			using (var host = new ZyanComponentHost("SampleServer2", serverSetup, new InProcSessionManager(), catalog))
 			{
 				host.RegisterComponent<ISampleComponent, ReleasableComponent>(
 					server, s => ((ReleasableComponent)s).Release());
-			}
 
-			Assert.IsFalse(disposed);
-			server.Release();
-			Assert.IsTrue(disposed);
+				Assert.IsFalse(disposed);
+				server.Release();
+				Assert.IsTrue(disposed);
+			}
 		}
 	}
 }

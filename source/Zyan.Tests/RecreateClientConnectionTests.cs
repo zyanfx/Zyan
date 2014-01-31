@@ -297,44 +297,40 @@ namespace Zyan.Tests
 		public void CreateDisposeAndReceateConnectionUsingTcpDuplexChannel()
 		{
 			string url = "tcpex://localhost:8084/RecreateClientConnectionTestHost_TcpDuplex";
-
 			var protocol = new TcpDuplexClientProtocolSetup(true);
-			ZyanConnection connection = new ZyanConnection(url, protocol);
 
-			var proxy1 = connection.CreateProxy<ISampleServer>("SampleServer");
-			Assert.AreEqual("Hallo", proxy1.Echo("Hallo"));
-			proxy1 = null;
+			using (var connection = new ZyanConnection(url, protocol))
+			{
+				var proxy1 = connection.CreateProxy<ISampleServer>("SampleServer");
+				Assert.AreEqual("Hallo", proxy1.Echo("Hallo"));
+				proxy1 = null;
+			}
 
-			connection.Dispose();
-
-			connection = new ZyanConnection(url, protocol);
-
-			var proxy2 = connection.CreateProxy<ISampleServer>("SampleServer");
-			Assert.AreEqual("Hallo", proxy2.Echo("Hallo"));
-
-			connection.Dispose();
+			using (var connection = new ZyanConnection(url, protocol))
+			{
+				var proxy2 = connection.CreateProxy<ISampleServer>("SampleServer");
+				Assert.AreEqual("Hallo", proxy2.Echo("Hallo"));
+			}
 		}
 
 		[TestMethod]
 		public void CreateDisposeAndReceateConnectionUsingTcpSimplexChannel()
 		{
 			string url = "tcp://localhost:8085/RecreateClientConnectionTestHost_TcpSimplex";
-
 			var protocol = new TcpCustomClientProtocolSetup(true);
-			ZyanConnection connection = new ZyanConnection(url, protocol);
 
-			var proxy1 = connection.CreateProxy<ISampleServer>("SampleServer");
-			Assert.AreEqual("Hallo", proxy1.Echo("Hallo"));
-			proxy1 = null;
+			using (var connection = new ZyanConnection(url, protocol))
+			{
+				var proxy1 = connection.CreateProxy<ISampleServer>("SampleServer");
+				Assert.AreEqual("Hallo", proxy1.Echo("Hallo"));
+				proxy1 = null;
+			}
 
-			connection.Dispose();
-
-			connection = new ZyanConnection(url, protocol);
-
-			var proxy2 = connection.CreateProxy<ISampleServer>("SampleServer");
-			Assert.AreEqual("Hallo", proxy2.Echo("Hallo"));
-
-			connection.Dispose();
+			using (var connection = new ZyanConnection(url, protocol))
+			{
+				var proxy2 = connection.CreateProxy<ISampleServer>("SampleServer");
+				Assert.AreEqual("Hallo", proxy2.Echo("Hallo"));
+			}
 		}
 
 		[TestMethod]

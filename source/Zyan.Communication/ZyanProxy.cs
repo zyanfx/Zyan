@@ -42,7 +42,7 @@ namespace Zyan.Communication
 		public ZyanProxy(string uniqueName, Type type, ZyanConnection connection, bool implicitTransactionTransfer, Guid sessionID, string componentHostName, bool autoLoginOnExpiredSession, ActivationType activationType)
 			: base(type)
 		{
-			if (type.Equals(null))
+			if (type == null)
 				throw new ArgumentNullException("type");
 
 			if (connection == null)

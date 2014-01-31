@@ -385,454 +385,498 @@ namespace Zyan.Tests
 		[TestMethod]
 		public void ZyanComponentFromMefCatalog_IsRegisteredAsSingleCall()
 		{
-			var cat = new ComponentCatalog();
-			cat.RegisterComponents(MefCatalog);
+			using (var cat = new ComponentCatalog())
+			{
+				cat.RegisterComponents(MefCatalog);
 
-			// get component registration
-			var reg = cat.GetRegistration(typeof(IMefSample));
-			Assert.IsNotNull(reg);
-			Assert.AreEqual(ActivationType.SingleCall, reg.ActivationType);
+				// get component registration
+				var reg = cat.GetRegistration(typeof(IMefSample));
+				Assert.IsNotNull(reg);
+				Assert.AreEqual(ActivationType.SingleCall, reg.ActivationType);
 
-			// get component instance
-			var obj = cat.GetComponent<IMefSample>();
-			Assert.IsNotNull(obj);
-			AssertEx.IsInstanceOf<MefSample1>(obj);
-			Assert.AreEqual(1, MefSample1.InstanceCount);
+				// get component instance
+				var obj = cat.GetComponent<IMefSample>();
+				Assert.IsNotNull(obj);
+				AssertEx.IsInstanceOf<MefSample1>(obj);
+				Assert.AreEqual(1, MefSample1.InstanceCount);
 
-			// clean up component instance
-			cat.CleanUpComponentInstance(reg, obj);
-			Assert.AreEqual(0, MefSample1.InstanceCount);
+				// clean up component instance
+				cat.CleanUpComponentInstance(reg, obj);
+				Assert.AreEqual(0, MefSample1.InstanceCount);
+			}
 		}
 
 		[TestMethod]
 		public void ZyanComponentFromMefContainer_IsRegisteredAsSingleCall()
 		{
-			var cat = new ComponentCatalog();
-			cat.RegisterComponents(MefContainer);
+			using (var cat = new ComponentCatalog())
+			{
+				cat.RegisterComponents(MefContainer);
 
-			// get component registration
-			var reg = cat.GetRegistration(typeof(IMefSample));
-			Assert.IsNotNull(reg);
-			Assert.AreEqual(ActivationType.SingleCall, reg.ActivationType);
+				// get component registration
+				var reg = cat.GetRegistration(typeof(IMefSample));
+				Assert.IsNotNull(reg);
+				Assert.AreEqual(ActivationType.SingleCall, reg.ActivationType);
 
-			// get component instance
-			var obj = cat.GetComponent<IMefSample>();
-			Assert.IsNotNull(obj);
-			AssertEx.IsInstanceOf<MefSample1>(obj);
-			Assert.AreEqual(1, MefSample1.InstanceCount);
+				// get component instance
+				var obj = cat.GetComponent<IMefSample>();
+				Assert.IsNotNull(obj);
+				AssertEx.IsInstanceOf<MefSample1>(obj);
+				Assert.AreEqual(1, MefSample1.InstanceCount);
 
-			// clean up component instance
-			cat.CleanUpComponentInstance(reg, obj);
-			Assert.AreEqual(0, MefSample1.InstanceCount);
+				// clean up component instance
+				cat.CleanUpComponentInstance(reg, obj);
+				Assert.AreEqual(0, MefSample1.InstanceCount);
+			}
 		}
 
 		[TestMethod]
 		public void NamedZyanComponentFromMefCatalog_IsRegistered()
 		{
-			var cat = new ComponentCatalog();
-			cat.RegisterComponents(MefCatalog);
+			using (var cat = new ComponentCatalog())
+			{
+				cat.RegisterComponents(MefCatalog);
 
-			// get component registration
-			var reg = cat.GetRegistration("UniqueName_MefSample2");
-			Assert.IsNotNull(reg);
+				// get component registration
+				var reg = cat.GetRegistration("UniqueName_MefSample2");
+				Assert.IsNotNull(reg);
 
-			// get component instance
-			var obj = cat.GetComponent("UniqueName_MefSample2") as IMefSample;
-			Assert.IsNotNull(obj);
-			AssertEx.IsInstanceOf<MefSample2>(obj);
-			Assert.AreEqual(1, MefSample2.InstanceCount);
+				// get component instance
+				var obj = cat.GetComponent("UniqueName_MefSample2") as IMefSample;
+				Assert.IsNotNull(obj);
+				AssertEx.IsInstanceOf<MefSample2>(obj);
+				Assert.AreEqual(1, MefSample2.InstanceCount);
 
-			// clean up component instance
-			cat.CleanUpComponentInstance(reg, obj);
-			Assert.AreEqual(0, MefSample2.InstanceCount);
+				// clean up component instance
+				cat.CleanUpComponentInstance(reg, obj);
+				Assert.AreEqual(0, MefSample2.InstanceCount);
+			}
 		}
 
 		[TestMethod]
 		public void NamedZyanComponentFromMefContainer_IsRegistered()
 		{
-			var cat = new ComponentCatalog();
-			cat.RegisterComponents(MefContainer);
+			using (var cat = new ComponentCatalog())
+			{
+				cat.RegisterComponents(MefContainer);
 
-			// get component registration
-			var reg = cat.GetRegistration("UniqueName_MefSample2");
-			Assert.IsNotNull(reg);
+				// get component registration
+				var reg = cat.GetRegistration("UniqueName_MefSample2");
+				Assert.IsNotNull(reg);
 
-			// get component instance
-			var obj = cat.GetComponent("UniqueName_MefSample2") as IMefSample;
-			Assert.IsNotNull(obj);
-			AssertEx.IsInstanceOf<MefSample2>(obj);
-			Assert.AreEqual(1, MefSample2.InstanceCount);
+				// get component instance
+				var obj = cat.GetComponent("UniqueName_MefSample2") as IMefSample;
+				Assert.IsNotNull(obj);
+				AssertEx.IsInstanceOf<MefSample2>(obj);
+				Assert.AreEqual(1, MefSample2.InstanceCount);
 
-			// clean up component instance
-			cat.CleanUpComponentInstance(reg, obj);
-			Assert.AreEqual(0, MefSample2.InstanceCount);
+				// clean up component instance
+				cat.CleanUpComponentInstance(reg, obj);
+				Assert.AreEqual(0, MefSample2.InstanceCount);
+			}
 		}
 
 		[TestMethod]
 		public void ExportedPartFromMefCatalog_IsRegistered()
 		{
-			var cat = new ComponentCatalog();
-			cat.RegisterComponents(MefCatalog);
+			using (var cat = new ComponentCatalog())
+			{
+				cat.RegisterComponents(MefCatalog);
 
-			// get component registration
-			var reg = cat.GetRegistration("UniqueName_MefSample3");
-			Assert.IsNotNull(reg);
+				// get component registration
+				var reg = cat.GetRegistration("UniqueName_MefSample3");
+				Assert.IsNotNull(reg);
 
-			// get component instance
-			var obj = cat.GetComponent("UniqueName_MefSample3") as IMefSample;
-			Assert.IsNotNull(obj);
-			AssertEx.IsInstanceOf<MefSample3>(obj);
-			Assert.AreEqual(1, MefSample3.InstanceCount);
+				// get component instance
+				var obj = cat.GetComponent("UniqueName_MefSample3") as IMefSample;
+				Assert.IsNotNull(obj);
+				AssertEx.IsInstanceOf<MefSample3>(obj);
+				Assert.AreEqual(1, MefSample3.InstanceCount);
 
-			// clean up component instance
-			cat.CleanUpComponentInstance(reg, obj);
-			Assert.AreEqual(0, MefSample3.InstanceCount);
+				// clean up component instance
+				cat.CleanUpComponentInstance(reg, obj);
+				Assert.AreEqual(0, MefSample3.InstanceCount);
+			}
 		}
 
 		[TestMethod]
 		public void ExportedPartFromFromMefContainer_IsRegistered()
 		{
-			var cat = new ComponentCatalog();
-			cat.RegisterComponents(MefContainer);
+			using (var cat = new ComponentCatalog())
+			{
+				cat.RegisterComponents(MefContainer);
 
-			// get component registration
-			var reg = cat.GetRegistration("UniqueName_MefSample3");
-			Assert.IsNotNull(reg);
+				// get component registration
+				var reg = cat.GetRegistration("UniqueName_MefSample3");
+				Assert.IsNotNull(reg);
 
-			// get component instance
-			var obj = cat.GetComponent("UniqueName_MefSample3") as IMefSample;
-			Assert.IsNotNull(obj);
-			AssertEx.IsInstanceOf<MefSample3>(obj);
-			Assert.AreEqual(1, MefSample3.InstanceCount);
+				// get component instance
+				var obj = cat.GetComponent("UniqueName_MefSample3") as IMefSample;
+				Assert.IsNotNull(obj);
+				AssertEx.IsInstanceOf<MefSample3>(obj);
+				Assert.AreEqual(1, MefSample3.InstanceCount);
 
-			// clean up component instance
-			cat.CleanUpComponentInstance(reg, obj);
-			Assert.AreEqual(0, MefSample3.InstanceCount);
+				// clean up component instance
+				cat.CleanUpComponentInstance(reg, obj);
+				Assert.AreEqual(0, MefSample3.InstanceCount);
+			}
 		}
 
 		[TestMethod, ExpectedException(typeof(KeyNotFoundException))]
 		public void PrivateExportedPartFromMefCatalog_IsNotRegistered()
 		{
-			var cat = new ComponentCatalog();
-			cat.RegisterComponents(MefCatalog);
+			using (var cat = new ComponentCatalog())
+			{
+				cat.RegisterComponents(MefCatalog);
 
-			// component is available in MefCatalog
-			var id = new ImportDefinition(def => def.Metadata.ContainsKey("ComponentInterface"), "UniqueName_MefSample4", ImportCardinality.ExactlyOne, false, false);
-			var exports = MefCatalog.GetExports(id);
-			Assert.IsNotNull(exports);
-			Assert.AreEqual(1, exports.Count());
+				// component is available in MefCatalog
+				var id = new ImportDefinition(def => def.Metadata.ContainsKey("ComponentInterface"), "UniqueName_MefSample4", ImportCardinality.ExactlyOne, false, false);
+				var exports = MefCatalog.GetExports(id);
+				Assert.IsNotNull(exports);
+				Assert.AreEqual(1, exports.Count());
 
-			// component is not registered in Zyan ComponentCatalog
-			cat.GetRegistration("UniqueName_MefSample4");
+				// component is not registered in Zyan ComponentCatalog
+				cat.GetRegistration("UniqueName_MefSample4");
+			}
 		}
 
 		[TestMethod, ExpectedException(typeof(KeyNotFoundException))]
 		public void PrivateExportedPartFromFromMefContainer_IsNotRegistered()
 		{
-			var cat = new ComponentCatalog();
-			cat.RegisterComponents(MefContainer);
+			using (var cat = new ComponentCatalog())
+			{
+				cat.RegisterComponents(MefContainer);
 
-			// component is available in MefContainer
-			var obj = MefContainer.GetExport<IMefSample>("UniqueName_MefSample4").Value;
-			Assert.IsNotNull(obj);
-			AssertEx.IsInstanceOf<MefSample4>(obj);
+				// component is available in MefContainer
+				var obj = MefContainer.GetExport<IMefSample>("UniqueName_MefSample4").Value;
+				Assert.IsNotNull(obj);
+				AssertEx.IsInstanceOf<MefSample4>(obj);
 
-			// component is not registered in Zyan ComponentCatalog
-			cat.GetRegistration("UniqueName_MefSample4");
+				// component is not registered in Zyan ComponentCatalog
+				cat.GetRegistration("UniqueName_MefSample4");
+			}
 		}
 
 		[TestMethod]
 		public void InheritedExportFromMefCatalog_IsRegistered()
 		{
-			var cat = new ComponentCatalog();
-			cat.RegisterComponents(MefCatalog);
+			using (var cat = new ComponentCatalog())
+			{
+				cat.RegisterComponents(MefCatalog);
 
-			// get component registration
-			var reg = cat.GetRegistration("UniqueName_MefSample5");
-			Assert.IsNotNull(reg);
+				// get component registration
+				var reg = cat.GetRegistration("UniqueName_MefSample5");
+				Assert.IsNotNull(reg);
 
-			// get component instance
-			var obj = cat.GetComponent("UniqueName_MefSample5") as IMefSample5;
-			Assert.IsNotNull(obj);
-			AssertEx.IsInstanceOf<MefSample5>(obj);
-			Assert.AreEqual(1, MefSample5.InstanceCount);
+				// get component instance
+				var obj = cat.GetComponent("UniqueName_MefSample5") as IMefSample5;
+				Assert.IsNotNull(obj);
+				AssertEx.IsInstanceOf<MefSample5>(obj);
+				Assert.AreEqual(1, MefSample5.InstanceCount);
 
-			// clean up component instance
-			cat.CleanUpComponentInstance(reg, obj);
-			Assert.AreEqual(0, MefSample5.InstanceCount);
+				// clean up component instance
+				cat.CleanUpComponentInstance(reg, obj);
+				Assert.AreEqual(0, MefSample5.InstanceCount);
+			}
 		}
 
 		[TestMethod]
 		public void InheritedExportFromFromMefContainer_IsRegistered()
 		{
-			var cat = new ComponentCatalog();
-			cat.RegisterComponents(MefContainer);
+			using (var cat = new ComponentCatalog())
+			{
+				cat.RegisterComponents(MefContainer);
 
-			// get component registration
-			var reg = cat.GetRegistration("UniqueName_MefSample5");
-			Assert.IsNotNull(reg);
+				// get component registration
+				var reg = cat.GetRegistration("UniqueName_MefSample5");
+				Assert.IsNotNull(reg);
 
-			// get component instance
-			var obj = cat.GetComponent("UniqueName_MefSample5") as IMefSample5;
-			Assert.IsNotNull(obj);
-			AssertEx.IsInstanceOf<MefSample5>(obj);
-			Assert.AreEqual(1, MefSample5.InstanceCount);
+				// get component instance
+				var obj = cat.GetComponent("UniqueName_MefSample5") as IMefSample5;
+				Assert.IsNotNull(obj);
+				AssertEx.IsInstanceOf<MefSample5>(obj);
+				Assert.AreEqual(1, MefSample5.InstanceCount);
 
-			// clean up component instance
-			cat.CleanUpComponentInstance(reg, obj);
-			Assert.AreEqual(0, MefSample5.InstanceCount);
+				// clean up component instance
+				cat.CleanUpComponentInstance(reg, obj);
+				Assert.AreEqual(0, MefSample5.InstanceCount);
+			}
 		}
 
 		[TestMethod, ExpectedException(typeof(KeyNotFoundException))]
 		public void PrivateInheritedExportFromMefCatalog_IsNotRegistered()
 		{
-			var cat = new ComponentCatalog();
-			cat.RegisterComponents(MefCatalog);
+			using (var cat = new ComponentCatalog())
+			{
+				cat.RegisterComponents(MefCatalog);
 
-			// component is available in MefCatalog
-			var id = new ImportDefinition(def => def.Metadata.ContainsKey("ComponentInterface"), "UniqueName_MefSample6", ImportCardinality.ExactlyOne, false, false);
-			var exports = MefCatalog.GetExports(id);
-			Assert.IsNotNull(exports);
-			Assert.AreEqual(1, exports.Count());
+				// component is available in MefCatalog
+				var id = new ImportDefinition(def => def.Metadata.ContainsKey("ComponentInterface"), "UniqueName_MefSample6", ImportCardinality.ExactlyOne, false, false);
+				var exports = MefCatalog.GetExports(id);
+				Assert.IsNotNull(exports);
+				Assert.AreEqual(1, exports.Count());
 
-			// component is not registered in Zyan ComponentCatalog
-			cat.GetRegistration("UniqueName_MefSample6");
+				// component is not registered in Zyan ComponentCatalog
+				cat.GetRegistration("UniqueName_MefSample6");
+			}
 		}
 
 		[TestMethod, ExpectedException(typeof(KeyNotFoundException))]
 		public void PrivateInheritedExportFromFromMefContainer_IsNotRegistered()
 		{
-			var cat = new ComponentCatalog();
-			cat.RegisterComponents(MefContainer);
+			using (var cat = new ComponentCatalog())
+			{
+				cat.RegisterComponents(MefContainer);
 
-			// component is available in MefContainer
-			var obj = MefContainer.GetExport<IMefSample6>("UniqueName_MefSample6").Value;
-			Assert.IsNotNull(obj);
-			AssertEx.IsInstanceOf<MefSample6>(obj);
+				// component is available in MefContainer
+				var obj = MefContainer.GetExport<IMefSample6>("UniqueName_MefSample6").Value;
+				Assert.IsNotNull(obj);
+				AssertEx.IsInstanceOf<MefSample6>(obj);
 
-			// component is not registered in Zyan ComponentCatalog
-			cat.GetRegistration("UniqueName_MefSample6");
+				// component is not registered in Zyan ComponentCatalog
+				cat.GetRegistration("UniqueName_MefSample6");
+			}
 		}
 
 		[TestMethod]
 		public void ZyanInterfaceFromMefCatalog_IsRegistered()
 		{
-			var cat = new ComponentCatalog();
-			cat.RegisterComponents(MefCatalog);
+			using (var cat = new ComponentCatalog())
+			{
+				cat.RegisterComponents(MefCatalog);
 
-			// get component registration
-			var reg = cat.GetRegistration(typeof(IMefSample7));
-			Assert.IsNotNull(reg);
+				// get component registration
+				var reg = cat.GetRegistration(typeof(IMefSample7));
+				Assert.IsNotNull(reg);
 
-			// get component instance
-			var obj = cat.GetComponent<IMefSample7>();
-			Assert.IsNotNull(obj);
-			AssertEx.IsInstanceOf<MefSample7>(obj);
-			Assert.AreEqual(1, MefSample7.InstanceCount);
+				// get component instance
+				var obj = cat.GetComponent<IMefSample7>();
+				Assert.IsNotNull(obj);
+				AssertEx.IsInstanceOf<MefSample7>(obj);
+				Assert.AreEqual(1, MefSample7.InstanceCount);
 
-			// clean up component instance
-			cat.CleanUpComponentInstance(reg, obj);
-			Assert.AreEqual(0, MefSample7.InstanceCount);
+				// clean up component instance
+				cat.CleanUpComponentInstance(reg, obj);
+				Assert.AreEqual(0, MefSample7.InstanceCount);
+			}
 		}
 
 		[TestMethod]
 		public void ZyanInterfaceFromFromMefContainer_IsRegistered()
 		{
-			var cat = new ComponentCatalog();
-			cat.RegisterComponents(MefContainer);
+			using (var cat = new ComponentCatalog())
+			{
+				cat.RegisterComponents(MefContainer);
 
-			// get component registration
-			var reg = cat.GetRegistration(typeof(IMefSample7));
-			Assert.IsNotNull(reg);
+				// get component registration
+				var reg = cat.GetRegistration(typeof(IMefSample7));
+				Assert.IsNotNull(reg);
 
-			// get component instance
-			var obj = cat.GetComponent<IMefSample7>();
-			Assert.IsNotNull(obj);
-			AssertEx.IsInstanceOf<MefSample7>(obj);
-			Assert.AreEqual(1, MefSample7.InstanceCount);
+				// get component instance
+				var obj = cat.GetComponent<IMefSample7>();
+				Assert.IsNotNull(obj);
+				AssertEx.IsInstanceOf<MefSample7>(obj);
+				Assert.AreEqual(1, MefSample7.InstanceCount);
 
-			// clean up component instance
-			cat.CleanUpComponentInstance(reg, obj);
-			Assert.AreEqual(0, MefSample7.InstanceCount);
+				// clean up component instance
+				cat.CleanUpComponentInstance(reg, obj);
+				Assert.AreEqual(0, MefSample7.InstanceCount);
+			}
 		}
 
 		[TestMethod]
 		public void NamedZyanInterfaceFromMefCatalog_IsRegistered()
 		{
-			var cat = new ComponentCatalog();
-			cat.RegisterComponents(MefCatalog);
+			using (var cat = new ComponentCatalog())
+			{
+				cat.RegisterComponents(MefCatalog);
 
-			// get component registration
-			var reg = cat.GetRegistration("UniqueName_MefSample8");
-			Assert.IsNotNull(reg);
+				// get component registration
+				var reg = cat.GetRegistration("UniqueName_MefSample8");
+				Assert.IsNotNull(reg);
 
-			// get component instance
-			var obj = cat.GetComponent("UniqueName_MefSample8") as IMefSample8;
-			Assert.IsNotNull(obj);
-			AssertEx.IsInstanceOf<MefSample8>(obj);
-			Assert.AreEqual(1, MefSample8.InstanceCount);
+				// get component instance
+				var obj = cat.GetComponent("UniqueName_MefSample8") as IMefSample8;
+				Assert.IsNotNull(obj);
+				AssertEx.IsInstanceOf<MefSample8>(obj);
+				Assert.AreEqual(1, MefSample8.InstanceCount);
 
-			// clean up component instance
-			cat.CleanUpComponentInstance(reg, obj);
-			Assert.AreEqual(0, MefSample8.InstanceCount);
+				// clean up component instance
+				cat.CleanUpComponentInstance(reg, obj);
+				Assert.AreEqual(0, MefSample8.InstanceCount);
+			}
 		}
 
 		[TestMethod]
 		public void NamedZyanInterfaceFromMefContainer_IsRegistered()
 		{
-			var cat = new ComponentCatalog();
-			cat.RegisterComponents(MefContainer);
+			using (var cat = new ComponentCatalog())
+			{
+				cat.RegisterComponents(MefContainer);
 
-			// get component registration
-			var reg = cat.GetRegistration("UniqueName_MefSample8");
-			Assert.IsNotNull(reg);
+				// get component registration
+				var reg = cat.GetRegistration("UniqueName_MefSample8");
+				Assert.IsNotNull(reg);
 
-			// get component instance
-			var obj = cat.GetComponent("UniqueName_MefSample8") as IMefSample8;
-			Assert.IsNotNull(obj);
-			AssertEx.IsInstanceOf<MefSample8>(obj);
-			Assert.AreEqual(1, MefSample8.InstanceCount);
+				// get component instance
+				var obj = cat.GetComponent("UniqueName_MefSample8") as IMefSample8;
+				Assert.IsNotNull(obj);
+				AssertEx.IsInstanceOf<MefSample8>(obj);
+				Assert.AreEqual(1, MefSample8.InstanceCount);
 
-			// clean up component instance
-			cat.CleanUpComponentInstance(reg, obj);
-			Assert.AreEqual(0, MefSample8.InstanceCount);
+				// clean up component instance
+				cat.CleanUpComponentInstance(reg, obj);
+				Assert.AreEqual(0, MefSample8.InstanceCount);
+			}
 		}
 
 		[TestMethod]
 		public void SharedZyanComponentFromMefCatalog_IsRegistered()
 		{
-			var cat = new ComponentCatalog();
-			cat.RegisterComponents(MefCatalog);
+			using (var cat = new ComponentCatalog())
+			{
+				cat.RegisterComponents(MefCatalog);
 
-			// get component registration
-			var reg = cat.GetRegistration("UniqueName_MefSample9");
-			Assert.IsNotNull(reg);
-			Assert.AreEqual(ActivationType.Singleton, reg.ActivationType);
+				// get component registration
+				var reg = cat.GetRegistration("UniqueName_MefSample9");
+				Assert.IsNotNull(reg);
+				Assert.AreEqual(ActivationType.Singleton, reg.ActivationType);
 
-			// get component instance
-			var obj = cat.GetComponent("UniqueName_MefSample9") as IMefSample;
-			Assert.IsNotNull(obj);
-			AssertEx.IsInstanceOf<MefSample9>(obj);
-			Assert.AreNotEqual(0, MefSample9.InstanceCount);
+				// get component instance
+				var obj = cat.GetComponent("UniqueName_MefSample9") as IMefSample;
+				Assert.IsNotNull(obj);
+				AssertEx.IsInstanceOf<MefSample9>(obj);
+				Assert.AreNotEqual(0, MefSample9.InstanceCount);
 
-			// make sure component instance is not cleaned up
-			cat.CleanUpComponentInstance(reg, obj);
-			Assert.AreNotEqual(0, MefSample9.InstanceCount);
+				// make sure component instance is not cleaned up
+				cat.CleanUpComponentInstance(reg, obj);
+				Assert.AreNotEqual(0, MefSample9.InstanceCount);
 
-			// make sure component instance is not disposed with catalog
-			cat.Dispose();
-			Assert.AreNotEqual(0, MefSample9.InstanceCount);
+				// make sure component instance is not disposed with catalog
+				cat.Dispose();
+				Assert.AreNotEqual(0, MefSample9.InstanceCount);
+			}
 		}
 
 		[TestMethod]
 		public void SharedZyanComponentFromMefContainer_IsRegistered()
 		{
-			var cat = new ComponentCatalog();
-			cat.RegisterComponents(MefContainer);
+			using (var cat = new ComponentCatalog())
+			{
+				cat.RegisterComponents(MefContainer);
 
-			// get component registration
-			var reg = cat.GetRegistration("UniqueName_MefSample9");
-			Assert.IsNotNull(reg);
-			Assert.AreEqual(ActivationType.Singleton, reg.ActivationType);
+				// get component registration
+				var reg = cat.GetRegistration("UniqueName_MefSample9");
+				Assert.IsNotNull(reg);
+				Assert.AreEqual(ActivationType.Singleton, reg.ActivationType);
 
-			// get component instance
-			var obj = cat.GetComponent("UniqueName_MefSample9") as IMefSample;
-			Assert.IsNotNull(obj);
-			AssertEx.IsInstanceOf<MefSample9>(obj);
-			Assert.AreNotEqual(0, MefSample9.InstanceCount);
+				// get component instance
+				var obj = cat.GetComponent("UniqueName_MefSample9") as IMefSample;
+				Assert.IsNotNull(obj);
+				AssertEx.IsInstanceOf<MefSample9>(obj);
+				Assert.AreNotEqual(0, MefSample9.InstanceCount);
 
-			// make sure component instance is not cleaned up
-			cat.CleanUpComponentInstance(reg, obj);
-			Assert.AreNotEqual(0, MefSample9.InstanceCount);
+				// make sure component instance is not cleaned up
+				cat.CleanUpComponentInstance(reg, obj);
+				Assert.AreNotEqual(0, MefSample9.InstanceCount);
 
-			// make sure component instance is not disposed with catalog
-			cat.Dispose();
-			Assert.AreNotEqual(0, MefSample9.InstanceCount);
+				// make sure component instance is not disposed with catalog
+				cat.Dispose();
+				Assert.AreNotEqual(0, MefSample9.InstanceCount);
+			}
 		}
 
 		[TestMethod]
 		public void IEntitySourceFromMefContainer_IsRegisteredAsIs()
 		{
-			var cat = new ComponentCatalog();
-			cat.RegisterComponents(MefContainer);
+			using (var cat = new ComponentCatalog())
+			{
+				cat.RegisterComponents(MefContainer);
 
-			// get component registration
-			var reg = cat.GetRegistration("UniqueName_MefSample10");
-			Assert.IsNotNull(reg);
+				// get component registration
+				var reg = cat.GetRegistration("UniqueName_MefSample10");
+				Assert.IsNotNull(reg);
 
-			// get component instance
-			var obj = cat.GetComponent("UniqueName_MefSample10") as IEntitySource;
-			Assert.IsNotNull(obj);
-			AssertEx.IsInstanceOf<MefSample10>(obj);
-			Assert.AreEqual(1, MefSample10.InstanceCount);
+				// get component instance
+				var obj = cat.GetComponent("UniqueName_MefSample10") as IEntitySource;
+				Assert.IsNotNull(obj);
+				AssertEx.IsInstanceOf<MefSample10>(obj);
+				Assert.AreEqual(1, MefSample10.InstanceCount);
 
-			// clean up component instance
-			cat.CleanUpComponentInstance(reg, obj);
-			Assert.AreEqual(0, MefSample10.InstanceCount);
+				// clean up component instance
+				cat.CleanUpComponentInstance(reg, obj);
+				Assert.AreEqual(0, MefSample10.InstanceCount);
+			}
 		}
 
 		[TestMethod]
 		public void IObjectSourceFromMefContainer_IsRegisteredAsIs()
 		{
-			var cat = new ComponentCatalog();
-			cat.RegisterComponents(MefContainer);
+			using (var cat = new ComponentCatalog())
+			{
+				cat.RegisterComponents(MefContainer);
 
-			// get component registration
-			var reg = cat.GetRegistration("UniqueName_MefSample11");
-			Assert.IsNotNull(reg);
+				// get component registration
+				var reg = cat.GetRegistration("UniqueName_MefSample11");
+				Assert.IsNotNull(reg);
 
-			// get component instance
-			var obj = cat.GetComponent("UniqueName_MefSample11") as IObjectSource;
-			Assert.IsNotNull(obj);
-			AssertEx.IsInstanceOf<MefSample11>(obj);
-			Assert.AreEqual(1, MefSample11.InstanceCount);
+				// get component instance
+				var obj = cat.GetComponent("UniqueName_MefSample11") as IObjectSource;
+				Assert.IsNotNull(obj);
+				AssertEx.IsInstanceOf<MefSample11>(obj);
+				Assert.AreEqual(1, MefSample11.InstanceCount);
 
-			// clean up component instance
-			cat.CleanUpComponentInstance(reg, obj);
-			Assert.AreEqual(0, MefSample11.InstanceCount);
+				// clean up component instance
+				cat.CleanUpComponentInstance(reg, obj);
+				Assert.AreEqual(0, MefSample11.InstanceCount);
+			}
 		}
 
 		[TestMethod]
 		public void MixedComponent_IsRegistered()
 		{
-			var cat = new ComponentCatalog();
-			cat.RegisterComponents(MefContainer);
+			using (var cat = new ComponentCatalog())
+			{
+				cat.RegisterComponents(MefContainer);
 
-			// get component registration
-			var reg = cat.GetRegistration("UniqueName_MefSample12");
-			Assert.IsNotNull(reg);
+				// get component registration
+				var reg = cat.GetRegistration("UniqueName_MefSample12");
+				Assert.IsNotNull(reg);
 
-			// get component instance
-			var obj = cat.GetComponent("UniqueName_MefSample12") as IMefSample12;
-			Assert.IsNotNull(obj);
-			AssertEx.IsInstanceOf<MefSample12>(obj);
+				// get component instance
+				var obj = cat.GetComponent("UniqueName_MefSample12") as IMefSample12;
+				Assert.IsNotNull(obj);
+				AssertEx.IsInstanceOf<MefSample12>(obj);
+			}
 		}
 
 		[TestMethod]
 		public void ZyanComponentWithSharedPolicyAttribute_IsRegisteredAsSingleton()
 		{
-			var cat = new ComponentCatalog();
-			cat.RegisterComponents(MefCatalog);
+			using (var cat = new ComponentCatalog())
+			{
+				cat.RegisterComponents(MefCatalog);
 
-			// get component registration
-			var reg = cat.GetRegistration("UniqueName_MefSample13");
-			Assert.IsNotNull(reg);
-			Assert.AreEqual(ActivationType.Singleton, reg.ActivationType);
+				// get component registration
+				var reg = cat.GetRegistration("UniqueName_MefSample13");
+				Assert.IsNotNull(reg);
+				Assert.AreEqual(ActivationType.Singleton, reg.ActivationType);
 
-			// get component instance
-			var obj = cat.GetComponent("UniqueName_MefSample13") as IMefSample;
-			Assert.IsNotNull(obj);
-			AssertEx.IsInstanceOf<MefSample13>(obj);
-			var ms13 = (MefSample13)obj;
-			var guid = ms13.Guid;
+				// get component instance
+				var obj = cat.GetComponent("UniqueName_MefSample13") as IMefSample;
+				Assert.IsNotNull(obj);
+				AssertEx.IsInstanceOf<MefSample13>(obj);
+				var ms13 = (MefSample13)obj;
+				var guid = ms13.Guid;
 
-			// make sure component instance is not cleaned up
-			cat.CleanUpComponentInstance(reg, obj);
-			Assert.AreEqual(guid, ms13.Guid);
+				// make sure component instance is not cleaned up
+				cat.CleanUpComponentInstance(reg, obj);
+				Assert.AreEqual(guid, ms13.Guid);
 
-			// make sure component instance is not disposed with component catalog
-			cat.Dispose();
-			Assert.AreEqual(guid, ms13.Guid);
+				// make sure component instance is not disposed with component catalog
+				cat.Dispose();
+				Assert.AreEqual(guid, ms13.Guid);
+			}
 		}
 	}
 }

@@ -61,7 +61,7 @@ namespace Zyan.Tests
 
 			public T Duplicate<T>(T data)
 			{
-				var result = default(object);
+				var result = (object)default(T);
 
 				if (typeof(int).IsAssignableFrom(typeof(T)))
 				{

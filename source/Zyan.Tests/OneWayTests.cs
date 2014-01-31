@@ -126,7 +126,6 @@ namespace Zyan.Tests
 			var serverSetup = new IpcBinaryServerProtocolSetup("OneWayTest");
 			ZyanHost = new ZyanComponentHost("OneWayServer", serverSetup);
 			ZyanHost.RegisterComponent<ISampleServer, SampleServer>();
-
 			ZyanConnection = new ZyanConnection("ipc://OneWayTest/OneWayServer");
 		}
 
@@ -144,50 +143,54 @@ namespace Zyan.Tests
 		{
 			// check server session several times to make sure everything is ok
 			var proxy = ZyanConnection.CreateProxy<ISampleServer>();
-			var countdownEvent = new CountdownEvent(100);
- 			var success = true;
-
-			// execute one-way method and compare current session id
-			for (int i = 0; i < countdownEvent.InitialCount; i++)
+			using (var countdownEvent = new CountdownEvent(100))
 			{
-				proxy.CheckServerSession(id =>
-				{
-					success = success && id == ZyanConnection.SessionID;
-					countdownEvent.Signal();
-				});
-			}
+				var success = true;
 
-			// wait a bit
-			Assert.IsTrue(countdownEvent.Wait(TimeSpan.FromSeconds(0.5)));
-			Assert.IsTrue(success);
+				// execute one-way method and compare current session id
+				for (int i = 0; i < countdownEvent.InitialCount; i++)
+				{
+					proxy.CheckServerSession(id =>
+					{
+						success = success && id == ZyanConnection.SessionID;
+						countdownEvent.Signal();
+					});
+				}
+
+				// wait a bit
+				Assert.IsTrue(countdownEvent.Wait(TimeSpan.FromSeconds(0.5)));
+				Assert.IsTrue(success);
+			}
 		}
 
 		[TestMethod]
 		public void OneWayMethodCallShouldReturnImmediatelly()
 		{
 			var proxy = ZyanConnection.CreateProxy<ISampleServer>();
-			var mre = new ManualResetEvent(false);
-			var callbackExecuted = false;
-
-			// this should return immediatelly
-			proxy.OneWayVoidMethod(() =>
+			using (var mre = new ManualResetEvent(false))
 			{
-				mre.Set();
-			},
-			() =>
-			{
-				callbackExecuted = true;
-				mre.Set();
-			});
+				var callbackExecuted = false;
 
-			// check if the method is still running
-			Assert.IsTrue(mre.WaitOne(5000));
-			Assert.IsFalse(callbackExecuted);
+				// this should return immediatelly
+				proxy.OneWayVoidMethod(() =>
+				{
+					mre.Set();
+				},
+				() =>
+				{
+					callbackExecuted = true;
+					mre.Set();
+				});
 
-			// wait for the method to finish
-			mre.Reset();
-			Assert.IsTrue(mre.WaitOne(5000));
-			Assert.IsTrue(callbackExecuted);
+				// check if the method is still running
+				Assert.IsTrue(mre.WaitOne(5000));
+				Assert.IsFalse(callbackExecuted);
+
+				// wait for the method to finish
+				mre.Reset();
+				Assert.IsTrue(mre.WaitOne(5000));
+				Assert.IsTrue(callbackExecuted);
+			}
 		}
 
 		[TestMethod]
@@ -230,18 +233,19 @@ namespace Zyan.Tests
 		{
 			var proxy = ZyanConnection.CreateProxy<ISampleServer>();
 			var callbackExecuted = false;
-			var mre = new ManualResetEvent(false);
-
-			// this should return immediatelly
-			proxy.OneWayMethodWithException(() =>
+			using (var mre = new ManualResetEvent(false))
 			{
-				callbackExecuted = true;
-				mre.Set();
-			});
+				// this should return immediatelly
+				proxy.OneWayMethodWithException(() =>
+				{
+					callbackExecuted = true;
+					mre.Set();
+				});
 
-			// check if exception was caught
-			Assert.IsTrue(mre.WaitOne(5000));
-			Assert.IsTrue(callbackExecuted);
+				// check if exception was caught
+				Assert.IsTrue(mre.WaitOne(5000));
+				Assert.IsTrue(callbackExecuted);
+			}
 		}
 	}
 }

@@ -219,7 +219,7 @@ namespace Zyan.Tests
 					if (arg1 == 123)
 					{
 						data.Intercepted = true;
-						var realResult = data.MakeRemoteCall();
+						var realResult = data.MakeRemoteCall() ?? string.Empty;
 						return interceptPrefix + realResult.ToString();
 					}
 

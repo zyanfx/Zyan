@@ -52,7 +52,8 @@ namespace Zyan.Communication.Toolbox
 		/// <returns>The value of the object.</returns>
 		public static T GetData<T>(string name, T defaultValue = default(T))
 		{
-			return (T)GetData(name);
+			var data = GetData(name) ?? defaultValue;
+			return (T)data;
 		}
 
 		/// <summary>

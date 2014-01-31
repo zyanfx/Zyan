@@ -226,7 +226,7 @@ namespace Zyan.Communication
 		/// <returns>Component registration</returns>
 		public static ComponentRegistration GetRegistration(this IComponentCatalog catalog, Type interfaceType)
 		{
-			if (interfaceType.Equals(null))
+			if (interfaceType == null)
 				throw new ArgumentNullException("interfaceType");
 
 			return catalog.GetRegistration(interfaceType.FullName);

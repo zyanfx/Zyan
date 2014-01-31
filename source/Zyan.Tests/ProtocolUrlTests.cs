@@ -120,7 +120,10 @@ namespace Zyan.Tests
 		[TestMethod, ExpectedException(typeof(ArgumentException))]
 		public void ZyanConnectionDoesntAcceptMalformedUrl()
 		{
-			new ZyanConnection("hello", new IpcBinaryClientProtocolSetup());
+			using (new ZyanConnection("hello", new IpcBinaryClientProtocolSetup()))
+			{
+				Assert.Fail("'hello' is not a valid url for the Ipc protocol.");
+			}
 		}
 	}
 }
