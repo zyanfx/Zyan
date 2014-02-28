@@ -89,6 +89,9 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 		// Gibt an, ob das Objekt bereits entsorgt wurde
 		private bool _disposed = false;
 
+		// When reentrancy level is greater than zero, it means that the server call is in progress
+		private int reentrancyLevel;
+
 		#endregion
 
 		#region Konstruktor und Desktruktor
@@ -132,6 +135,24 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 
 			// Zeitstempel aktualisieren
 			_timestamp = DateTime.UtcNow;
+		}
+
+		/// <summary>
+		/// Begins the method call.
+		/// </summary>
+		public void BeginMethodCall()
+		{
+			CheckDisposed();
+			System.Threading.Interlocked.Increment(ref reentrancyLevel);
+		}
+
+		/// <summary>
+		/// Ends the method call.
+		/// </summary>
+		public void EndMethodCall()
+		{
+			CheckDisposed();
+			System.Threading.Interlocked.Decrement(ref reentrancyLevel);
 		}
 
 		/// <summary>
@@ -221,6 +242,18 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 
 				// Zeitstempel zurückgeben
 				return _timestamp;
+			}
+		}
+
+		/// <summary>
+		/// Gets a value indicating whether a call is in progress.
+		/// </summary>
+		public bool CallInProgress
+		{
+			get
+			{
+				CheckDisposed();
+				return reentrancyLevel > 0;
 			}
 		}
 
