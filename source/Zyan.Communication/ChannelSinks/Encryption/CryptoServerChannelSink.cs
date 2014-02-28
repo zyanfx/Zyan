@@ -163,30 +163,39 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 
 			// Zeitstempel aktualisieren
 			connectionData.UpdateTimestamp();
+			connectionData.BeginMethodCall();
 
-			// Datenstrom entschlüsseln
-			Stream decryptedStream = CryptoTools.GetDecryptedStream(requestStream, connectionData.CryptoProvider);
+			try
+			{
+				// Datenstrom entschlüsseln
+				Stream decryptedStream = CryptoTools.GetDecryptedStream(requestStream, connectionData.CryptoProvider);
 
-			// Verschlüsselten-Quelldatenstrom schließen
-			requestStream.Close();
+				// Verschlüsselten-Quelldatenstrom schließen
+				requestStream.Close();
 
-			// Entschlüsselte Nachricht zur Weiterverarbeitung an die nächste Kanalsenke weitergeben
-			ServerProcessing processingResult = _next.ProcessMessage(sinkStack, requestMsg, requestHeaders, decryptedStream, out responseMsg, out responseHeaders, out responseStream);
+				// Entschlüsselte Nachricht zur Weiterverarbeitung an die nächste Kanalsenke weitergeben
+				ServerProcessing processingResult = _next.ProcessMessage(sinkStack, requestMsg, requestHeaders, decryptedStream, out responseMsg, out responseHeaders, out responseStream);
 
-			// Status der Sicherheitstransaktion auf "verschlüsselte Atwortnachricht senden" einstellen
-			responseHeaders[CommonHeaderNames.SECURE_TRANSACTION_STATE] = ((int)SecureTransactionStage.SendingEncryptedResult).ToString();
+				// Status der Sicherheitstransaktion auf "verschlüsselte Atwortnachricht senden" einstellen
+				responseHeaders[CommonHeaderNames.SECURE_TRANSACTION_STATE] = ((int)SecureTransactionStage.SendingEncryptedResult).ToString();
 
-			// Antwortnachricht verschlüsseln
-			Stream encryptedStream = CryptoTools.GetEncryptedStream(responseStream, connectionData.CryptoProvider);
+				// Antwortnachricht verschlüsseln
+				Stream encryptedStream = CryptoTools.GetEncryptedStream(responseStream, connectionData.CryptoProvider);
 
-			// Unverschlüsselten Quell-Datenstrom schließen
-			responseStream.Close(); // close the plaintext stream now that we're done with it
+				// Unverschlüsselten Quell-Datenstrom schließen
+				responseStream.Close(); // close the plaintext stream now that we're done with it
 
-			// Verschlüsselten Datenstrom als Antwort-Datenstrom verwenden
-			responseStream = encryptedStream;
+				// Verschlüsselten Datenstrom als Antwort-Datenstrom verwenden
+				responseStream = encryptedStream;
 
-			// Verarbeitungsstatus zurückgeben
-			return processingResult;
+				// Verarbeitungsstatus zurückgeben
+				return processingResult;
+			}
+			finally
+			{
+				connectionData.EndMethodCall();
+				connectionData.UpdateTimestamp();
+			}
 		}
 
 		/// <summary>
@@ -446,7 +455,7 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 					ClientConnectionData connectionData = (ClientConnectionData)entry.Value;
 
 					// Wenn die Verbindung bereits das Zeitlimit überschritten hat (abgelaufen ist) ...
-					if (connectionData.Timestamp.AddSeconds(_connectionAgeLimit).CompareTo(DateTime.UtcNow) < 0)
+					if (connectionData.Timestamp.AddSeconds(_connectionAgeLimit).CompareTo(DateTime.UtcNow) < 0 && !connectionData.CallInProgress)
 					{
 						// Sicherheitstransaktionskennung der Verbindung zur Löschliste zufügen
 						toDelete.Add(entry.Key);
