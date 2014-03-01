@@ -4,89 +4,89 @@ using System.Security.Cryptography;
 namespace Zyan.Communication.ChannelSinks.Encryption
 {
 	/// <summary>
-	/// Namen der von Client und Server gemeinsam genutzten Transportheader.
+	/// Common transport header names.
 	/// </summary>
 	internal class CommonHeaderNames
 	{
 		/// <summary>
-		/// Eindeutige Kennung der Sicherheitstransaktion.
+		/// Unique identifier of the secure transaction.
 		/// </summary>
 		public const string SECURE_TRANSACTION_ID = "X-CY_SECURE_TRANSACTION_ID";
 
 		/// <summary>
-		/// Status der Sicherheitstransaktion.
+		/// Status of the secure transaction.
 		/// </summary>
 		public const string SECURE_TRANSACTION_STATE = "X-CY_SECURE_TRANSACTION_STATE";
 
 		/// <summary>
-		/// Öffentlicher RSA Schlüssel.
+		/// RSA public key.
 		/// </summary>
 		public const string PUBLIC_KEY = "X-CY_PUBLIC_KEY";
 
 		/// <summary>
-		/// Verschlüsselter gemeinsamer Schlüssel.
+		/// Encrypted shared key.
 		/// </summary>
 		public const string SHARED_KEY = "X-CY_SHARED_KEY";
 
 		/// <summary>
-		/// Verschlüsselter gemeinsamer Inizialisierungsvektor.
+		/// Encrypted shared initialization vector.
 		/// </summary>
 		public const string SHARED_IV = "X-CY_SHARED_IV";
 	}
 
 	/// <summary>
-	/// Aufzählung der einzelnen Verarbeitungsschritte einer Sicherheitstransaktion.
+	/// Security transaction stages.
 	/// </summary>
 	internal enum SecureTransactionStage
 	{
 		/// <summary>
-		/// Uninizialisiert, noch nichts geschehen.
+		/// Uninitialized, nothing happened yet.
 		/// </summary>
 		Uninitialized = 0,
 
 		/// <summary>
-		/// Client sendet den öffentlichen Schlüssel an den Server.
+		/// The client is sending his public key to the server.
 		/// </summary>
 		SendingPublicKey,
 
 		/// <summary>
-		/// Server sendet den verschlüsselten gemeinsamen Schlüssel zurück zum Client.
+		/// The server is sending shared key encrypted with the client's public key.
 		/// </summary>
 		SendingSharedKey,
 
 		/// <summary>
-		/// Client sendet die verschlüsselte Anfragenachricht an den Server.
+		/// The client is sending a message encrypted with the shared key.
 		/// </summary>
 		SendingEncryptedMessage,
 
 		/// <summary>
-		/// Server sendet die verschlüsselte Antwortnachricht an den Client zurück.
+		/// The server is sending an encrypted response message to the client.
 		/// </summary>
 		SendingEncryptedResult,
 
 		/// <summary>
-		/// Unbekannte Sicherheitstransaktionskennung.
+		/// Unknown secure transaction identifier.
 		/// </summary>
 		UnknownTransactionID
 	}
 
 	/// <summary>
-	/// Enthält Clientverbindungsinformation zu einer Sicherheitstransaktion.
+	/// Contains client connection information for a secure transaction.
 	/// </summary>
 	internal class ClientConnectionData : IDisposable
 	{
-		#region Deklarationen
+		#region Declarations
 
-		// Eindeutige Sicherheitstransaktionskennung des Clients
+		// Unique security transaction ID of the client
 		private Guid _secureTransactionID;
 
-		// Kryptografieanbieter für symmetrische Verschlüsselung
+		// Cryptographic algorithm for symmetric encryption
 		private SymmetricAlgorithm _cryptoProvider;
 
-		// Zeitpunkt der letzten Kommunikation
+		// The time of last communication
 		private DateTime _timestamp;
 
-		// Gibt an, ob das Objekt bereits entsorgt wurde
+		// Indicates whether the object has already been disposed of
 		private bool _disposed = false;
 
 		// When reentrancy level is greater than zero, it means that the server call is in progress
@@ -94,46 +94,41 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 
 		#endregion
 
-		#region Konstruktor und Desktruktor
+		#region Constructor and destructor
 
-		/// <summary>Erstellt eine neue Instanz von ClientConnectionData</summary>
-		/// <param name="secureTransactionID">Sicherheitstransaktionskennung</param>
-		/// <param name="cryptoProvider">Verschlüsselungsanbieter</param>
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ClientConnectionData"/> class.
+		/// </summary>
+		/// <param name="secureTransactionID">The secure transaction identifier.</param>
+		/// <param name="cryptoProvider">The cryptographic provider.</param>
 		public ClientConnectionData(Guid secureTransactionID, SymmetricAlgorithm cryptoProvider)
 		{
-			// Wenn kein Kryptografieanbieter übergeben wurde ...
 			if (cryptoProvider == null)
-				// Ausnahme werfen
 				throw new ArgumentNullException("cryptoProvider");
 
-			// Werte übernehmen
 			_secureTransactionID = secureTransactionID;
 			_cryptoProvider = cryptoProvider;
 			_timestamp = DateTime.UtcNow;
 		}
 
 		/// <summary>
-		/// Entsorgt die Verbindungsdaten.
+		/// Finalizes an instance of the <see cref="ClientConnectionData"/> class.
 		/// </summary>
 		~ClientConnectionData()
 		{
-			// Verwaltete Ressourcen freigeben
 			Dispose(false);
 		}
 
 		#endregion
 
-		#region Methoden
+		#region Methods
 
 		/// <summary>
-		/// Aktualisiert den Zeitstempel.
+		/// Updates the timestamp.
 		/// </summary>
 		public void UpdateTimestamp()
 		{
-			// Prüfen, ob das Objekt bereits entsorgt wurde
 			CheckDisposed();
-
-			// Zeitstempel aktualisieren
 			_timestamp = DateTime.UtcNow;
 		}
 
@@ -156,91 +151,77 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 		}
 
 		/// <summary>
-		/// Gibt verwaltete Ressourcen frei.
+		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
 		void IDisposable.Dispose()
 		{
-			// Ressourcen freigeben und sicherstellen, dass der Destruktor nicht aufgerufen wird
+			// Release resources and make sure that the destructor is not called
 			Dispose(true);
 		}
 
 		/// <summary>
-		/// Gibt verwaltete Ressourcen frei.
+		/// Releases unmanaged and — optionally — managed resources.
 		/// </summary>
-		/// <param name="disposing">Legt fest, ob der Destruktor nicht aufgerufen werden soll</param>
+		/// <param name="disposing">
+		/// <c>true</c> to release both managed and unmanaged resources;
+		/// <c>false</c> to release only unmanaged resources.
+		/// </param>
 		protected void Dispose(bool disposing)
 		{
-			// Wenn das Objekt nicht bereits entsorgt wurde ...
-			if (!_disposed)
+			if (disposing && !_disposed)
 			{
-				// Wenn der Kryptografieanbieter noch existiert ...
 				if (_cryptoProvider != null)
-					// Kryptografieanbieter entsorgen
 					((IDisposable)_cryptoProvider).Dispose();
 
-				// Wenn der Destruktor nicht mehr aufgerufen werden soll ...
-				if (disposing)
-					// Aufruf des Konstrukturs durch den Müllsamler unterbinden
-					GC.SuppressFinalize(this);
+				GC.SuppressFinalize(this);
 			}
 		}
 
 		/// <summary>
-		/// Wirft eine Ausnahme, wenn das Objekt bereits entsorgt wurde.
+		/// Throws an exception if the object has already been disposed of.
 		/// </summary>
 		private void CheckDisposed()
 		{
-			// Wenn das Objekt bereits entsorgt wurde ...
 			if (_disposed)
-				// Ausnahme werfen
 				throw new ObjectDisposedException("ClientConnectionData");
 		}
 
 		#endregion
 
-		#region Eigenschaften
+		#region Properties
 
 		/// <summary>
-		/// Gibt die Sicherheitstransaktionskennung zurück.
+		/// Gets the secure transaction identifier.
 		/// </summary>
 		public Guid SecureTransactionID
 		{
 			get
 			{
-				// Prüfen, ob das Objekt bereits entsorgt wurde
 				CheckDisposed();
-
-				// Sicherheitstransaktionskennung zurückgeben
 				return _secureTransactionID;
 			}
 		}
 
 		/// <summary>
-		/// Gibt den verwendeten Kryptografieanbieter für symmetrische Verschlüsselung zurück.
+		/// Gets the cryptographic provider used for symmetric encryption.
 		/// </summary>
 		public SymmetricAlgorithm CryptoProvider
 		{
 			get
 			{
-				// Prüfen, ob das Objekt bereits entsorgt wurde
 				CheckDisposed();
-
-				// Kryptografieanbieter zurückgeben
 				return _cryptoProvider;
 			}
 		}
 
 		/// <summary>
-		/// Gibt den Zeitpunkt der letzten Kommunikation zurück.
+		/// Gets the timestamp of the last communication.
 		/// </summary>
 		public DateTime Timestamp
 		{
 			get
 			{
-				// Prüfen, ob das Objekt bereits entsorgt wurde
 				CheckDisposed();
-
-				// Zeitstempel zurückgeben
 				return _timestamp;
 			}
 		}
