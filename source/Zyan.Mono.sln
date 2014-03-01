@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterLinq.UnitTests.Artefac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterLinq.UnitTests.NUnit.Mono", "Zyan.Tests.InterLinq\UnitTests\InterLinq.UnitTests.NUnit.Mono.csproj", "{37A20035-ABE1-44D1-901E-845157D85010}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Communication.Mono", "Zyan.Communication\Zyan.Communication.Mono.csproj", "{F14FF4B4-A9C6-415F-9484-444CBBDBBEA2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Communication.Mono", "Zyan.Communication\Zyan.Communication.Mono.csproj", "{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,14 +51,14 @@ Global
 		{DF5A0083-AB07-4E04-BA02-8D21ED866337}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF5A0083-AB07-4E04-BA02-8D21ED866337}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DF5A0083-AB07-4E04-BA02-8D21ED866337}.Release|x64.ActiveCfg = Release|Any CPU
-		{F14FF4B4-A9C6-415F-9484-444CBBDBBEA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F14FF4B4-A9C6-415F-9484-444CBBDBBEA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F14FF4B4-A9C6-415F-9484-444CBBDBBEA2}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{F14FF4B4-A9C6-415F-9484-444CBBDBBEA2}.Debug|x64.Build.0 = Debug|Any CPU
-		{F14FF4B4-A9C6-415F-9484-444CBBDBBEA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F14FF4B4-A9C6-415F-9484-444CBBDBBEA2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F14FF4B4-A9C6-415F-9484-444CBBDBBEA2}.Release|x64.ActiveCfg = Release|Any CPU
-		{F14FF4B4-A9C6-415F-9484-444CBBDBBEA2}.Release|x64.Build.0 = Release|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Debug|x64.Build.0 = Debug|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Release|x64.ActiveCfg = Release|Any CPU
+		{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}.Release|x64.Build.0 = Release|Any CPU
 		{F2C28EEA-A38F-4BDB-A599-29B38D5FFF66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F2C28EEA-A38F-4BDB-A599-29B38D5FFF66}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2C28EEA-A38F-4BDB-A599-29B38D5FFF66}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -74,7 +74,7 @@ Global
 		{37A20035-ABE1-44D1-901E-845157D85010} = {502B0A21-982C-48A4-81D7-6073B99194E0}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Zyan.Tests.InterLinq\Server\InterLinq.UnitTests.Server.Mono.csproj
+		StartupItem = IntegrationTest_DistributedEvents\IntegrationTest_DistributedEvents.Mono.csproj
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
 		SccNumberOfProjects = 5
