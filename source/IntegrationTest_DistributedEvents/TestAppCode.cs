@@ -294,6 +294,12 @@ namespace IntegrationTest_DistributedEvents
 				_httpCustomHost.Dispose();
 				_httpCustomHost = null;
 			}
+
+			if (_nullChannelHost != null)
+			{
+				_nullChannelHost.Dispose();
+				_nullChannelHost = null;
+			}
 		}
 	}
 }

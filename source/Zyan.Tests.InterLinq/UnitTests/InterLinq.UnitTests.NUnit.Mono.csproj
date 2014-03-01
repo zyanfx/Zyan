@@ -42,6 +42,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <NoWarn>1685</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -53,13 +54,13 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System"/>
+    <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Linq" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml" />
-    <Reference Include="nunit.framework, Version=2.4.8.0">
+    <Reference Include="nunit.framework, Version=2.4.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
       <HintPath>..\..\..\libraries\NUnit\nunit.framework.dll</HintPath>
     </Reference>
   </ItemGroup>
@@ -90,7 +91,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Zyan.Communication\Zyan.Communication.Mono.csproj">
-      <Project>{F14FF4B4-A9C6-415F-9484-444CBBDBBEA2}</Project>
+      <Project>{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}</Project>
       <Name>Zyan.Communication.Mono</Name>
     </ProjectReference>
     <ProjectReference Include="..\Artefacts\InterLinq.UnitTests.Artefacts.Mono.csproj">

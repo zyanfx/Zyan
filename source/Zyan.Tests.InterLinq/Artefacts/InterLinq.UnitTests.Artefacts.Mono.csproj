@@ -42,6 +42,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <NoWarn>1685</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -114,7 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Zyan.Communication\Zyan.Communication.Mono.csproj">
-      <Project>{F14FF4B4-A9C6-415F-9484-444CBBDBBEA2}</Project>
+      <Project>{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}</Project>
       <Name>Zyan.Communication.Mono</Name>
     </ProjectReference>
   </ItemGroup>

@@ -16,7 +16,7 @@ namespace Zyan.InterLinq.Communication.Wcf.NetDataContractSerializer
 		/// <see cref="DataContractSerializerOperationBehavior"/>
 		/// class with the specified operation.
 		/// </summary>
-		/// <param name="operationDescription">An <see cref="OperationDescription "/> that represents the operation.</param>
+		/// <param name="operationDescription">An <see cref="OperationDescription"/> that represents the operation.</param>
 		public NetDataContractSerializerOperationBehavior(OperationDescription operationDescription) :
 			base(operationDescription) { }
 
