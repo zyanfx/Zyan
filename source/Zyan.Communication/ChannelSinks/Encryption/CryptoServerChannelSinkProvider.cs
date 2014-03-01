@@ -6,29 +6,29 @@ using System.Runtime.Remoting.Channels;
 namespace Zyan.Communication.ChannelSinks.Encryption
 {
 	/// <summary>
-	/// Anbieter für die serverseitige Kanalsenke zur verschlüsselten Kommunikation.
+	/// Provides the server-side channel sink for encrypted communication.
 	/// </summary>
 	public class CryptoServerChannelSinkProvider : IServerChannelSinkProvider
 	{
-		// Nächster Senkenanbieter
+		// Next sink provider
 		private IServerChannelSinkProvider _next = null;
 
-		// Name des symmetrischen Verschlüsselungsalgorithmus, der verwendet werden soll
+		// Name of the symmetric encryption algorithm to be used
 		private string _algorithm = "3DES";
 
-		// Schalter für OAEP-Padding
+		// Switch for OAEP padding
 		private bool _oaep = false;
 
-		// Gibt an, ob clientseitig auch entsprechende Verschlüsselungs-Kanalsenken vorhanden sein müssen
+		// Specifies whether the corresponding encryption channel sink need to be present on the client side
 		private bool _requireCryptoClient = false;
 
-		// Lebenszeit einer Clientverbindung in Sekunden
+		// Lifetime of a client connection, in seconds
 		private double _connectionAgeLimit = 60.0;
 
-		// Intervall für den Aufräumvorgang alter Verbindungen in Sekunden
+		// Interval for sweeping old connections, in seconds
 		private double _sweepFrequency = 15.0;
 
-		// Client-IP Ausnahmeliste
+		// Client IP exemption list
 		private IPAddress[] _securityExemptionList = null;
 
 		/// <summary>
@@ -41,7 +41,7 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 		}
 
 		/// <summary>
-		/// Gets or sets, if OEAP padding should be activated.
+		/// Gets or sets a value indicating whether OEAP padding should be activated.
 		/// </summary>
 		public bool Oaep
 		{
@@ -50,7 +50,7 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 		}
 
 		/// <summary>
-		/// Gibt zurück, ob der zwingend auch verschlüsseln muss, oder legt dies fest.
+		/// Gets or sets a value indicating whether crypto client sink is required on the client side.
 		/// </summary>
 		public bool RequireCryptoClient
 		{
@@ -59,53 +59,50 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 		}
 
 		/// <summary>
-		/// Erzeugt eine neue Instanz von CryptoServerChannelSinkProvider.
+		/// Initializes a new instance of the <see cref="CryptoServerChannelSinkProvider"/> class.
 		/// </summary>
 		public CryptoServerChannelSinkProvider()
 		{
-			// Standardeinstellungen verwenden
 		}
 
 		/// <summary>
-		/// Erzeugt eine neue Instanz von CryptoServerChannelSinkProvider.
+		/// Initializes a new instance of the <see cref="CryptoServerChannelSinkProvider"/> class.
 		/// </summary>
-		/// <param name="properties">Konfigurationseinstellungen (z.B. aus der App.config)</param>
-		/// <param name="providerData">Optionale Anbieterdaten</param>
+		/// <param name="properties">Configuration properties (from App.config, for example).</param>
+		/// <param name="providerData">Optional provider data.</param>
 		public CryptoServerChannelSinkProvider(IDictionary properties, ICollection providerData)
 		{
-			// Alle Konfigurationseinstellungen durchlaufen
 			foreach (DictionaryEntry entry in properties)
 			{
-				// Aktuelle Konfigurationseinstellunge auswerten
 				switch ((String)entry.Key)
 				{
-					case "algorithm": // Verschlüsselungsalgorithmus
+					case "algorithm": // Symmetric encryption algorithm
 						_algorithm = (string)entry.Value;
 						break;
 
-					case "oaep": // OAEP Padding-Einstellung
+					case "oaep": // OAEP padding switch
 						_oaep = bool.Parse((string)entry.Value);
 						break;
 
-					case "connectionAgeLimit": // Maximale Lebenszeit einer Verbindung
+					case "connectionAgeLimit": // Maximal connection lifetime
 						_connectionAgeLimit = double.Parse((string)entry.Value);
 
 						if (_connectionAgeLimit < 0)
 							throw new ArgumentException(LanguageResource.ArgumentException_InvalidConnectionAgeLimitSetting, "_connectionAgeLimit");
 						break;
 
-					case "sweepFrequency":
+					case "sweepFrequency": // Inactive connection sweeping frequency
 						_sweepFrequency = double.Parse((string)entry.Value);
 
 						if (_sweepFrequency < 0)
 							throw new ArgumentException(LanguageResource.ArgumentException_InvalidSweepFrequencySetting, "_sweepFrequency");
 						break;
 
-					case "requireCryptoClient":
+					case "requireCryptoClient": // Whether the client-side encryption sink is required
 						_requireCryptoClient = bool.Parse((string)entry.Value);
 						break;
 
-					case "securityExemptionList":
+					case "securityExemptionList": // IP addresses that do not require encryption
 						string ipList = (string)entry.Value;
 						if (ipList != null && ipList != string.Empty)
 						{
@@ -115,52 +112,50 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 						}
 						break;
 
-					default: // Ansonsten ...
-						// Ausnahme werfen
+					default:
 						throw new ArgumentException(string.Format(LanguageResource.ArgumentException_InvalidConfigurationSetting, (String)entry.Key));
 				}
 			}
 		}
 
 		/// <summary>
-		/// Erzeugt eine Senkenkette.
+		/// Creates a sink chain.
 		/// </summary>
-		/// <param name="channel">Kanal, für welchen die Senkenkette erstellt werden soll</param>
-		/// <returns>Verkettete Kanalsenke, oder null, wenn keine erstellt wurde</returns>
+		/// <param name="channel">The channel for which to create the channel sink chain.</param>
+		/// <returns>
+		/// The first sink of the newly formed channel sink chain, or null, which indicates that this provider will not or cannot provide a connection for this endpoint.
+		/// </returns>
 		public IServerChannelSink CreateSink(IChannelReceiver channel)
 		{
-			// Variable für nächste Kanalsenke
 			IServerChannelSink nextSink = null;
 
-			// Wenn ein Senkenanbieter für eine weitere Kanalsenke angegeben wurde ...
+			// If next sink provider is specified, create the next channel sink
 			if (_next != null)
 			{
-				// Nächste Kanalsenke vom angegebenen Senkenanbieter erstellen lassen
 				nextSink = _next.CreateSink(channel);
 
-				// Wenn keine Kanalsenke erzeugt wurde ...
 				if (nextSink == null)
-					// null zurückgeben
 					return null;
 			}
-			// Kanalsenke erzeugen und in den Senkenkette einhängen
-			return new CryptoServerChannelSink(nextSink, _algorithm, _oaep,
-											   _connectionAgeLimit, _sweepFrequency,
-											   _requireCryptoClient, _securityExemptionList);
+
+			// Create channel sink and attach it to the current sink chain
+			return new CryptoServerChannelSink(nextSink, _algorithm, _oaep, _connectionAgeLimit,
+				_sweepFrequency, _requireCryptoClient, _securityExemptionList);
 		}
 
 		/// <summary>
-		/// Ruft Einstellungen des zu Grunde liegenden Kanals ab.
+		/// Returns the channel data for the channel that the current sink is associated with.
 		/// </summary>
-		/// <param name="channelData">Kanal-Einstellungen</param>
+		/// <param name="channelData">A <see cref="T:System.Runtime.Remoting.Channels.IChannelDataStore" /> object in which the channel data is to be returned.</param>
 		public void GetChannelData(System.Runtime.Remoting.Channels.IChannelDataStore channelData)
 		{
-			// Nichts tun, wenn keine bestimmten Kanal-Einstellungen ausgewertet werden müsen
+			// we don't use channel data
 		}
 
 		/// <summary>
-		/// Gibt den nächsten Senkenanbieter zurück, oder legt ihn fest.
+		/// Gets or sets the next sink provider in the channel sink provider chain.
 		/// </summary>
+		/// <returns>The next sink provider in the channel sink provider chain.</returns>
 		public IServerChannelSinkProvider Next
 		{
 			get { return _next; }

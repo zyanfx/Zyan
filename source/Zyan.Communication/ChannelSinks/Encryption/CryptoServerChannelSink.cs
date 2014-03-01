@@ -10,199 +10,178 @@ using System.Timers;
 namespace Zyan.Communication.ChannelSinks.Encryption
 {
 	/// <summary>
-	/// Serverseitige Kanalsenke für verschlüsselte Kommunikation.
-	/// <remarks>
-	/// Benötigt auf der Clientseite CryptoClientChannelSink als Gegenstück!
-	/// </remarks>
+	/// Server-side channel sink for encrypted communication. 
 	/// </summary>
+	/// <remarks>
+	/// Requires the client-side CryptoClientChannelSink counterpart.
+	/// </remarks>
 	internal class CryptoServerChannelSink : BaseChannelSinkWithProperties, IServerChannelSink
 	{
-		#region Deklarationen
+		#region Fields
 
-		// Name des symmetrischen Verschlüsselungsalgorithmus
+		// Symmetric encryption algorithm name
 		private readonly string _algorithm;
 
-		// Schalter für OAEP-Padding
+		// OAEP padding switch
 		private readonly bool _oaep;
 
-		// Minimale Lebensdauer einer Cient-Verbindung in Sekunden
+		// Maximal client connection lifetime, in seconds
 		private readonly double _connectionAgeLimit;
 
-		// Intervall des Aufräumvorgangs in Sekunden
+		// Client connection sweeping interval, in seconds
 		private readonly double _sweepFrequency;
 
-		// Zeitgeber für den Aufräumvorgang
+		// Connection sweeping timer
 		private System.Timers.Timer _sweepTimer = null;
 
-		// Gibt an, ob clientseitig auch entsprechende Verschlüsselungs-Kanalsenken vorhanden sein müssen
+		// Specifies whether the corresponding encryption channel sinks need to be present on the client side
 		private readonly bool _requireCryptoClient;
 
-		// Client-IP Ausnahmeliste
+		// Client IP addresses that don't require encryption
 		private IPAddress[] _securityExemptionList;
 
-		// Auflistung der aktiven Client-Verbindungen
+		// List of active client connections
 		private readonly Hashtable _connections = null;
 
-		// Nächste Kanalsenke in der Senkenkette
+		// Next sink in the sink chain
 		private readonly IServerChannelSink _next = null;
 
 		#endregion
 
-		#region Konstruktoren
+		#region Constructors
 
-		/// <summary>Erstellt eine neue Instanz von CryptoServerChannelSink.</summary>
-		/// <param name="nextSink">Nächste Kanalsenke in der Senkenkette</param>
-		/// <param name="algorithm">Name des symmetrischen Verschlüsselungsalgorithmus</param>
-		/// <param name="oaep">Gibt an, ob OAEP-Padding verwendet werden soll, oder nicht</param>
-		/// <param name="connectionAgeLimit">Lebenszeit einer Client-Verbindung in Sekunden</param>
-		/// <param name="sweeperFrequency">Intervall des Aufräumvorgangs in Sekunden</param>
-		/// <param name="requireCryptoClient">Gibt an, ob clientseitig eine Kanalsenke für verschlüsselte Kommunikation vorhanden sein muss</param>
-		/// <param name="securityExemptionList">IP-Adressen Ausnahmeliste</param>
+		/// <summary>
+		/// Initializes a new instance of the <see cref="CryptoServerChannelSink"/> class.
+		/// </summary>
+		/// <param name="nextSink">The next sink.</param>
+		/// <param name="algorithm">Symmetric encryption algorithm.</param>
+		/// <param name="oaep">if set to <c>true</c>, OAEP padding is enabled.</param>
+		/// <param name="connectionAgeLimit">Connection age limit.</param>
+		/// <param name="sweeperFrequency">Connection sweeper frequency.</param>
+		/// <param name="requireCryptoClient">if set to <c>true</c>, crypto client sink is required.</param>
+		/// <param name="securityExemptionList">Security exemption list.</param>
 		public CryptoServerChannelSink(IServerChannelSink nextSink, string algorithm, bool oaep, double connectionAgeLimit, double sweeperFrequency, bool requireCryptoClient, IPAddress[] securityExemptionList)
 		{
-			// Werte übernehmen
 			_algorithm = algorithm;
 			_oaep = oaep;
 			_connectionAgeLimit = connectionAgeLimit;
 			_sweepFrequency = sweeperFrequency;
 			_requireCryptoClient = requireCryptoClient;
 			_securityExemptionList = securityExemptionList;
-
-			// Nächste Kanalsenke übernehmen
 			_next = nextSink;
-
-			// Verbindungs-Auflistung erzeugen
 			_connections = new Hashtable(103, 0.5F);
 
-			// Aufräumvorgang einrichten
 			StartConnectionSweeper();
 		}
+
 		#endregion
 
-		#region Synchrone Verarbeitung
+		#region Synchronous processing
 
 		/// <summary>
-		/// Erzeugt den gemeinsamen Schlüssel und bereitet dessen Übertragung zum Client vor.
+		/// Creates the shared key.
 		/// </summary>
-		/// <param name="transactID">Sicherheitstransaktionskennung</param>
-		/// <param name="requestHeaders">Anfrage-Header vom Client</param>
-		/// <param name="responseMsg">Antwortnachricht</param>
-		/// <param name="responseHeaders">Antwort-Header</param>
-		/// <param name="responseStream">Antwort-Datenstrom</param>
-		/// <returns>Status</returns>		
+		/// <param name="transactID">Secure transaction identifier.</param>
+		/// <param name="requestHeaders">Request transport headers.</param>
+		/// <param name="responseMsg">The response message.</param>
+		/// <param name="responseHeaders">The response headers.</param>
+		/// <param name="responseStream">The response stream.</param>
 		private ServerProcessing MakeSharedKey(Guid transactID, ITransportHeaders requestHeaders, out IMessage responseMsg, out ITransportHeaders responseHeaders, out Stream responseStream)
 		{
-			// Gemeinsamer Schlüssel und Inizialisierungsvektor
+			// save shared symmetric encryption key and initialization vector for the current client connection
 			SymmetricAlgorithm symmetricProvider = CryptoTools.CreateSymmetricCryptoProvider(_algorithm);
-
-			// Clientverbindungsdaten erzeugen
 			ClientConnectionData connectionData = new ClientConnectionData(transactID, symmetricProvider);
 
+			// Store client data connection under the specified security transaction identifier
 			lock (_connections.SyncRoot)
 			{
-				// Clientverbindungsdaten unter der angegebenen Sicherheitstransaktionskennung speichern
 				_connections[transactID.ToString()] = connectionData;
 			}
-			// RSA Kryptografieanbieter erzeugen
-			RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider();
 
-			// Öffentlichen Schlüssel (vom Client) aus den Anfrage-Headern lesen
+			// Get client's RSA public key
 			string publicKey = (string)requestHeaders[CommonHeaderNames.PUBLIC_KEY];
-
-			// Wenn kein öffentlicher Schlüssel gefunden wurde ...
 			if (string.IsNullOrEmpty(publicKey))
 				throw new CryptoRemotingException(LanguageResource.CryptoRemotingException_PublicKeyNotFound);
 
-			// Öffentlichen Schlüssel in den Kryptografieanbieter laden
+			// Initialize RSA cryptographic provider using the client's public key
+			RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider();
 			rsaProvider.FromXmlString(publicKey);
 
-			// Gemeinsamen Schlüssel und dessen Inizialisierungsfaktor verschlüsseln
+			// Encrypt shared key for the symmetric algorithm using the client's public key
 			byte[] encryptedKey = rsaProvider.Encrypt(symmetricProvider.Key, _oaep);
 			byte[] encryptedIV = rsaProvider.Encrypt(symmetricProvider.IV, _oaep);
 
-			// Antwort-Header zusammenstellen
+			// Put the data to the response headers
 			responseHeaders = new TransportHeaders();
 			responseHeaders[CommonHeaderNames.SECURE_TRANSACTION_STATE] = ((int)SecureTransactionStage.SendingSharedKey).ToString();
 			responseHeaders[CommonHeaderNames.SHARED_KEY] = Convert.ToBase64String(encryptedKey);
 			responseHeaders[CommonHeaderNames.SHARED_IV] = Convert.ToBase64String(encryptedIV);
 
-			// Es wird keine Antwortnachricht benötigt
+			// There is no response message
 			responseMsg = null;
 			responseStream = new MemoryStream();
-
-			// Vollständige Verarbeitung zurückmelden
 			return ServerProcessing.Complete;
 		}
 
 		/// <summary>
-		/// Entschlüsselt die eingehende Nachricht vom Client.
+		/// Processes the encrypted message.
 		/// </summary>
-		/// <param name="transactID">Sicherheitstransaktionskennung</param>
-		/// <param name="sinkStack">Senkenstapel</param>
-		/// <param name="requestMsg">Anfrage-Nachricht vom Client</param>
-		/// <param name="requestHeaders">Anfrage-Header vom Cient</param>
-		/// <param name="requestStream">Anfrage-Datenstrom</param>
-		/// <param name="responseMsg">Antwort-Nachricht</param>
-		/// <param name="responseHeaders">Antwort-Header</param>
-		/// <param name="responseStream">Antwort-Datenstrom</param>
-		/// <returns>Verarbeitungsstatus</returns>
+		/// <param name="transactID">Secure transaction identifier.</param>
+		/// <param name="sinkStack">The sink stack.</param>
+		/// <param name="requestMsg">Request message.</param>
+		/// <param name="requestHeaders">Request transport headers.</param>
+		/// <param name="requestStream">Request stream.</param>
+		/// <param name="responseMsg">Response message.</param>
+		/// <param name="responseHeaders">Response transport headers.</param>
+		/// <param name="responseStream">Response stream.</param>
 		public ServerProcessing ProcessEncryptedMessage(Guid transactID, IServerChannelSinkStack sinkStack, IMessage requestMsg, ITransportHeaders requestHeaders, Stream requestStream, out IMessage responseMsg, out ITransportHeaders responseHeaders, out Stream responseStream)
 		{
-			// Variable für Client-Verbindungsinformationen
+			// Get the client connection data
 			ClientConnectionData connectionData;
-
 			lock (_connections.SyncRoot)
 			{
-				// Client-Verbindungsdaten über die angegebene Sicherheitstransaktionskennung abrufen
 				connectionData = (ClientConnectionData)_connections[transactID.ToString()];
 			}
-			// Wenn keine Verbindungsdaten zu dieser Sicherheitstransaktionskennung gefunden wurden ...
+
 			if (connectionData == null)
-				// Ausnahme werfen
 				throw new CryptoRemotingException(LanguageResource.CryptoRemotingException_ClientConnectionInfoMissing);
 
-			// Zeitstempel aktualisieren
+			// Update the timestamp and indicate that method call is in progress
 			connectionData.UpdateTimestamp();
 			connectionData.BeginMethodCall();
 
 			try
 			{
-				// Datenstrom entschlüsseln
+				// Decrypt the data stream
 				Stream decryptedStream = CryptoTools.GetDecryptedStream(requestStream, connectionData.CryptoProvider);
-
-				// Verschlüsselten-Quelldatenstrom schließen
 				requestStream.Close();
 
-				// Entschlüsselte Nachricht zur Weiterverarbeitung an die nächste Kanalsenke weitergeben
+				// Pass decrypted message for further processing to the next channel sink
 				ServerProcessing processingResult = _next.ProcessMessage(sinkStack, requestMsg, requestHeaders, decryptedStream, out responseMsg, out responseHeaders, out responseStream);
 
-				// Status der Sicherheitstransaktion auf "verschlüsselte Atwortnachricht senden" einstellen
+				// Update secure transaction state
 				responseHeaders[CommonHeaderNames.SECURE_TRANSACTION_STATE] = ((int)SecureTransactionStage.SendingEncryptedResult).ToString();
 
-				// Antwortnachricht verschlüsseln
+				// Encrypt the response stream and close the original response stream now that we're done with it
 				Stream encryptedStream = CryptoTools.GetEncryptedStream(responseStream, connectionData.CryptoProvider);
+				responseStream.Close(); // 
 
-				// Unverschlüsselten Quell-Datenstrom schließen
-				responseStream.Close(); // close the plaintext stream now that we're done with it
-
-				// Verschlüsselten Datenstrom als Antwort-Datenstrom verwenden
+				// Use encrypted data stream as a response stream
 				responseStream = encryptedStream;
-
-				// Verarbeitungsstatus zurückgeben
 				return processingResult;
 			}
 			finally
 			{
+				// Method call is finished, so the connection data can be swept
 				connectionData.EndMethodCall();
 				connectionData.UpdateTimestamp();
 			}
 		}
 
 		/// <summary>
-		/// Prüft, ob eine bestimmte Sicherheitstransaktionskennung bereits bekannt ist.
+		/// Determines whether the specified security transaction exists.
 		/// </summary>
-		/// <param name="transactID">Sicherheitstransaktionskennung</param>
-		/// <returns>Wahr, wenn die Sicherheitstransaktion bekannt ist, ansonsten Falsch</returns>
+		/// <param name="transactID">Secure transaction identifier.</param>
 		private bool IsExistingSecurityTransaction(Guid transactID)
 		{
 			lock (_connections.SyncRoot)
@@ -212,17 +191,17 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 		}
 
 		/// <summary>
-		/// Erzeugt eine leere Antwortnachricht.
+		/// Creates an empty response message.
 		/// </summary>
-		/// <param name="sinkStack">Aufrufstapel der Kanalsenken</param>
-		/// <param name="requestMsg">Anfrage-nachricht</param>
-		/// <param name="requestHeaders">Anfrage-Header</param>
-		/// <param name="requestStream">Anfrage-Datenstrom</param>
-		/// <param name="transactionStage">Art des aktuellen Transaktionsschritts</param>
-		/// <param name="responseMsg">Antwort-Nachricht</param>
-		/// <param name="responseHeaders">Antwort-Header</param>
-		/// <param name="responseStream">Antwort-Datenstrom</param>
-		/// <returns>Verarbeitungsstatus</returns>
+		/// <param name="sinkStack">The sink stack.</param>
+		/// <param name="requestMsg">Request message.</param>
+		/// <param name="requestHeaders">Request transport headers.</param>
+		/// <param name="requestStream">Request stream.</param>
+		/// <param name="transactionStage">Current secure transaction stage.</param>
+		/// <param name="responseMsg">Response message.</param>
+		/// <param name="responseHeaders">Response transport headers.</param>
+		/// <param name="responseStream">Response stream.</param>
+		/// <returns></returns>
 		private ServerProcessing SendEmptyToClient(IServerChannelSinkStack sinkStack, IMessage requestMsg, ITransportHeaders requestHeaders, Stream requestStream, SecureTransactionStage transactionStage, out IMessage responseMsg, out ITransportHeaders responseHeaders, out Stream responseStream)
 		{
 			responseMsg = null;
@@ -237,64 +216,53 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 		}
 
 		/// <summary>
-		/// Verarbeitet eine einzele Clientanfrage
+		/// Requests message processing from the current sink.
 		/// </summary>
-		/// <param name="sinkStack">Aufrufstapel der Kanalsenken</param>
-		/// <param name="requestMsg">Anfrage-nachricht</param>
-		/// <param name="requestHeaders">Anfrage-Header</param>
-		/// <param name="requestStream">Anfrage-Datenstrom</param>
-		/// <param name="responseMsg">Antwort-Nachricht</param>
-		/// <param name="responseHeaders">Antwort-Header</param>
-		/// <param name="responseStream">Antwort-Datenstrom</param>
-		/// <returns>Status serverseitigen Verarbeitung der Nachricht insgesamt</returns>
+		/// <param name="sinkStack">A stack of channel sinks that called the current sink.</param>
+		/// <param name="requestMsg">The message that contains the request.</param>
+		/// <param name="requestHeaders">Headers retrieved from the incoming message from the client.</param>
+		/// <param name="requestStream">The stream that needs to be to processed and passed on to the deserialization sink.</param>
+		/// <param name="responseMsg">When this method returns, contains a <see cref="T:System.Runtime.Remoting.Messaging.IMessage" /> that holds the response message. This parameter is passed uninitialized.</param>
+		/// <param name="responseHeaders">When this method returns, contains a <see cref="T:System.Runtime.Remoting.Channels.ITransportHeaders" /> that holds the headers that are to be added to return message heading to the client. This parameter is passed uninitialized.</param>
+		/// <param name="responseStream">When this method returns, contains a <see cref="T:System.IO.Stream" /> that is heading back to the transport sink. This parameter is passed uninitialized.</param>
 		public ServerProcessing ProcessMessage(IServerChannelSinkStack sinkStack, IMessage requestMsg, ITransportHeaders requestHeaders, Stream requestStream, out IMessage responseMsg, out ITransportHeaders responseHeaders, out Stream responseStream)
 		{
-			// Sicherheitstransaktionskennung aus Anfrage-Header lesen
+			// Read secure transaction identifier from request headers
 			string strTransactID = (string)requestHeaders[CommonHeaderNames.SECURE_TRANSACTION_ID];
-
-			// In Guid umwandeln
 			Guid transactID = (strTransactID == null ? Guid.Empty : new Guid(strTransactID));
 
-			// Aktuellen Transaktionsschritt aus Anfrage-Header lesen
+			// Read current transaction step and client IP address from request headers
 			SecureTransactionStage transactionStage = (SecureTransactionStage)Convert.ToInt32((string)requestHeaders[CommonHeaderNames.SECURE_TRANSACTION_STATE]);
-
-			// IP-Adresse des Clients aus Anfrage-Header lesen
 			IPAddress clientAddress = requestHeaders[CommonTransportKeys.IPAddress] as IPAddress;
 
-			// Aktuelle Kanalsenke auf den Senkenstapel legen, damit AsyncProcessResponse später ggf. asynchron aufgerufen werden kann
+			// Put current channel sink to the sink stack so AsyncProcessResponse can be called asynchronously if necessary order
 			sinkStack.Push(this, null);
-
-			// Variable für Verarbeitungsstatus
 			ServerProcessing processingResult;
 
 			try
 			{
-				// Aktuellen Transaktionsschritt auswerten
 				switch (transactionStage)
 				{
-					case SecureTransactionStage.SendingPublicKey: // Client sendet den öffentlichen Schlüssel an den Server
+					case SecureTransactionStage.SendingPublicKey: // Client sends the public key to the server
 
-						// Gemeinsamen Schlüssel erzeugen und mit dem öffentlichen Schlüssel des Clients verschlüsseln
+						// Generate shared key and encrypt with the public key of the client
 						processingResult = MakeSharedKey(transactID, requestHeaders, out responseMsg, out responseHeaders, out responseStream);
 
 						break;
 
-					case SecureTransactionStage.SendingEncryptedMessage: // Client sendet die verschlüsselte Anfragenachricht an den Server
+					case SecureTransactionStage.SendingEncryptedMessage: // Client sends the encrypted request message to the server
 
-						// Wenn die Sicherheitstransaktionskennung des Clients bekannt ist ...
 						if (IsExistingSecurityTransaction(transactID))
-							// Verschlüsselte Nachricht verarbeiten
 							processingResult = ProcessEncryptedMessage(transactID, sinkStack, requestMsg, requestHeaders, requestStream, out responseMsg, out responseHeaders, out responseStream);
 						else
 							throw new CryptoRemotingException(string.Format(LanguageResource.CryptoRemotingException_InvalidClientRequest, SecureTransactionStage.UnknownTransactionID));
 
 						break;
 
-					case SecureTransactionStage.Uninitialized: // Uninizialisiert, noch nichts geschehen
+					case SecureTransactionStage.Uninitialized: // Uninitialized, nothing has happened
 
-						// Wenn für diesen Client Verschlüsselung nicht zwingend notwendig ist ...
+						// Check if encryption is not required for this client address
 						if (!RequireEncryption(clientAddress))
-							// Nachricht gleich an die nächste Senke zur Weiterverarbeitung übergeben
 							processingResult = _next.ProcessMessage(sinkStack, requestMsg, requestHeaders, requestStream, out responseMsg, out responseHeaders, out responseStream);
 						else
 							throw new CryptoRemotingException(LanguageResource.CryptoRemotingException_ServerRequiresEncryption);
@@ -308,23 +276,13 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 			}
 			catch (CryptoRemotingException)
 			{
-				processingResult = SendEmptyToClient
-									(
-										sinkStack,
-										requestMsg,
-										requestHeaders,
-										requestStream,
-										transactionStage,
-										out responseMsg,
-										out responseHeaders,
-										out responseStream
-									);
+				processingResult = SendEmptyToClient(sinkStack, requestMsg, requestHeaders, requestStream,
+					transactionStage, out responseMsg, out responseHeaders, out responseStream);
 				requestMsg = null;
 			}
-			// Aktuelle Senke wieder vom Senkenstapel runternehmen
-			sinkStack.Pop(this);
 
-			// Veratbeitungsstatus zurückgeben
+			// Pop the current sink from the sink stack
+			sinkStack.Pop(this);
 			return processingResult;
 		}
 
@@ -344,130 +302,108 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 		}
 
 		/// <summary>
-		/// Prüft, ob für die Kommunikation mit einem bestimmten Client zwingend Verschlüsselung erforderlich ist, oder nicht.
+		/// Checks whether the given IP address requires the encryption.
 		/// </summary>
-		/// <param name="clientAddress">IP-Adresse des Clients</param>
-		/// <returns>Wahr, wenn Verschlüsselung erforderlich ist, ansonsten Falsch</returns>
+		/// <param name="clientAddress">The client address.</param>
 		private bool RequireEncryption(IPAddress clientAddress)
 		{
-			// Wenn keine Ausnahmen definiert sind ...
 			if (clientAddress == null || _securityExemptionList == null || _securityExemptionList.Length == 0)
-				// Standardvorgabe zurückgeben
 				return _requireCryptoClient;
 
-			// Gefunden-Schalter
 			bool found = false;
 
-			// Alle IP-Adrssen der Ausnahmeliste durchgehen
 			foreach (IPAddress address in _securityExemptionList)
 			{
-				// Wenn die aktuelle Adresse gefunden wurde ...
 				if (clientAddress.Equals(address))
 				{
-					// Gefunden-Schalter setzen
 					found = true;
-
-					// Schleife abbrechen
 					break;
 				}
 			}
-			// Prüfergebnis bestimmen und zurückgeben
+
 			return found ? !_requireCryptoClient : _requireCryptoClient;
 		}
 
 		/// <summary>
-		/// Gibt die nächste Kanalsenke in der Aufrufkette zurück.
+		/// Gets the next server channel sink in the server sink chain.
 		/// </summary>
+		/// <returns>The next server channel sink in the server sink chain.</returns>
 		public IServerChannelSink NextChannelSink
 		{
 			get { return _next; }
 		}
 
 		/// <summary>
-		/// Gibt den Antwort-Datenstrom zurück.
+		/// Returns the <see cref="T:System.IO.Stream" /> onto which the provided response message is to be serialized.
 		/// </summary>
-		/// <param name="sinkStack">Senkenstapel</param>
-		/// <param name="state">Optionale Statusinformationen</param>
-		/// <param name="msg">Remoting-Nachricht</param>
-		/// <param name="headers">Header-Informationen</param>
-		/// <returns>Antwort-Datenstrom</returns>
+		/// <param name="sinkStack">A stack of sinks leading back to the server transport sink.</param>
+		/// <param name="state">The state that has been pushed to the stack by this sink.</param>
+		/// <param name="msg">The response message to serialize.</param>
+		/// <param name="headers">The headers to put in the response stream to the client.</param>
 		public Stream GetResponseStream(IServerResponseChannelSinkStack sinkStack, object state, IMessage msg, ITransportHeaders headers)
 		{
-			// Immer null zurückgeben
 			return null;
 		}
 
 		#endregion
 
-		#region Asynchrone Verarbeitung
+		#region Asynchronous processing
 
 		/// <summary>
-		/// Fordert die Verarbeitung der Antwortnachricht von dieser Senke an, wenn die Anfragenachricht asynchron verarbeitet wurde.
+		/// Requests processing from the current sink of the response from a method call sent asynchronously.
 		/// </summary>
-		/// <param name="sinkStack">Senkenstapel</param>
-		/// <param name="state">Zustand</param>
-		/// <param name="msg">antwort-Nachricht</param>
-		/// <param name="headers">Antwort-Header</param>
-		/// <param name="stream">Antwort-Datenstrom</param>
+		/// <param name="sinkStack">A stack of sinks leading back to the server transport sink.</param>
+		/// <param name="state">Information generated on the request side that is associated with this sink.</param>
+		/// <param name="msg">The response message.</param>
+		/// <param name="headers">The headers to add to the return message heading to the client.</param>
+		/// <param name="stream">The stream heading back to the transport sink.</param>
 		public void AsyncProcessResponse(IServerResponseChannelSinkStack sinkStack, object state, IMessage msg, ITransportHeaders headers, Stream stream)
 		{
-			// Antwortnachtenverarbeitung der verbleibenden Senken im Stapel aufrufen
 			sinkStack.AsyncProcessResponse(msg, headers, stream);
 		}
 
 		#endregion
 
-		#region Aufräumvorgang für Verbindungsinformationen
+		#region Inactive connection sweeper
 
 		/// <summary>
-		/// Startet den Zeitgeber für den Aufräumvorgang.
+		/// Starts the connection sweeper.
 		/// </summary>
 		private void StartConnectionSweeper()
 		{
-			// Wenn noch kein Zeitgeber eingerichtet wurde ...
 			if (_sweepTimer == null)
 			{
-				// Neuen Zeitgeber erzeugen und Intervall laut Konfiguration einstellen
 				_sweepTimer = new System.Timers.Timer(_sweepFrequency * 1000);
-
-				// Ereignis bei Zeitgeberintervall abonnieren
 				_sweepTimer.Elapsed += new ElapsedEventHandler(SweepConnections);
-
-				// Zeitgeber starten
 				_sweepTimer.Start();
 			}
 		}
 
 		/// <summary>
-		/// Räumt abgelaufende Client-Verbindungen weg.
+		/// Sweeps the connections.
 		/// </summary>
+		/// <param name="sender">The sender.</param>
+		/// <param name="e">The <see cref="ElapsedEventArgs"/> instance containing the event data.</param>
 		private void SweepConnections(object sender, ElapsedEventArgs e)
 		{
 			lock (_connections.SyncRoot)
 			{
-				// Liste für Löschungen erzeugen
+				// Connections to be swept
 				ArrayList toDelete = new ArrayList(_connections.Count);
 
-				// Alle Verbindungen durchlaufen
 				foreach (DictionaryEntry entry in _connections)
 				{
-					// Daten der aktuell durchlaufenen Verbindung abrufen
 					ClientConnectionData connectionData = (ClientConnectionData)entry.Value;
 
-					// Wenn die Verbindung bereits das Zeitlimit überschritten hat (abgelaufen ist) ...
 					if (connectionData.Timestamp.AddSeconds(_connectionAgeLimit).CompareTo(DateTime.UtcNow) < 0 && !connectionData.CallInProgress)
 					{
-						// Sicherheitstransaktionskennung der Verbindung zur Löschliste zufügen
 						toDelete.Add(entry.Key);
-
-						// Verbindung entsorgen
 						((IDisposable)connectionData).Dispose();
 					}
 				}
-				// Löschliste durchlaufen
+
 				foreach (Object obj in toDelete)
 				{
-					// Verbindung löschen
 					_connections.Remove(obj);
 				}
 			}
