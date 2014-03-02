@@ -5,20 +5,20 @@ using System.Runtime.Remoting.Channels;
 namespace Zyan.Communication.ChannelSinks.Encryption
 {
 	/// <summary>
-	/// Anbieter der clientseitigen Kanalsenke für verschlüsselte Übertragung.
+	/// Provider of client-side channel sink for encrypted transmission.
 	/// </summary>
 	public class CryptoClientChannelSinkProvider : IClientChannelSinkProvider
 	{
-		// Nächster Senkenanbieter
+		// Next sink provider
 		private IClientChannelSinkProvider _next = null;
 
-		// Name des symmetrischen Verschlüsselungsalgorithmus, der verwendet werden soll
+		// Name of the symmetrical encryption algorithm
 		private string _algorithm = "3DES";
 
-		// Schalter für OAEP-Padding
+		// OAEP padding switch
 		private bool _oaep = false;
 
-		// Anzahl der Versuche
+		// Number of attempts
 		private int _maxAttempts = 2;
 
 		/// <summary>
@@ -31,7 +31,7 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 		}
 
 		/// <summary>
-		/// Gets or sets, if OEAP padding should be activated.
+		/// Gets or sets a value indicating whether OEAP padding should be activated.
 		/// </summary>
 		public bool Oaep
 		{
@@ -49,83 +49,76 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 		}
 
 		/// <summary>
-		/// Erzeugt eine neue Instanz von CryptoClientChannelSinkProvider.
+		/// Initializes a new instance of the <see cref="CryptoClientChannelSinkProvider"/> class.
 		/// </summary>
 		public CryptoClientChannelSinkProvider()
 		{
-			// Standardeinstellungen verwenden
+			// Use default settings
 		}
 
 		/// <summary>
-		/// Erzeugt eine neue Instanz von CryptoClientChannelSinkProvider.
+		/// Initializes a new instance of the <see cref="CryptoClientChannelSinkProvider"/> class.
 		/// </summary>
-		/// <param name="properties">Konfigurationseinstellungen (z.B. aus der App.config)</param>
-		/// <param name="providerData">Optionale Anbieterdaten</param>
+		/// <param name="properties">Configuration settings (taken, for example, from App.config).</param>
+		/// <param name="providerData">Optional provider data.</param>
 		public CryptoClientChannelSinkProvider(IDictionary properties, ICollection providerData)
 		{
-			// Alle Konfigurationseinstellungen durchlaufen
 			foreach (DictionaryEntry entry in properties)
 			{
-				// Aktuelle Konfigurationseinstellunge auswerten
 				switch ((String)entry.Key)
 				{
-					case "algorithm": // Verschlüsselungsalgorithmus
+					case "algorithm": // Encryption algorithm name
 						_algorithm = (string)entry.Value;
 						break;
 
-					case "oaep": // OAEP Padding-Einstellung
+					case "oaep": // OAEP padding switch
 						_oaep = bool.Parse((string)entry.Value);
 						break;
 
-					case "maxRetries": // Anzahl der Wiederholungsversuche 
+					case "maxRetries": // Number of attempts
 						_maxAttempts = Convert.ToInt32((string)entry.Value);
 
-						// Wenn die angegebene Anzahl kleiner 1 ist ...
 						if (_maxAttempts < 1)
-							// Ausnahme werfen
 							throw new ArgumentException(LanguageResource.ArgumentException_MaxAttempts, "maxAttempts");
 
-						// Um eins hochzäjlen, da der erste Versuch auch gezählt wird
+						// Increase by one because the first attempt also counts
 						_maxAttempts++;
 						break;
 
-					default: // Ansonsten ...
-						// Ausnahme werfen
+					default:
 						throw new ArgumentException(string.Format(LanguageResource.ArgumentException_InvalidConfigSetting, (String)entry.Key));
 				}
 			}
 		}
 
 		/// <summary>
-		/// Erzeugt eine Senkenkette.
+		/// Creates a sink chain.
 		/// </summary>
-		/// <param name="channel">Kanal, welcher den aktuellen Senkenanbieter erzeugt hat</param>
-		/// <param name="url">URL des entfernten Objekts</param>
-		/// <param name="remoteChannelData">Beschreibung des Serverkanals</param>
-		/// <returns>Verkettete Kanalsenke, oder null, wenn keine erstellt wurde</returns>
+		/// <param name="channel">Channel for which the current sink chain is being constructed.</param>
+		/// <param name="url">The URL of the object to connect to. This parameter can be null if the connection is based entirely on the information contained in the <paramref name="remoteChannelData" /> parameter.</param>
+		/// <param name="remoteChannelData">A channel data object that describes a channel on the remote server.</param>
+		/// <returns>
+		/// The first sink of the newly formed channel sink chain, or null, which indicates that this provider will not or cannot provide a connection for this endpoint.
+		/// </returns>
 		public IClientChannelSink CreateSink(IChannelSender channel, string url, object remoteChannelData)
 		{
-			// Variable für nächste Kanalsenke
 			IClientChannelSink nextSink = null;
 
-			// Wenn ein Senkenanbieter für eine weitere Kanalsenke angegeben wurde ...
 			if (_next != null)
 			{
-				// Nächste Kanalsenke vom angegebenen Senkenanbieter erstellen lassen
 				nextSink = _next.CreateSink(channel, url, remoteChannelData);
 
-				// Wenn keine Kanalsenke erzeugt wurde ...
 				if (nextSink == null)
-					// null zurückgeben
 					return null;
 			}
-			// Kanalsenke erzeugen und in den Senkenkette einhängen
+
 			return new CryptoClientChannelSink(nextSink, _algorithm, _oaep, _maxAttempts);
 		}
 
 		/// <summary>
-		/// Gibt den nächsten Senkenanbieter zurück, oder legt ihn fest.
+		/// Gets or sets the next sink provider in the channel sink provider chain.
 		/// </summary>
+		/// <returns>The next sink provider in the channel sink provider chain.</returns>
 		public IClientChannelSinkProvider Next
 		{
 			get { return _next; }
