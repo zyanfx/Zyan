@@ -7,304 +7,290 @@ using System.Security.Cryptography;
 namespace Zyan.Communication.ChannelSinks.Encryption
 {
 	/// <summary>
-	/// Clientseitige Kanalsenke für verschlüsselte Kommunikation.
-	/// <remarks>
-	/// Benötigt auf der Serverseite CryptoServerChannelSink als Gegenstück!
-	/// </remarks>
+	/// Client-side channel sink for the encrypted communication.
 	/// </summary>
+	/// <remarks>
+	/// Requires a <see cref="CryptoServerChannelSink"/> on the server side.
+	/// </remarks>
 	internal class CryptoClientChannelSink : BaseChannelSinkWithProperties, IClientChannelSink
 	{
-		#region Deklarationen
+		#region Fields
 
-		// Name des symmetrischen Verschlüsselungsalgorithmus
+		// Symmetric encryption algorithm name
 		private readonly string _algorithm;
 
-		// Schalter für OAEP-Padding
+		// OAEP padding switch
 		private readonly bool _oaep;
 
-		// Maximale Anzahl der Verarbeitungsversuche
+		// Maximal number of attempts
 		private readonly int _maxAttempts;
 
-		// Nächste Kanalsenke
+		// Next channel sink
 		private readonly IClientChannelSink _next;
 
-		// Eindeutige Kennung der Sicherheitstransaktion
+		// Unique identifier of the secure transaction
 		private Guid _secureTransactionID = Guid.Empty;
 
-		// Symmetrischer Verschlüsselungsanbieter
+		// Symmetric encryption algorithm
 		private volatile SymmetricAlgorithm _provider = null;
 
-		// Anbieter für asymmetrische Verschlüsselung
+		// Asymmetric encryption algorithm used for symmetric key exchange
 		private volatile RSACryptoServiceProvider _rsaProvider = null;
 
-		// Sperr-Objekt (für Thread-Synchronisierung)
+		// Locking object for thread synchronization
 		private readonly object _lockObject = null;
 
-		// Standard-Ausnahmetext
-		private const string DEFAULT_EXCEPTION_TEXT = "Die clientseitige Kanalsenke konnte keine verschlüsselte Verbindung zum Server herstellen.";
+		// Default exception text
+		private const string DEFAULT_EXCEPTION_TEXT = "The client-side channel sink could not establish encrypted connection to the server.";
 
 		#endregion
 
-		#region Konstruktoren
+		#region Constructors
 
-		/// <summary>Erstellt eine neue Instanz von CryptoClientChannelSink</summary>
-		/// <param name="nextSink">Nächste Kanalsenke in der Senkenkette</param>
-		/// <param name="algorithm">Name des symmetrischen Verschlüsselungsalgorithmus</param>
-		/// <param name="oaep">Gibt an, ob OAEP-Padding verwendet werden soll, oder nicht</param>
-		/// <param name="maxAttempts">Maximale Anzahl der Verarbeitungsversuche</param>
+		/// <summary>
+		/// Initializes a new instance of the <see cref="CryptoClientChannelSink"/> class.
+		/// </summary>
+		/// <param name="nextSink">The next channel sink.</param>
+		/// <param name="algorithm">Symmetric encryption algorithm na,e.</param>
+		/// <param name="oaep">OAEP padding switch.</param>
+		/// <param name="maxAttempts">The maximum number of attempts.</param>
 		public CryptoClientChannelSink(IClientChannelSink nextSink, string algorithm, bool oaep, int maxAttempts)
 		{
-			// Werte übernehmen
 			_algorithm = algorithm;
 			_oaep = oaep;
 			_next = nextSink;
 			_maxAttempts = maxAttempts;
-
-			// Sperrobjekt erzeugen
 			_lockObject = new object();
 
-			// Asymmetrischen Verschlüsselungsanbieter erzeugen
+			// Initialize asymmetric encryption algorithm
 			_rsaProvider = new RSACryptoServiceProvider();
 		}
 
 		#endregion
 
-		#region Synchrone Verarbeitung
+		#region Synchronous processing
 
-		/// <summary>Startet eine neue Sicherheitstransaktion</summary>
-		/// <param name="msg">Remoting-Nachricht</param>
-		/// <param name="requestHeaders">Anfrage-Header-Auflistung</param>
-		/// <returns>Eindeutige Kennung der Sicherheitstransaktion</returns>		
+		/// <summary>
+		/// Starts a new secure transaction.
+		/// </summary>
+		/// <param name="msg">The message.</param>
+		/// <param name="requestHeaders">Request transport headers.</param>
+		/// <returns>New transaction unique identifier.</returns>
 		private Guid StartSecureTransaction(IMessage msg, ITransportHeaders requestHeaders)
 		{
-			// Wenn noch keine kein Sicherheitstransaktion läuft ...
 			if (_provider == null || _secureTransactionID.Equals(Guid.Empty))
 			{
-				// Neue eindeutige Kennung generieren
 				_secureTransactionID = Guid.NewGuid();
-
-				// Gemeinsamen Schlüssel vom Server anfordern
 				_provider = ObtainSharedKey(msg);
 			}
+
 			return _secureTransactionID;
 		}
 
 		/// <summary>
-		/// Fordert einen gemeinsamen Schlüssel vom Server an.
+		/// Requests the shared key for symmetrical encryption algorithm from the server.
 		/// </summary>
-		/// <param name="msg">Original-Remoting-Nachricht</param>
-		/// <returns>Verschlüsselungsanbieter</returns>
+		/// <param name="msg">The message.</param>
 		private SymmetricAlgorithm ObtainSharedKey(IMessage msg)
 		{
-			// Anfrage-Transport-Header-Auflistung erzeugen
 			TransportHeaders requestHeaders = new TransportHeaders();
-
-			// Anfrage-Datenstrom erzeugen
 			MemoryStream requestStream = new MemoryStream();
-
-			// Variable für Antwort-Header-Auflistung
 			ITransportHeaders responseHeaders;
-
-			// Variable für Antwort-Datenstrom
 			Stream responseStream;
 
-			// Anfrage nach Gemeinsamen Schlüssel erzeugen
+			// Generate a request for the shared key
 			CreateSharedKeyRequest(requestHeaders);
 
-			// Anforderungsnachricht für gemeinsamen Schlüssel über die Senkenkette versenden
+			// Send the request to the next sink to communicate with the CryptoServerChannelSink across the wire
 			_next.ProcessMessage(msg, requestHeaders, requestStream, out responseHeaders, out responseStream);
 
-			// Antwort vom Server verarbeiten
+			// Process server's response
 			return ProcessSharedKeyResponse(responseHeaders);
 		}
 
 		/// <summary>
-		/// Löscht den gemeinsamen Schlüssel und die eindeutige Sicherheitstransaktionskennung.
-		/// </summary>		
+		/// Clears the shared key and starts a new secure transaction.
+		/// </summary>
 		private void ClearSharedKey()
 		{
-			// Verschlüsselungsanbieter zurücksetzen
 			_provider = null;
-
-			// Eindeutige Sicherheitstransaktionskennung zurücksetzen
 			_secureTransactionID = Guid.Empty;
 		}
 
-		/// <summary>Erzeugt eine Anfrage nach einem gemeinsamen Schlüssel</summary>
-		/// <param name="requestHeaders">Transport-Header-Auflistung</param>
+		/// <summary>
+		/// Creates the shared key request.
+		/// </summary>
+		/// <param name="requestHeaders">Request transport headers.</param>
 		private void CreateSharedKeyRequest(ITransportHeaders requestHeaders)
 		{
-			// Gemeinsamen RSA-Schlüssel erzeugen
+			// Get the public RSA key for encryption
 			string rsaKey = _rsaProvider.ToXmlString(false);
 
-			// Gemeinsamen Schlüssel und Zusatzinformationen über die aktuelle Sicherheitstransaktion der Transport-Header-Auflistung zufügen
+			// Pass the public key and secure transaction identifier to the server
 			requestHeaders[CommonHeaderNames.SECURE_TRANSACTION_STATE] = ((int)SecureTransactionStage.SendingPublicKey).ToString();
 			requestHeaders[CommonHeaderNames.SECURE_TRANSACTION_ID] = _secureTransactionID.ToString();
 			requestHeaders[CommonHeaderNames.PUBLIC_KEY] = rsaKey;
 		}
 
-		/// <summary>Entschlüsselt den eingehenden Antwort-Datenstrom</summary>
-		/// <param name="responseStream">Antwort-Datenstrom</param>
-		/// <param name="responseHeaders">Antwort-Transportheader</param>
-		/// <returns>Entschlüsselter Datenstrom (oder null, wenn die Verschlüsselung fehlgeschlagen ist)</returns>
+		/// <summary>
+		/// Decrypts the incoming response stream.
+		/// </summary>
+		/// <param name="responseStream">The response stream.</param>
+		/// <param name="responseHeaders">The response headers.</param>
 		private Stream DecryptResponse(Stream responseStream, ITransportHeaders responseHeaders)
 		{
 			try
 			{
-				// Wenn laut Header verschlüsselte Daten vom Server zurückgesendet wurden ...
 				if (responseHeaders != null && (SecureTransactionStage)Convert.ToInt32((string)responseHeaders[CommonHeaderNames.SECURE_TRANSACTION_STATE]) == SecureTransactionStage.SendingEncryptedResult)
 				{
-					// Antwort-Datenstrom entschlüsseln
+					// Decrypt the response stream and close it as we won't be using it anymore
 					Stream decryptedStream = CryptoTools.GetDecryptedStream(responseStream, _provider);
-					responseStream.Close(); // close the old stream as we won't be using it anymore
-
-					// Entschlüsselten Datenstrom zurückgeben
+					responseStream.Close();
 					return decryptedStream;
 				}
 			}
 			catch { }
 
-			// Nichts zurückgeben
+			// Failed to decrypt server's response
 			return null;
 		}
 
-		/// <summary>Verarbeitet die Antwort der Servers einer Anfrage nach einen Gemeinsamen Schlüssel</summary>
-		/// <param name="responseHeaders">Transport-Header-Auflistung</param>
-		/// <returns>Verschlüsselungsanbieter</returns>
+		/// <summary>
+		/// Processes the shared key response.
+		/// </summary>
+		/// <param name="responseHeaders">Response transport headers.</param>
 		private SymmetricAlgorithm ProcessSharedKeyResponse(ITransportHeaders responseHeaders)
 		{
-			// Gemeinsamen Schlüssel und Inizialisierungsvektor asu den Antwort-Headern lesen
+			// Get the encrypted key and initialization vector from the transport headers sent by the server
 			string encryptedKey = (string)responseHeaders[CommonHeaderNames.SHARED_KEY];
 			string encryptedIV = (string)responseHeaders[CommonHeaderNames.SHARED_IV];
 
-			// Wenn kein gemeinsamer Schlüssel übermittelt wurde ...
 			if (encryptedKey == null || encryptedKey == string.Empty)
-				// Ausnahme werfen
 				throw new CryptoRemotingException(LanguageResource.CryptoRemotingException_KeyChanged);
 
-			// Wenn kein Inizialisierungsvektor übermittelt wurde ...
 			if (encryptedIV == null || encryptedIV == string.Empty)
-				// Ausnahme werfen
 				throw new CryptoRemotingException(LanguageResource.CryptoRemotingException_IVMissing);
 
-			// Gemeinsamen Schlüssel und Inizialisierungsvektor entschlüsseln
+			// Create symmetric algorithm and set shared key and initialization vector
 			SymmetricAlgorithm sharedProvider = CryptoTools.CreateSymmetricCryptoProvider(_algorithm);
 			sharedProvider.Key = _rsaProvider.Decrypt(Convert.FromBase64String(encryptedKey), _oaep);
 			sharedProvider.IV = _rsaProvider.Decrypt(Convert.FromBase64String(encryptedIV), _oaep);
 
-			// Verschlüsselungsanbieter zurückgeben
+			// Return the encryption provider
 			return sharedProvider;
 		}
 
-		/// <summary>Verschlüsselt eine bestimmte Remoting-Nachricht</summary>
-		/// <param name="requestHeaders">Anfrage-Transport-Header-Auflistung</param>
-		/// <param name="requestStream">Anfrage-Datenstrom</param>
-		/// <returns>Verschlüsselter Datenstrom</returns>
+		/// <summary>
+		/// Encrypts the message.
+		/// </summary>
+		/// <param name="requestHeaders">Request transport headers.</param>
+		/// <param name="requestStream">Request stream.</param>
 		private Stream EncryptMessage(ITransportHeaders requestHeaders, Stream requestStream)
 		{
-			// Nachricht verschlüsseln
+			// Encrypt message using the symmetric encryption algorithm
 			requestStream = CryptoTools.GetEncryptedStream(requestStream, _provider);
 
-			// Statusinformationen über die Sicherheitstransaktion in die Header-Auflistung schreiben
+			// Send the current secure transaction stage and identifier in the transport headers
 			requestHeaders[CommonHeaderNames.SECURE_TRANSACTION_STATE] = ((int)SecureTransactionStage.SendingEncryptedMessage).ToString();
 			requestHeaders[CommonHeaderNames.SECURE_TRANSACTION_ID] = _secureTransactionID.ToString();
 
-			// Verschlüsselten Datenstrom zurückgeben
+			// Return the encrypted data stream
 			return requestStream;
 		}
 
 		/// <summary>
-		/// Verarbeitet die verschlüsselte Nachricht.
+		/// Processes the encrypted message.
 		/// </summary>
-		/// <param name="msg">Original Remotingnachricht</param>
-		/// <param name="requestHeaders">Original Anfrage-Header</param>
-		/// <param name="requestStream">Original Anfrage-Datenstrom (unverschlüsselt)</param>
-		/// <param name="responseHeaders">Antwort-Header</param>
-		/// <param name="responseStream">Antwort-Datenstrom (unverschlüsselt nach Verarbeitung!)</param>
-		/// <returns>Wahr, wenn Verarbeitung erfolgreich, ansonsten Falsch</returns>
+		/// <param name="msg">The message.</param>
+		/// <param name="requestHeaders">Request transport headers.</param>
+		/// <param name="requestStream">Request stream.</param>
+		/// <param name="responseHeaders">Response transport headers.</param>
+		/// <param name="responseStream">Response stream.</param>
 		private bool ProcessEncryptedMessage(IMessage msg, ITransportHeaders requestHeaders, Stream requestStream, out ITransportHeaders responseHeaders, out Stream responseStream)
 		{
-			// Variable für Sicherheitstransaktionskennung
 			Guid secureTransactionID;
 
 			lock (_lockObject)
 			{
-				// Neue Sicherheitstransaktion starten und Kennung speichern
+				// Start a new security transaction and save its identifier
 				secureTransactionID = StartSecureTransaction(msg, requestHeaders);
 
-				// Nachricht verschlüsseln
+				// Enctypt the message
 				requestStream = EncryptMessage(requestHeaders, requestStream);
 			}
-			// Verschlüsselte Anfragenachricht zum Server senden
+
+			// Pass the encrypted message to the next sink
 			_next.ProcessMessage(msg, requestHeaders, requestStream, out responseHeaders, out responseStream);
 
 			lock (_lockObject)
 			{
-				// Antwort-Datenstrom entschlüsselm
+				// Decrypt the response data stream
 				responseStream = DecryptResponse(responseStream, responseHeaders);
 
-				// Wenn kein Antwort-Datenstrom für diese Sicherheitstransaktion empfangen wurde ...
+				// If decryption failed, clear the shared key to re-establish a new secure transaction
 				if (responseStream == null && secureTransactionID.Equals(_secureTransactionID))
-					// Gemeinsamen Schlüssel und Sitzungsinformationen der Sicherheitstransaktion löschen
 					ClearSharedKey();
 			}
-			// Zurückgeben, ob ein Antwort-Datenstrom empfangen wurde, oder nicht
+
+			// Processing failed if the stream wasn't decrypted
 			return responseStream != null;
 		}
 
-		/// <summary>Verarbeitet eine bestimmte Remoting-Nachricht</summary>
-		/// <param name="msg">Remoting-Nachricht</param>
-		/// <param name="requestHeaders">Anfrage-Header-Auflistung</param>
-		/// <param name="requestStream">Anfrage-Datenstrom</param>
-		/// <param name="responseHeaders">Antwort-Header-Auflistung</param>
-		/// <param name="responseStream">Antwort-Datenstrom</param>		
+		/// <summary>
+		/// Requests message processing from the current sink.
+		/// </summary>
+		/// <param name="msg">The message to process.</param>
+		/// <param name="requestHeaders">The headers to add to the outgoing message heading to the server.</param>
+		/// <param name="requestStream">The stream headed to the transport sink.</param>
+		/// <param name="responseHeaders">When this method returns, contains a <see cref="T:System.Runtime.Remoting.Channels.ITransportHeaders" /> interface that holds the headers that the server returned. This parameter is passed uninitialized.</param>
+		/// <param name="responseStream">When this method returns, contains a <see cref="T:System.IO.Stream" /> coming back from the transport sink. This parameter is passed uninitialized.</param>
+		/// <exception cref="Zyan.Communication.ChannelSinks.Encryption.CryptoRemotingException"></exception>
 		public void ProcessMessage(IMessage msg, ITransportHeaders requestHeaders, Stream requestStream, out ITransportHeaders responseHeaders, out Stream responseStream)
 		{
 			try
 			{
-				// Aktuelle Position des Datenstroms speichern
+				// Save the current stream position
 				long initialStreamPos = requestStream.CanSeek ? requestStream.Position : -1;
 
-				// Ggf. mehrere Male versuchen (höchstens bis maximal konfigurierte Anzahl)
+				// Try several times if necessary
 				for (int i = 0; i < _maxAttempts; i++)
 				{
-					// Wenn die verschlüsselte Nachricht erfolgreich verarbeitet werden konnte ...
 					if (ProcessEncryptedMessage(msg, requestHeaders, requestStream, out responseHeaders, out responseStream))
-						// Prozedur verlassen
 						return;
 
-					// Wenn der Datenstrom noch zugreifbar ist ...
+					// Reset the input stream position and retry
 					if (requestStream.CanSeek)
-						// Datenstrom aus gespeicherte Anfangsposition zurücksetzen
 						requestStream.Position = initialStreamPos;
 					else
 						break;
 				}
-				// Ausnahme werfen
+
 				throw new CryptoRemotingException(DEFAULT_EXCEPTION_TEXT);
 			}
 			finally
 			{
-				// Anfrage-Datenstrom schließen
 				requestStream.Close();
 			}
 		}
 
 		/// <summary>
-		/// Gibt den Anfrage-Datenstrom zurück.
+		/// Returns the <see cref="T:System.IO.Stream" /> onto which the provided message is to be serialized.
 		/// </summary>
-		/// <param name="msg">Remoting-Nachricht</param>
-		/// <param name="headers">Header-Informationen</param>
-		/// <returns>Anfrage-Datenstrom</returns>
+		/// <param name="msg">The <see cref="T:System.Runtime.Remoting.Messaging.IMethodCallMessage" /> containing details about the method call.</param>
+		/// <param name="headers">The headers to add to the outgoing message heading to the server.</param>
+		/// <returns>
+		/// The <see cref="T:System.IO.Stream" /> onto which the provided message is to be serialized.
+		/// </returns>
 		public Stream GetRequestStream(IMessage msg, ITransportHeaders headers)
 		{
-			// Immer null zurückgeben (Diese Funktion wird nicht benötigt)
+			// we don't use it
 			return null;
 		}
 
 		/// <summary>
-		/// Gibt die nächste Kanalsenke in der Senkenkette zurück.
+		/// Gets the next client channel sink in the client sink chain.
 		/// </summary>
+		/// <returns>The next client channel sink in the client sink chain.</returns>
 		public IClientChannelSink NextChannelSink
 		{
 			get { return _next; }
@@ -312,175 +298,161 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 
 		#endregion
 
-		#region Asynchrone Verarbeitung
+		#region Asynchronous processing
 
 		/// <summary>
-		/// Speichert Informationen über den asynchronen Verarbeitungsstatus.
+		/// Asynchronous processing state information.
 		/// </summary>
 		private class AsyncProcessingState
 		{
-			// Eingabe-Datenstrom
+			// Input data stream
 			private Stream _stream;
 
-			// Header-Auflistung
+			// Transport headers
 			private ITransportHeaders _headers;
 
-			// Remoting-Nachricht
+			// Remoting message
 			private IMessage _msg;
 
-			// Eindeutige Kennung der Sicherheitstransaktion
+			// Unique identifier of the secure transaction
 			private Guid _secureTransactionID;
 
-			/// <summary>Erzeugt eine neue Instanz von AsyncProcessingState</summary>
-			/// <param name="msg">Remoting-Nachricht</param>
-			/// <param name="headers">Header-Auflistung</param>
-			/// <param name="stream">Eingabe-Datenstrom</param>
-			/// <param name="id">Eindeutige Kennung der Sicherheitstransaktion</param>
+			/// <summary>
+			/// Initializes a new instance of the <see cref="AsyncProcessingState"/> class.
+			/// </summary>
+			/// <param name="msg">The message.</param>
+			/// <param name="headers">Transport headers.</param>
+			/// <param name="stream">Input stream.</param>
+			/// <param name="id">Secure transaction identifier.</param>
 			public AsyncProcessingState(IMessage msg, ITransportHeaders headers, ref Stream stream, Guid id)
 			{
-				// Werte übernehmen
 				_msg = msg;
 				_headers = headers;
-				_stream = DuplicateStream(ref stream); // Datenstrom kopieren
+				_stream = DuplicateStream(ref stream); // Copy the input stream
 				_secureTransactionID = id;
 			}
 
 			/// <summary>
-			/// Gibt den Eingabedatenstrom zurück.
+			/// Gets the input stream.
 			/// </summary>
 			public Stream Stream { get { return _stream; } }
 
 			/// <summary>
-			/// Gibt die Header-Auflistung zurück.
+			/// Gets the transport headers.
 			/// </summary>
 			public ITransportHeaders Headers { get { return _headers; } }
 
 			/// <summary>
-			/// Gibt die Remoting-Nachricht zurück.
+			/// Gets the remoting message.
 			/// </summary>
 			public IMessage Message { get { return _msg; } }
 
 			/// <summary>
-			/// Gibt die eindeutige Kennung der Sicherheitstransaktion zurück.
+			/// Gets the secure transaction identifier.
 			/// </summary>
 			public Guid SecureTransactionID { get { return _secureTransactionID; } }
 
-			/// <summary>Kopiert einen bestimmten Datenstrom</summary>
-			/// <param name="stream">Datenstrom</param>
-			/// <returns>Kopie des Datenstroms</returns>			
+			/// <summary>
+			/// Duplicates the given stream.
+			/// </summary>
+			/// <param name="stream">The input stream.</param>
+			/// <returns>Stream copy.</returns>
 			private Stream DuplicateStream(ref Stream stream)
 			{
-				// Variablen für Speicherdatenströme
 				MemoryStream memStream1 = new MemoryStream();
 				MemoryStream memStream2 = new MemoryStream();
 
-				// 1 KB Puffer erzeugen
 				byte[] buffer = new byte[1024];
-
-				// Anzahl der gelesenen Bytes
 				int readBytes;
 
-				// Eingabe-Datenstrom durchlaufen
 				while ((readBytes = stream.Read(buffer, 0, buffer.Length)) > 0)
 				{
-					// Puffer in beide Speicherdatenströme kopieren
 					memStream1.Write(buffer, 0, readBytes);
 					memStream2.Write(buffer, 0, readBytes);
 				}
-				// Eingabe-Datenstrom schließen
+
+				// Close input stream
 				stream.Close();
 
-				// Position der Speicherdatenströme zurücksetzen
+				// Reset the stream positions
 				memStream1.Position = 0;
 				memStream2.Position = 0;
 
-				// Original-Datenstrom durch 1. Kopie ersetzen
+				// Replace the original stream with the first copy
 				stream = memStream1;
 
-				// 2. Kopie zurückgeben
+				// Return the second copy
 				return memStream2;
 			}
 		}
 
 		/// <summary>
-		/// Verarbeitet eine Anfragenachricht asynchron.
+		/// Requests asynchronous processing of a method call on the current sink.
 		/// </summary>
-		/// <param name="sinkStack">Senkenstapel</param>
-		/// <param name="msg">Remoting-Nachricht</param>
-		/// <param name="headers">Anfrage-Header-Auflistung</param>
-		/// <param name="stream">Anfrage-Datenstrom</param>
+		/// <param name="sinkStack">A stack of channel sinks that called this sink.</param>
+		/// <param name="msg">The message to process.</param>
+		/// <param name="headers">The headers to add to the outgoing message heading to the server.</param>
+		/// <param name="stream">The stream headed to the transport sink.</param>
 		public void AsyncProcessRequest(IClientChannelSinkStack sinkStack, IMessage msg, ITransportHeaders headers, Stream stream)
 		{
-			// Asynchroner Verarbeitungsstatus
 			AsyncProcessingState state = null;
-
-			// Verschlüsselter Datenstrom
 			Stream encryptedStream = null;
-
-			// Eindeutige Kennung der Sicherheitstransaktion
 			Guid _secureTransactionID;
 
 			lock (_lockObject)
 			{
-				// Sicherheitstransaktion starten
+				// Start the secure transaction and save its identifier
 				_secureTransactionID = StartSecureTransaction(msg, headers);
 
-				// Asynchronen Verarbeitungsstatus erzeugen
+				// Prepare asynchronous state
 				state = new AsyncProcessingState(msg, headers, ref stream, _secureTransactionID);
 
-				// Nachricht verschlüsseln
+				// Encrypt the message
 				encryptedStream = EncryptMessage(headers, stream);
 			}
-			// Aktuelle Senke auf den Senkenstapel legen (Damit ggf. die Verarbeitung der Antwort später asynchron aufgerufen werden kann)
+
+			// Push the current sink onto the sink stack so the processing of the response can be invoked asynchronously later
 			sinkStack.Push(this, state);
 
-			// Nächste Kanalsenke aufrufen
+			// Pass the message on to the next sink
 			_next.AsyncProcessRequest(sinkStack, msg, headers, encryptedStream);
 		}
 
 		/// <summary>
-		/// Verarbeitet eine Antwort-Nachricht asynchron.
+		/// Requests asynchronous processing of a response to a method call on the current sink.
 		/// </summary>
-		/// <param name="sinkStack">Senkenstapel</param>
-		/// <param name="state">Asynchroner Verarbeitungsstatus</param>
-		/// <param name="headers">Anfrage-Header-Auflistung</param>
-		/// <param name="stream">Anfrage-Datenstrom</param>
+		/// <param name="sinkStack">A stack of sinks that called this sink.</param>
+		/// <param name="state">Information generated on the request side that is associated with this sink.</param>
+		/// <param name="headers">The headers retrieved from the server response stream.</param>
+		/// <param name="stream">The stream coming back from the transport sink.</param>
 		public void AsyncProcessResponse(IClientResponseChannelSinkStack sinkStack, object state, ITransportHeaders headers, Stream stream)
 		{
-			// Asychronen Verarbeitungsstatus abrufen
+			// Gets the asynchronous processing state
 			AsyncProcessingState asyncState = (AsyncProcessingState)state;
 
 			try
 			{
-				// Aktuellen Verarbeitungsschritt der Sicherheitstransaktion ermitteln
 				SecureTransactionStage currentStage = (SecureTransactionStage)Convert.ToInt32((string)headers[CommonHeaderNames.SECURE_TRANSACTION_STATE]);
-
-				// Verarbeitungsschritt auswerten
 				switch (currentStage)
 				{
-					case SecureTransactionStage.SendingEncryptedResult: // Verschlüsselte Daten vom Server eingtroffen
+					case SecureTransactionStage.SendingEncryptedResult: // Get the encrypted response from the server
 
 						lock (_lockObject)
 						{
-							// Wenn die Antwort auch tatsächlich zur aktuellen Sicherheitstransaktion gehört ...
 							if (asyncState.SecureTransactionID.Equals(_secureTransactionID))
-								// Datenstrom entschlüsseln
 								stream = DecryptResponse(stream, headers);
-							// Andernfalls ...
 							else
-								// Ausnahme werfen
 								throw new CryptoRemotingException(LanguageResource.CryptoRemotingException_KeyChanged);
 						}
 						break;
 
-					case SecureTransactionStage.UnknownTransactionID: // Unbekannte Transaktionskennung
+					case SecureTransactionStage.UnknownTransactionID: // Bad transaction identifier
 
-						// Ausnahme werfen
 						throw new CryptoRemotingException(LanguageResource.CryptoRemotingException_InvalidTransactionID);
 
 					default:
 
-					case SecureTransactionStage.Uninitialized: // Keine Sicherheitstransaktion eingerichtet
+					case SecureTransactionStage.Uninitialized: // Secure transaction is not yet set up
 						break;
 				}
 			}
@@ -488,21 +460,20 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 			{
 				lock (_lockObject)
 				{
-					// Wenn die gesendete Transaktionskennung mit der lokalen übereinstimmt ...
+					// If remote transaction identifier matches the local secure transaction identifier, reset the shared key
 					if (_provider == null || asyncState.SecureTransactionID.Equals(_secureTransactionID))
-						// Gemeinamen Schlüssel löschen
 						ClearSharedKey();
 
-					// Nachricht weiterverarbeiten
 					ProcessMessage(asyncState.Message, asyncState.Headers, asyncState.Stream, out headers, out stream);
 				}
 			}
 			finally
 			{
-				// Datenstrom schließen
+				// Close the input stream
 				asyncState.Stream.Close();
 			}
-			// Verarbeitung in der nächsten Kanalsenke fortsetzen
+
+			// Pass on to the next sink to continue processing
 			sinkStack.AsyncProcessResponse(headers, stream);
 		}
 
