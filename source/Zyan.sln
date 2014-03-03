@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Communication", "Zyan.Communication\Zyan.Communication.csproj", "{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Tests", "Zyan.Tests\Zyan.Tests.csproj", "{6D0167F8-9611-410F-9212-3D8AE9FF95E4}"
@@ -32,7 +32,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterLinq.UnitTests.NUnit",
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 5
+		SccNumberOfProjects = 9
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs15
 		SccLocalPath0 = .
@@ -50,6 +50,22 @@ Global
 		SccProjectUniqueName4 = Zyan.Communication\\Zyan.Communication.Fx3.csproj
 		SccProjectName4 = Zyan.Communication
 		SccLocalPath4 = Zyan.Communication
+		SccProjectUniqueName5 = Zyan.Tests.InterLinq\\Artefacts\\InterLinq.UnitTests.Artefacts.csproj
+		SccProjectTopLevelParentUniqueName5 = Zyan.sln
+		SccProjectName5 = Zyan.Tests.InterLinq/Artefacts
+		SccLocalPath5 = Zyan.Tests.InterLinq\\Artefacts
+		SccProjectUniqueName6 = Zyan.Tests.InterLinq\\Server\\InterLinq.UnitTests.Server.csproj
+		SccProjectTopLevelParentUniqueName6 = Zyan.sln
+		SccProjectName6 = Zyan.Tests.InterLinq/Server
+		SccLocalPath6 = Zyan.Tests.InterLinq\\Server
+		SccProjectUniqueName7 = Zyan.Tests.InterLinq\\UnitTests\\InterLinq.UnitTests.csproj
+		SccProjectTopLevelParentUniqueName7 = Zyan.sln
+		SccProjectName7 = Zyan.Tests.InterLinq/UnitTests
+		SccLocalPath7 = Zyan.Tests.InterLinq\\UnitTests
+		SccProjectUniqueName8 = Zyan.Tests.InterLinq\\UnitTests\\InterLinq.UnitTests.NUnit.csproj
+		SccProjectTopLevelParentUniqueName8 = Zyan.sln
+		SccProjectName8 = Zyan.Tests.InterLinq/UnitTests
+		SccLocalPath8 = Zyan.Tests.InterLinq\\UnitTests
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Zyan.vsmdi
