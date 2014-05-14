@@ -22,9 +22,12 @@ namespace Zyan.Communication.Composition
 		/// <summary>
 		/// Registers all components in a MEF catalog attributed by "ComponentInterface" metadata tag.
 		/// </summary>
-		public static void RegisterComponents(this IComponentCatalog host, ComposablePartCatalog rootCatalog)
+		/// <param name="host"><see cref="ZyanComponentHost"/> or <see cref="ComponentCatalog"/> instance.</param>
+		/// <param name="rootCatalog">Component catalog to register components.</param>
+		/// <param name="container">Optional root composition container used to instantiate components.</param>
+		public static void RegisterComponents(this IComponentCatalog host, ComposablePartCatalog rootCatalog, CompositionContainer container = null)
 		{
-			var parentContainer = new CompositionContainer(rootCatalog);
+			var parentContainer = container ?? new CompositionContainer(rootCatalog);
 			var nonSharedCatalog = new NonSharedPartsCatalog(rootCatalog);
 
 			// register exported components
@@ -37,6 +40,8 @@ namespace Zyan.Communication.Composition
 		/// <summary>
 		/// Registers all components in a MEF container attributed by "ComponentInterface" metadata tag.
 		/// </summary>
+		/// <param name="host"><see cref="ZyanComponentHost"/> or <see cref="ComponentCatalog"/> instance.</param>
+		/// <param name="container">Root composition container used to instantiate components.</param>
 		public static void RegisterComponents(this IComponentCatalog host, CompositionContainer container)
 		{
 			var rootCatalog = container.Catalog;
