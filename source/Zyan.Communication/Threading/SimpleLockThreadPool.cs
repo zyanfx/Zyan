@@ -201,8 +201,11 @@ namespace Zyan.Communication.Threading
 				Monitor.PulseAll(m_queue);
 			}
 
-			for (int i = 0; i < m_threads.Length; i++)
-				m_threads[i].Join();
+			if (m_threads != null)
+			{
+				for (int i = 0; i < m_threads.Length; i++)
+					m_threads[i].Join();
+			}
 		}
 	}
 }
