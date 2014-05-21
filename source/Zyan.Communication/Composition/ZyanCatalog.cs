@@ -27,9 +27,21 @@ namespace Zyan.Communication.Composition
 		/// <param name="connection">The <see cref="ZyanConnection"/> to pull remote components from.</param>
 		/// <param name="transferTransactions">Enable ambient transactions support for created proxies.</param>
 		public ZyanCatalog(ZyanConnection connection, bool transferTransactions)
+			: this(connection, true, true)
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ZyanCatalog"/> class.
+		/// </summary>
+		/// <param name="connection">The <see cref="ZyanConnection"/> to pull remote components from.</param>
+		/// <param name="transferTransactions">Enable ambient transactions support for created proxies.</param>
+		/// <param name="keepSynchronizationContext">Keep synchronization context for the callbacks and event handlers.</param>
+		public ZyanCatalog(ZyanConnection connection, bool transferTransactions, bool keepSynchronizationContext)
 		{
 			Connection = connection;
 			ImplicitTransactionTransfer = transferTransactions;
+			KeepSynchronizationContext = keepSynchronizationContext;
 		}
 
 		private object lockObject = new object();
@@ -43,6 +55,11 @@ namespace Zyan.Communication.Composition
 		/// Gets a value indicating whether implicit transaction transfer is enabled for proxy objects created using this catalog instance.
 		/// </summary>
 		public bool ImplicitTransactionTransfer { get; private set; }
+
+		/// <summary>
+		/// Gets or sets a value indicating whether original synchronization context should be used to execute callbacks and event handlers.
+		/// </summary>
+		public bool KeepSynchronizationContext { get; private set; }
 
 		IList<ZyanComposablePartDefinition> innerParts = null;
 
@@ -70,7 +87,7 @@ namespace Zyan.Communication.Composition
 							innerParts = new List<ZyanComposablePartDefinition>();
 							foreach (var component in Connection.RemoteDispatcher.GetRegisteredComponents())
 							{
-								var part = new ZyanComposablePartDefinition(Connection, component.InterfaceName, component.UniqueName, ImplicitTransactionTransfer);
+								var part = new ZyanComposablePartDefinition(Connection, component.InterfaceName, component.UniqueName, ImplicitTransactionTransfer, KeepSynchronizationContext);
 								innerParts.Add(part);
 							}
 						}

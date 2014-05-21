@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Zyan.Communication.Toolbox.Diagnostics;
 
 namespace Zyan.Communication.Delegates
@@ -21,6 +22,11 @@ namespace Zyan.Communication.Delegates
 		public object ClientDelegate { get; set; }
 
 		/// <summary>
+		/// Gets or sets the synchronization context of the client delegate.
+		/// </summary>
+		public SynchronizationContext SynchronizationContext { get; set; }
+
+		/// <summary>
 		/// Invokes the wired client delegate.
 		/// </summary>
 		/// <param name="args">Parameters</param>
@@ -28,8 +34,20 @@ namespace Zyan.Communication.Delegates
 		{
 			try
 			{
-				Delegate clientDelegate = (Delegate)ClientDelegate;
-				return clientDelegate.DynamicInvoke(args);
+				// execute as is
+				var clientDelegate = (Delegate)ClientDelegate;
+				if (SynchronizationContext == null)
+				{
+					return clientDelegate.DynamicInvoke(args);
+				}
+
+				// use synchronization context if specified
+				object result = null;
+				SynchronizationContext.Send(x =>
+				{
+					result = clientDelegate.DynamicInvoke(args);
+				}, null);
+				return result;
 			}
 			catch (Exception ex)
 			{

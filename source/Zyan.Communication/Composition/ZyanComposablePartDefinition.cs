@@ -21,13 +21,15 @@ namespace Zyan.Communication.Composition
 		/// <param name="componentInterfaceName">Name of the component interface.</param>
 		/// <param name="uniqueName">Unique name of the published component.</param>
 		/// <param name="transferTransactions">if set to <c>true</c>, then ambient transaction transfer is enabled.</param>
-		public ZyanComposablePartDefinition(ZyanConnection connection, string componentInterfaceName, string uniqueName, bool transferTransactions)
+		/// <param name="keepSynchronizationContext">Keep synchronization context for the callbacks and event handlers.</param>
+		public ZyanComposablePartDefinition(ZyanConnection connection, string componentInterfaceName, string uniqueName, bool transferTransactions, bool keepSynchronizationContext)
 		{
 			Connection = connection;
 			ComponentUniqueName = uniqueName;
 			ComponentInterfaceName = GetTypeFullName(componentInterfaceName);
 			ComponentInterface = new Lazy<Type>(() => TypeHelper.GetType(componentInterfaceName, true));
 			ImplicitTransactionTransfer = transferTransactions;
+			KeepSynchronizationContext = keepSynchronizationContext;
 		}
 
 		private object lockObject = new object();
@@ -56,6 +58,11 @@ namespace Zyan.Communication.Composition
 		/// Gets a value indicating whether implicit transaction transfer is enabled.
 		/// </summary>
 		public bool ImplicitTransactionTransfer { get; private set; }
+
+		/// <summary>
+		/// Gets or sets a value indicating whether original synchronization context should be used to execute callbacks and event handlers.
+		/// </summary>
+		public bool KeepSynchronizationContext { get; private set; }
 
 		/// <summary>
 		/// Converts Type.AssemblyQualifiedName format into Type.FullName.

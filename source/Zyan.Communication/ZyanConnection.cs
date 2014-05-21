@@ -373,7 +373,7 @@ namespace Zyan.Communication
 		/// Creates a local proxy object of a specified remote component.
 		/// </summary>
 		/// <typeparam name="T">Remote component interface type</typeparam>
-		/// <param name="implicitTransactionTransfer">Specify whether transactions (System.Transactions) should be transferred to remote component automaticly</param>
+		/// <param name="implicitTransactionTransfer">Specify whether transactions (System.Transactions) should be transferred to remote component automatically.</param>
 		/// <returns>Proxy</returns>
 		public T CreateProxy<T>(bool implicitTransactionTransfer)
 		{
@@ -385,9 +385,22 @@ namespace Zyan.Communication
 		/// </summary>
 		/// <typeparam name="T">Remote component interface type</typeparam>
 		/// <param name="uniqueName">Unique component name</param>
-		/// <param name="implicitTransactionTransfer">Specify whether transactions (System.Transactions) should be transferred to remote component automaticly</param>
+		/// <param name="implicitTransactionTransfer">Specify whether transactions (System.Transactions) should be transferred to remote component automatically.</param>
 		/// <returns>Proxy</returns>
 		public T CreateProxy<T>(string uniqueName, bool implicitTransactionTransfer)
+		{
+			return CreateProxy<T>(uniqueName, implicitTransactionTransfer, false);
+		}
+
+		/// <summary>
+		/// Creates a local proxy object of a specified remote component.
+		/// </summary>
+		/// <typeparam name="T">Remote component interface type</typeparam>
+		/// <param name="uniqueName">Unique component name</param>
+		/// <param name="implicitTransactionTransfer">Specify whether transactions (System.Transactions) should be transferred to remote component automatically.</param>
+		/// <param name="keepCallbackSynchronizationContext">Specify whether callbacks and events should use the original synchronization context.</param>
+		/// <returns>Proxy</returns>
+		public T CreateProxy<T>(string uniqueName, bool implicitTransactionTransfer, bool keepCallbackSynchronizationContext)
 		{
 			Type interfaceType = typeof(T);
 
@@ -408,7 +421,7 @@ namespace Zyan.Communication
 			if (info == null)
 				throw new ApplicationException(string.Format(LanguageResource.ApplicationException_NoServerComponentIsRegisteredForTheGivenInterface, interfaceType.FullName, _serverUrl));
 
-			var proxy = new ZyanProxy(info.UniqueName, typeof(T), this, implicitTransactionTransfer, _sessionID, _componentHostName, _autoLoginOnExpiredSession, info.ActivationType);
+			var proxy = new ZyanProxy(info.UniqueName, typeof(T), this, implicitTransactionTransfer, keepCallbackSynchronizationContext, _sessionID, _componentHostName, _autoLoginOnExpiredSession, info.ActivationType);
 			lock (_proxies)
 			{
 				var proxyReference = new WeakReference(proxy);
