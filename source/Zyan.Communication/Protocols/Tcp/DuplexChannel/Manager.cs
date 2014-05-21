@@ -11,6 +11,7 @@
 */
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -19,7 +20,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.IO;
 using System.Runtime.Serialization;
-using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using Zyan.Communication.Toolbox;
 
@@ -171,8 +171,8 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 		#region Listening
 		
-		// Hashtable<Guid|string, AsyncResult>
-		private static readonly Hashtable _listeners = new Hashtable();
+		// Key — Guid or string (can be MessageID, LocalChannelID or LocalAddress), Value — AsyncResult
+		private static readonly Dictionary<object, AsyncResult> _listeners = new Dictionary<object,AsyncResult>();
 		private static object _listenersLockObject=new object();
 
 		public static void StartListening(Connection connection)
@@ -242,8 +242,15 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			}
 		}
 
-		// Hashtable<string(server), Stack<object[Connection, Message]>>
-		static readonly Hashtable outstandingMessages = new Hashtable();
+		// Key — ChannelID or LocalAddress, Value — Queue<Connection+Message>
+		static readonly Dictionary<object, Queue<ConnectionAndMessage>> pendingMessages = new Dictionary<object, Queue<ConnectionAndMessage>>();
+
+		private class ConnectionAndMessage
+		{
+			public Connection Connection { get; set; }
+
+			public Message Message { get; set; }
+		}
 
 		internal static void ReceiveMessage(IAsyncResult ar)
 		{
@@ -262,36 +269,43 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 			lock (_listenersLockObject)
 			{
-				if (!_listeners.Contains(m.Guid))
+				if (!_listeners.ContainsKey(m.Guid))
 				{
 					// New incoming message
-					if (_listeners.Contains(connection.LocalChannelID))
+					if (_listeners.ContainsKey(connection.LocalChannelID))
 					{
-						AsyncResult myAr = (AsyncResult)_listeners[connection.LocalChannelID];
+						AsyncResult myAr = _listeners[connection.LocalChannelID];
 						_listeners.Remove(connection.LocalChannelID);
 						myAr.Complete(connection, m);
 					}
-					else if (_listeners.Contains(connection.LocalAddress))
+					else if (_listeners.ContainsKey(connection.LocalAddress))
 					{
-						AsyncResult myAr = (AsyncResult)_listeners[connection.LocalAddress];
+						AsyncResult myAr = _listeners[connection.LocalAddress];
 						_listeners.Remove(connection.LocalAddress);
 						myAr.Complete(connection, m);
 					}
 					else
 					{
-						Stack outstanding = (Stack)outstandingMessages[connection.LocalAddress];
-						if (outstanding == null)
+						// add incoming message to the pending messages
+						var key = connection.LocalChannelID;
+						Queue<ConnectionAndMessage> queue;
+						if (!pendingMessages.TryGetValue(key, out queue))
 						{
-							outstanding = new Stack();
-							outstandingMessages.Add(connection.LocalAddress, outstanding);
+							queue = new Queue<ConnectionAndMessage>();
+							pendingMessages.Add(key, queue);
 						}
-						outstanding.Push(new Object[] {connection, m});
+
+						queue.Enqueue(new ConnectionAndMessage
+						{
+							Connection = connection, 
+							Message = m
+						});
 					}	
 				}
 				else
 				{
 					// Response to previous message
-					AsyncResult myAr = (AsyncResult)_listeners[m.Guid];
+					AsyncResult myAr = _listeners[m.Guid];
 					_listeners.Remove(m.Guid);
 					myAr.Complete(connection, m);
 				}
@@ -306,11 +320,11 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 				foreach (object key in _listeners.Keys)
 				{
-					AsyncResult myAr = (AsyncResult)_listeners[key];
+					AsyncResult myAr = _listeners[key];
 					if (myAr != null && myAr.Connection == e.Connection)
 					{
 						myAr.Complete(e);
-						toBeDeleted.Add(myAr);
+						toBeDeleted.Add(key);
 					}
 				}
 				foreach (object o in toBeDeleted)
@@ -326,19 +340,23 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		{
 			lock (_listenersLockObject)
 			{
-				Debug.Assert(!_listeners.Contains(guidOrServer), "Handler for this guid already registered.");
+				Debug.Assert(!_listeners.ContainsKey(guidOrServer), "Handler for this guid already registered.");
 
-				AsyncResult ar = new AsyncResult(connection, callback, asyncState);
-				if (outstandingMessages.Contains(guidOrServer))
+				var ar = new AsyncResult(connection, callback, asyncState);
+
+				// process pending message
+				Queue<ConnectionAndMessage> queue;
+				if (pendingMessages.TryGetValue(guidOrServer, out queue))
 				{
-					Stack outstanding = (Stack)outstandingMessages[guidOrServer];
-					if (outstanding.Count > 0)
+					if (queue.Count > 0)
 					{
-						object[] result = (object[])outstanding.Pop();
-						ar.Complete((Connection)result[0], (Message)result[1]);
+						var result = queue.Dequeue();
+						ar.Complete(result.Connection, result.Message);
 						return ar;
 					}
 				}
+
+				// or start listening for incoming messages
 				_listeners.Add(guidOrServer, ar);
 				return ar;
 			}
