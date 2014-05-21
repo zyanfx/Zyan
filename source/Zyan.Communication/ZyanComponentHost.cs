@@ -303,9 +303,14 @@ namespace Zyan.Communication
 				throw new ApplicationException(LanguageResource.ApplicationException_NoChannel);
 			}
 
-			// register the channel and publish the dispatcher
+			// register the channel if needed
 			_channelName = channel.ChannelName;
-			ChannelServices.RegisterChannel(channel, false);
+			if (ChannelServices.GetChannel(_channelName) == null)
+			{
+				ChannelServices.RegisterChannel(channel, false);
+			}
+
+			// publish the dispatcher
 			RemotingServices.Marshal(_dispatcher, _name);
 		}
 
