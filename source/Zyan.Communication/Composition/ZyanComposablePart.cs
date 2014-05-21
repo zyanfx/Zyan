@@ -50,6 +50,11 @@ namespace Zyan.Communication.Composition
 		public bool ImplicitTransactionTransfer { get { return Definition.ImplicitTransactionTransfer; } }
 
 		/// <summary>
+		/// Gets or sets a value indicating whether original synchronization context should be used to execute callbacks and event handlers.
+		/// </summary>
+		public bool KeepSynchronizationContext { get { return Definition.KeepSynchronizationContext; } }
+
+		/// <summary>
 		/// Gets a collection of the <see cref="T:System.ComponentModel.Composition.Primitives.ExportDefinition"/> objects 
 		/// that describe the exported objects provided by the part.
 		/// </summary>
@@ -61,9 +66,9 @@ namespace Zyan.Communication.Composition
 		}
 
 		/// <summary>
-		/// Method info for the ZyanConnection.CreateProxy{T}(string uniqueName, bool implicitTransactionTransfer) generic method.
+		/// Method info for the ZyanConnection.CreateProxy{T}(string uniqueName, bool implicitTransactionTransfer, bool keepSynchronizationContext) generic method.
 		/// </summary>
-		static MethodInfo CreateProxyGenericMethodInfo = typeof(ZyanConnection).GetMethod("CreateProxy", new[] { typeof(string), typeof(bool) });
+		static MethodInfo CreateProxyGenericMethodInfo = typeof(ZyanConnection).GetMethod("CreateProxy", new[] { typeof(string), typeof(bool), typeof(bool) });
 
 		/// <summary>
 		/// Method info for the ZyanConnection.CreateProxy{ComponentInterface}(string uniqueName, bool implicitTransactionTransfer) method.
@@ -93,7 +98,7 @@ namespace Zyan.Communication.Composition
 			}
 
 			// create transparent proxy
-			return CreateProxyMethodInfo.Invoke(Connection, new object[] { ComponentUniqueName, ImplicitTransactionTransfer });
+			return CreateProxyMethodInfo.Invoke(Connection, new object[] { ComponentUniqueName, ImplicitTransactionTransfer, KeepSynchronizationContext });
 		}
 
 		/// <summary>

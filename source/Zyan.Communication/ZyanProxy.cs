@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Messaging;
 using System.Runtime.Remoting.Proxies;
+using System.Threading;
 using Zyan.Communication.Delegates;
 using Zyan.Communication.Toolbox;
 using Zyan.InterLinq;
@@ -27,6 +28,7 @@ namespace Zyan.Communication
 		private ZyanConnection _connection = null;
 		private ActivationType _activationType = ActivationType.SingleCall;
 		private string _uniqueName = string.Empty;
+		private SynchronizationContext _synchronizationContext;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ZyanProxy"/> class.
@@ -35,11 +37,12 @@ namespace Zyan.Communication
 		/// <param name="type">Component interface type.</param>
 		/// <param name="connection"><see cref="ZyanConnection"/> instance.</param>
 		/// <param name="implicitTransactionTransfer">Specifies whether transactions should be passed implicitly.</param>
+		/// <param name="keepSynchronizationContext">Specifies whether callbacks and event handlers should use the original synchronization context.</param>
 		/// <param name="sessionID">Session ID.</param>
 		/// <param name="componentHostName">Name of the remote component host.</param>
 		/// <param name="autoLoginOnExpiredSession">Specifies whether Zyan should login automatically with cached credentials after the session is expired.</param>
 		/// <param name="activationType">Component activation type</param>
-		public ZyanProxy(string uniqueName, Type type, ZyanConnection connection, bool implicitTransactionTransfer, Guid sessionID, string componentHostName, bool autoLoginOnExpiredSession, ActivationType activationType)
+		public ZyanProxy(string uniqueName, Type type, ZyanConnection connection, bool implicitTransactionTransfer, bool keepSynchronizationContext, Guid sessionID, string componentHostName, bool autoLoginOnExpiredSession, ActivationType activationType)
 			: base(type)
 		{
 			if (type == null)
@@ -62,6 +65,12 @@ namespace Zyan.Communication
 			_implicitTransactionTransfer = implicitTransactionTransfer;
 			_autoLoginOnExpiredSession = autoLoginOnExpiredSession;
 			_delegateCorrelationSet = new List<DelegateCorrelationInfo>();
+
+			// capture synchronization context for callback execution
+			if (keepSynchronizationContext)
+			{
+				_synchronizationContext = SynchronizationContext.Current;
+			}
 		}
 
 		/// <summary>
@@ -260,13 +269,14 @@ namespace Zyan.Communication
 				// Trim "set_" or "add_" prefix
 				string propertyName = methodCallMessage.MethodName.Substring(4);
 
-				// Create delegate correlation info
-				DelegateInterceptor wiring = new DelegateInterceptor()
+				// Create delegate interceptor and correlation info
+				var wiring = new DelegateInterceptor()
 				{
-					ClientDelegate = receiveMethodDelegate
+					ClientDelegate = receiveMethodDelegate,
+					SynchronizationContext = _synchronizationContext
 				};
 
-				DelegateCorrelationInfo correlationInfo = new DelegateCorrelationInfo()
+				var correlationInfo = new DelegateCorrelationInfo()
 				{
 					IsEvent = methodCallMessage.MethodName.StartsWith("add_"),
 					DelegateMemberName = propertyName,
