@@ -126,8 +126,10 @@
     <Compile Include="Delegates\SessionEventFilter.cs" />
     <Compile Include="DisconnectedEventArgs.cs" />
     <Compile Include="Discovery\DiscoveryClient.cs" />
+    <Compile Include="Discovery\DiscoveryEventArgs.cs" />
     <Compile Include="Discovery\DiscoveryServer.cs" />
     <Compile Include="Discovery\Metadata\DiscoveryMetadata.cs" />
+    <Compile Include="Discovery\Metadata\DiscoveryMetadataHelper.cs" />
     <Compile Include="Discovery\Metadata\DiscoveryRequest.cs" />
     <Compile Include="Discovery\Metadata\DiscoveryResponse.cs" />
     <Compile Include="IComponentCatalog.cs" />
