@@ -6,6 +6,8 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Zyan.Communication;
+using Zyan.Communication.Discovery.Metadata;
 
 namespace Zyan.Examples.MiniChat.Client
 {
@@ -31,15 +33,29 @@ namespace Zyan.Examples.MiniChat.Client
 			set;
 		}
 
+		private const string discoveryMessage = "Looking for available servers...";
+
 		protected override void OnLoad(EventArgs args)
 		{
 			base.OnLoad(args);
 
-			// select the first address from the list automatically
-			if (_comboServerUrl.Items.Count > 0)
+			_comboServerUrl.Items.Insert(0, discoveryMessage);
+			_comboServerUrl.SelectedIndex = 0;
+
+			// start service discovery
+			ZyanConnection.DiscoverHosts("MiniChat", ServerDiscovered);
+		}
+
+		private void ServerDiscovered(DiscoveryResponse response)
+		{
+			if (InvokeRequired)
 			{
-				_comboServerUrl.SelectedIndex = 0;
+				BeginInvoke(new Action<DiscoveryResponse>(ServerDiscovered), response);
+				return;
 			}
+
+			_comboServerUrl.Items.Remove(discoveryMessage);
+			_comboServerUrl.SelectedIndex = _comboServerUrl.Items.Add(response.HostUrl);
 		}
 	}
 }
