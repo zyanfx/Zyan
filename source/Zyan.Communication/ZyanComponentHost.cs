@@ -4,6 +4,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
+using Zyan.Communication.Discovery;
+using Zyan.Communication.Discovery.Metadata;
 using Zyan.Communication.Notification;
 using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp;
@@ -116,6 +118,7 @@ namespace Zyan.Communication
 
 			_hosts.Add(this);
 			StartListening();
+			DiscoverableUrl = _protocolSetup.GetDiscoverableUrl(_name);
 		}
 
 		#endregion
@@ -338,6 +341,58 @@ namespace Zyan.Communication
 			var disposableChannel = channel as IDisposable;
 			if (disposableChannel != null)
 				disposableChannel.Dispose();
+		}
+
+		#endregion
+
+		#region Service discovery
+
+		/// <summary>
+		/// Gets or sets the discoverable server URL.
+		/// </summary>
+		public string DiscoverableUrl { get; set; }
+
+		/// <summary>
+		/// Gets or sets the discoverable server version.
+		/// </summary>
+		public string DiscoverableVersion { get; set; }
+
+		private DiscoveryServer DiscoveryServer { get; set; }
+
+		/// <summary>
+		/// Enables the automatic <see cref="ZyanComponentHost"/> discovery.
+		/// </summary>
+		public void EnableDiscovery()
+		{
+			EnableDiscovery(DiscoveryServer.DefaultDiscoveryPort);
+		}
+
+		/// <summary>
+		/// Enables the automatic <see cref="ZyanComponentHost"/> discovery.
+		/// </summary>
+		/// <param name="port">The port.</param>
+		public void EnableDiscovery(int port)
+		{
+			if (string.IsNullOrEmpty(DiscoverableUrl))
+			{
+				throw new InvalidOperationException("DiscoverableUrl is not specified and cannot be autodetected for the selected server protocol.");
+			}
+
+			var discoveryMetadata = new DiscoveryResponse(DiscoverableUrl, DiscoverableVersion);
+			DiscoveryServer = new DiscoveryServer(discoveryMetadata, port);
+			DiscoveryServer.StartListening();
+		}
+
+		/// <summary>
+		/// Disables the automatic <see cref="ZyanComponentHost"/> discovery.
+		/// </summary>
+		public void DisableDiscovery()
+		{
+			if (DiscoveryServer != null)
+			{
+				DiscoveryServer.Dispose();
+				DiscoveryServer = null;
+			}
 		}
 
 		#endregion
@@ -570,6 +625,7 @@ namespace Zyan.Communication
 				_isDisposed = true;
 				_hosts.Remove(this);
 
+				DisableDiscovery();
 				StopListening();
 
 				if (_sessionManager != null)
