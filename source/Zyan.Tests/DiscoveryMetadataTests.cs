@@ -38,23 +38,23 @@ namespace Zyan.Tests
 		public void EscapeUnescapeTests()
 		{
 			var source = @"Something\ wonderful| is h@ppening";
-			var escaped = DiscoveryMetadata.Escape(source);
+			var escaped = DiscoveryMetadataHelper.Escape(source);
 			Assert.AreEqual(@"Something\s wonderful\p is h\appening", escaped);
 
-			var unescaped = DiscoveryMetadata.Unescape(escaped);
+			var unescaped = DiscoveryMetadataHelper.Unescape(escaped);
 			Assert.AreEqual(source, unescaped);
 		}
 
 		[TestMethod]
 		public void EscapeUnescapeNulls()
 		{
-			var escaped = DiscoveryMetadata.Escape(null);
+			var escaped = DiscoveryMetadataHelper.Escape(null);
 			Assert.AreEqual("@", escaped);
 
-			var unescaped = DiscoveryMetadata.Unescape("@");
+			var unescaped = DiscoveryMetadataHelper.Unescape("@");
 			Assert.IsNull(unescaped);
 
-			unescaped = DiscoveryMetadata.Unescape(null);
+			unescaped = DiscoveryMetadataHelper.Unescape(null);
 			Assert.IsNull(unescaped);
 		}
 
@@ -62,10 +62,10 @@ namespace Zyan.Tests
 		public void EscapeUnescapeAnotherTest()
 		{
 			var source = @"\|\\d|a|\\s\s\\p|@@\fd|\pp||\\\p\p";
-			var escaped = DiscoveryMetadata.Escape(source);
+			var escaped = DiscoveryMetadataHelper.Escape(source);
 			Assert.AreNotEqual(source, escaped);
 
-			var unescaped = DiscoveryMetadata.Unescape(escaped);
+			var unescaped = DiscoveryMetadataHelper.Unescape(escaped);
 			Assert.AreEqual(source, unescaped);
 		}
 
@@ -98,7 +98,7 @@ namespace Zyan.Tests
 			dp.Version = "1.0";
 			dp.Properties["Name"] = "Dummy";
 
-			var packet = DiscoveryMetadata.Encode(dp);
+			var packet = DiscoveryMetadataHelper.Encode(dp);
 			Assert.IsNotNull(packet);
 			Assert.IsTrue(packet.Length == 110);
 		}
@@ -110,10 +110,10 @@ namespace Zyan.Tests
 			dp.Version = "EDC35F23-60AD-4730-A9AC-23D57B666DC1";
 			dp.ServiceUri = @"tcp://msdn.microsoft.com/en-us/library/tst0kwb1(v=vs.110).aspx|Something=Else|#5235@#$%\a\p\|@@";
 			dp.Properties["ExtraProperty"] = @"#%@$%45654!@#$\4214\|Shame=Value";
-			DiscoveryMetadata.RegisterDiscoveryMetadataFactory(dp.Signature, () => new SamplePacket());
+			DiscoveryMetadataHelper.RegisterDiscoveryMetadataFactory(dp.Signature, () => new SamplePacket());
 
-			var packet = DiscoveryMetadata.Encode(dp);
-			var decoded = DiscoveryMetadata.Decode(packet);
+			var packet = DiscoveryMetadataHelper.Encode(dp);
+			var decoded = DiscoveryMetadataHelper.Decode(packet);
 
 			Assert.IsNotNull(decoded);
 			Assert.AreEqual(decoded.GetType(), typeof(SamplePacket));
@@ -124,8 +124,8 @@ namespace Zyan.Tests
 		public void EncodeDecodeDiscoveryRequest()
 		{
 			var request = new DiscoveryRequest("SomeService");
-			var encoded = DiscoveryMetadata.Encode(request);
-			var decoded = DiscoveryMetadata.Decode(encoded);
+			var encoded = DiscoveryMetadataHelper.Encode(request);
+			var decoded = DiscoveryMetadataHelper.Decode(encoded);
 
 			Assert.IsNotNull(decoded);
 			Assert.AreEqual(request, decoded);
@@ -135,8 +135,8 @@ namespace Zyan.Tests
 		public void EncodeDecodeDiscoveryResponse()
 		{
 			var response = new DiscoveryResponse("tcpex://some:123/SomeService", "1.0");
-			var encoded = DiscoveryMetadata.Encode(response);
-			var decoded = DiscoveryMetadata.Decode(encoded);
+			var encoded = DiscoveryMetadataHelper.Encode(response);
+			var decoded = DiscoveryMetadataHelper.Decode(encoded);
 
 			Assert.IsNotNull(decoded);
 			Assert.AreEqual(response, decoded);
