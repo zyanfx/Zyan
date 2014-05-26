@@ -45,6 +45,7 @@ namespace Zyan.Examples.MiniChat.Server
 					ActiveNicknames.Remove(e.Identity.Name);
 				});
 
+				host.EnableDiscovery();
 				Console.WriteLine("Chat server started. Press Enter to exit.");
 				Console.ReadLine();
 			}
