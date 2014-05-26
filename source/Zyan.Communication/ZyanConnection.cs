@@ -10,6 +10,8 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using System.Transactions;
+using Zyan.Communication.Discovery;
+using Zyan.Communication.Discovery.Metadata;
 using Zyan.Communication.Notification;
 using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp.DuplexChannel;
@@ -1056,6 +1058,55 @@ namespace Zyan.Communication
 					return false;
 				}
 			}
+		}
+
+		#endregion
+
+		#region Service discovery
+
+		/// <summary>
+		/// Discovers the available <see cref="ZyanComponentHost"/> instances in the local network.
+		/// </summary>
+		/// <param name="namePattern">The <see cref="ZyanComponentHost"/> name pattern.</param>
+		/// <param name="responseHandler">The response handler is called every time a server is discovered.</param>
+		public static void DiscoverHosts(string namePattern, Action<DiscoveryResponse> responseHandler)
+		{
+			DiscoverHosts(namePattern, null, DiscoveryServer.DefaultDiscoveryPort, responseHandler);
+		}
+
+		/// <summary>
+		/// Discovers the available <see cref="ZyanComponentHost"/> instances in the local network.
+		/// </summary>
+		/// <param name="namePattern">The <see cref="ZyanComponentHost"/> name pattern.</param>
+		/// <param name="version">Desired server version.</param>
+		/// <param name="port">Discovery service port.</param>
+		/// <param name="responseHandler">The response handler is called every time a server is discovered.</param>
+		public static void DiscoverHosts(string namePattern, string version, int port, Action<DiscoveryResponse> responseHandler)
+		{
+			if (string.IsNullOrEmpty(namePattern))
+			{
+				throw new ArgumentNullException("namePattern", "ZyanComponentHost name pattern is required for discovery.");
+			}
+
+			if (responseHandler == null)
+			{
+				throw new ArgumentNullException("responseHandler", "Response handler is required for discovery.");
+			}
+
+			// start service discovery
+			var request = new DiscoveryRequest(namePattern, version);
+			var dc = new DiscoveryClient(request, port);
+			dc.Discovered += (s, e) =>
+			{
+				var response = e.Metadata as DiscoveryResponse;
+				if (response != null)
+				{
+					responseHandler(response);
+				}
+			};
+
+			// note: the discovery will be stopped automatically when timed out
+			dc.StartDiscovery();
 		}
 
 		#endregion

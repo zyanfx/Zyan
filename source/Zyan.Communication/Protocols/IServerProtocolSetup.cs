@@ -42,5 +42,11 @@ namespace Zyan.Communication.Protocols
 		/// Gets the name of the remoting channel.
 		/// </summary>
 		string ChannelName { get; }
+
+		/// <summary>
+		/// Gets the URL for automatic discovery.
+		/// </summary>
+		/// <param name="zyanHostName">Name of the <see cref="ZyanComponentHost"/> instance.</param>
+		string GetDiscoverableUrl(string zyanHostName);
 	}
 }

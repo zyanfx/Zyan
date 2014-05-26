@@ -432,6 +432,36 @@ namespace Zyan.Communication.Protocols.Tcp
 			return channel;
 		}
 
+		/// <summary>
+		/// Determines whether the given URL is discoverable across the network.
+		/// </summary>
+		/// <param name="url">The URL to check.</param>
+		protected override bool IsDiscoverableUrl(string url)
+		{
+			if (!base.IsDiscoverableUrl(url))
+			{
+				return false;
+			}
+
+			var channel = CreateChannel() as TcpExChannel;
+			if (channel == null)
+			{
+				return false;
+			}
+
+			try
+			{
+				// URL based on ChannelID is not discoverable
+				var uri = new Uri(url);
+				var host = uri.Host;
+				return host != channel.ChannelID.ToString();
+			}
+			catch (UriFormatException)
+			{
+				return false;
+			}
+		}
+
 		#region Versioning settings
 
 		private Versioning _versioning = Versioning.Strict;

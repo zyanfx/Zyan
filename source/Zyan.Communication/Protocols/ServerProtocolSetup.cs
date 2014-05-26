@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using Zyan.Communication.Security;
@@ -184,6 +186,42 @@ namespace Zyan.Communication.Protocols
 					_authProvider = new NullAuthenticationProvider();
 				else
 					_authProvider = value;
+			}
+		}
+
+		/// <summary>
+		/// Gets the URL for automatic discovery.
+		/// </summary>
+		/// <param name="zyanHostName">Name of the <see cref="ZyanComponentHost" /> instance.</param>
+		public virtual string GetDiscoverableUrl(string zyanHostName)
+		{
+			var channel = CreateChannel() as IChannelReceiver;
+			if (channel == null)
+			{
+				return null;
+			}
+
+			var objectUrls = channel.GetUrlsForUri(zyanHostName).Where(IsDiscoverableUrl);
+			return objectUrls.FirstOrDefault();
+		}
+
+		/// <summary>
+		/// Determines whether the given URL is discoverable across the network.
+		/// </summary>
+		/// <param name="url">The URL to check.</param>
+		protected virtual bool IsDiscoverableUrl(string url)
+		{
+			try
+			{
+				// everything but loopback is discoverable
+				var uri = new Uri(url);
+				var host = uri.Host.ToLower();
+				return host != "localhost" && host != IPAddress.Loopback.ToString() && host != IPAddress.IPv6Loopback.ToString();
+			}
+			catch (UriFormatException)
+			{
+				// invalid uri is not discoverable
+				return false;
 			}
 		}
 	}
