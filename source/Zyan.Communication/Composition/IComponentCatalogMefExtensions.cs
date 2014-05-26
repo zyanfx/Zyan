@@ -120,6 +120,7 @@ namespace Zyan.Communication.Composition
 
 			// Dictionary: component -> owning container
 			var containers = new ConcurrentDictionary<object, CompositionContainer>();
+			var lockObject = new object();
 
 			// SingleCall component instance is created inside the child container
 			host.RegisterComponent<I>
@@ -144,7 +145,10 @@ namespace Zyan.Communication.Composition
 					// free child container and release non-shared MEF component
 					if (containers.TryRemove(component, out childContainer))
 					{
-						childContainer.Dispose();
+						lock (lockObject)
+						{
+							childContainer.Dispose();
+						}
 					}
 				}
 			);
