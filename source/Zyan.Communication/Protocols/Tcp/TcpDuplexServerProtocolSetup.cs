@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Serialization.Formatters;
@@ -8,6 +9,9 @@ using Zyan.Communication.Protocols.Tcp.DuplexChannel;
 using Zyan.Communication.Security;
 using Zyan.Communication.Toolbox;
 using System.Collections;
+using System.Net.NetworkInformation;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace Zyan.Communication.Protocols.Tcp
 {
@@ -432,6 +436,10 @@ namespace Zyan.Communication.Protocols.Tcp
 			return channel;
 		}
 
+		// Get addresses from local network adaptors
+		private static Lazy<HashSet<string>> LocalAddresses = new Lazy<HashSet<string>>(() =>
+			new HashSet<string>(Manager.GetAddresses().Select(id => id.ToString())));
+
 		/// <summary>
 		/// Determines whether the given URL is discoverable across the network.
 		/// </summary>
@@ -443,23 +451,9 @@ namespace Zyan.Communication.Protocols.Tcp
 				return false;
 			}
 
-			var channel = CreateChannel() as TcpExChannel;
-			if (channel == null)
-			{
-				return false;
-			}
-
-			try
-			{
-				// URL based on ChannelID is not discoverable
-				var uri = new Uri(url);
-				var host = uri.Host;
-				return host != channel.ChannelID.ToString();
-			}
-			catch (UriFormatException)
-			{
-				return false;
-			}
+			// URL based on ChannelID is not discoverable
+			var hostAddress = new Uri(url).Host;
+			return LocalAddresses.Value.Contains(hostAddress);
 		}
 
 		#region Versioning settings

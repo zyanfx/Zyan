@@ -92,7 +92,10 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				// GetAllNetworkInterfaces() may be slow, so execute it once and cache results
 				var query =
 					from nic in NetworkInterface.GetAllNetworkInterfaces()
-					from ua in GetUnicastAddresses(nic.GetIPProperties())
+					where nic.OperationalStatus == OperationalStatus.Up
+					let props = nic.GetIPProperties()
+					where props.GatewayAddresses.Any() // has default gateway address
+					from ua in GetUnicastAddresses(props)
 					where ua.AddressFamily == addressFamily
 					select ua;
 				addresses = query.ToList();
