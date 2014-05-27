@@ -74,6 +74,7 @@ namespace Zyan.Communication.Discovery
 
 			var serverEndpoint = new IPEndPoint(LocalAddress, Port);
 			UdpClient = new UdpClient();
+			UdpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, 1);
 			UdpClient.Client.Bind(serverEndpoint);
 			UdpClient.BeginReceive(ReceiveCallback, UdpClient);
 		}
