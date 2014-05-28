@@ -390,6 +390,7 @@ namespace Zyan.Communication
 				details.Registration = _host.ComponentRegistry[details.InterfaceName];
 
 			// get component instance
+			details.InterfaceType = details.Registration.InterfaceType;
 			details.Instance = _host.GetComponentInstance(details.Registration);
 			details.Type = details.Instance.GetType();
 		}
@@ -400,8 +401,7 @@ namespace Zyan.Communication
 		/// <param name="details">Invocation details</param>
 		private void Invoke_ObtainMethodMetadata(InvocationDetails details)
 		{
-			details.MethodInfo = details.Type.GetMethod(details.MethodName, details.GenericArguments, details.ParamTypes);
-			if (details.MethodInfo == null)
+			if (!details.FindMethodInfo())
 			{
 				var methodSignature = MessageHelpers.GetMethodSignature(details.Type, details.MethodName, details.ParamTypes);
 				var exceptionMessage = String.Format(LanguageResource.MissingMethodException_MethodNotFound, methodSignature);
