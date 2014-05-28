@@ -82,6 +82,7 @@
     <Compile Include="EventStubTests.cs" />
     <Compile Include="GenericMethodsTests.cs" />
     <Compile Include="HeartbeatSessionTests.cs" />
+    <Compile Include="InvocationDetailsTests.cs" />
     <Compile Include="LinqTests.cs" />
     <Compile Include="LocalCallContextDataTests.cs" />
     <Compile Include="MefClientTests.cs" />

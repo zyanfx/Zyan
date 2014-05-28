@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Transactions;
 using Zyan.Communication.Delegates;
+using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication
 {
@@ -78,6 +79,11 @@ namespace Zyan.Communication
 		public Type Type { get; set; }
 
 		/// <summary>
+		/// Gets or sets the interface type.
+		/// </summary>
+		public Type InterfaceType { get; set; }
+
+		/// <summary>
 		/// Gets or stes the session.
 		/// </summary>
 		public ServerSession Session { get; set; }
@@ -101,5 +107,31 @@ namespace Zyan.Communication
 		/// Gets or sets method metadata.
 		/// </summary>
 		public MethodInfo MethodInfo { get; set; }
+
+		/// <summary>
+		/// Finds the method information.
+		/// </summary>
+		public bool FindMethodInfo()
+		{
+			// find public method of the component
+			MethodInfo = Type.GetMethod(MethodName, GenericArguments, ParamTypes);
+			if (MethodInfo == null)
+			{
+				// find method of the interface
+				var method = InterfaceType.GetMethod(MethodName, GenericArguments, ParamTypes);
+				if (method != null && Type.GetInterface(InterfaceType.Name) != null)
+				{
+					// get the corresponding method of the component
+					var map = Type.GetInterfaceMap(InterfaceType);
+					var index = Array.IndexOf(map.InterfaceMethods, method);
+					if (index >= 0)
+					{
+						MethodInfo = map.TargetMethods[index];
+					}
+				}
+			}
+
+			return MethodInfo != null;
+		}
 	}
 }
