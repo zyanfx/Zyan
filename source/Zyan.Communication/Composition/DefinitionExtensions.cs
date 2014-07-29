@@ -25,8 +25,25 @@ namespace Zyan.Communication.Composition
 			// Condition:
 			// 1) md[ComponentInterface] is defined
 			// 2) md[IsPublished] is true or is not defined
-			return md.ContainsKey(key) && md[key] is Type && (!md.ContainsKey(flag) ||
-				(md.ContainsKey(flag) && md[flag] is bool && Convert.ToBoolean(md[flag])));
+			// -----------------
+			// md.ContainsKey(key) && md[key] is Type && (!md.ContainsKey(flag) ||
+			//	(md.ContainsKey(flag) && md[flag] is bool && Convert.ToBoolean(md[flag])));
+
+			// Optimized condition:
+			object typeValue, flagValue;
+			if (md.TryGetValue(key, out typeValue) && typeValue is Type)
+			{
+				if (md.TryGetValue(flag, out flagValue) && flagValue is bool)
+				{
+					return Convert.ToBoolean(flagValue);
+				}
+
+				// default flag value: IsPublished = true
+				return true;
+			}
+
+			// component type metadata is required
+			return false;
 		}
 
 		/// <summary>
@@ -38,7 +55,16 @@ namespace Zyan.Communication.Composition
 			var key = CompositionConstants.PartCreationPolicyMetadataName;
 
 			// Condition: CreationPolicy == NonShared
-			return md.ContainsKey(key) && (CreationPolicy)md[key] == CreationPolicy.NonShared;
+			// return md.ContainsKey(key) && (CreationPolicy)md[key] == CreationPolicy.NonShared;
+
+			// Optimized condition:
+			object creationPolicy;
+			if (md.TryGetValue(key, out creationPolicy) && (CreationPolicy)creationPolicy == CreationPolicy.NonShared)
+			{
+				return true;
+			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -50,7 +76,18 @@ namespace Zyan.Communication.Composition
 			var key = CompositionConstants.PartCreationPolicyMetadataName;
 
 			// Condition: CreationPolicy is not specified or is either Any or NonShared
-			return !md.ContainsKey(key) || (CreationPolicy)md[key] == CreationPolicy.Any || def.IsNonShared();
+			// return !md.ContainsKey(key) || (CreationPolicy)md[key] == CreationPolicy.Any || def.IsNonShared();
+
+			// Optimized condition:
+			object creationPolicy;
+			if (md.TryGetValue(key, out creationPolicy))
+			{
+				var policy = (CreationPolicy)creationPolicy;
+				return policy == CreationPolicy.Any || policy == CreationPolicy.NonShared;
+			}
+
+			// by default, treat components as non-shared
+			return true;
 		}
 	}
 }
