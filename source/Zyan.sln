@@ -30,43 +30,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests.InterLinq", "Tests.In
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterLinq.UnitTests.NUnit", "Zyan.Tests.InterLinq\UnitTests\InterLinq.UnitTests.NUnit.csproj", "{37A20035-ABE1-44D1-901E-845157D85010}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Communication.Fx4", "Zyan.Communication\Zyan.Communication.Fx4.csproj", "{7E93E5E0-B1FB-48E9-9E83-0F07AED2A094}"
+EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 9
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs15
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = Zyan.Communication\\Zyan.Communication.csproj
-		SccProjectName1 = Zyan.Communication
-		SccLocalPath1 = Zyan.Communication
-		SccProjectUniqueName2 = Zyan.Tests\\Zyan.Tests.csproj
-		SccProjectTopLevelParentUniqueName2 = Zyan.sln
-		SccProjectName2 = Zyan.Tests
-		SccLocalPath2 = Zyan.Tests
-		SccProjectUniqueName3 = IntegrationTest_DistributedEvents\\IntegrationTest_DistributedEvents.csproj
-		SccProjectTopLevelParentUniqueName3 = Zyan.sln
-		SccProjectName3 = IntegrationTest_DistributedEvents
-		SccLocalPath3 = IntegrationTest_DistributedEvents
-		SccProjectUniqueName4 = Zyan.Communication\\Zyan.Communication.Fx3.csproj
-		SccProjectName4 = Zyan.Communication
-		SccLocalPath4 = Zyan.Communication
-		SccProjectUniqueName5 = Zyan.Tests.InterLinq\\Artefacts\\InterLinq.UnitTests.Artefacts.csproj
-		SccProjectTopLevelParentUniqueName5 = Zyan.sln
-		SccProjectName5 = Zyan.Tests.InterLinq/Artefacts
-		SccLocalPath5 = Zyan.Tests.InterLinq\\Artefacts
-		SccProjectUniqueName6 = Zyan.Tests.InterLinq\\Server\\InterLinq.UnitTests.Server.csproj
-		SccProjectTopLevelParentUniqueName6 = Zyan.sln
-		SccProjectName6 = Zyan.Tests.InterLinq/Server
-		SccLocalPath6 = Zyan.Tests.InterLinq\\Server
-		SccProjectUniqueName7 = Zyan.Tests.InterLinq\\UnitTests\\InterLinq.UnitTests.csproj
-		SccProjectTopLevelParentUniqueName7 = Zyan.sln
-		SccProjectName7 = Zyan.Tests.InterLinq/UnitTests
-		SccLocalPath7 = Zyan.Tests.InterLinq\\UnitTests
-		SccProjectUniqueName8 = Zyan.Tests.InterLinq\\UnitTests\\InterLinq.UnitTests.NUnit.csproj
-		SccProjectTopLevelParentUniqueName8 = Zyan.sln
-		SccProjectName8 = Zyan.Tests.InterLinq/UnitTests
-		SccLocalPath8 = Zyan.Tests.InterLinq\\UnitTests
-	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Zyan.vsmdi
 	EndGlobalSection
@@ -129,6 +95,12 @@ Global
 		{37A20035-ABE1-44D1-901E-845157D85010}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{37A20035-ABE1-44D1-901E-845157D85010}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{37A20035-ABE1-44D1-901E-845157D85010}.Release|x64.ActiveCfg = Release|Any CPU
+		{7E93E5E0-B1FB-48E9-9E83-0F07AED2A094}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E93E5E0-B1FB-48E9-9E83-0F07AED2A094}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E93E5E0-B1FB-48E9-9E83-0F07AED2A094}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7E93E5E0-B1FB-48E9-9E83-0F07AED2A094}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E93E5E0-B1FB-48E9-9E83-0F07AED2A094}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E93E5E0-B1FB-48E9-9E83-0F07AED2A094}.Release|x64.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
