@@ -27,7 +27,12 @@ namespace Zyan.Communication.Composition
 		/// <param name="container">Optional root composition container used to instantiate components.</param>
 		public static void RegisterComponents(this IComponentCatalog host, ComposablePartCatalog rootCatalog, CompositionContainer container = null)
 		{
-			var parentContainer = container ?? new CompositionContainer(rootCatalog);
+			var parentContainer = container ??
+#if FX4
+				new CompositionContainer(rootCatalog);
+#else
+				new CompositionContainer(rootCatalog, CompositionOptions.DisableSilentRejection);
+#endif
 			var nonSharedCatalog = new NonSharedPartsCatalog(rootCatalog);
 
 			// register exported components
@@ -129,7 +134,12 @@ namespace Zyan.Communication.Composition
 				delegate // factory method
 				{
 					// create child container for early component disposal
-					var childContainer = new CompositionContainer(childCatalog, parentContainer);
+					var childContainer =
+#if FX4
+						new CompositionContainer(childCatalog, parentContainer);
+#else
+						new CompositionContainer(childCatalog, CompositionOptions.DisableSilentRejection, parentContainer);
+#endif
 					var component = contractName != null ? 
 						childContainer.GetExport<I>(contractName).Value : 
 						childContainer.GetExport<I>().Value;
