@@ -106,6 +106,7 @@ namespace Zyan.Tests
 		public static void StartServer(TestContext ctx)
 		{
 			ZyanSettings.LegacyBlockingEvents = true;
+			ZyanSettings.LegacyBlockingSubscriptions = true;
 
 			var serverSetup = new NullServerProtocolSetup(3456);
 			ZyanHost = new ZyanComponentHost("CallInterceptorServer", serverSetup);

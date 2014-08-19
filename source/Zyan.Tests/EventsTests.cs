@@ -155,6 +155,7 @@ namespace Zyan.Tests
 		public static void StartServer(TestContext ctx)
 		{
 			ZyanSettings.LegacyBlockingEvents = true;
+			ZyanSettings.LegacyBlockingSubscriptions = true;
 			ZyanSettings.LegacyUnprotectedEventHandlers = true;
 
 			var serverSetup = new NullServerProtocolSetup(2345);

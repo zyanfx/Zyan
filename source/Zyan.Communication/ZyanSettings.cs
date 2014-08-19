@@ -30,6 +30,14 @@ namespace Zyan.Communication
 		public static bool LegacyBlockingEvents { get; set; }
 
 		/// <summary>
+		/// Gets or sets a value indicating whether legacy blocking subscription mode is enabled.
+		/// </summary>
+		/// <remarks>
+		/// Zyan v2.5 and lower blocked client threads while subscribing to events: proxy.Event += handler;
+		/// </remarks>
+		public static bool LegacyBlockingSubscriptions { get; set; }
+
+		/// <summary>
 		/// Gets or sets a value indicating whether legacy unprotected events handling mode is enabled.
 		/// </summary>
 		/// <remarks>

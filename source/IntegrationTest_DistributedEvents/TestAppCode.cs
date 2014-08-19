@@ -261,6 +261,7 @@ namespace IntegrationTest_DistributedEvents
 
 			// use legacy blocking events mode because we check the handlers synchronously
 			ZyanSettings.LegacyBlockingEvents = true;
+			ZyanSettings.LegacyBlockingSubscriptions = true;
 		}
 
 		public void Dispose()

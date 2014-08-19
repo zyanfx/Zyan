@@ -47,6 +47,9 @@ namespace IntegrationTest_DistributedEvents
 			});
 			_serverAppDomain.DoCallBack(serverWork);
 
+			// Subscriptions are tested synchronously
+			ZyanSettings.LegacyBlockingSubscriptions = true;
+
 			// Test IPC Binary
 			int ipcBinaryTestResult = IpcBinaryTest.RunTest();
 			Console.WriteLine("Passed: {0}", ipcBinaryTestResult == 0);
