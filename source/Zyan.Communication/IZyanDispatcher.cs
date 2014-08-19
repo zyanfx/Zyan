@@ -66,20 +66,20 @@ namespace Zyan.Communication
 		int RenewSession();
 
 		/// <summary>
-		/// Adds a handler to an event of a server component.
+		/// Adds remote handlers to events of a server component.
 		/// </summary>
-		/// <param name="interfaceName">Name of the server component interface</param>
-		/// <param name="correlation">Correlation information</param>
-		/// <param name="uniqueName">Unique name of the server component instance (May left empty, if component isn´t registered with a unique name)</param>
-		void AddEventHandler(string interfaceName, DelegateCorrelationInfo correlation, string uniqueName);
+		/// <param name="interfaceName">Name of the server component interface.</param>
+		/// <param name="correlationSet">Correlation information.</param>
+		/// <param name="uniqueName">Unique name of the server component instance (may be left empty, if component isn't registered with a unique name).</param>
+		void AddEventHandlers(string interfaceName, IEnumerable<DelegateCorrelationInfo> correlationSet, string uniqueName);
 
 		/// <summary>
-		/// Removes a handler from an event of a server component.
+		/// Removes remote handlers from events of a server component.
 		/// </summary>
-		/// <param name="interfaceName">Name of the server component interface</param>
-		/// <param name="correlation">Correlation information</param>
-		/// <param name="uniqueName">Unique name of the server component instance (May left empty, if component isn´t registered with a unique name)</param>
-		void RemoveEventHandler(string interfaceName, DelegateCorrelationInfo correlation, string uniqueName);
+		/// <param name="interfaceName">Name of the server component interface.</param>
+		/// <param name="correlationSet">Correlation information.</param>
+		/// <param name="uniqueName">Unique name of the server component instance (may be left empty, if component isn't registered with a unique name).</param>
+		void RemoveEventHandlers(string interfaceName, IEnumerable<DelegateCorrelationInfo> correlationSet, string uniqueName);
 
 		/// <summary>
 		/// Event: Occours when a heartbeat signal is received from a client.

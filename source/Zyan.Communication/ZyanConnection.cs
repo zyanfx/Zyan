@@ -998,11 +998,11 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Increments the subscription counter.
+		/// Adds the specified count to the subscription counter.
 		/// </summary>
-		internal void IncrementSubscriptionCounter()
+		internal void UpdateSubscriptionCounter(int count)
 		{
-			Interlocked.Increment(ref _remoteSubscriptionCounter);
+			Interlocked.Add(ref _remoteSubscriptionCounter, count);
 		}
 
 		/// <summary>

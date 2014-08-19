@@ -49,7 +49,7 @@ namespace Zyan.Communication
 		/// <param name="eventStub"><see cref="EventStub"/> with cached subscriptions.</param>
 		/// <param name="delegateCorrelationSet">Correlation set (say how to wire)</param>
 		/// <param name="wiringList">Collection of built wires</param>
-		private void CreateClientServerWires(Type type, EventStub eventStub, List<DelegateCorrelationInfo> delegateCorrelationSet, Dictionary<Guid, Delegate> wiringList)
+		private void CreateClientServerWires(Type type, EventStub eventStub, IEnumerable<DelegateCorrelationInfo> delegateCorrelationSet, Dictionary<Guid, Delegate> wiringList)
 		{
 			if (delegateCorrelationSet == null)
 				return;
@@ -121,7 +121,7 @@ namespace Zyan.Communication
 		/// <param name="eventStub"><see cref="EventStub"/> with cached subscriptions.</param>
 		/// <param name="delegateCorrelationSet">Correlation set with wiring information</param>
 		/// <param name="wiringList">List with known wirings</param>
-		private void RemoveClientServerWires(Type type, EventStub eventStub, List<DelegateCorrelationInfo> delegateCorrelationSet, Dictionary<Guid, Delegate> wiringList)
+		private void RemoveClientServerWires(Type type, EventStub eventStub, IEnumerable<DelegateCorrelationInfo> delegateCorrelationSet, Dictionary<Guid, Delegate> wiringList)
 		{
 			if (delegateCorrelationSet == null)
 				return;
@@ -555,12 +555,12 @@ namespace Zyan.Communication
 		#region Event support
 
 		/// <summary>
-		/// Adds a handler to an event of a server component.
+		/// Adds remote handlers to events of a server component.
 		/// </summary>
-		/// <param name="interfaceName">Name of the server component interface</param>
-		/// <param name="correlation">Correlation information</param>
-		/// <param name="uniqueName">Unique name of the server component instance (May left empty, if component isn´t registered with a unique name)</param>
-		public void AddEventHandler(string interfaceName, DelegateCorrelationInfo correlation, string uniqueName)
+		/// <param name="interfaceName">Name of the server component interface.</param>
+		/// <param name="correlationSet">Correlation information.</param>
+		/// <param name="uniqueName">Unique name of the server component instance (may be left empty, if component isn't registered with a unique name).</param>
+		public void AddEventHandlers(string interfaceName, IEnumerable<DelegateCorrelationInfo> correlationSet, string uniqueName)
 		{
 			if (string.IsNullOrEmpty(interfaceName))
 				throw new ArgumentException(LanguageResource.ArgumentException_InterfaceNameMissing, "interfaceName");
@@ -580,23 +580,18 @@ namespace Zyan.Communication
 			Invoke_LoadCallContextData(details);
 			Invoke_SetSession(details);
 			Invoke_ResolveComponentInstance(details);
-
-			var correlationSet = new List<DelegateCorrelationInfo>
-			{
-				correlation
-			};
 
 			CreateClientServerWires(details.Type, details.Registration.EventStub, correlationSet, details.Registration.EventWirings);
 			Invoke_CleanUp(details);
 		}
 
 		/// <summary>
-		/// Removes a handler from an event of a server component.
+		/// Removes remote handlers from events of a server component.
 		/// </summary>
-		/// <param name="interfaceName">Name of the server component interface</param>
-		/// <param name="correlation">Correlation information</param>
-		/// <param name="uniqueName">Unique name of the server component instance (May left empty, if component isn´t registered with a unique name)</param>
-		public void RemoveEventHandler(string interfaceName, DelegateCorrelationInfo correlation, string uniqueName)
+		/// <param name="interfaceName">Name of the server component interface.</param>
+		/// <param name="correlationSet">Correlation information.</param>
+		/// <param name="uniqueName">Unique name of the server component instance (may be left empty, if component isn't registered with a unique name).</param>
+		public void RemoveEventHandlers(string interfaceName, IEnumerable<DelegateCorrelationInfo> correlationSet, string uniqueName)
 		{
 			if (string.IsNullOrEmpty(interfaceName))
 				throw new ArgumentException(LanguageResource.ArgumentException_InterfaceNameMissing, "interfaceName");
@@ -616,11 +611,6 @@ namespace Zyan.Communication
 			Invoke_LoadCallContextData(details);
 			Invoke_SetSession(details);
 			Invoke_ResolveComponentInstance(details);
-
-			var correlationSet = new List<DelegateCorrelationInfo>
-			{
-				correlation
-			};
 
 			RemoveClientServerWires(details.Type, details.Registration.EventStub, correlationSet, details.Registration.EventWirings);
 			Invoke_CleanUp(details);
