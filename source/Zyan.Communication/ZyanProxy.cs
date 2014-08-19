@@ -284,7 +284,7 @@ namespace Zyan.Communication
 					EventFilter = eventFilter
 				};
 
-				AddRemoteEventHandler(correlationInfo);
+				AddRemoteEventHandlers(new List<DelegateCorrelationInfo> { correlationInfo });
 
 				// Save delegate correlation info
 				lock (_delegateCorrelationSet)
@@ -337,7 +337,7 @@ namespace Zyan.Communication
 
 					if (found != null)
 					{
-						RemoveRemoteEventHandler(found);
+						RemoveRemoteEventHandlers(new List<DelegateCorrelationInfo> { found });
 
 						// Remove delegate correlation info
 						lock (_delegateCorrelationSet)
@@ -378,30 +378,37 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Adds a handler to a remote event or delegate.
+		/// Adds remote handlers to server events or delegate properties.
 		/// </summary>
-		/// <param name="correlationInfo">Correlation data</param>
-		private void AddRemoteEventHandler(DelegateCorrelationInfo correlationInfo)
+		/// <param name="correlationSet">Correlation data.</param>
+		private void AddRemoteEventHandlers(List<DelegateCorrelationInfo> correlationSet)
 		{
-			if (correlationInfo == null)
-				throw new ArgumentNullException("correlationInfo");
+			if (correlationSet == null)
+				throw new ArgumentNullException("correlationSet");
 
-			_connection.PrepareCallContext(false);
-			_connection.RemoteDispatcher.AddEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
-			_connection.IncrementSubscriptionCounter();
+			var count = correlationSet.Count;
+			if (count > 0)
+			{
+				_connection.PrepareCallContext(false);
+				_connection.RemoteDispatcher.AddEventHandlers(_interfaceType.FullName, correlationSet, _uniqueName);
+				_connection.UpdateSubscriptionCounter(count);
+			}
 		}
 
 		/// <summary>
-		/// Removes a handler from a remote event or delegate.
+		/// Removes remote handlers from server events or delegate properties.
 		/// </summary>
-		/// <param name="correlationInfo">Correlation data</param>
-		private void RemoveRemoteEventHandler(DelegateCorrelationInfo correlationInfo)
+		/// <param name="correlationSet">Correlation data.</param>
+		private void RemoveRemoteEventHandlers(List<DelegateCorrelationInfo> correlationSet)
 		{
-			if (correlationInfo == null)
-				throw new ArgumentNullException("correlationInfo");
+			if (correlationSet == null)
+				throw new ArgumentNullException("correlationSet");
 
-			_connection.PrepareCallContext(false);
-			_connection.RemoteDispatcher.RemoveEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
+			if (correlationSet.Count > 0)
+			{
+				_connection.PrepareCallContext(false);
+				_connection.RemoteDispatcher.RemoveEventHandlers(_interfaceType.FullName, correlationSet, _uniqueName);
+			}
 		}
 
 		/// <summary>
@@ -413,16 +420,13 @@ namespace Zyan.Communication
 		internal void ReconnectRemoteEvents()
 		{
 			// copy delegates
-			IEnumerable<DelegateCorrelationInfo> correlationSet;
+			List<DelegateCorrelationInfo> correlationSet;
 			lock (_delegateCorrelationSet)
 			{
-				correlationSet = _delegateCorrelationSet.ToArray();
+				correlationSet = _delegateCorrelationSet.ToList();
 			}
 
-			foreach (var correlationInfo in correlationSet)
-			{
-				AddRemoteEventHandler(correlationInfo);
-			}
+			AddRemoteEventHandlers(correlationSet);
 		}
 
 		/// <summary>
@@ -616,20 +620,16 @@ namespace Zyan.Communication
 			if (_delegateCorrelationSet.Count > 0)
 			{
 				// copy delegates
-				IEnumerable<DelegateCorrelationInfo> correlationSet;
+				List<DelegateCorrelationInfo> correlationSet;
 				lock (_delegateCorrelationSet)
 				{
-					correlationSet = _delegateCorrelationSet.ToArray();
+					correlationSet = _delegateCorrelationSet.ToList();
 				}
 
-				foreach (var correlationInfo in correlationSet)
+				RemoveRemoteEventHandlers(correlationSet);
+				lock (_delegateCorrelationSet)
 				{
-					RemoveRemoteEventHandler(correlationInfo);
-
-					lock (_delegateCorrelationSet)
-					{
-						_delegateCorrelationSet.Remove(correlationInfo);
-					}
+					_delegateCorrelationSet.Clear();
 				}
 			}
 		}
