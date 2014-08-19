@@ -9,6 +9,7 @@ using System.Runtime.Remoting.Proxies;
 using System.Threading;
 using Zyan.Communication.Delegates;
 using Zyan.Communication.Toolbox;
+using Zyan.Communication.Toolbox.Diagnostics;
 using Zyan.InterLinq;
 
 namespace Zyan.Communication
@@ -243,6 +244,28 @@ namespace Zyan.Communication
 			}
 		}
 
+		private void OptionalAsync(bool sync, Action action)
+		{
+			if (sync)
+			{
+				action();
+				return;
+			}
+
+			ThreadPool.QueueUserWorkItem(x =>
+			{
+				try
+				{
+					action();
+				}
+				catch (Exception ex) // SocketException, etc.
+				{
+					// ZyanConnection will detect and retry to subscribe/unsubscribe when connection is re-established
+					Trace.WriteLine("Subscription failed due to an exception: {0}", ex);
+				}
+			});
+		}
+
 		/// <summary>
 		/// Handles subscription to events.
 		/// </summary>
@@ -284,7 +307,8 @@ namespace Zyan.Communication
 					EventFilter = eventFilter
 				};
 
-				AddRemoteEventHandlers(new List<DelegateCorrelationInfo> { correlationInfo });
+				OptionalAsync(ZyanSettings.LegacyBlockingSubscriptions, () =>
+					AddRemoteEventHandlers(new List<DelegateCorrelationInfo> { correlationInfo }));
 
 				// Save delegate correlation info
 				lock (_delegateCorrelationSet)
@@ -337,7 +361,8 @@ namespace Zyan.Communication
 
 					if (found != null)
 					{
-						RemoveRemoteEventHandlers(new List<DelegateCorrelationInfo> { found });
+						OptionalAsync(ZyanSettings.LegacyBlockingSubscriptions, () =>
+							RemoveRemoteEventHandlers(new List<DelegateCorrelationInfo> { found }));
 
 						// Remove delegate correlation info
 						lock (_delegateCorrelationSet)
@@ -389,9 +414,9 @@ namespace Zyan.Communication
 			var count = correlationSet.Count;
 			if (count > 0)
 			{
+				_connection.UpdateSubscriptionCounter(count);
 				_connection.PrepareCallContext(false);
 				_connection.RemoteDispatcher.AddEventHandlers(_interfaceType.FullName, correlationSet, _uniqueName);
-				_connection.UpdateSubscriptionCounter(count);
 			}
 		}
 
@@ -408,6 +433,20 @@ namespace Zyan.Communication
 			{
 				_connection.PrepareCallContext(false);
 				_connection.RemoteDispatcher.RemoveEventHandlers(_interfaceType.FullName, correlationSet, _uniqueName);
+			}
+		}
+
+		/// <summary>
+		/// Gets the delegate correlations between server events and client handlers.
+		/// </summary>
+		internal List<DelegateCorrelationInfo> DelegateCorrelationSet
+		{
+			get
+			{
+				lock (_delegateCorrelationSet)
+				{
+					return _delegateCorrelationSet.ToList();
+				}
 			}
 		}
 

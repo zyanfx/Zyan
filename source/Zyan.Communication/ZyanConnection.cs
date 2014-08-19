@@ -959,7 +959,7 @@ namespace Zyan.Communication
 				if (performNewLogon)
 				{
 					RemoteDispatcher.Logon(_sessionID, credentials);
-					ReconnectRemoteEvents();
+					ReconnectRemoteEventsAsync();
 
 					RemoteDispatcher.ReceiveClientHeartbeat(_sessionID);
 					return true;
@@ -983,9 +983,6 @@ namespace Zyan.Communication
 
 		/// <summary>
 		/// Reconnects to all remote events or delegates of any known proxy for this connection, after a server restart.
-		/// <remarks>
-		/// Caution! This method does not check, if the event handler registrations are truly lost (caused by a server restart).
-		/// </remarks>
 		/// </summary>
 		private void ReconnectRemoteEvents()
 		{
@@ -995,6 +992,24 @@ namespace Zyan.Communication
 			{
 				zyanProxy.ReconnectRemoteEvents();
 			}
+		}
+
+		/// <summary>
+		/// Reconnects the remote events asynchronously.
+		/// </summary>
+		private void ReconnectRemoteEventsAsync()
+		{
+			ThreadPool.QueueUserWorkItem(x =>
+			{
+				try
+				{
+					ReconnectRemoteEvents();
+				}
+				catch (Exception ex)
+				{
+					Trace.WriteLine("Error while restoring client subscriptions: {0}", ex);
+				}
+			});
 		}
 
 		/// <summary>
@@ -1018,17 +1033,7 @@ namespace Zyan.Communication
 				if (remoteCounter < _remoteSubscriptionCounter)
 				{
 					// restore subscriptions asynchronously
-					ThreadPool.QueueUserWorkItem(x =>
-					{
-						try
-						{
-							ReconnectRemoteEvents();
-						}
-						catch (Exception ex)
-						{
-							Trace.WriteLine("Error while restoring client subscriptions: {0}", ex);
-						}
-					});
+					ReconnectRemoteEventsAsync();
 				}
 			}
 		}
@@ -1038,7 +1043,7 @@ namespace Zyan.Communication
 			// restore subscriptions if necessary
 			if (_remoteSubscriptionCounter > 0)
 			{
-				ReconnectRemoteEvents();
+				ReconnectRemoteEventsAsync();
 			}
 		}
 
