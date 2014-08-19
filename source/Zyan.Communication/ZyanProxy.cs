@@ -624,11 +624,7 @@ namespace Zyan.Communication
 
 				foreach (var correlationInfo in correlationSet)
 				{
-					if (_activationType == ActivationType.Singleton)
-					{
-						_connection.PrepareCallContext(false);
-						_connection.RemoteDispatcher.RemoveEventHandler(_interfaceType.FullName, correlationInfo, _uniqueName);
-					}
+					RemoveRemoteEventHandler(correlationInfo);
 
 					lock (_delegateCorrelationSet)
 					{
