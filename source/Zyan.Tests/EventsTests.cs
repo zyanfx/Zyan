@@ -161,6 +161,8 @@ namespace Zyan.Tests
 			var serverSetup = new NullServerProtocolSetup(2345);
 			ZyanHost = new ZyanComponentHost("EventsServer", serverSetup);
 			ZyanHost.RegisterComponent<ISampleServer, SampleServer<int>>("Singleton", ActivationType.Singleton);
+			ZyanHost.RegisterComponent<ISampleServer, SampleServer<short>>("Singleton2", ActivationType.Singleton);
+			ZyanHost.RegisterComponent<ISampleServer, SampleServer<long>>("Singleton3", ActivationType.Singleton);
 			ZyanHost.RegisterComponent<ISampleServer, SampleServer<byte>>("SingleCall", ActivationType.SingleCall);
 			ZyanHost.RegisterComponent<ISampleServer, SampleServer<char>>("SingletonExternal", new SampleServer<char>());
 
@@ -244,7 +246,7 @@ namespace Zyan.Tests
 				throw new Exception();
 			});
 
-			var proxy = ZyanConnection.CreateProxy<ISampleServer>("Singleton");
+			var proxy = ZyanConnection.CreateProxy<ISampleServer>("Singleton2");
 			proxy.TestEvent += eventHandler;
 
 			// raise an event, catch exception and unsubscribe automatically
@@ -262,7 +264,7 @@ namespace Zyan.Tests
 			var handled = false;
 			var eventHandler = new EventHandler((s, e) => handled = true);
 
-			var proxy = ZyanConnection.CreateProxy<ISampleServer>("Singleton");
+			var proxy = ZyanConnection.CreateProxy<ISampleServer>("Singleton3");
 			proxy.TestEvent += eventHandler;
 			handled = false;
 

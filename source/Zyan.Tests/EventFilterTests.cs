@@ -236,10 +236,11 @@ namespace Zyan.Tests
 		public static void StartServer(TestContext ctx)
 		{
 			ZyanSettings.LegacyBlockingEvents = true;
+			ZyanSettings.LegacyBlockingSubscriptions = true;
 
 			var serverSetup = new NullServerProtocolSetup(4567);
 			ZyanHost = new ZyanComponentHost("EventFilterServer", serverSetup);
-			ZyanHost.RegisterComponent<ISampleServer, SampleServer>(ActivationType.Singleton);
+			ZyanHost.RegisterComponent<ISampleServer, SampleServer>();
 
 			ZyanConnection = new ZyanConnection("null://NullChannel:4567/EventFilterServer");
 		}

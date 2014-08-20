@@ -20,7 +20,7 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>..\..\bin\UnitTestsMono\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NUNIT</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NUNIT;MONO</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>1685</NoWarn>

@@ -193,6 +193,7 @@ namespace Zyan.Tests
 			Assert.AreSame(type1, type2);
 		}
 
+#if !MONO
 		[TestMethod, ExpectedException(typeof(SerializationException))]
 		public void BinaryFormatter_DeserializationProblems()
 		{
@@ -210,6 +211,7 @@ namespace Zyan.Tests
 				Assert.IsNotNull(newObj);
 			}
 		}
+#endif
 
 		[TestMethod]
 		public void BinaryFormatter_DynamicBinderAllowsDeserialization()

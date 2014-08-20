@@ -35,11 +35,10 @@ namespace Zyan.Tests
 	[TestClass]
 	public class LocalCallContextDataTests : MarshalByRefObject
 	{
-		private const string SlotName = "Hello";
-
 		[TestMethod]
 		public void OrdinalCallContextDataDoesntFlowWithExecutionContextInDeledateBeginInvoke()
 		{
+			const string SlotName = "Hello1";
 			CallContext.SetData(SlotName, "World");
 
 			var dataAccessible = false;
@@ -58,6 +57,7 @@ namespace Zyan.Tests
 		[TestMethod]
 		public void OrdinalCallContextDataDoesntFlowWithExecutionContextInQueueUserWorkItem()
 		{
+			const string SlotName = "Hello2";
 			CallContext.SetData(SlotName, "World");
 
 			var dataAccessible = false;
@@ -77,6 +77,7 @@ namespace Zyan.Tests
 		[TestMethod]
 		public void OrdinalCallContextDataDoesntFlowWithExecutionContextInThreadStart()
 		{
+			const string SlotName = "Hello3";
 			CallContext.SetData(SlotName, "World");
 
 			var dataAccessible = false;
@@ -97,15 +98,14 @@ namespace Zyan.Tests
 		[TestMethod]
 		public void OrdinalCallContextDataDoesntFlowWithExecutionContextInTaskStartNew()
 		{
+			const string SlotName = "Hello4";
 			CallContext.SetData(SlotName, "World");
 
 			var dataAccessible = false;
-			var resetEvent = new ManualResetEvent(false);
 			var task = Task.Factory.StartNew(() =>
 			{
 				var data = CallContext.GetData(SlotName);
 				dataAccessible = data != null;
-				resetEvent.Set();
 			});
 
 			// check if ordinal call context data is not accessible
@@ -116,6 +116,7 @@ namespace Zyan.Tests
 		[TestMethod]
 		public void LocalCallContextDataFlowsWithExecutionContextInDeledateBeginInvoke()
 		{
+			const string SlotName = "Hello5";
 			LocalCallContextData.SetData(SlotName, "World");
 
 			var dataAccessible = false;
@@ -134,6 +135,7 @@ namespace Zyan.Tests
 		[TestMethod]
 		public void LocalCallContextDataFlowsWithExecutionContextInQueueUserWorkItem()
 		{
+			const string SlotName = "Hello6";
 			LocalCallContextData.SetData(SlotName, "World");
 
 			var dataAccessible = false;
@@ -153,6 +155,7 @@ namespace Zyan.Tests
 		[TestMethod]
 		public void LocalCallContextDataFlowsWithExecutionContextInThreadStart()
 		{
+			const string SlotName = "Hello7";
 			LocalCallContextData.SetData(SlotName, "World");
 
 			var dataAccessible = false;
@@ -173,6 +176,7 @@ namespace Zyan.Tests
 		[TestMethod]
 		public void LocalCallContextDataFlowsWithExecutionContextInTaskStartNew()
 		{
+			const string SlotName = "Hello8";
 			LocalCallContextData.SetData(SlotName, "World");
 
 			var dataAccessible = false;
@@ -192,12 +196,14 @@ namespace Zyan.Tests
 		[TestMethod]
 		public void LocalCallContextDataDoestnLeaveApplicationDomain()
 		{
-			var domainSetup = new AppDomainSetup { ApplicationBase = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) };
+			var domainSetup = new AppDomainSetup { ApplicationBase = AppDomain.CurrentDomain.BaseDirectory };
 			var otherDomain = AppDomain.CreateDomain("Sandbox", null, domainSetup);
 			otherDomain.Load(typeof(ZyanConnection).Assembly.GetName());
+			otherDomain.Load(typeof(LocalCallContextDataTests).Assembly.GetName());
 
 			try
 			{
+				const string SlotName = "Hello9";
 				LocalCallContextData.SetData(SlotName, "World");
 				var dataAccessible = LocalCallContextData.GetData(SlotName) != null;
 				Assert.IsTrue(dataAccessible);
