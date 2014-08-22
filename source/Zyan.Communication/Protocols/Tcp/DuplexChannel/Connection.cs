@@ -74,6 +74,9 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 			Trace.WriteLine("TcpEx.Connection.GetConnection: {0}", address);
 
+			Connection connection = null;
+			var newConnectionEstablished = false;
+
 			lock (_connectionsLockObject)
 			{
 				if (_connections.ContainsKey(address))
@@ -87,8 +90,6 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 						return foundConnection;
 				}
 
-				Connection connection = null;
-
 				try
 				{
 					Trace.WriteLine("TcpEx.Connection is created...");
@@ -98,7 +99,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 						_connections.Add(address, connection); // This most often happens when using the loopback address
 
 					Manager.StartListening(connection);
-					channel.OnConnectionEstablished(EventArgs.Empty);
+					newConnectionEstablished = true;
 				}
 				catch (DuplicateConnectionException ex)
 				{
@@ -109,9 +110,14 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				{
 					throw new RemotingException(string.Format(LanguageResource.RemotingException_ConnectionError, formatEx.Message), formatEx);
 				}
-
-				return connection;
 			}
+
+			if (newConnectionEstablished)
+			{
+				channel.OnConnectionEstablished(EventArgs.Empty);
+			}
+
+			return connection;
 		}
 
 		/// <summary>
@@ -544,7 +550,11 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			{
 				try
 				{
+					_socket.Shutdown(SocketShutdown.Both);
 					_socket.Close();
+				}
+				catch (SocketException)
+				{ 
 				}
 				catch (ObjectDisposedException)
 				{

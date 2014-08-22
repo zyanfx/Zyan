@@ -170,7 +170,8 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 					throw new MessageException("Connection closed.", null, connection);
 				}
 
-				int bytesRead = connection.Socket.EndReceive(myAr.InternalAsyncResult);
+				SocketError socketError;
+				int bytesRead = connection.Socket.EndReceive(myAr.InternalAsyncResult, out socketError);
 				if (bytesRead == 16)
 				{
 					Message retVal = new Message();
@@ -187,7 +188,6 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 					if (bodyLength > 0)
 					{
-
 						retVal.messageBodyBytes = reader.ReadBytes(bodyLength);
 						if (retVal.messageBodyBytes.Length != bodyLength)
 							throw new Exception("Not enough body read...");
@@ -201,10 +201,10 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				}
 				else if (bytesRead == 0)
 				{
-					throw new MessageException("Connection closed.", null, connection);
+					throw new MessageException("Connection closed.", new SocketException((int)socketError), connection);
 				}
 				else
-					throw new MessageException("Insufficient data received", null, connection);
+					throw new MessageException("Insufficient data received", new SocketException((int)socketError), connection);
 			}
 			catch (Exception e)
 			{
