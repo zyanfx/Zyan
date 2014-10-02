@@ -227,6 +227,7 @@ namespace Zyan.Communication
 			if (credentials != null && credentials.Count == 0)
 				credentials = null;
 
+			var currentSession = ServerSession.CurrentSession;
 			try
 			{
 				RemoteDispatcher.Logon(_sessionID, credentials);
@@ -248,8 +249,12 @@ namespace Zyan.Communication
 
 				throw ex.PreserveStackTrace();
 			}
-			StartKeepSessionAliveTimer();
+			finally
+			{
+				ServerSession.CurrentSession = currentSession;
+			}
 
+			StartKeepSessionAliveTimer();
 			_connections.Add(this);
 		}
 
