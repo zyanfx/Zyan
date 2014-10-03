@@ -165,7 +165,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			try
 			{
 				connection.LockRead();
-				if (connection.Socket == null)
+				if (connection.Socket == null || connection.Channel == null)
 				{
 					throw new MessageException("Connection closed.", null, connection);
 				}
