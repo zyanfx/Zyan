@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Remoting.Messaging;
 using System.Runtime.Serialization;
+using System.Threading;
 
 namespace Zyan.Communication.Toolbox
 {
@@ -23,8 +25,18 @@ namespace Zyan.Communication.Toolbox
 		/// </remarks>
 		private object Value { get; set; }
 
+		/// <summary>
+		/// Gets or sets the name of a LogicalCallContext slot.
+		/// </summary>
+		private string Name { get; set; }
+
 		[ThreadStatic]
-		private static object threadStaticValue;
+		private static Dictionary<string, object> threadStaticValues;
+
+		private static Dictionary<string, object> ThreadStaticValues
+		{
+			get { return threadStaticValues ?? (threadStaticValues = new Dictionary<string, object>()); }
+		}
 
 		/// <summary>
 		/// Stores the instance data.
@@ -33,14 +45,31 @@ namespace Zyan.Communication.Toolbox
 		/// <param name="context">Streaming context.</param>
 		void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
 		{
-			// instead of populating the SerializationInfo, we save the value to TLS before making the remote call.
-			threadStaticValue = Value;
+			info.AddValue("Name", Name);
+
+			// instead of saving Value to the SerializationInfo, we save it to TLS before making a remote call
+			ThreadStaticValues[Name ?? string.Empty] = Value;
 		}
 
 		public LocalCallContextData(SerializationInfo info, StreamingContext context)
 		{
+			// backward-compatible deserialization
+			foreach (SerializationEntry entry in info)
+			{
+				if (entry.Name == "Name")
+				{
+					Name = (string)entry.Value;
+					break;
+				}
+			}
+
 			// restore the value from TLS after making the remote call.
-			Value = threadStaticValue;
+			object value;
+			if (ThreadStaticValues.TryGetValue(Name ?? string.Empty, out value))
+			{
+				Value = value;
+				ThreadStaticValues.Remove(Name ?? string.Empty);
+			}
 		}
 
 		/// <summary>
@@ -79,7 +108,11 @@ namespace Zyan.Communication.Toolbox
 		/// <param name="value">The value of the object.</param>
 		public static void SetData(string name, object value)
 		{
-			CallContext.SetData(name, new LocalCallContextData { Value = value });
+			CallContext.SetData(name, new LocalCallContextData
+			{
+				Value = value,
+				Name = name
+			});
 		}
 	}
 }

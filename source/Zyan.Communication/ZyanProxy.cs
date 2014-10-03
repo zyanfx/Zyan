@@ -179,18 +179,10 @@ namespace Zyan.Communication
 		/// <returns><see cref="ReturnMessage"/>, if the call is processed successfully, otherwise, false.</returns>
 		private ReturnMessage HandleRemoteInvocation(IMethodCallMessage methodCallMessage, MethodInfo methodInfo)
 		{
-			var currentSession = ServerSession.CurrentSession;
-			try
-			{
-				_connection.PrepareCallContext(_implicitTransactionTransfer);
-				var returnMessage = InvokeRemoteMethod(methodCallMessage);
-				_connection.CheckRemoteSubscriptionCounter();
-				return returnMessage;
-			}
-			finally
-			{
-				ServerSession.CurrentSession = currentSession;
-			}
+			_connection.PrepareCallContext(_implicitTransactionTransfer);
+			var returnMessage = InvokeRemoteMethod(methodCallMessage);
+			_connection.CheckRemoteSubscriptionCounter();
+			return returnMessage;
 		}
 
 		/// <summary>
