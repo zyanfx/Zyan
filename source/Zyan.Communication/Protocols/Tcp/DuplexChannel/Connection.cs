@@ -703,6 +703,14 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		}
 
 		/// <summary>
+		/// Gets the local channel.
+		/// </summary>
+		internal TcpExChannel Channel
+		{
+			get { return _channel; }
+		}
+
+		/// <summary>
 		/// Gets the unique identifier of the local channel.
 		/// </summary>
 		public Guid LocalChannelID
