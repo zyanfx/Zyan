@@ -14,11 +14,12 @@
 */
 using System;
 using System.IO;
+using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.Remoting.Channels;
+using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
-using System.Runtime.Serialization.Formatters;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
@@ -165,46 +166,51 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			try
 			{
 				connection.LockRead();
-				if (connection.Socket == null || connection.Channel == null)
+				if (connection.Socket == null)
 				{
 					throw new MessageException("Connection closed.", null, connection);
 				}
 
 				SocketError socketError;
 				int bytesRead = connection.Socket.EndReceive(myAr.InternalAsyncResult, out socketError);
-				if (bytesRead == 16)
-				{
-					Message retVal = new Message();
-					retVal.Guid = new Guid(myAr.Buffer);
-					BinaryReader reader = connection.Reader;
-
-					int headerLength = reader.ReadInt32();
-					MemoryStream headerStream = new MemoryStream(reader.ReadBytes(headerLength));
-					if (headerStream.Length != headerLength)
-						throw new Exception("Not enough headers read...");
-					retVal.Headers = TransportHeaderWrapper.Deserialize(headerStream);
-
-					int bodyLength = reader.ReadInt32();
-
-					if (bodyLength > 0)
-					{
-						retVal.messageBodyBytes = reader.ReadBytes(bodyLength);
-						if (retVal.messageBodyBytes.Length != bodyLength)
-							throw new Exception("Not enough body read...");
-						
-						System.Diagnostics.Debug.Assert(retVal.MessageBody.CanRead);
-					}
-
-					Message.BeginReceive(connection, myAr.Callback, myAr.AsyncState);
-					
-					return retVal;
-				}
-				else if (bytesRead == 0)
+				if (bytesRead == 0 || connection.Channel == null)
 				{
 					throw new MessageException("Connection closed.", new SocketException((int)socketError), connection);
 				}
-				else
-					throw new MessageException("Insufficient data received", new SocketException((int)socketError), connection);
+
+				// read message identifier
+				var reader = connection.Reader;
+				if (bytesRead < SizeOfGuid)
+				{
+					var rest = reader.Read(myAr.Buffer, bytesRead, SizeOfGuid - bytesRead);
+					if (rest < SizeOfGuid - bytesRead)
+					{
+						throw new MessageException("Insufficient data received. Got " + bytesRead + " bytes.", new SocketException((int)socketError), connection);
+					}
+				}
+
+				// read message header
+				Message retVal = new Message();
+				retVal.Guid = new Guid(myAr.Buffer);
+
+				int headerLength = reader.ReadInt32();
+				MemoryStream headerStream = new MemoryStream(reader.ReadBytes(headerLength));
+				if (headerStream.Length != headerLength)
+					throw new Exception("Not enough headers read...");
+				retVal.Headers = TransportHeaderWrapper.Deserialize(headerStream);
+
+				int bodyLength = reader.ReadInt32();
+				if (bodyLength > 0)
+				{
+					retVal.messageBodyBytes = reader.ReadBytes(bodyLength);
+					if (retVal.messageBodyBytes.Length != bodyLength)
+						throw new Exception("Not enough body read...");
+						
+					System.Diagnostics.Debug.Assert(retVal.MessageBody.CanRead);
+				}
+
+				Message.BeginReceive(connection, myAr.Callback, myAr.AsyncState);
+				return retVal;
 			}
 			catch (Exception e)
 			{
