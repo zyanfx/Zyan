@@ -396,15 +396,16 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// <exception cref="T:System.Security.SecurityException">The immediate caller does not have infrastructure permission. </exception>
 		public void StartListening(object data)
 		{
-			if (this.port != 0)
-				throw new InvalidOperationException("Channel is already listening.  TcpEx currently only allows listening on one port.");
+			if (port != 0)
+				throw new InvalidOperationException("Channel is already listening. TcpEx currently only allows listening on one port.");
 
 			if (data is int)
 			{
-				this.port = Manager.StartListening((int)data, this, _bindToAddress);
+				port = (int)data;
 				channelData = new TcpExChannelData(this);
+				Manager.StartListening(port, this, _bindToAddress);
 
-				foreach (string url in Manager.GetAddresses(this.port, Guid.Empty, true))
+				foreach (string url in Manager.GetAddresses(port, Guid.Empty, true))
 				{
 					Manager.BeginReadMessage(url, null, new AsyncCallback(messageSink.ReceiveMessage), url);
 				}
