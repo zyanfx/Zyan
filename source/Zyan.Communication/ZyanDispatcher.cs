@@ -697,6 +697,8 @@ namespace Zyan.Communication
 				identity = session.Identity;
 				timestamp = session.Timestamp;
 			}
+
+			_host.SessionManager.SetCurrentSession(session);
 			_host.SessionManager.RemoveSession(sessionID);
 
 			string clientIP = string.Empty;
