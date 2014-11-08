@@ -600,8 +600,11 @@ namespace Zyan.Communication
 		/// <param name="e">Event arguments</param>
 		protected virtual void OnDisposing(EventArgs e)
 		{
-			if (Disposing != null)
-				Disposing(this, e);
+			var disposing = Disposing;
+			if (disposing != null)
+			{
+				disposing(this, e);
+			}
 		}
 
 		/// <summary>
@@ -674,6 +677,11 @@ namespace Zyan.Communication
 		public event EventHandler<LoginEventArgs> ClientLoggedOff;
 
 		/// <summary>
+		/// Occurs when the client logon operation is canceled due to an exception.
+		/// </summary>
+		public event EventHandler<LoginEventArgs> ClientLogonCanceled;
+
+		/// <summary>
 		/// Occurs when the client session is terminated abnormally.
 		/// </summary>
 		public event EventHandler<LoginEventArgs> ClientSessionTerminated;
@@ -684,8 +692,11 @@ namespace Zyan.Communication
 		/// <param name="e">Arguments</param>
 		protected internal void OnClientLoggedOn(LoginEventArgs e)
 		{
-			if (ClientLoggedOn != null)
-				ClientLoggedOn(this, e);
+			var clientLoggedOn = ClientLoggedOn;
+			if (clientLoggedOn != null)
+			{
+				clientLoggedOn(this, e);
+			}
 		}
 
 		/// <summary>
@@ -694,8 +705,24 @@ namespace Zyan.Communication
 		/// <param name="e">Arguments</param>
 		protected internal void OnClientLoggedOff(LoginEventArgs e)
 		{
-			if (ClientLoggedOff != null)
-				ClientLoggedOff(this, e);
+			var clientLoggedOff = ClientLoggedOff;
+			if (clientLoggedOff != null)
+			{
+				clientLoggedOff(this, e);
+			}
+		}
+
+		/// <summary>
+		/// Fires "ClientLogonCanceled" event.
+		/// </summary>
+		/// <param name="e">Arguments</param>
+		protected internal void OnClientLogonCanceled(LoginEventArgs e)
+		{
+			var clientLogonCanceled = ClientLogonCanceled;
+			if (clientLogonCanceled != null)
+			{
+				clientLogonCanceled(this, e);
+			}
 		}
 
 		/// <summary>
@@ -704,8 +731,11 @@ namespace Zyan.Communication
 		/// <param name="e">Arguments</param>
 		protected internal void OnClientSessionTerminated(LoginEventArgs e)
 		{
-			if (ClientSessionTerminated != null)
-				ClientSessionTerminated(this, e);
+			var clientSessionTerminated = ClientSessionTerminated;
+			if (clientSessionTerminated != null)
+			{
+				clientSessionTerminated(this, e);
+			}
 		}
 
 		#endregion
@@ -731,8 +761,11 @@ namespace Zyan.Communication
 				var session = SessionManager.GetSessionBySessionID(e.SessionID);
 				session.Timestamp = DateTime.Now;
 
-				if (ClientHeartbeatReceived != null)
-					ClientHeartbeatReceived(this, e);
+				var clientHeartbeatReceived = ClientHeartbeatReceived;
+				if (clientHeartbeatReceived != null)
+				{
+					clientHeartbeatReceived(this, e);
+				}
 			}
 		}
 

@@ -643,29 +643,51 @@ namespace Zyan.Communication
 			if (sessionID == Guid.Empty)
 				throw new ArgumentException(LanguageResource.ArgumentException_EmptySessionIDIsNotAllowed, "sessionID");
 
-			if (!_host.SessionManager.ExistSession(sessionID))
-			{
-				// reset current session before authentication is complete
-				_host.SessionManager.SetCurrentSession(null);
-				var clientAddress = GetCallingClientIPAddress();
-				var authResponse = _host.Authenticate(new AuthRequestMessage
-				{
-					Credentials = credentials,
-					ClientAddress = clientAddress != null ? clientAddress.ToString() : string.Empty
-				});
+			// prepare client IP address
+			var clientAddress = GetCallingClientIPAddress();
+			var clientAddressString = clientAddress != null ? clientAddress.ToString() : string.Empty;
 
-				if (!authResponse.Success)
+			try
+			{
+				if (!_host.SessionManager.ExistSession(sessionID))
 				{
-					var exception = authResponse.Exception ?? new SecurityException(authResponse.ErrorMessage);
-					throw exception.PreserveStackTrace();
+					// reset current session before authentication is complete
+					_host.SessionManager.SetCurrentSession(null);
+
+					// authenticate
+					var authResponse = _host.Authenticate(new AuthRequestMessage
+					{
+						Credentials = credentials,
+						ClientAddress = clientAddressString
+					});
+
+					if (!authResponse.Success)
+					{
+						var exception = authResponse.Exception ?? new SecurityException(authResponse.ErrorMessage);
+						throw exception.PreserveStackTrace();
+					}
+
+					// create a new session
+					var session = _host.SessionManager.CreateServerSession(sessionID, DateTime.Now, authResponse.AuthenticatedIdentity);
+					_host.SessionManager.StoreSession(session);
+					_host.SessionManager.SetCurrentSession(session);
+					PutClientAddressToCurrentSession();
+
+					_host.OnClientLoggedOn(new LoginEventArgs(LoginEventType.Logon, session.Identity, session.ClientAddress, session.Timestamp));
+				}
+			}
+			catch (Exception ex)
+			{
+				var args = new LoginEventArgs(LoginEventType.Logon, null, clientAddressString, DateTime.Now);
+				args.Exception = ex;
+				_host.OnClientLogonCanceled(args);
+				if (args.Exception != null)
+				{
+					// this exception may be translated
+					throw args.Exception.PreserveStackTrace();
 				}
 
-				var session = _host.SessionManager.CreateServerSession(sessionID, DateTime.Now, authResponse.AuthenticatedIdentity);
-				_host.SessionManager.StoreSession(session);
-				_host.SessionManager.SetCurrentSession(session);
-				PutClientAddressToCurrentSession();
-
-				_host.OnClientLoggedOn(new LoginEventArgs(LoginEventType.Logon, session.Identity, session.ClientAddress, session.Timestamp));
+				throw;
 			}
 		}
 
