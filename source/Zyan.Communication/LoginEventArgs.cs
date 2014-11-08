@@ -12,26 +12,27 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Gets or sets <see cref="IIdentity"/> object.
 		/// </summary>
-		public IIdentity Identity
-		{ get; set; }
+		public IIdentity Identity { get; set; }
 
 		/// <summary>
 		/// Gets or sets connected client's address, for example, <see cref="System.Net.IPAddress"/>.
 		/// </summary>
-		public string ClientAddress
-		{ get; set; }
+		public string ClientAddress { get; set; }
 
 		/// <summary>
 		/// Gets or sets event time stamp.
 		/// </summary>
-		public DateTime Timestamp
-		{ get; set; }
+		public DateTime Timestamp { get; set; }
+
+		/// <summary>
+		/// Gets or sets the exception occured during the operation.
+		/// </summary>
+		public Exception Exception { get; set; }
 
 		/// <summary>
 		/// Gets or sets <see cref="LoginEventType"/> (Login or Logoff).
 		/// </summary>
-		public LoginEventType EventType
-		{ get; set; }
+		public LoginEventType EventType { get; set; }
 
 		/// <summary>
 		/// Initializes LoginEventArgs instance.
