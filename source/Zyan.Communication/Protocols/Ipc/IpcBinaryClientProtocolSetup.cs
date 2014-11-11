@@ -7,6 +7,7 @@ using System.Runtime.Remoting.Channels.Ipc;
 using System.Runtime.Serialization.Formatters;
 using System.Security.Principal;
 using System.Text.RegularExpressions;
+using Zyan.Communication.Security;
 using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication.Protocols.Ipc
@@ -19,6 +20,8 @@ namespace Zyan.Communication.Protocols.Ipc
 		private bool _useWindowsSecurity = false;
 		private TokenImpersonationLevel _impersonationLevel = TokenImpersonationLevel.Identification;
 		private ProtectionLevel _protectionLevel = ProtectionLevel.EncryptAndSign;
+		private bool _exclusiveAddressUse = false;
+		private string _authorizedGroup = WindowsSecurityTools.EveryoneGroupName;
 
 		/// <summary>
 		/// Gets or sets, if Windows Security should be used.
@@ -45,6 +48,24 @@ namespace Zyan.Communication.Protocols.Ipc
 		{
 			get { return _protectionLevel; }
 			set { _protectionLevel = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets a value indicating whether the channel uses its address exclusively.
+		/// </summary>
+		public bool ExclusiveAddressUse
+		{
+			get { return _exclusiveAddressUse; }
+			set { _exclusiveAddressUse = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the name of the user group authorized to use this channel.
+		/// </summary>
+		public string AuthorizedGroup
+		{
+			get { return _authorizedGroup; }
+			set { _authorizedGroup = value; }
 		}
 
 		/// <summary>
@@ -123,19 +144,28 @@ namespace Zyan.Communication.Protocols.Ipc
 		/// <returns>Remoting channel</returns>
 		public override IChannel CreateChannel()
 		{
-			IChannel channel = ChannelServices.GetChannel(_channelName);
-
+			var channel = ChannelServices.GetChannel(_channelName);
 			if (channel == null)
 			{
 				_channelSettings["name"] = _channelName;
 				_channelSettings["portName"] = "zyan_" + Guid.NewGuid().ToString();
-				_channelSettings["secure"] = _useWindowsSecurity;
+				if (!_channelSettings.ContainsKey("authorizedGroup"))
+				{
+					_channelSettings["authorizedGroup"] = AuthorizedGroup;
+				}
 
+				if (!_channelSettings.ContainsKey("exclusiveAddressUse"))
+				{
+					_channelSettings["exclusiveAddressUse"] = ExclusiveAddressUse;
+				}
+
+				_channelSettings["secure"] = _useWindowsSecurity;
 				if (_useWindowsSecurity)
 				{
 					_channelSettings["tokenImpersonationLevel"] = _impersonationLevel;
 					_channelSettings["protectionLevel"] = _protectionLevel;
 				}
+
 				if (_channelFactory == null)
 					throw new ApplicationException(LanguageResource.ApplicationException_NoChannelFactorySpecified);
 
@@ -146,8 +176,8 @@ namespace Zyan.Communication.Protocols.Ipc
 					if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
 						RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
 				}
-				return channel;
 			}
+
 			return channel;
 		}
 
