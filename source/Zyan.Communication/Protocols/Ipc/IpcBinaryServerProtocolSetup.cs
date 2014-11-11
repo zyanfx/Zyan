@@ -21,7 +21,7 @@ namespace Zyan.Communication.Protocols.Ipc
 		private bool _useWindowsSecurity = false;
 		private TokenImpersonationLevel _impersonationLevel = TokenImpersonationLevel.Identification;
 		private ProtectionLevel _protectionLevel = ProtectionLevel.EncryptAndSign;
-		private bool _exclusiveAddressUse = false;
+		private bool _exclusiveAddressUse = true;
 		private string _authorizedGroup = WindowsSecurityTools.EveryoneGroupName;
 
 		/// <summary>
