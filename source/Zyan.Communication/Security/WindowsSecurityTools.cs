@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using System.Security.Principal;
 
 namespace Zyan.Communication.Security
 {
@@ -37,6 +38,19 @@ namespace Zyan.Communication.Security
 			LOGON32_PROVIDER_WINNT35 = 1,
 			LOGON32_PROVIDER_WINNT40 = 2,
 			LOGON32_PROVIDER_WINNT50 = 3
+		}
+
+		/// <summary>
+		/// Gets the localized name of "Everyone" group of users.
+		/// </summary>
+		public static string EveryoneGroupName
+		{
+			get
+			{
+				var sid = new SecurityIdentifier(WellKnownSidType.WorldSid, null);
+				var acct = sid.Translate(typeof(NTAccount)) as NTAccount;
+				return acct.ToString(); 
+			}
 		}
 	}
 }
