@@ -5,7 +5,7 @@ namespace Zyan.InterLinq
 	/// <summary>
 	/// Abstract base class holding an <see cref="IQueryHandler"/>.
 	/// The usage of the <see cref="InterLinqContext"/> is comparable
-	/// with <see cref="System.Data.Linq.DataContext"/>.
+	/// with System.Data.Linq.DataContext.
 	/// </summary>
 	/// <example>
 	/// The following code illustrates a possible implementation of <see cref="InterLinqContext"/>.
