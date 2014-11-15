@@ -3,12 +3,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>12.0.0</ProductVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{0EABDF90-ED81-49E2-B153-D5B02E1B6D27}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>Zyan.Examples.Android.ConsoleServer</RootNamespace>
     <AssemblyName>Zyan.Examples.Android.ConsoleServer</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -40,7 +41,7 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <ProjectReference Include="..\Zyan.Examples.Android.Shared\Zyan.Examples.Android.Shared.csproj">
-      <Project>{3C63D711-9A47-4FD5-9740-5B31DCC21A8C}</Project>
+      <Project>{358247A3-F56D-477C-AEFE-FB721070925F}</Project>
       <Name>Zyan.Examples.Android.Shared</Name>
     </ProjectReference>
   </ItemGroup>
