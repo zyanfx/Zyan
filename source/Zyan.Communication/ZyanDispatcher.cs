@@ -214,9 +214,10 @@ namespace Zyan.Communication
 		/// Gets the IP Address of the calling client from CallContext.
 		/// </summary>
 		/// <returns></returns>
-		private IPAddress GetCallingClientIPAddress()
+		private string GetCallingClientIPAddress()
 		{
-			return CallContext.GetData(ClientAddressServerChannelSink.CallContextSlotName) as IPAddress;
+			var ipAddress = CallContext.GetData(ClientAddressServerChannelSink.CallContextSlotName) as IPAddress;
+			return string.Format("{0}", ipAddress);
 		}
 
 		/// <summary>
@@ -227,12 +228,7 @@ namespace Zyan.Communication
 			if (ServerSession.CurrentSession == null)
 				return;
 
-			IPAddress clientAddress = GetCallingClientIPAddress();
-
-			if (clientAddress != null)
-				ServerSession.CurrentSession.ClientAddress = clientAddress.ToString();
-			else
-				ServerSession.CurrentSession.ClientAddress = string.Empty;
+			ServerSession.CurrentSession.ClientAddress = GetCallingClientIPAddress();
 		}
 
 		/// <summary>
@@ -276,8 +272,8 @@ namespace Zyan.Communication
 			// set current session
 			details.Session = _host.SessionManager.GetSessionBySessionID(sessionID);
 			details.Session.Timestamp = DateTime.Now;
+			details.Session.ClientAddress = GetCallingClientIPAddress();
 			_host.SessionManager.SetCurrentSession(details.Session);
-			PutClientAddressToCurrentSession();
 		}
 
 		/// <summary>
@@ -645,7 +641,6 @@ namespace Zyan.Communication
 
 			// prepare client IP address
 			var clientAddress = GetCallingClientIPAddress();
-			var clientAddressString = clientAddress != null ? clientAddress.ToString() : string.Empty;
 
 			try
 			{
@@ -658,7 +653,7 @@ namespace Zyan.Communication
 					var authResponse = _host.Authenticate(new AuthRequestMessage
 					{
 						Credentials = credentials,
-						ClientAddress = clientAddressString
+						ClientAddress = clientAddress
 					});
 
 					if (!authResponse.Success)
@@ -669,16 +664,16 @@ namespace Zyan.Communication
 
 					// create a new session
 					var session = _host.SessionManager.CreateServerSession(sessionID, DateTime.Now, authResponse.AuthenticatedIdentity);
+					session.ClientAddress = clientAddress;
 					_host.SessionManager.StoreSession(session);
 					_host.SessionManager.SetCurrentSession(session);
-					PutClientAddressToCurrentSession();
 
 					_host.OnClientLoggedOn(new LoginEventArgs(LoginEventType.Logon, session.Identity, session.ClientAddress, session.Timestamp));
 				}
 			}
 			catch (Exception ex)
 			{
-				var args = new LoginEventArgs(LoginEventType.Logon, null, clientAddressString, DateTime.Now);
+				var args = new LoginEventArgs(LoginEventType.Logon, null, clientAddress, DateTime.Now);
 				args.Exception = ex;
 				_host.OnClientLogonCanceled(args);
 				if (args.Exception != null)
@@ -692,7 +687,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Returns true, if a specified Session ID is valid, otherwis false.
+		/// Returns true, if a specified Session ID is valid, otherwise false.
 		/// </summary>
 		/// <param name="sessionID">Session ID to check</param>
 		/// <returns>Session check result</returns>
@@ -712,10 +707,12 @@ namespace Zyan.Communication
 		{
 			IIdentity identity = null;
 			DateTime timestamp = DateTime.MinValue;
+			var clientAddress = GetCallingClientIPAddress();
 
 			var session = _host.SessionManager.GetSessionBySessionID(sessionID);
 			if (session != null)
 			{
+				session.ClientAddress = clientAddress;
 				identity = session.Identity;
 				timestamp = session.Timestamp;
 			}
@@ -723,16 +720,10 @@ namespace Zyan.Communication
 			_host.SessionManager.SetCurrentSession(session);
 			_host.SessionManager.RemoveSession(sessionID);
 
-			string clientIP = string.Empty;
-			IPAddress clientAddress = GetCallingClientIPAddress();
-
-			if (clientAddress != null)
-				clientIP = clientAddress.ToString();
-
 			try
 			{
 				if (identity != null)
-					_host.OnClientLoggedOff(new LoginEventArgs(LoginEventType.Logoff, identity, clientIP, timestamp));
+					_host.OnClientLoggedOff(new LoginEventArgs(LoginEventType.Logoff, identity, clientAddress, timestamp));
 			}
 			finally
 			{
