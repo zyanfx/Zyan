@@ -183,7 +183,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			Message.BeginReceive(connection, new AsyncCallback(ReceiveMessage), null);
 		}
 		
-		public static int StartListening(int port, TcpExChannel channel, IPAddress bindToAddress)
+		public static Socket StartListening(int port, TcpExChannel channel, IPAddress bindToAddress)
 		{
 			if (bindToAddress == null)
 				throw new ArgumentNullException("bindToAddress");
@@ -193,25 +193,36 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			listener.Listen(1000);
 			listener.BeginAccept(new AsyncCallback(listener_Accept), new object[] {listener, channel});
 
-			return ((IPEndPoint)listener.LocalEndPoint).Port;
+			return listener;
 		}
 
 		/// <summary>
 		/// Stops listening of a specified channel.
 		/// </summary>
 		/// <param name="channel">TcpEx Channel</param>
-		public static void StopListening(TcpExChannel channel)
+		/// <param name="listenerAddresses">Addresses the channel is listening</param>
+		public static void StopListening(TcpExChannel channel, string[] listenerAddresses)
 		{
 			if (channel == null)
 				throw new ArgumentNullException("channel");
 
+			// close running connections
 			var runningConnections = Connection.GetRunningConnectionsOfChannel(channel);
-
 			if (runningConnections != null)
 			{
-				while(runningConnections.Count()>0)
+				while (runningConnections.Count()>0)
 				{
 					runningConnections.First().Close();
+				}
+			}
+
+			// remove pending listeners if specified
+			if (listenerAddresses != null)
+			{
+				lock (_listenersLockObject)
+				{
+					foreach (var address in listenerAddresses)
+						_listeners.Remove(address);
 				}
 			}
 		}
@@ -221,10 +232,20 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			object[] state = (object[])ar.AsyncState;
 			Socket listener = (Socket)state[0];
 			TcpExChannel channel = (TcpExChannel)state[1];
-			Socket client = listener.EndAccept(ar);
+			Socket client;
+			try
+			{
+				client = listener.EndAccept(ar);
 
-			// Wait for next Client request
-			listener.BeginAccept(new AsyncCallback(listener_Accept), new object[] {listener, channel});
+				// Wait for next Client request
+				listener.BeginAccept(new AsyncCallback(listener_Accept), new object[] { listener, channel });
+			}
+			catch (ObjectDisposedException)
+			{
+				// listener was closed
+				// TODO: Add tracing here!
+				return;
+			}
 
 			try
 			{
