@@ -294,7 +294,7 @@ namespace Zyan.Tests
 		#region Test methods
 
 		[TestMethod]
-		public void CreateDisposeAndReceateConnectionUsingTcpDuplexChannel()
+		public void CreateDisposeAndRecreateConnectionUsingTcpDuplexChannel()
 		{
 			string url = "tcpex://localhost:8084/RecreateClientConnectionTestHost_TcpDuplex";
 			var protocol = new TcpDuplexClientProtocolSetup(true);
@@ -314,7 +314,7 @@ namespace Zyan.Tests
 		}
 
 		[TestMethod]
-		public void CreateDisposeAndReceateConnectionUsingTcpSimplexChannel()
+		public void CreateDisposeAndRecreateConnectionUsingTcpSimplexChannel()
 		{
 			string url = "tcp://localhost:8085/RecreateClientConnectionTestHost_TcpSimplex";
 			var protocol = new TcpCustomClientProtocolSetup(true);

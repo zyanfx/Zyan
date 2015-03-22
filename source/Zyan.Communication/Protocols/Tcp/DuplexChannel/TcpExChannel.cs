@@ -17,6 +17,7 @@ using System.Runtime.Remoting.Messaging;
 using System.Runtime.Serialization.Formatters;
 using Zyan.Communication.Toolbox.Diagnostics;
 using System.Net;
+using System.Net.Sockets;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
@@ -403,14 +404,25 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			{
 				port = (int)data;
 				channelData = new TcpExChannelData(this);
-				Manager.StartListening(port, this, _bindToAddress);
+				ListenerSocket = Manager.StartListening(port, this, _bindToAddress);
+				ListenerAddresses = Manager.GetAddresses(port, Guid.Empty, true);
 
-				foreach (string url in Manager.GetAddresses(port, Guid.Empty, true))
+				foreach (string url in ListenerAddresses)
 				{
 					Manager.BeginReadMessage(url, null, new AsyncCallback(messageSink.ReceiveMessage), url);
 				}
 			}
 		}
+
+		/// <summary>
+		/// Gets or sets the listener socket.
+		/// </summary>
+		private Socket ListenerSocket { get; set; }
+
+		/// <summary>
+		/// Gets or sets the addresses this channel is listening to.
+		/// </summary>
+		private string[] ListenerAddresses { get; set; }
 
 		/// <summary>
 		/// Instructs the current channel to stop listening for requests.
@@ -419,8 +431,20 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// <exception cref="T:System.Security.SecurityException">The immediate caller does not have infrastructure permission. </exception>
 		public void StopListening(object data)
 		{
-			Manager.StopListening(this);
-		}
+			try
+			{
+				Manager.StopListening(this, ListenerAddresses);
+			}
+			finally
+			{
+				var listener = ListenerSocket;
+				ListenerSocket = null;
+				if (listener != null)
+				{
+					listener.Close();
+				}
+			}
+        }
 
 		/// <summary>
 		/// Returns an array of all the URLs for a URI.
