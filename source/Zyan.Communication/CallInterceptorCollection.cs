@@ -121,7 +121,10 @@ namespace Zyan.Communication
 					GetTypeList(interceptor.ParameterTypes) == GetTypeList(remotingMessage.MethodBase.GetParameters())
 				select interceptor;
 
-			return matchingInterceptors.FirstOrDefault();
+			lock (_lockObject)
+			{
+				return matchingInterceptors.FirstOrDefault();
+			}
 		}
 
 		private string GetTypeList(Type[] types)
