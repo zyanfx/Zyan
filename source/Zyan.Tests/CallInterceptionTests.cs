@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using Zyan.Communication;
 using Zyan.Communication.Protocols.Null;
 using Zyan.Communication.SessionMgmt;
@@ -321,6 +322,39 @@ namespace Zyan.Tests
 			proxy.ProcedureCalled -= handler;
 			Assert.IsTrue(procedureCalled);
 			Assert.IsTrue(intercepted);
+		}
+
+		[TestMethod]
+		public void CallInterceptorRegistrationThreadingTest()
+		{
+			var interceptor = CallInterceptor.For<IInterceptableComponent>().Action(c => c.Procedure(), c =>
+			{
+				c.Intercepted = true;
+			});
+
+			ZyanConnection.CallInterceptors.Clear();
+			var proxy = ZyanConnection.CreateProxy<IInterceptableComponent>();
+			var count = 100000;
+
+			var action1 = new Action(async () =>
+			{
+				for (var i = 0; i < count; i++)
+				{
+					ZyanConnection.CallInterceptors.Add(interceptor);
+					await Task.Yield();
+				}
+			});
+
+			var action2 = new Action(async () =>
+			{
+				for (var i = 0; i < count; i++)
+				{
+					proxy.Procedure();
+					await Task.Delay(0);
+				}
+			});
+
+			Task.WaitAll(Task.Run(action1), Task.Run(action2));
 		}
 	}
 }
