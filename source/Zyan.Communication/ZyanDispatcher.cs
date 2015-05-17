@@ -312,6 +312,10 @@ namespace Zyan.Communication
 			var args = new InvokeCanceledEventArgs
 			{
 				TrackingID = details.TrackingID,
+				InterfaceName = details.InterfaceName,
+				DelegateCorrelationSet = details.DelegateCorrelationSet,
+				MethodName = details.MethodName,
+				Arguments = details.Args,
 				CancelException = ex
 			};
 
@@ -332,6 +336,10 @@ namespace Zyan.Communication
 			var args = new InvokeCanceledEventArgs
 			{
 				TrackingID = details.TrackingID,
+				InterfaceName = details.InterfaceName,
+				DelegateCorrelationSet = details.DelegateCorrelationSet,
+				MethodName = details.MethodName,
+				Arguments = details.Args,
 				CancelException = ex
 			};
 
