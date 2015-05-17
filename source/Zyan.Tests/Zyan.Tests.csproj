@@ -75,6 +75,7 @@
     <Compile Include="ChannelWrapperTests.cs" />
     <Compile Include="CleanupTests.cs" />
     <Compile Include="CompressionTests.cs" />
+    <Compile Include="CryptoToolsTests.cs" />
     <Compile Include="DefaultProtocolTests.cs" />
     <Compile Include="DiscoveryMetadataTests.cs" />
     <Compile Include="DuckTypingTests.cs" />

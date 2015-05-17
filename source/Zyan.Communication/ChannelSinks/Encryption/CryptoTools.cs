@@ -21,9 +21,16 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 		/// </remarks>
 		/// </summary>
 		/// <param name="algorithm">Name des zu verwendenden Verschlüsselungsalgorithmus (z.B. "3DES")</param>
-		/// <returns>Kryptografieanbieter für symmetrische Verschlüsselung</returns>		
+		/// <returns>Kryptografieanbieter für symmetrische Verschlüsselung</returns>
 		public static SymmetricAlgorithm CreateSymmetricCryptoProvider(string algorithm)
 		{
+			// use CryptoConfig infrastructure for standard algorithms
+			var result = SymmetricAlgorithm.Create(algorithm);
+			if (result != null)
+			{
+				return result;
+			}
+
 			// Angegebenen Algorithmusnamen auswerten
 			switch (algorithm.Trim().ToLower())
 			{
@@ -130,7 +137,7 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 			// Eingabepuffer erzeugen
 			byte[] inputBuffer = new byte[_bufferSize];
 
-			// Solange das Ende des Eingabedatenstroms noch nicht erreicht ist ...			
+			// Solange das Ende des Eingabedatenstroms noch nicht erreicht ist ...
 			while ((position = decryptStream.Read(inputBuffer, 0, inputBuffer.Length)) != 0)
 			{
 				// Entschlüsselte Daten vom Eingabepuffer in den Ausgabedatenstrom schreiben

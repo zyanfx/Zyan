@@ -54,6 +54,7 @@
     <Compile Include="CallInterceptionTests.cs" />
     <Compile Include="CallInterceptorBuilderTests.cs" />
     <Compile Include="CleanupTests.cs" />
+    <Compile Include="CryptoToolsTests.cs" />
     <Compile Include="DefaultProtocolTests.cs" />
     <Compile Include="DiscoveryMetadataTests.cs" />
     <Compile Include="EmptyDelegateFactoryTests.cs" />
