@@ -255,6 +255,7 @@
     <Compile Include="Toolbox\Extensions.cs" />
     <Compile Include="Toolbox\MessageHelpers.cs" />
     <Compile Include="Toolbox\MonoCheck.cs" />
+    <Compile Include="Toolbox\RemotingHelper.cs" />
     <Compile Include="Toolbox\TypeComparer.cs" />
     <Compile Include="Toolbox\TypeHelper.cs" />
     <Compile Include="Version.cs" />

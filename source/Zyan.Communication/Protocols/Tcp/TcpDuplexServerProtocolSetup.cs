@@ -423,14 +423,7 @@ namespace Zyan.Communication.Protocols.Tcp
 					throw new ApplicationException(LanguageResource.ApplicationException_NoChannelFactorySpecified);
 
 				channel = _channelFactory(_channelSettings, BuildClientSinkChain(), BuildServerSinkChain());
-
-				if (!MonoCheck.IsRunningOnMono)
-				{
-					if (RemotingConfiguration.CustomErrorsMode != CustomErrorsModes.Off)
-					{
-						RemotingConfiguration.CustomErrorsMode = CustomErrorsModes.Off;
-					}
-				}
+				RemotingHelper.ResetCustomErrorsMode();
 			}
 
 			return channel;
