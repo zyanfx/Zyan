@@ -16,10 +16,16 @@ namespace Zyan.Communication.Delegates
 		{
 		}
 
+		private WeakReference weakClientDelegate = new WeakReference(null);
+
 		/// <summary>
 		/// Gets or sets the client delegate.
 		/// </summary>
-		public object ClientDelegate { get; set; }
+		public object ClientDelegate
+		{
+			get { return weakClientDelegate.Target; }
+			set { weakClientDelegate = new WeakReference(value); }
+		}
 
 		/// <summary>
 		/// Gets or sets the synchronization context of the client delegate.
@@ -34,8 +40,14 @@ namespace Zyan.Communication.Delegates
 		{
 			try
 			{
+				// check if the delegate is initialized and not garbage collected
+				var clientDelegate = ClientDelegate as Delegate;
+				if (clientDelegate == null)
+				{
+					return null;
+				}
+
 				// execute as is
-				var clientDelegate = (Delegate)ClientDelegate;
 				if (SynchronizationContext == null)
 				{
 					return clientDelegate.DynamicInvoke(args);
