@@ -16,16 +16,10 @@ namespace Zyan.Communication.Delegates
 		{
 		}
 
-		private WeakReference weakClientDelegate = new WeakReference(null);
-
 		/// <summary>
 		/// Gets or sets the client delegate.
 		/// </summary>
-		public object ClientDelegate
-		{
-			get { return weakClientDelegate.Target; }
-			set { weakClientDelegate = new WeakReference(value); }
-		}
+		public object ClientDelegate { get; set; }
 
 		/// <summary>
 		/// Gets or sets the synchronization context of the client delegate.
