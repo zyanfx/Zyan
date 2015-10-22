@@ -174,15 +174,29 @@ namespace Zyan.InterLinq.Expressions.Helpers
 			// If the member is a display class member (non-serializable, internal)
 			// replace the whole member expression by a constant expression containing
 			// the display class member value.
-			if (expression.Expression != null && expression.Expression is ConstantExpression)
+			if (expression.Expression != null && expression.Expression.Type != null && expression.Expression.Type.IsDisplayClass())
 			{
-				ConstantExpression innerExpression = (ConstantExpression)expression.Expression;
-				if (innerExpression.Type.IsDisplayClass())
+				// C# 6.0 can generate nested display classes
+				if (expression.Expression is MemberExpression)
 				{
-					object value = ((FieldInfo)expression.Member).GetValue(innerExpression.Value);
-					return Visit(Expression.Constant(value));
+					var scx = VisitMemberExpression((MemberExpression)expression.Expression) as SerializableConstantExpression;
+					if (scx != null)
+					{
+						object value = ((FieldInfo)expression.Member).GetValue(scx.Value);
+						return Visit(Expression.Constant(value));
+					}
+				}
+				else if (expression.Expression is ConstantExpression)
+				{
+					var innerExpression = (ConstantExpression)expression.Expression;
+					if (innerExpression.Type.IsDisplayClass())
+					{
+						object value = ((FieldInfo)expression.Member).GetValue(innerExpression.Value);
+						return Visit(Expression.Constant(value));
+					}
 				}
 			}
+
 			return new SerializableMemberExpression(expression, this);
 		}
 
