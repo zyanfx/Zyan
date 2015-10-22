@@ -3,6 +3,7 @@ using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Zyan.InterLinq;
 using Zyan.InterLinq.Expressions;
 
@@ -87,6 +88,58 @@ namespace InterLinq.UnitTests
 			var dx = sx.Deserialize();
 
 			Assert.AreEqual(expression.ToString(), dx.ToString());
+		}
+
+		class Example
+		{
+			public int ID { get; set; }
+		}
+
+		[TestMethod]
+		public void TestExpressionSerializationWithTwoNestedClosures()
+		{
+			var managerList = new[] { 1, 2, 3 };
+			var filter = GetFilter<Example>(r => r.ID < 0);
+			
+			// С# 6.0 produces nested closures here:
+			{
+				var locationId = 123;
+				filter = GetFilter<Example>(r => managerList.Contains(r.ID) && r.ID == locationId);
+			}
+
+			var sx = filter.MakeSerializable();
+			var dx = sx.Deserialize();
+
+			Assert.AreEqual("r => (value(System.Int32[]).Contains(r.ID) AndAlso (r.ID == 123))", dx.ToString());
+		}
+
+		private Expression<Func<T, bool>> GetFilter<T>(Expression<Func<T, bool>> filter)
+		{
+			return filter;
+		}
+
+		[TestMethod]
+		public void TestExpressionSerializationWithManyNestedClosures()
+		{
+			var managerList = new[] { 1, 2, 3 };
+			var filter = GetFilter<Example>(r => r.ID < 0);
+			{
+				var locationId = 123;
+				filter = GetFilter<Example>(r => managerList.Contains(r.ID) && r.ID == locationId);
+				{
+					var more = 0;
+					filter = GetFilter<Example>(r => managerList.Contains(r.ID) && r.ID == locationId && r.ID > more);
+					{
+						var last = 321;
+						filter = GetFilter<Example>(r => managerList.Contains(r.ID) && r.ID == locationId && r.ID > more && r.ID < last);
+					}
+				}
+			}
+
+			var sx = filter.MakeSerializable();
+			var dx = sx.Deserialize();
+
+			Assert.AreEqual("r => (((value(System.Int32[]).Contains(r.ID) AndAlso (r.ID == 123)) AndAlso (r.ID > 0)) AndAlso (r.ID < 321))", dx.ToString());
 		}
 	}
 }
