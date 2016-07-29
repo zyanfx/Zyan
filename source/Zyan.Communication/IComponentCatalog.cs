@@ -65,5 +65,18 @@ namespace Zyan.Communication
 		/// <param name="registration">Component registration</param>
 		/// <returns>Component instance</returns>
 		object GetComponentInstance(ComponentRegistration registration);
+
+		/// <summary>
+		/// Processes resource clean up logic for a specified registered Singleton activated component.
+		/// </summary>
+		/// <param name="regEntry">Component registration</param>
+		void CleanUpComponentInstance(ComponentRegistration regEntry);
+
+		/// <summary>
+		/// Processes resource clean up logic for a specified registered component.
+		/// </summary>
+		/// <param name="regEntry">Component registration</param>
+		/// <param name="instance">Component instance to clean up</param>
+		void CleanUpComponentInstance(ComponentRegistration regEntry, object instance);
 	}
 }

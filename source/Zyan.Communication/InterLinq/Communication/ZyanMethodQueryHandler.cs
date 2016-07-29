@@ -53,22 +53,33 @@ namespace Zyan.InterLinq
 			var instance = Catalog.GetComponentInstance(registration);
 			var type = instance.GetType();
 
-			// create generic method
-			var genericMethodInfo = type.GetMethod(MethodInfo.Name, new[] { typeof(T) }, new Type[0]);
-			if (genericMethodInfo == null)
+			try
 			{
-				var methodSignature = MessageHelpers.GetMethodSignature(type, MethodInfo.Name, new Type[0]);
-				var exceptionMessage = String.Format(LanguageResource.MissingMethodException_MethodNotFound, methodSignature);
-				throw new MissingMethodException(exceptionMessage);
-			}
+				// create generic method
+				var genericMethodInfo = type.GetMethod(MethodInfo.Name, new[] { typeof(T) }, new Type[0]);
+				if (genericMethodInfo == null)
+				{
+					var methodSignature = MessageHelpers.GetMethodSignature(type, MethodInfo.Name, new Type[0]);
+					var exceptionMessage = String.Format(LanguageResource.MissingMethodException_MethodNotFound, methodSignature);
+					throw new MissingMethodException(exceptionMessage);
+				}
 
-			// invoke Get<T> method and return IQueryable<T>
-			object result = genericMethodInfo.Invoke(instance, new object[0]);
-			if (result is IQueryable<T>)
-				return result as IQueryable<T>;
-			if (result is IEnumerable<T>)
-				return (result as IEnumerable<T>).AsQueryable();
-			return null;
+				// invoke Get<T> method and return IQueryable<T>
+				object result = genericMethodInfo.Invoke(instance, new object[0]);
+				if (result is IQueryable<T>)
+					return result as IQueryable<T>;
+				if (result is IEnumerable<T>)
+					return (result as IEnumerable<T>).AsQueryable();
+				return null;
+			}
+			finally
+			{
+				if (instance != null && registration.ActivationType == ActivationType.SingleCall)
+				{
+					Catalog.CleanUpComponentInstance(registration, instance);
+					instance = null;
+				}
+			}
 		}
 
 		public bool StartSession()
