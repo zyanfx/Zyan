@@ -187,7 +187,7 @@ namespace Zyan.Communication
 		{
 			if (!ComponentRegistry.ContainsKey(interfaceName))
 				throw new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_CannotFindComponentForInterface, interfaceName));
-			
+
 			return ComponentRegistry[interfaceName];
 		}
 
@@ -203,7 +203,7 @@ namespace Zyan.Communication
 			{
 				if (_disposed)
 					throw new ObjectDisposedException("_componentRegistry");
-				
+
 				if (_componentRegistry == null)
 					_componentRegistry = new Dictionary<string, ComponentRegistration>();
 
@@ -231,7 +231,7 @@ namespace Zyan.Communication
 			}
 			return result;
 		}
-		
+
 		/// <summary>
 		/// Returns an instance of a specified registered component.
 		/// </summary>
@@ -302,7 +302,7 @@ namespace Zyan.Communication
 		{
 			return GetComponentInstance(ComponentRegistry[uniqueName]);
 		}
-		
+
 		#endregion
 
 		#region Cleanup
@@ -317,7 +317,7 @@ namespace Zyan.Communication
 		{
 			get { return _disposeWithHost; }
 		}
-				
+
 		/// <summary>
 		/// Releases all managed resources.
 		/// </summary>
@@ -335,7 +335,7 @@ namespace Zyan.Communication
 			if (!_disposed)
 			{
 				_disposed = true;
-				
+
 				if (_componentRegistry != null)
 				{
 					foreach (ComponentRegistration regEntry in _componentRegistry.Values)

@@ -274,6 +274,25 @@ namespace Zyan.Communication
 			_catalog.RegisterComponent<I, T>(uniqueName, instance, cleanUpHandler);
 		}
 
+		/// <summary>
+		/// Processes resource clean up logic for a specified registered Singleton activated component.
+		/// </summary>
+		/// <param name="regEntry">Component registration</param>
+		public void CleanUpComponentInstance(ComponentRegistration regEntry)
+		{
+			_catalog.CleanUpComponentInstance(regEntry);
+		}
+
+		/// <summary>
+		/// Processes resource clean up logic for a specified registered component.
+		/// </summary>
+		/// <param name="regEntry">Component registration</param>
+		/// <param name="instance">Component instance to clean up</param>
+		public void CleanUpComponentInstance(ComponentRegistration regEntry, object instance)
+		{
+			_catalog.CleanUpComponentInstance(regEntry, instance);
+		}
+
 		#endregion
 
 		#region Network Communication
@@ -302,7 +321,7 @@ namespace Zyan.Communication
 		{
 			var channel = _protocolSetup.CreateChannel();
 			if (channel == null)
-			{ 
+			{
 				throw new ApplicationException(LanguageResource.ApplicationException_NoChannel);
 			}
 
