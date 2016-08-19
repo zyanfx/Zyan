@@ -368,6 +368,7 @@ namespace Zyan.Communication
 						lock (_delegateCorrelationSet)
 						{
 							_delegateCorrelationSet.Remove(found);
+							found.Dispose();
 						}
 					}
 				}

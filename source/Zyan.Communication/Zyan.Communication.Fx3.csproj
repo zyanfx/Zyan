@@ -290,6 +290,7 @@
     <Compile Include="Toolbox\Crc32Calculator.cs" />
     <Compile Include="Toolbox\Diagnostics\Trace.cs" />
     <Compile Include="Toolbox\Disposable.cs" />
+    <Compile Include="Toolbox\DisposableMarshalByRefObject.cs" />
     <Compile Include="Toolbox\DynamicTypeBinder.cs" />
     <Compile Include="Toolbox\ExceptionHelper.cs" />
     <Compile Include="Toolbox\Extensions.cs" />

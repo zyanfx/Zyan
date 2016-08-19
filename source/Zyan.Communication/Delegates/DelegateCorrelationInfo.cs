@@ -6,7 +6,7 @@ namespace Zyan.Communication.Delegates
 	/// Beschreibt Korrelationsinformationen zur Verdrahtung eines Server-Delegaten mit einer Client-Methode.
 	/// </summary>
 	[Serializable]
-	public class DelegateCorrelationInfo
+	public class DelegateCorrelationInfo : IDisposable
 	{
 		// Korrelationsschlüssel
 		private Guid _correlationID;
@@ -18,6 +18,18 @@ namespace Zyan.Communication.Delegates
 		{
 			// Eindeutigen Korrelationsschlüssel erzeugen
 			_correlationID = Guid.NewGuid();
+		}
+
+		/// <summary>
+		/// Disposes of the <see cref="DelegateCorrelationInfo"/> instance.
+		/// </summary>
+		public void Dispose()
+		{
+			if (ClientDelegateInterceptor != null)
+			{
+				ClientDelegateInterceptor.Dispose();
+				ClientDelegateInterceptor = null;
+			}
 		}
 
 		/// <summary>
