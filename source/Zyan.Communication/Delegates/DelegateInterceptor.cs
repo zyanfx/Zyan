@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Zyan.Communication.Toolbox;
 using Zyan.Communication.Toolbox.Diagnostics;
 
 namespace Zyan.Communication.Delegates
@@ -7,7 +8,7 @@ namespace Zyan.Communication.Delegates
 	/// <summary>
 	/// Interception fixture for remote delegate invocation.
 	/// </summary>
-	public class DelegateInterceptor : MarshalByRefObject
+	public class DelegateInterceptor : DisposableMarshalByRefObject
 	{
 		/// <summary>
 		/// Creates a new instance of the DelegateInterceptor class.
@@ -64,15 +65,6 @@ namespace Zyan.Communication.Delegates
 				}
 			}
 
-			return null;
-		}
-
-		/// <summary>
-		/// Ensures unlimited Remoting lifetime.
-		/// </summary>
-		/// <returns>Always null</returns>
-		public override object InitializeLifetimeService()
-		{
 			return null;
 		}
 	}
