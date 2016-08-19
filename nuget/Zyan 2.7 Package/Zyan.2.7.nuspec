@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Zyan</id>
+    <version>2.7</version>
+    <title>Zyan</title>
+    <authors>Rainbird,yallie</authors>
+    <owners>Hagen Siegel</owners>
+    <licenseUrl>http://zyan.codeplex.com/license</licenseUrl>
+    <projectUrl>http://zyan.com.de</projectUrl>
+    <iconUrl>http://download.codeplex.com/Project/Download/FileDownload.aspx?ProjectName=zyan&amp;DownloadId=512099</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Zyan is a framework that simplifies development of distributed applications for desktop and mobile platforms. With Zyan you can publish any .NET class for remote access over the network. Zyan is highly customizable and provides you with tools to build modular and plugable distributed applications.</description>
+    <summary>Amazingly easy distributed application framework for .NET, Mono and Xamarin.Android</summary>
+    <releaseNotes>What's new: CryptoConfig infrastructure integration, InvokeCanceledEventArgs improvements, lots of bugfixes and stability improvements. For more details, see the project website: http://zyan.com.de</releaseNotes>
+    <language>en-US</language>
+    <tags>mobile android xamarin duplex tcp tcpex http ipc remoting network communication socket sockets nat firewall distributed cloud wcf rpc linq mef composition event events ebc event-based-components binary flowdesign easy secure ldap authentication security compression server service services mono</tags>
+  </metadata>
+  <files>
+    <file src="lib\net35\de\Zyan.Communication.resources.dll" target="lib\net35\de\Zyan.Communication.resources.dll" />
+    <file src="lib\net35\ru\Zyan.Communication.resources.dll" target="lib\net35\ru\Zyan.Communication.resources.dll" />
+    <file src="lib\net35\Zyan.Communication.dll" target="lib\net35\Zyan.Communication.dll" />
+    <file src="lib\net35\Zyan.Communication.pdb" target="lib\net35\Zyan.Communication.pdb" />
+    <file src="lib\net35\Zyan.Communication.xml" target="lib\net35\Zyan.Communication.xml" />
+    <file src="lib\net40\de\Zyan.Communication.resources.dll" target="lib\net40\de\Zyan.Communication.resources.dll" />
+    <file src="lib\net40\ru\Zyan.Communication.resources.dll" target="lib\net40\ru\Zyan.Communication.resources.dll" />
+    <file src="lib\net40\Zyan.Communication.dll" target="lib\net40\Zyan.Communication.dll" />
+    <file src="lib\net40\Zyan.Communication.pdb" target="lib\net40\Zyan.Communication.pdb" />
+    <file src="lib\net40\Zyan.Communication.xml" target="lib\net40\Zyan.Communication.xml" />
+    <file src="lib\net45\de\Zyan.Communication.resources.dll" target="lib\net45\de\Zyan.Communication.resources.dll" />
+    <file src="lib\net45\ru\Zyan.Communication.resources.dll" target="lib\net45\ru\Zyan.Communication.resources.dll" />
+    <file src="lib\net45\Zyan.Communication.dll" target="lib\net45\Zyan.Communication.dll" />
+    <file src="lib\net45\Zyan.Communication.pdb" target="lib\net45\Zyan.Communication.pdb" />
+    <file src="lib\net45\Zyan.Communication.xml" target="lib\net45\Zyan.Communication.xml" />
+    <file src="lib\net46\de\Zyan.Communication.resources.dll" target="lib\net46\de\Zyan.Communication.resources.dll" />
+    <file src="lib\net46\ru\Zyan.Communication.resources.dll" target="lib\net46\ru\Zyan.Communication.resources.dll" />
+    <file src="lib\net46\Zyan.Communication.dll" target="lib\net46\Zyan.Communication.dll" />
+    <file src="lib\net46\Zyan.Communication.pdb" target="lib\net46\Zyan.Communication.pdb" />
+    <file src="lib\net46\Zyan.Communication.xml" target="lib\net46\Zyan.Communication.xml" />
+    <file src="lib\MonoAndroid10\de\Zyan.Communication.resources.dll" target="lib\MonoAndroid10\de\Zyan.Communication.resources.dll" />
+    <file src="lib\MonoAndroid10\ru\Zyan.Communication.resources.dll" target="lib\MonoAndroid10\ru\Zyan.Communication.resources.dll" />
+    <file src="lib\MonoAndroid10\Zyan.Communication.dll" target="lib\MonoAndroid10\Zyan.Communication.dll" />
+    <file src="lib\MonoAndroid10\Zyan.Communication.xml" target="lib\MonoAndroid10\Zyan.Communication.xml" />
+  </files>
+</package>
