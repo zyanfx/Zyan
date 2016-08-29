@@ -14,8 +14,9 @@ namespace Zyan.Communication.SessionMgmt
 	/// </summary>
 	public class InProcSessionManager : SessionManagerBase
 	{
-		volatile SessionDictionary sessions = new SessionDictionary();
-		volatile SessionVariableDictionary variables = new SessionVariableDictionary();
+		private SessionDictionary sessions = new SessionDictionary();
+
+		private SessionVariableDictionary variables = new SessionVariableDictionary();
 
 		/// <summary>
 		/// Checks whether the given session exists.
@@ -61,6 +62,9 @@ namespace Zyan.Communication.SessionMgmt
 		{
 			ServerSession session;
 			sessions.TryRemove(sessionID, out session);
+
+			VariableDictionary sessionVars;
+			variables.TryRemove(sessionID, out sessionVars);
 		}
 
 		/// <summary>
