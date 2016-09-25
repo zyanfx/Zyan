@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using Zyan.Communication.Toolbox;
 
@@ -123,6 +124,20 @@ namespace Zyan.Communication
 		public static CallInterceptorBuilder<TInterface> For<TInterface>(string uniqueName)
 		{
 			return new CallInterceptorBuilder<TInterface>(uniqueName);
+		}
+
+		/// <summary>
+		/// Returns a <see cref="System.String" /> that represents this instance.
+		/// </summary>
+		public override string ToString()
+		{
+			var parameters = string.Join(", ", (ParameterTypes ?? new Type[0]).Select(t => t.Name).ToArray());
+			if (!string.IsNullOrEmpty(parameters))
+			{
+				parameters = "(" + parameters + ")";
+			}
+
+			return string.Format("{0}.{1}{2}", InterfaceType, MemberName, parameters);
 		}
 	}
 }

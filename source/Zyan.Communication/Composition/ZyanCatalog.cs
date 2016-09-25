@@ -39,6 +39,9 @@ namespace Zyan.Communication.Composition
 		/// <param name="keepSynchronizationContext">Keep synchronization context for the callbacks and event handlers.</param>
 		public ZyanCatalog(ZyanConnection connection, bool transferTransactions, bool keepSynchronizationContext)
 		{
+			if (connection == null)
+				throw new ArgumentNullException("connection");
+
 			Connection = connection;
 			ImplicitTransactionTransfer = transferTransactions;
 			KeepSynchronizationContext = keepSynchronizationContext;
@@ -66,7 +69,7 @@ namespace Zyan.Communication.Composition
 		/// <summary>
 		/// Gets the part definitions that are contained in the catalog.
 		/// </summary>
-		/// <returns>The <see cref="T:System.ComponentModel.Composition.Primitives.ComposablePartDefinition"/> 
+		/// <returns>The <see cref="T:System.ComponentModel.Composition.Primitives.ComposablePartDefinition"/>
 		/// contained in the <see cref="T:System.ComponentModel.Composition.Primitives.ComposablePartCatalog"/>.</returns>
 		public override IQueryable<ComposablePartDefinition> Parts
 		{
