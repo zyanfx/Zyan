@@ -250,7 +250,10 @@ namespace Zyan.Communication
 			}
 
 			StartKeepSessionAliveTimer();
-			_connections.Add(this);
+			lock (_connections)
+			{
+				_connections.Add(this);
+			}
 		}
 
 		#endregion
@@ -648,7 +651,10 @@ namespace Zyan.Communication
 				}
 				finally
 				{
-					_connections.Remove(this);
+					lock (_connections)
+					{
+						_connections.Remove(this);
+					}
 				}
 				if (_remotingChannel != null)
 				{
@@ -842,7 +848,7 @@ namespace Zyan.Communication
 		{
 			if (_sendingHeartbeat)
 			{
-				// if polling timer interval is less than 
+				// if polling timer interval is less than
 				// channel timeout, skip sending a heartbeat
 				return;
 			}
