@@ -238,7 +238,7 @@ namespace Zyan.Communication
 		private void Invoke_CheckInterfaceName(InvocationDetails details)
 		{
 			// look up the component registration info
-			if (!_host.ComponentRegistry.ContainsKey(details.InterfaceName))
+			if (!_host.ComponentCatalog.HasRegistration(details.InterfaceName))
 				throw new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_CannotFindComponentForInterface, details.InterfaceName));
 		}
 
@@ -391,7 +391,7 @@ namespace Zyan.Communication
 		{
 			// Skip resolving registration, if already done
 			if (details.Registration == null)
-				details.Registration = _host.ComponentRegistry[details.InterfaceName];
+				details.Registration = _host.ComponentCatalog.GetRegistration(details.InterfaceName);
 
 			// get component instance
 			details.InterfaceType = details.Registration.InterfaceType;
@@ -474,7 +474,7 @@ namespace Zyan.Communication
 		/// <param name="details">Invocation details</param>
 		private void Invoke_CleanUp(InvocationDetails details)
 		{
-			if (details.Instance != null && details.Registration != null && 
+			if (details.Instance != null && details.Registration != null &&
 				details.Registration.ActivationType == ActivationType.SingleCall)
 			{
 				_host.ComponentCatalog.CleanUpComponentInstance(details.Registration, details.Instance);
@@ -572,13 +572,13 @@ namespace Zyan.Communication
 			if (string.IsNullOrEmpty(uniqueName))
 				uniqueName = interfaceName;
 
-			if (!_host.ComponentRegistry.ContainsKey(uniqueName))
+			if (!_host.ComponentCatalog.HasRegistration(uniqueName))
 				throw new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_CannotFindComponentForInterface, interfaceName));
 
 			var details = new InvocationDetails()
 			{
 				InterfaceName = interfaceName,
-				Registration = _host.ComponentRegistry[uniqueName]
+				Registration = _host.ComponentCatalog.GetRegistration(uniqueName)
 			};
 
 			Invoke_LoadCallContextData(details);
@@ -603,13 +603,13 @@ namespace Zyan.Communication
 			if (string.IsNullOrEmpty(uniqueName))
 				uniqueName = interfaceName;
 
-			if (!_host.ComponentRegistry.ContainsKey(uniqueName))
+			if (!_host.ComponentCatalog.HasRegistration(uniqueName))
 				throw new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_CannotFindComponentForInterface, interfaceName));
 
 			var details = new InvocationDetails()
 			{
 				InterfaceName = interfaceName,
-				Registration = _host.ComponentRegistry[uniqueName]
+				Registration = _host.ComponentCatalog.GetRegistration(uniqueName)
 			};
 
 			Invoke_LoadCallContextData(details);
