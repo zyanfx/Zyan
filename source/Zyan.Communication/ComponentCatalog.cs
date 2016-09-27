@@ -21,15 +21,6 @@ namespace Zyan.Communication
 		{
 		}
 
-		/// <summary>
-		/// Creates a new instance of the ComponentCatalog class.
-		/// </summary>
-		/// <param name="disposeWithHost">Must be "true", when this instance should be disposed together with its owning host</param>
-		public ComponentCatalog(bool disposeWithHost) : this()
-		{
-			_disposeWithHost = disposeWithHost;
-		}
-
 		#endregion
 
 		#region Register components
@@ -179,6 +170,15 @@ namespace Zyan.Communication
 		private Dictionary<string, ComponentRegistration> _componentRegistry = null;
 
 		/// <summary>
+		/// Determines whether the specified interface name has registration.
+		/// </summary>
+		/// <param name="interfaceName">Name of the interface.</param>
+		public bool HasRegistration(string interfaceName)
+		{
+			return ComponentRegistry.ContainsKey(interfaceName);
+		}
+
+		/// <summary>
 		/// Gets registration data for a specified component by its interface name.
 		/// </summary>
 		/// <param name="interfaceName">Name of the component´s interface</param>
@@ -307,16 +307,7 @@ namespace Zyan.Communication
 
 		#region Cleanup
 
-		private bool _disposeWithHost = false;
 		private bool _disposed = false;
-
-		/// <summary>
-		/// Gets, if this component catalog should be automaticly disposed, when the owning host is disposed.
-		/// </summary>
-		public bool DisposeWithHost
-		{
-			get { return _disposeWithHost; }
-		}
 
 		/// <summary>
 		/// Releases all managed resources.

@@ -33,8 +33,9 @@ namespace Zyan.Communication
 		/// <param name="name">The name of the component host.</param>
 		/// <param name="tcpPort">The TCP port.</param>
 		public ZyanComponentHost(string name, int tcpPort)
-			: this(name, new DefaultServerProtocolSetup(tcpPort), new InProcSessionManager(), new ComponentCatalog(true))
+			: this(name, new DefaultServerProtocolSetup(tcpPort), new InProcSessionManager(), new ComponentCatalog())
 		{
+			DisposeCatalogWithHost = true;
 		}
 
 		/// <summary>
@@ -43,7 +44,7 @@ namespace Zyan.Communication
 		/// <param name="name">The name of the component host.</param>
 		/// <param name="tcpPort">The TCP port.</param>
 		/// <param name="catalog">The component catalog.</param>
-		public ZyanComponentHost(string name, int tcpPort, ComponentCatalog catalog)
+		public ZyanComponentHost(string name, int tcpPort, IComponentCatalog catalog)
 			: this(name, new DefaultServerProtocolSetup(tcpPort), new InProcSessionManager(), catalog)
 		{
 		}
@@ -54,8 +55,9 @@ namespace Zyan.Communication
 		/// <param name="name">The name of the component host.</param>
 		/// <param name="protocolSetup">The protocol setup.</param>
 		public ZyanComponentHost(string name, IServerProtocolSetup protocolSetup)
-			: this(name, protocolSetup, new InProcSessionManager(), new ComponentCatalog(true))
+			: this(name, protocolSetup, new InProcSessionManager(), new ComponentCatalog())
 		{
+			DisposeCatalogWithHost = true;
 		}
 
 		/// <summary>
@@ -64,7 +66,7 @@ namespace Zyan.Communication
 		/// <param name="name">The name of the component host.</param>
 		/// <param name="protocolSetup">The protocol setup.</param>
 		/// <param name="catalog">The component catalog.</param>
-		public ZyanComponentHost(string name, IServerProtocolSetup protocolSetup, ComponentCatalog catalog)
+		public ZyanComponentHost(string name, IServerProtocolSetup protocolSetup, IComponentCatalog catalog)
 			: this(name, protocolSetup, new InProcSessionManager(), catalog)
 		{
 		}
@@ -76,8 +78,9 @@ namespace Zyan.Communication
 		/// <param name="protocolSetup">The protocol setup.</param>
 		/// <param name="sessionManager">The session manager.</param>
 		public ZyanComponentHost(string name, IServerProtocolSetup protocolSetup, ISessionManager sessionManager)
-			: this(name, protocolSetup, sessionManager, new ComponentCatalog(true))
+			: this(name, protocolSetup, sessionManager, new ComponentCatalog())
 		{
+			DisposeCatalogWithHost = true;
 		}
 
 		/// <summary>
@@ -87,7 +90,7 @@ namespace Zyan.Communication
 		/// <param name="protocolSetup">The protocol setup.</param>
 		/// <param name="sessionManager">The session manager.</param>
 		/// <param name="catalog">The component catalog.</param>
-		public ZyanComponentHost(string name, IServerProtocolSetup protocolSetup, ISessionManager sessionManager, ComponentCatalog catalog)
+		public ZyanComponentHost(string name, IServerProtocolSetup protocolSetup, ISessionManager sessionManager, IComponentCatalog catalog)
 		{
 			if (string.IsNullOrEmpty(name))
 				throw new ArgumentException(LanguageResource.ArgumentException_ComponentHostNameMissing, "name");
@@ -156,8 +159,10 @@ namespace Zyan.Communication
 		[Obsolete("Use ZyanSettings.LegacyBlockingEvents static property instead.")]
 		public static bool LegacyBlockingEvents { get; set; }
 
-		private ComponentCatalog _catalog = null;
-		private ZyanDispatcher _dispatcher = null;
+		private bool DisposeCatalogWithHost { get; set; }
+
+		private IComponentCatalog _catalog;
+		private ZyanDispatcher _dispatcher;
 		private static List<ZyanComponentHost> _hosts = new List<ZyanComponentHost>();
 
 		/// <summary>
@@ -165,13 +170,13 @@ namespace Zyan.Communication
 		/// </summary>
 		public static List<ZyanComponentHost> Hosts
 		{
-			get { return _hosts.ToList<ZyanComponentHost>(); }
+			get { return _hosts.ToList(); }
 		}
 
 		/// <summary>
 		/// Get or sets the component catalog for this host instance.
 		/// </summary>
-		public ComponentCatalog ComponentCatalog
+		public IComponentCatalog ComponentCatalog
 		{
 			get { return _catalog; }
 			set
@@ -180,20 +185,6 @@ namespace Zyan.Communication
 					throw new ArgumentNullException();
 
 				_catalog = value;
-			}
-		}
-
-		/// <summary>
-		/// Returns a name-value-list of all component registrations.
-		/// <remarks>
-		/// If the list doesn´t exist yet, it will be created automaticly.
-		/// </remarks>
-		/// </summary>
-		internal Dictionary<string, ComponentRegistration> ComponentRegistry
-		{
-			get
-			{
-				return _catalog.ComponentRegistry;
 			}
 		}
 
@@ -215,6 +206,15 @@ namespace Zyan.Communication
 		ComponentRegistration IComponentCatalog.GetRegistration(string interfaceName)
 		{
 			return _catalog.GetRegistration(interfaceName);
+		}
+
+		/// <summary>
+		/// Determines whether the specified interface name has registration.
+		/// </summary>
+		/// <param name="interfaceName">Name of the interface.</param>
+		bool IComponentCatalog.HasRegistration(string interfaceName)
+		{
+			return _catalog.HasRegistration(interfaceName);
 		}
 
 		/// <summary>
@@ -660,10 +660,11 @@ namespace Zyan.Communication
 				Authenticate = null;
 				_authProvider = null;
 
-				if (_catalog != null)
+				if (_catalog != null && DisposeCatalogWithHost)
 				{
-					if (_catalog.DisposeWithHost)
-						_catalog.Dispose();
+					var catalog = _catalog as IDisposable;
+					if (catalog != null)
+						catalog.Dispose();
 
 					_catalog = null;
 				}
