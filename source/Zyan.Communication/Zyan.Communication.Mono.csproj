@@ -99,6 +99,7 @@
     <Compile Include="ClientHeartbeatEventArgs.cs" />
     <Compile Include="ComponentCatalog.cs" />
     <Compile Include="ComponentInfo.cs" />
+    <Compile Include="ComponentRegistry.cs" />
     <Compile Include="Composition\DefinitionExtensions.cs" />
     <Compile Include="Composition\IComponentCatalogMefExtensions.cs" />
     <Compile Include="Composition\NonSharedPartsCatalog.cs" />
@@ -142,6 +143,7 @@
     <Compile Include="IComponentCatalogExtensions.cs">
       <DependentUpon>IComponentCatalog.cs</DependentUpon>
     </Compile>
+    <Compile Include="IComponentRegistry.cs" />
     <Compile Include="InterLinq\Communication\ClientQueryHandler.cs" />
     <Compile Include="InterLinq\Communication\ClientQueryProvider.cs" />
     <Compile Include="InterLinq\Communication\Remoting\ClientQueryRemotingHandler.cs" />
