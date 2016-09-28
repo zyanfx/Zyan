@@ -238,7 +238,7 @@ namespace Zyan.Communication
 		private void Invoke_CheckInterfaceName(InvocationDetails details)
 		{
 			// look up the component registration info
-			if (!_host.ComponentCatalog.HasRegistration(details.InterfaceName))
+			if (!_host.ComponentCatalog.IsRegistered(details.InterfaceName))
 				throw new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_CannotFindComponentForInterface, details.InterfaceName));
 		}
 
@@ -572,7 +572,7 @@ namespace Zyan.Communication
 			if (string.IsNullOrEmpty(uniqueName))
 				uniqueName = interfaceName;
 
-			if (!_host.ComponentCatalog.HasRegistration(uniqueName))
+			if (!_host.ComponentCatalog.IsRegistered(uniqueName))
 				throw new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_CannotFindComponentForInterface, interfaceName));
 
 			var details = new InvocationDetails()
@@ -603,7 +603,7 @@ namespace Zyan.Communication
 			if (string.IsNullOrEmpty(uniqueName))
 				uniqueName = interfaceName;
 
-			if (!_host.ComponentCatalog.HasRegistration(uniqueName))
+			if (!_host.ComponentCatalog.IsRegistered(uniqueName))
 				throw new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_CannotFindComponentForInterface, interfaceName));
 
 			var details = new InvocationDetails()

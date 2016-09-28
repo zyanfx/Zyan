@@ -170,10 +170,10 @@ namespace Zyan.Communication
 		private Dictionary<string, ComponentRegistration> _componentRegistry = null;
 
 		/// <summary>
-		/// Determines whether the specified interface name has registration.
+		/// Determines whether the specified interface name is registered.
 		/// </summary>
 		/// <param name="interfaceName">Name of the interface.</param>
-		public bool HasRegistration(string interfaceName)
+		public bool IsRegistered(string interfaceName)
 		{
 			return ComponentRegistry.ContainsKey(interfaceName);
 		}

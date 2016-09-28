@@ -47,10 +47,10 @@ namespace Zyan.Communication
 		void UnregisterComponent(string uniqueName);
 
 		/// <summary>
-		/// Determines whether the specified interface name has registration.
+		/// Determines whether the specified interface name is registered.
 		/// </summary>
 		/// <param name="interfaceName">Name of the interface.</param>
-		bool HasRegistration(string interfaceName);
+		bool IsRegistered(string interfaceName);
 
 		/// <summary>
 		/// Gets registration data for a specified component by its interface name.
