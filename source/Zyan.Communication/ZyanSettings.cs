@@ -25,7 +25,7 @@ namespace Zyan.Communication
 		/// Gets or sets a value indicating whether legacy blocking events raising mode is enabled.
 		/// </summary>
 		/// <remarks>
-		/// Zyan v2.3 and lower blocked server threads while raising events.
+		/// Zyan v2.3 and below blocked server threads while raising events.
 		/// </remarks>
 		public static bool LegacyBlockingEvents { get; set; }
 
@@ -33,7 +33,7 @@ namespace Zyan.Communication
 		/// Gets or sets a value indicating whether legacy blocking subscription mode is enabled.
 		/// </summary>
 		/// <remarks>
-		/// Zyan v2.5 and lower blocked client threads while subscribing to events: proxy.Event += handler;
+		/// Zyan v2.5 and below blocked client threads while subscribing to events: proxy.Event += handler;
 		/// </remarks>
 		public static bool LegacyBlockingSubscriptions { get; set; }
 
@@ -41,8 +41,16 @@ namespace Zyan.Communication
 		/// Gets or sets a value indicating whether legacy unprotected events handling mode is enabled.
 		/// </summary>
 		/// <remarks>
-		/// Zyan v2.4 and lower didn't prevent client event handlers from throwing exceptions back to server.
+		/// Zyan v2.4 and below didn't prevent client event handlers from throwing exceptions back to server.
 		/// </remarks>
 		public static bool LegacyUnprotectedEventHandlers { get; set; }
+
+		/// <summary>
+		/// Gets or sets a value indicating whether the ComponentCatalog should ignore duplicate registrations.
+		/// </summary>
+		/// <remarks>
+		/// Zyan v2.7 and below didn't update the existing component registrations.
+		/// </remarks>
+		public static bool LegacyIgnoreDuplicateRegistrations { get; set; }
 	}
 }

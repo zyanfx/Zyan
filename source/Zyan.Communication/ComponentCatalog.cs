@@ -21,6 +21,15 @@ namespace Zyan.Communication
 		{
 		}
 
+		/// <summary>
+		/// Creates a new instance of the ComponentCatalog class.
+		/// </summary>
+		/// <param name="customRegistry">Custom <see cref="IComponentRegistry"/> implementation.</param>
+		public ComponentCatalog(IComponentRegistry customRegistry)
+		{
+			_componentRegistry = customRegistry;
+		}
+
 		#endregion
 
 		#region Register components
@@ -49,12 +58,10 @@ namespace Zyan.Communication
 			if (string.IsNullOrEmpty(uniqueName))
 				uniqueName = interfaceType.FullName;
 
-			if (!ComponentRegistry.ContainsKey(uniqueName))
-			{
-				var registration = new ComponentRegistration(interfaceType, implementationType, uniqueName, activationType, cleanUpHandler);
-				registration.DisposeWithCatalog = true;
-				ComponentRegistry.Add(uniqueName, registration);
-			}
+			// register the component and its queryable methods
+			var registration = new ComponentRegistration(interfaceType, implementationType, uniqueName, activationType, cleanUpHandler);
+			registration.DisposeWithCatalog = true;
+			ComponentRegistry.Register(uniqueName, registration, ZyanSettings.LegacyIgnoreDuplicateRegistrations);
 
 			RegisterQueryableMethods<I>(uniqueName);
 		}
@@ -80,12 +87,10 @@ namespace Zyan.Communication
 			if (string.IsNullOrEmpty(uniqueName))
 				uniqueName = interfaceType.FullName;
 
-			if (!ComponentRegistry.ContainsKey(uniqueName))
-			{
-				var registration = new ComponentRegistration(interfaceType, factoryMethod, uniqueName, activationType, cleanUpHandler);
-				registration.DisposeWithCatalog = true;
-				ComponentRegistry.Add(uniqueName, registration);
-			}
+			// register the component and its queryable methods
+			var registration = new ComponentRegistration(interfaceType, factoryMethod, uniqueName, activationType, cleanUpHandler);
+			registration.DisposeWithCatalog = true;
+			ComponentRegistry.Register(uniqueName, registration, ZyanSettings.LegacyIgnoreDuplicateRegistrations);
 
 			RegisterQueryableMethods<I>(uniqueName);
 		}
@@ -117,13 +122,11 @@ namespace Zyan.Communication
 			// do not dispose externally-owned component instance
 			var externallyOwned = cleanUpHandler == null;
 
-			if (!ComponentRegistry.ContainsKey(uniqueName))
-			{
-				var registration = new ComponentRegistration(interfaceType, instance, uniqueName, cleanUpHandler);
-				registration.DisposeWithCatalog = !externallyOwned;
-				registration.EventStub.WireTo(instance);
-				ComponentRegistry.Add(uniqueName, registration);
-			}
+			// register the component and its queryable methods
+			var registration = new ComponentRegistration(interfaceType, instance, uniqueName, cleanUpHandler);
+			registration.DisposeWithCatalog = !externallyOwned;
+			registration.EventStub.WireTo(instance);
+			ComponentRegistry.Register(uniqueName, registration, ZyanSettings.LegacyIgnoreDuplicateRegistrations);
 
 			RegisterQueryableMethods<I>(uniqueName);
 		}
@@ -159,15 +162,14 @@ namespace Zyan.Communication
 		/// <param name="uniqueName">Unique component name</param>
 		public void UnregisterComponent(string uniqueName)
 		{
-			if (ComponentRegistry.ContainsKey(uniqueName))
-				ComponentRegistry.Remove(uniqueName);
+			ComponentRegistry.Remove(uniqueName);
 		}
 
 		#endregion
 
 		#region Managing component registrations
 
-		private Dictionary<string, ComponentRegistration> _componentRegistry = null;
+		private IComponentRegistry _componentRegistry;
 
 		/// <summary>
 		/// Determines whether the specified interface name is registered.
@@ -175,7 +177,7 @@ namespace Zyan.Communication
 		/// <param name="interfaceName">Name of the interface.</param>
 		public bool IsRegistered(string interfaceName)
 		{
-			return ComponentRegistry.ContainsKey(interfaceName);
+			return ComponentRegistry.IsRegistered(interfaceName);
 		}
 
 		/// <summary>
@@ -185,10 +187,12 @@ namespace Zyan.Communication
 		/// <returns>Component registration</returns>
 		public ComponentRegistration GetRegistration(string interfaceName)
 		{
-			if (!ComponentRegistry.ContainsKey(interfaceName))
+			ComponentRegistration registration;
+
+			if (!ComponentRegistry.TryGetRegistration(interfaceName, out registration))
 				throw new KeyNotFoundException(string.Format(LanguageResource.KeyNotFoundException_CannotFindComponentForInterface, interfaceName));
 
-			return ComponentRegistry[interfaceName];
+			return registration;
 		}
 
 		/// <summary>
@@ -197,7 +201,7 @@ namespace Zyan.Communication
 		/// If the list doesn´t exist yet, it will be created automaticly.
 		/// </remarks>
 		/// </summary>
-		internal Dictionary<string, ComponentRegistration> ComponentRegistry
+		internal IComponentRegistry ComponentRegistry
 		{
 			get
 			{
@@ -205,7 +209,7 @@ namespace Zyan.Communication
 					throw new ObjectDisposedException("_componentRegistry");
 
 				if (_componentRegistry == null)
-					_componentRegistry = new Dictionary<string, ComponentRegistration>();
+					_componentRegistry = new ComponentRegistry();
 
 				return _componentRegistry;
 			}
@@ -219,7 +223,7 @@ namespace Zyan.Communication
 		{
 			List<ComponentInfo> result = new List<ComponentInfo>();
 
-			foreach (ComponentRegistration registration in ComponentRegistry.Values)
+			foreach (ComponentRegistration registration in ComponentRegistry.GetRegistrations())
 			{
 				result.Add(
 					new ComponentInfo()
@@ -229,6 +233,7 @@ namespace Zyan.Communication
 						ActivationType = registration.ActivationType
 					});
 			}
+
 			return result;
 		}
 
@@ -329,13 +334,15 @@ namespace Zyan.Communication
 
 				if (_componentRegistry != null)
 				{
-					foreach (ComponentRegistration regEntry in _componentRegistry.Values)
+					foreach (ComponentRegistration regEntry in _componentRegistry.GetRegistrations())
 					{
 						CleanUpComponentInstance(regEntry);
 					}
+
 					_componentRegistry.Clear();
 					_componentRegistry = null;
 				}
+
 				if (!calledFromFinalizer)
 					GC.SuppressFinalize(this);
 			}
