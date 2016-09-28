@@ -209,12 +209,12 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Determines whether the specified interface name has registration.
+		/// Determines whether the specified interface name is registered.
 		/// </summary>
 		/// <param name="interfaceName">Name of the interface.</param>
-		bool IComponentCatalog.HasRegistration(string interfaceName)
+		bool IComponentCatalog.IsRegistered(string interfaceName)
 		{
-			return _catalog.HasRegistration(interfaceName);
+			return _catalog.IsRegistered(interfaceName);
 		}
 
 		/// <summary>
