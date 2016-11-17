@@ -368,7 +368,10 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			{
 				TcpExChannelData channelData = remoteChannelData as TcpExChannelData;
 				if (channelData != null)
-					url = Manager.CreateUrl(channelData.ChannelID);
+				{
+					var channelID = this.channelData.RemoteChannelID ?? channelData.ChannelID;
+					url = Manager.CreateUrl(channelID);
+				}
 				else
 					return null;
 			}
