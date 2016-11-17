@@ -18,6 +18,7 @@ using System.Runtime.Serialization.Formatters;
 using Zyan.Communication.Toolbox.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
@@ -369,8 +370,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				TcpExChannelData channelData = remoteChannelData as TcpExChannelData;
 				if (channelData != null)
 				{
-					var channelID = this.channelData.RemoteChannelID ?? channelData.ChannelID;
-					url = Manager.CreateUrl(channelID);
+					url = Manager.CreateUrl(LocalCallContextData.GetData("RemoteChannelID", channelData.ChannelID));
 				}
 				else
 					return null;
