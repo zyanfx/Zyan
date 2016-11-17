@@ -40,7 +40,14 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			IMessage responseMsg;
 			ITransportHeaders responseHeaders;
 			Stream responseStream;
-			
+
+			var channelData = connection.Channel.ChannelData as TcpExChannelData;
+
+			if (channelData != null)
+			{
+				channelData.RemoteChannelID = connection.RemoteChannelID;
+			}
+
 			var serverProcessing = ProcessMessage(new ServerChannelSinkStack(), null, request.Headers, request.MessageBody, out responseMsg, out responseHeaders, out responseStream);
 			if (serverProcessing != ServerProcessing.OneWay)
 			{
