@@ -15,6 +15,7 @@ using System.IO;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Messaging;
+using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
@@ -41,12 +42,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			ITransportHeaders responseHeaders;
 			Stream responseStream;
 
-			var channelData = connection.Channel.ChannelData as TcpExChannelData;
-
-			if (channelData != null)
-			{
-				channelData.RemoteChannelID = connection.RemoteChannelID;
-			}
+			LocalCallContextData.SetData("RemoteChannelID", connection.RemoteChannelID);
 
 			var serverProcessing = ProcessMessage(new ServerChannelSinkStack(), null, request.Headers, request.MessageBody, out responseMsg, out responseHeaders, out responseStream);
 			if (serverProcessing != ServerProcessing.OneWay)

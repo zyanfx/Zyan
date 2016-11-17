@@ -28,10 +28,6 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		[NonSerialized]
 		private string[] _channelUris;
 
-		[NonSerialized]
-		[ThreadStatic]
-		private Guid? _remoteChannelID;
-
 		/// <summary>
 		/// Creates a new instance of the TcpExChannelData class.
 		/// </summary>
@@ -48,15 +44,6 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		}
 
 		#region Properties
-		/// <summary>
-		/// Remote channel identity
-		/// </summary>
-		public Guid? RemoteChannelID
-		{
-			get { return _remoteChannelID; }
-			set { _remoteChannelID = value; }
-		}
-
 		/// <summary>
 		/// Gets the TCP port number of the channel.
 		/// </summary>
