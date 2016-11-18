@@ -1,12 +1,12 @@
 /*
  THIS CODE IS BASED ON:
- -------------------------------------------------------------------------------------------------------------- 
+ --------------------------------------------------------------------------------------------------------------
  TcpEx Remoting Channel
  Version 1.2 - 18 November, 2003
  Richard Mason - r.mason@qut.edu.au
  Originally published at GotDotNet:
  http://www.gotdotnet.com/Community/UserSamples/Details.aspx?SampleGuid=3F46C102-9970-48B1-9225-8758C38905B1
- Copyright © 2003 Richard Mason. All Rights Reserved. 
+ Copyright © 2003 Richard Mason. All Rights Reserved.
  --------------------------------------------------------------------------------------------------------------
 */
 using System;
@@ -41,8 +41,6 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			IMessage responseMsg;
 			ITransportHeaders responseHeaders;
 			Stream responseStream;
-
-			LocalCallContextData.SetData("RemoteChannelID", connection.RemoteChannelID);
 
 			var serverProcessing = ProcessMessage(new ServerChannelSinkStack(), null, request.Headers, request.MessageBody, out responseMsg, out responseHeaders, out responseStream);
 			if (serverProcessing != ServerProcessing.OneWay)
@@ -90,7 +88,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		#endregion
 
 		#region Implementation of IChannelSinkBase
-		
+
 		public IDictionary Properties
 		{
 			get { return null; }
