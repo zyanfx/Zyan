@@ -19,6 +19,7 @@ using Zyan.Communication.Toolbox.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using Zyan.Communication.Toolbox;
+using System.Linq;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
@@ -50,7 +51,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		private short _maxRetries = 10;
 		private int _retryDelay = 1000;
 		private IPAddress _bindToAddress = IPAddress.Any;
-		
+
 		#region TCP KeepAlive
 
 		/// <summary>
@@ -367,14 +368,24 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 			if (url == null)
 			{
-				TcpExChannelData channelData = remoteChannelData as TcpExChannelData;
-				if (channelData != null)
+				var channelData = remoteChannelData as TcpExChannelData;
+				if (channelData == null)
 				{
-					url = Manager.CreateUrl(LocalCallContextData.GetData("RemoteChannelID", channelData.ChannelID));
-				}
-				else
+					// unsupported ChannelData object
 					return null;
+				}
+
+				var connections = Connection.GetRunningConnectionsOfChannel(this);
+				if (connections.All(c => c.RemoteChannelID != channelData.ChannelID))
+				{
+					// unknown channel identity
+					return null;
+				}
+
+				// known channel is establishing back connection to us
+				url = Manager.CreateUrl(LocalCallContextData.GetData("RemoteChannelID", channelData.ChannelID));
 			}
+
 			if (Manager.Parse(url, out objectURI) != null)
 			{
 				IClientChannelSink clientChannelSink = clientSinkProvider.CreateSink(this, url, remoteChannelData);
@@ -386,7 +397,10 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				return messageSink;
 			}
 			else
+			{
+				// unsupported URL format
 				return null;
+			}
 		}
 
 		#endregion
