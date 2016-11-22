@@ -417,8 +417,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// <returns>True, if sending was successfully, otherwise false</returns>
 		private bool SendChannelInfo()
 		{
-			Stream stream = this.Stream;
-
+			var stream = Stream;
 			if (stream != null)
 			{
 				BinaryFormatter formatter = new BinaryFormatter();
@@ -427,6 +426,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				Trace.WriteLine("TcpEx.Connection sends ChannelInfo, this ChannelID: {0}", _channel.ChannelID);
 				return true;
 			}
+
 			return false;
 		}
 
@@ -436,17 +436,16 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// <returns>True, if receiving was successfully, otherwise false</returns>
 		private bool ReceiveChannelInfo()
 		{
-			Stream stream = this.Stream;
-
+			var stream = Stream;
 			if (stream != null)
 			{
 				BinaryFormatter formatter = new BinaryFormatter();
 				_remoteChannelData = (TcpExChannelData)formatter.Deserialize(stream);
 
 				Trace.WriteLine("TcpEx.Connection received remote ChannelInfo, ChannelID: {0}", _remoteChannelData.ChannelID);
-
 				return true;
 			}
+
 			return false;
 		}
 
@@ -489,15 +488,17 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		{
 			lock (_connectionsLockObject)
 			{
-				List<string> toBeDeleted = (from pair in _connections
-											where pair.Value == this
-											select pair.Key).ToList();
+				var toBeDeleted =
+					from pair in _connections
+					where pair.Value == this
+					select pair.Key;
 
-				foreach (string key in toBeDeleted)
+				foreach (string key in toBeDeleted.ToList())
 				{
 					_connections.Remove(key);
 				}
 			}
+
 			LockRead();
 			LockWrite();
 
@@ -518,6 +519,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 					_reader = null;
 				}
 			}
+
 			if (_writer != null)
 			{
 				try
@@ -532,6 +534,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 					_writer = null;
 				}
 			}
+
 			if (_stream != null)
 			{
 				try
@@ -546,6 +549,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 					_stream = null;
 				}
 			}
+
 			if (_socket != null)
 			{
 				try
@@ -554,7 +558,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 					_socket.Close();
 				}
 				catch (SocketException)
-				{ 
+				{
 				}
 				catch (ObjectDisposedException)
 				{
@@ -564,6 +568,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 					_socket = null;
 				}
 			}
+
 			if (_channel != null)
 				_channel = null;
 
@@ -600,6 +605,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 					if (_socket != null)
 						_stream = new NetworkStream(_socket, FileAccess.ReadWrite, false);
 				}
+
 				return _stream;
 			}
 		}
@@ -803,7 +809,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			set
 			{
 				_tcpKeepAliveEnabled = value;
-				
+
 				if (_socket!=null)
 					_tcpKeepAliveEnabled = SetTcpKeepAlive(_socket, _tcpKeepAliveEnabled ? TcpKeepAliveTime : 0, _tcpKeepAliveEnabled ? TcpKeepAliveInterval : 0);
 			}
