@@ -13,6 +13,7 @@
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Zyan.Key\zyan.snk</AssemblyOriginatorKeyFile>
+    <BaseIntermediateOutputPath>obj.Android</BaseIntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -295,6 +296,8 @@
     <Compile Include="SubscriptionEventArgs.cs" />
     <Compile Include="ZyanSettings.cs" />
     <Compile Include="Toolbox\LocalCallContextData.cs" />
+    <Compile Include="IComponentRegistry.cs" />
+    <Compile Include="ComponentRegistry.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="LanguageResource.resx">
@@ -325,12 +328,5 @@
     <Folder Include="Toolbox\Android\" />
     <Folder Include="Threading\" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>
