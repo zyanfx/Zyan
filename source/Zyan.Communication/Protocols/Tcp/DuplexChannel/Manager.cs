@@ -12,7 +12,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -22,6 +21,8 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Net.NetworkInformation;
 using Zyan.Communication.Toolbox;
+using Debug = System.Diagnostics.Debug;
+using Trace = Zyan.Communication.Toolbox.Diagnostics.Trace;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
@@ -159,7 +160,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			if (!IPAddress.TryParse(name, out ipAddress))
 			{
 				IPAddress[] resolvedAddresses = Dns.GetHostEntry(name).AddressList;
-				
+
 				foreach (var ip in resolvedAddresses)
 				{
 					if (ip.AddressFamily == AddressFamily.InterNetwork)
@@ -169,11 +170,11 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			}
 			return ipAddress;
 		}
-		
+
 		#endregion
 
 		#region Listening
-		
+
 		// Key — Guid or string (can be MessageID, LocalChannelID or LocalAddress), Value — AsyncResult
 		private static readonly Dictionary<object, AsyncResult> _listeners = new Dictionary<object,AsyncResult>();
 		private static object _listenersLockObject=new object();
@@ -182,7 +183,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		{
 			Message.BeginReceive(connection, new AsyncCallback(ReceiveMessage), null);
 		}
-		
+
 		public static Socket StartListening(int port, TcpExChannel channel, IPAddress bindToAddress)
 		{
 			if (bindToAddress == null)
@@ -240,10 +241,10 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				// Wait for next Client request
 				listener.BeginAccept(new AsyncCallback(listener_Accept), new object[] { listener, channel });
 			}
-			catch (ObjectDisposedException)
+			catch (ObjectDisposedException ex)
 			{
-				// listener was closed
-				// TODO: Add tracing here!
+				// the listener was closed
+				Trace.WriteLine("TcpEx.Manager: the listener was closed. Got exception: " + ex.ToString());
 				return;
 			}
 
@@ -254,15 +255,22 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			catch (DuplicateConnectionException)
 			{
 			}
-			catch (IOException)
+			catch (IOException ex)
 			{
 				// Client socket is not responding
-				//TODO: Add Tracing here!
+				Trace.WriteLine("TcpEx.Manager: client socket is not responding. Got exception: " + ex.ToString());
 			}
-			catch (SerializationException)
+			catch (SerializationException ex)
 			{
 				// Client sends bad data
-				//TODO: Add Tracing here!
+				Trace.WriteLine("TcpEx.Manager: client is sending bad data. Got exception: " + ex.ToString());
+			}
+			catch (Exception ex)
+			{
+				// Cannot cleanly connect to the remote party
+				// it's probably not TcpEx channel that's trying to connect us
+				Trace.WriteLine("TcpEx.Manager: cannot accept the incoming connection. Got exception: " + ex.ToString());
+				return;
 			}
 		}
 
@@ -321,10 +329,10 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 						queue.Enqueue(new ConnectionAndMessage
 						{
-							Connection = connection, 
+							Connection = connection,
 							Message = m
 						});
-					}	
+					}
 				}
 				else
 				{
@@ -503,7 +511,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				}
 			}
 			#endregion
-		
+
 			#region Implementation of IAsyncResult
 			public object AsyncState
 			{
