@@ -430,8 +430,10 @@ namespace Zyan.Communication
 			if (correlationSet == null)
 				throw new ArgumentNullException("correlationSet");
 
-			if (correlationSet.Count > 0)
-			{
+			var count = correlationSet.Count;
+			if (count > 0)
+ 			{
+				_connection.UpdateSubscriptionCounter(-count);
 				_connection.PrepareCallContext(false);
 				_connection.RemoteDispatcher.RemoveEventHandlers(_interfaceType.FullName, correlationSet, _uniqueName);
 			}
