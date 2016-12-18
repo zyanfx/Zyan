@@ -1,0 +1,13 @@
+*.bak
+*.cache
+*.log
+*.orig
+*.user
+bin
+obj
+obj.Android
+obj.fx3
+obj.fx4
+obj.fx45
+/source/Zyan.Key/zyan.snk
+/source/Zyan.Communication/Zyan.Communication.xml
