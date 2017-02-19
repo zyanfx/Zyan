@@ -5,10 +5,10 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Zyan.Communication;
 using Zyan.Communication.Protocols.Null;
-using Zyan.Communication.SessionMgmt;
+using Zyan.Communication.Protocols.Tcp;
+using Zyan.Communication.Security;
 
 namespace Zyan.Tests
 {
@@ -28,8 +28,6 @@ namespace Zyan.Tests
 	using Microsoft.VisualStudio.TestTools.UnitTesting;
 	using ClassInitializeNonStatic = DummyAttribute;
 	using ClassCleanupNonStatic = DummyAttribute;
-	using Communication.Protocols.Tcp;
-	using Communication.Security;
 #endif
 	#endregion
 
