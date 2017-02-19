@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Zyan.Communication;
 using Zyan.Communication.Protocols.Null;
 using Zyan.Communication.SessionMgmt;
@@ -27,6 +28,8 @@ namespace Zyan.Tests
 	using Microsoft.VisualStudio.TestTools.UnitTesting;
 	using ClassInitializeNonStatic = DummyAttribute;
 	using ClassCleanupNonStatic = DummyAttribute;
+	using Communication.Protocols.Tcp;
+	using Communication.Security;
 #endif
 	#endregion
 
@@ -355,6 +358,68 @@ namespace Zyan.Tests
 			});
 
 			Task.WaitAll(Task.Run(action1), Task.Run(action2));
+		}
+
+		[TestMethod]
+		public void CallInterceptionBug()
+		{
+			ThreadPool.QueueUserWorkItem(x => CreateTestService());
+
+			var firstConnection = CreateFirstConnection();
+			var firstService = firstConnection.CreateProxy<IFirstTestService>(null);
+			firstConnection.CallInterceptors.Add(CreateCallInterceptor());
+			firstService.TestMethod();
+		}
+
+		public interface IFirstTestService
+		{
+			event EventHandler Test;
+			void TestMethod();
+		}
+
+		public class FirstTestService : IFirstTestService
+		{
+			public event EventHandler Test;
+
+			public void OnTest(EventArgs args)
+			{
+				Test?.Invoke(null, args);
+			}
+
+			public void TestMethod()
+			{
+			}
+		}
+
+		private void CreateTestService()
+		{
+			var clientService = new FirstTestService();
+			var proto = new TcpCustomServerProtocolSetup(18888, new NullAuthenticationProvider(), false);
+			using (var host = new ZyanComponentHost("FirstTestServer", proto))
+			{
+				host.RegisterComponent<IFirstTestService>(() => clientService, ActivationType.Singleton);
+				Thread.Sleep(TimeSpan.FromSeconds(10));
+			}
+		}
+
+		private ZyanConnection CreateFirstConnection()
+		{
+			var proto = new TcpCustomClientProtocolSetup(false);
+			var connection = new ZyanConnection("tcp://127.0.0.1:18888/FirstTestServer", proto, null, true, true);
+			connection.CallInterceptionEnabled = true;
+			return connection;
+		}
+
+		private CallInterceptor CreateCallInterceptor()
+		{
+			var callInterceptor = CallInterceptor.For<IFirstTestService>().Action(service => service.TestMethod(), data =>
+			{
+				data.Intercepted = true;
+				data.MakeRemoteCall();
+			});
+
+			callInterceptor.Enabled = true;
+			return callInterceptor;
 		}
 	}
 }
