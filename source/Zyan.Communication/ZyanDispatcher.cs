@@ -294,7 +294,7 @@ namespace Zyan.Communication
 		/// <param name="details">The details.</param>
 		private void Invoke_SetRemoteSubscriptionCounter(InvocationDetails details)
 		{
-			if (details.CallContextData.Store != null && ServerSession.CurrentSession != null)
+			if (details.CallContextData != null && details.CallContextData.Store != null && ServerSession.CurrentSession != null)
 			{
 				details.CallContextData.Store["subscriptions"] = ServerSession.CurrentSession.RemoteSubscriptionCounter;
 			}

@@ -368,13 +368,15 @@ namespace Zyan.Tests
 			var firstConnection = CreateFirstConnection();
 			var firstService = firstConnection.CreateProxy<IFirstTestService>(null);
 			firstConnection.CallInterceptors.Add(CreateCallInterceptor());
-			firstService.TestMethod();
+
+			var result = firstService.TestMethod();
+			Assert.AreEqual(nameof(FirstTestService), result);
 		}
 
 		public interface IFirstTestService
 		{
 			event EventHandler Test;
-			void TestMethod();
+			string TestMethod();
 		}
 
 		public class FirstTestService : IFirstTestService
@@ -386,8 +388,9 @@ namespace Zyan.Tests
 				Test?.Invoke(null, args);
 			}
 
-			public void TestMethod()
+			public string TestMethod()
 			{
+				return nameof(FirstTestService);
 			}
 		}
 
@@ -415,7 +418,7 @@ namespace Zyan.Tests
 			var callInterceptor = CallInterceptor.For<IFirstTestService>().Action(service => service.TestMethod(), data =>
 			{
 				data.Intercepted = true;
-				data.MakeRemoteCall();
+				data.ReturnValue = data.MakeRemoteCall();
 			});
 
 			callInterceptor.Enabled = true;

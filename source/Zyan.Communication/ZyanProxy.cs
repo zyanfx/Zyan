@@ -160,7 +160,7 @@ namespace Zyan.Communication
 			var interceptor = _connection.CallInterceptors.FindMatchingInterceptor(_interfaceType, _uniqueName, methodCallMessage);
 			if (interceptor != null && interceptor.OnInterception != null)
 			{
-				var interceptionData = new CallInterceptionData(methodCallMessage.Args, InvokeRemoteMethod, methodCallMessage);
+				var interceptionData = new CallInterceptionData(methodCallMessage.Args, HandleRemoteInvocation, methodCallMessage);
 				interceptor.OnInterception(interceptionData);
 
 				if (interceptionData.Intercepted)
