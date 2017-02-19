@@ -363,66 +363,47 @@ namespace Zyan.Tests
 		[TestMethod]
 		public void CallInterceptionBug()
 		{
-			ThreadPool.QueueUserWorkItem(x => CreateTestService());
+			// create a service running for a couple of seconds
+			ThreadPool.QueueUserWorkItem(x =>
+			{
+				var clientService = new TestService();
+				var sproto = new TcpCustomServerProtocolSetup(18888, new NullAuthenticationProvider(), false);
+				using (var host = new ZyanComponentHost("FirstTestServer", sproto))
+				{
+					host.RegisterComponent<ITestService>(() => clientService, ActivationType.Singleton);
+					Thread.Sleep(TimeSpan.FromSeconds(2));
+				}
+			});
 
-			var firstConnection = CreateFirstConnection();
-			var firstService = firstConnection.CreateProxy<IFirstTestService>(null);
-			firstConnection.CallInterceptors.Add(CreateCallInterceptor());
+			// create a client and connect to the service
+			var cproto = new TcpCustomClientProtocolSetup(false);
+			var connection = new ZyanConnection("tcp://127.0.0.1:18888/FirstTestServer", cproto);
+			connection.CallInterceptionEnabled = true;
 
-			var result = firstService.TestMethod();
-			Assert.AreEqual(nameof(FirstTestService), result);
+			// add a call interceptor for the TestService.TestMethod
+			connection.CallInterceptors.Add(CallInterceptor.For<ITestService>().Action(service => service.TestMethod(), data =>
+			{
+				data.Intercepted = true;
+				data.MakeRemoteCall();
+				data.ReturnValue = nameof(TestService);
+			}));
+
+			var testService = connection.CreateProxy<ITestService>(null);
+			var result = testService.TestMethod();
+			Assert.AreEqual(nameof(TestService), result);
 		}
 
-		public interface IFirstTestService
+		public interface ITestService
 		{
-			event EventHandler Test;
 			string TestMethod();
 		}
 
-		public class FirstTestService : IFirstTestService
+		public class TestService : ITestService
 		{
-			public event EventHandler Test;
-
-			public void OnTest(EventArgs args)
-			{
-				Test?.Invoke(null, args);
-			}
-
 			public string TestMethod()
 			{
-				return nameof(FirstTestService);
+				return string.Empty;
 			}
-		}
-
-		private void CreateTestService()
-		{
-			var clientService = new FirstTestService();
-			var proto = new TcpCustomServerProtocolSetup(18888, new NullAuthenticationProvider(), false);
-			using (var host = new ZyanComponentHost("FirstTestServer", proto))
-			{
-				host.RegisterComponent<IFirstTestService>(() => clientService, ActivationType.Singleton);
-				Thread.Sleep(TimeSpan.FromSeconds(10));
-			}
-		}
-
-		private ZyanConnection CreateFirstConnection()
-		{
-			var proto = new TcpCustomClientProtocolSetup(false);
-			var connection = new ZyanConnection("tcp://127.0.0.1:18888/FirstTestServer", proto, null, true, true);
-			connection.CallInterceptionEnabled = true;
-			return connection;
-		}
-
-		private CallInterceptor CreateCallInterceptor()
-		{
-			var callInterceptor = CallInterceptor.For<IFirstTestService>().Action(service => service.TestMethod(), data =>
-			{
-				data.Intercepted = true;
-				data.ReturnValue = data.MakeRemoteCall();
-			});
-
-			callInterceptor.Enabled = true;
-			return callInterceptor;
 		}
 	}
 }
