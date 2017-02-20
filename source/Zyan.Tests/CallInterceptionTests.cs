@@ -361,34 +361,25 @@ namespace Zyan.Tests
 		[TestMethod]
 		public void CallInterceptionBug()
 		{
-			// create a service running for a couple of seconds
-			ThreadPool.QueueUserWorkItem(x =>
+			using (var host = new ZyanComponentHost("FirstTestServer", 18888))
 			{
-				var clientService = new TestService();
-				var sproto = new TcpCustomServerProtocolSetup(18888, new NullAuthenticationProvider(), false);
-				using (var host = new ZyanComponentHost("FirstTestServer", sproto))
+				host.RegisterComponent<ITestService, TestService>(ActivationType.Singleton);
+
+				using (var connection = new ZyanConnection("tcp://127.0.0.1:18888/FirstTestServer") { CallInterceptionEnabled = true })
 				{
-					host.RegisterComponent<ITestService>(() => clientService, ActivationType.Singleton);
-					Thread.Sleep(TimeSpan.FromSeconds(2));
+					// add a call interceptor for the TestService.TestMethod
+					connection.CallInterceptors.Add(CallInterceptor.For<ITestService>().Action(service => service.TestMethod(), data =>
+					{
+						data.Intercepted = true;
+						data.MakeRemoteCall();
+						data.ReturnValue = nameof(TestService);
+					}));
+
+					var testService = connection.CreateProxy<ITestService>(null);
+					var result = testService.TestMethod();
+					Assert.AreEqual(nameof(TestService), result);
 				}
-			});
-
-			// create a client and connect to the service
-			var cproto = new TcpCustomClientProtocolSetup(false);
-			var connection = new ZyanConnection("tcp://127.0.0.1:18888/FirstTestServer", cproto);
-			connection.CallInterceptionEnabled = true;
-
-			// add a call interceptor for the TestService.TestMethod
-			connection.CallInterceptors.Add(CallInterceptor.For<ITestService>().Action(service => service.TestMethod(), data =>
-			{
-				data.Intercepted = true;
-				data.MakeRemoteCall();
-				data.ReturnValue = nameof(TestService);
-			}));
-
-			var testService = connection.CreateProxy<ITestService>(null);
-			var result = testService.TestMethod();
-			Assert.AreEqual(nameof(TestService), result);
+			}
 		}
 
 		public interface ITestService
