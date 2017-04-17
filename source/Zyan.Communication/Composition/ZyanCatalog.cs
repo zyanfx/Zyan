@@ -64,7 +64,7 @@ namespace Zyan.Communication.Composition
 		/// </summary>
 		public bool KeepSynchronizationContext { get; private set; }
 
-		IList<ZyanComposablePartDefinition> innerParts = null;
+		private volatile IList<ZyanComposablePartDefinition> innerParts = null;
 
 		/// <summary>
 		/// Gets the part definitions that are contained in the catalog.

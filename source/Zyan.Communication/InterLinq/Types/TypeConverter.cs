@@ -101,7 +101,7 @@ namespace Zyan.InterLinq.Types
 		}
 
 		/// <summary>
-		/// Converts each element of an <see cref="IEnumerable"/> 
+		/// Converts each element of an <see cref="IEnumerable"/>
 		/// into a target <see cref="Type"/>.
 		/// </summary>
 		/// <typeparam name="T">Target <see cref="Type"/>.</typeparam>
@@ -125,7 +125,7 @@ namespace Zyan.InterLinq.Types
 		#region Convert C# Anonymous Type to AnonymousObject
 
 		/// <summary>
-		/// Converts an object to an <see cref="AnonymousObject"/> 
+		/// Converts an object to an <see cref="AnonymousObject"/>
 		/// or an <see cref="IEnumerable{AnonymousObject}"/>.
 		/// </summary>
 		/// <param name="objectToConvert"><see langword="object"/> to convert.</param>
@@ -148,7 +148,7 @@ namespace Zyan.InterLinq.Types
 				return method.Invoke(null, new[] { objectToConvert });
 			}
 			// Handle "IEnumerable<AnonymousType>" / "IEnumerator<T>"
-			if (elementType != null && elementType.GetGenericArguments()[0].IsAnonymous() || typeOfObject.IsEnumerator())
+			if (elementType != null && (elementType.GetGenericArguments()[0].IsAnonymous() || typeOfObject.IsEnumerator()))
 			{
 				MethodInfo method = typeof(TypeConverter).GetMethod("ConvertToSerializableCollection", BindingFlags.NonPublic | BindingFlags.Static).MakeGenericMethod(elementType.GetGenericArguments()[0]);
 				return method.Invoke(null, new[] { objectToConvert });
@@ -185,8 +185,8 @@ namespace Zyan.InterLinq.Types
 		}
 
 		/// <summary>
-		/// Converts each element of an <see cref="IEnumerable"/> to 
-		/// an <see cref="IEnumerable{AnonymousObject}"/> 
+		/// Converts each element of an <see cref="IEnumerable"/> to
+		/// an <see cref="IEnumerable{AnonymousObject}"/>
 		/// </summary>
 		/// <typeparam name="T">Target <see cref="Type"/>.</typeparam>
 		/// <param name="enumerable"><see cref="IEnumerable"/>.</param>

@@ -248,6 +248,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		{
 			if (disposing)
 			{
+				StopListening(null);
 				Connection.UnregisterConnectionsOfChannel(this);
 			}
 		}
@@ -504,11 +505,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
 		protected internal void OnConnectionEstablished(EventArgs e)
 		{
-			var connectionEstablished = ConnectionEstablished;
-			if (connectionEstablished != null)
-			{
-				ConnectionEstablished(this, e);
-			}
+			ConnectionEstablished?.Invoke(this, e);
 		}
 
 		#endregion

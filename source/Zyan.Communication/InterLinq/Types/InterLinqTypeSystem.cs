@@ -14,7 +14,7 @@ namespace Zyan.InterLinq.Types
 	{
 		#region Singleton
 
-		private static InterLinqTypeSystem instance;
+		private volatile static InterLinqTypeSystem instance;
 
 		private static object padlock = new object();
 

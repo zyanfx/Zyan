@@ -51,7 +51,7 @@ namespace Zyan.Communication.Toolbox
 			ThreadStaticValues[Name ?? string.Empty] = Value;
 		}
 
-		public LocalCallContextData(SerializationInfo info, StreamingContext context)
+		internal LocalCallContextData(SerializationInfo info, StreamingContext context)
 		{
 			// backward-compatible deserialization
 			foreach (SerializationEntry entry in info)
