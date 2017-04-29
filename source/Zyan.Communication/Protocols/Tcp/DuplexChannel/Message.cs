@@ -14,11 +14,9 @@
 */
 using System;
 using System.IO;
-using System.Linq;
 using System.Net.Sockets;
+using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
-using System.Runtime.Serialization.Formatters;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
@@ -112,21 +110,28 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			}
 			catch (ObjectDisposedException)
 			{
-				// Socket may be closed meanwhile. Connection isn´t working anymore, so close it.
+				// Socket may be closed meanwhile. Connection isn't working anymore, so close it.
 				connection.ReleaseWrite();
 				connection.Close();
 				connection = null;
 			}
 			catch (IOException)
 			{
-				// Unexpected connection loss. Connection isn´t working anymore, so close it.
+				// Unexpected connection loss. Connection isn't working anymore, so close it.
 				connection.ReleaseWrite();
 				connection.Close();
 				connection = null;
 			}
 			catch (SocketException)
 			{
-				// Unexpected connection loss. Connection isn´t working anymore, so close it.
+				// Unexpected connection loss. Connection isn't working anymore, so close it.
+				connection.ReleaseWrite();
+				connection.Close();
+				connection = null;
+			}
+			catch (RemotingException)
+			{
+				// Unexpected connection loss. Connection isn't working anymore, so close it.
 				connection.ReleaseWrite();
 				connection.Close();
 				connection = null;
@@ -205,7 +210,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 					retVal.messageBodyBytes = reader.ReadBytes(bodyLength);
 					if (retVal.messageBodyBytes.Length != bodyLength)
 						throw new Exception("Not enough body read...");
-						
+
 					System.Diagnostics.Debug.Assert(retVal.MessageBody.CanRead);
 				}
 
