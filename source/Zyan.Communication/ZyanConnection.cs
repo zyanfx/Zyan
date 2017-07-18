@@ -153,7 +153,7 @@ namespace Zyan.Communication
 		/// <param name="autoLoginOnExpiredSession">Specifies whether the proxy should relogin automatically when the session expired.</param>
 		/// <param name="keepSessionAlive">Specifies whether the session should be automaticly kept alive.</param>
 		public ZyanConnection(string serverUrl, Hashtable credentials, bool autoLoginOnExpiredSession, bool keepSessionAlive)
-			: this(serverUrl, ClientProtocolSetup.GetClientProtocol(serverUrl), null, autoLoginOnExpiredSession, true)
+			: this(serverUrl, ClientProtocolSetup.GetClientProtocol(serverUrl), credentials, autoLoginOnExpiredSession, true)
 		{
 		}
 
