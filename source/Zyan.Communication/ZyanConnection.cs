@@ -246,6 +246,8 @@ namespace Zyan.Communication
 				if (disposableChannel != null)
 					disposableChannel.Dispose();
 
+				_remotingChannel = null;
+				_remoteDispatcher = null;
 				throw ex.PreserveStackTrace();
 			}
 
@@ -695,14 +697,6 @@ namespace Zyan.Communication
 				}
 				GC.WaitForPendingFinalizers();
 			}
-		}
-
-		/// <summary>
-		/// Called from CLR when the object is finalized.
-		/// </summary>
-		~ZyanConnection()
-		{
-			Dispose(false);
 		}
 
 		#endregion

@@ -218,9 +218,11 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			}
 
 			// remove pending listeners if specified
-			if (listenerAddresses != null)
+			lock (_listenersLockObject)
 			{
-				lock (_listenersLockObject)
+				_listeners.Remove(channel.ChannelID);
+
+				if (listenerAddresses != null)
 				{
 					foreach (var address in listenerAddresses)
 						_listeners.Remove(address);
