@@ -84,6 +84,7 @@
     <Compile Include="EventFilterTests.cs" />
     <Compile Include="EventsTests.cs" />
     <Compile Include="EventStubTests.cs" />
+    <Compile Include="ExpressionSerializationTests.cs" />
     <Compile Include="GenericMethodsTests.cs" />
     <Compile Include="HeartbeatSessionTests.cs" />
     <Compile Include="InvocationDetailsTests.cs" />

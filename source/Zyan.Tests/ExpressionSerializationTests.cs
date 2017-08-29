@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Zyan.InterLinq;
 using Zyan.InterLinq.Expressions;
 
-namespace InterLinq.UnitTests
+namespace Zyan.Tests
 {
 	#region Unit testing platform abstraction layer
 #if NUNIT
@@ -18,7 +18,6 @@ namespace InterLinq.UnitTests
 	using ClassInitialize = DummyAttribute;
 	using ClassCleanupNonStatic = NUnit.Framework.TestFixtureTearDownAttribute;
 	using ClassCleanup = DummyAttribute;
-	using Owner = DummyAttribute;
 	using TestContext = System.Object;
 #else
 	using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -28,10 +27,10 @@ namespace InterLinq.UnitTests
 	#endregion
 
 	/// <summary>
-	/// Expression serialization tests
+	/// Test class for ExpressionSerializationHandler.
 	/// </summary>
 	[TestClass]
-	public class SerializationTest
+	public class ExpressionSerializationTests
 	{
 		/// <summary>
 		/// Gets or sets the test context which provides
@@ -39,17 +38,20 @@ namespace InterLinq.UnitTests
 		///</summary>
 		public TestContext TestContext { get; set; }
 
+		private ExpressionSerializationHandler Handler { get; } = new ExpressionSerializationHandler();
+
 		/// <summary>
 		/// Simple expression
 		/// </summary>
 		[TestMethod]
-		public void TestSimpleSerialization()
+		public void TestSimpleSerializationUsingHandler()
 		{
 			// http://interlinq.codeplex.com/discussions/60896
 			Expression<Func<Guid, bool>> expression = (guid) => guid != Guid.Empty;
 
-			var sx = expression.MakeSerializable();
-			var dx = sx.Deserialize();
+			var sx = Handler.Serialize(expression);
+			Assert.IsTrue(sx.Length <= 4954); // original size: 5585
+			var dx = Handler.Deserialize(expression.GetType(), sx);
 
 			Assert.AreEqual(expression.ToString(), dx.ToString());
 		}
@@ -58,11 +60,12 @@ namespace InterLinq.UnitTests
 		/// A bit more complex expression
 		/// </summary>
 		[TestMethod]
-		public void TestComplexSerialization()
+		public void TestComplexSerializationUsingHandler()
 		{
 			Expression<Func<Expression, bool>> expression = t => t.Type.FullName.ToLower().EndsWith("e");
-			var sx = expression.MakeSerializable();
-			var dx = sx.Deserialize();
+			var sx = Handler.Serialize(expression);
+			Assert.IsTrue(sx.Length <= 6681); // original size: 7342
+			var dx = Handler.Deserialize(expression.GetType(), sx);
 
 			Assert.AreEqual(expression.ToString(), dx.ToString());
 		}
@@ -81,11 +84,12 @@ namespace InterLinq.UnitTests
 		/// Expression with member access.
 		/// </summary>
 		[TestMethod]
-		public void TestMemberExpressionSerialization()
+		public void TestMemberExpressionSerializationUsingHandler()
 		{
 			Expression<Func<Sample, Delegate>> expression = new Sample().GetExpression();
-			var sx = expression.MakeSerializable();
-			var dx = sx.Deserialize();
+			var sx = Handler.Serialize(expression);
+			Assert.IsTrue(sx.Length <= 3841); // original size: 4256
+			var dx = Handler.Deserialize(expression.GetType(), sx);
 
 			Assert.AreEqual(expression.ToString(), dx.ToString());
 		}
@@ -96,7 +100,7 @@ namespace InterLinq.UnitTests
 		}
 
 		[TestMethod]
-		public void TestExpressionSerializationWithTwoNestedClosures()
+		public void TestExpressionSerializationWithTwoNestedClosuresUsingHandler()
 		{
 			var managerList = new[] { 1, 2, 3 };
 			var filter = GetFilter<Example>(r => r.ID < 0);
@@ -107,8 +111,9 @@ namespace InterLinq.UnitTests
 				filter = GetFilter<Example>(r => managerList.Contains(r.ID) && r.ID == locationId);
 			}
 
-			var sx = filter.MakeSerializable();
-			var dx = sx.Deserialize();
+			var sx = Handler.Serialize(filter);
+			Assert.IsTrue(sx.Length <= 7520); // original size: 8339
+			var dx = Handler.Deserialize(filter.GetType(), sx);
 
 			Assert.AreEqual("r => (value(System.Int32[]).Contains(r.ID) AndAlso (r.ID == 123))", dx.ToString());
 		}
@@ -119,7 +124,7 @@ namespace InterLinq.UnitTests
 		}
 
 		[TestMethod]
-		public void TestExpressionSerializationWithManyNestedClosures()
+		public void TestExpressionSerializationWithManyNestedClosuresUsingHandler()
 		{
 			var managerList = new[] { 1, 2, 3 };
 			var filter = GetFilter<Example>(r => r.ID < 0);
@@ -136,8 +141,9 @@ namespace InterLinq.UnitTests
 				}
 			}
 
-			var sx = filter.MakeSerializable();
-			var dx = sx.Deserialize();
+			var sx = Handler.Serialize(filter);
+			Assert.IsTrue(sx.Length <= 7848); // original size: 8667
+			var dx = Handler.Deserialize(filter.GetType(), sx);
 
 			Assert.AreEqual("r => (((value(System.Int32[]).Contains(r.ID) AndAlso (r.ID == 123)) AndAlso (r.ID > 0)) AndAlso (r.ID < 321))", dx.ToString());
 		}
