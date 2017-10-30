@@ -1,0 +1,18 @@
+version: 1.0.{build}
+image: Visual Studio 2017
+build:
+  project: source\Zyan.sln
+  parallel: true
+  verbosity: minimal
+before_test:
+- cmd: >-
+    where vstest.console
+
+    copy C:\projects\zyan\bin\UnitTests\Zyan.Communication.dll "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\*.*"
+
+    copy C:\projects\zyan\bin\UnitTests\Zyan.Tests.dll "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\*.*"
+
+test:
+  assemblies:
+    only:
+    - bin\UnitTests\Zyan.Tests.dll
