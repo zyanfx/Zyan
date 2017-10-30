@@ -1,12 +1,12 @@
 /*
  THIS CODE IS BASED ON:
- -------------------------------------------------------------------------------------------------------------- 
+ --------------------------------------------------------------------------------------------------------------
  TcpEx Remoting Channel
  Version 1.2 - 18 November, 2003
  Richard Mason - r.mason@qut.edu.au
  Originally published at GotDotNet:
  http://www.gotdotnet.com/Community/UserSamples/Details.aspx?SampleGuid=3F46C102-9970-48B1-9225-8758C38905B1
- Copyright © 2003 Richard Mason. All Rights Reserved. 
+ Copyright © 2003 Richard Mason. All Rights Reserved.
  --------------------------------------------------------------------------------------------------------------
 */
 using System;
@@ -34,7 +34,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			if (channel.ConnectDuringCreation)
 			{
 				// Try to connect so we fail during creation if the other side isn't listening
-				Connection.GetConnection(server, channel, channel.TcpKeepAliveEnabled, channel.TcpKeepAliveTime, 
+				Connection.GetConnection(server, channel, channel.TcpKeepAliveEnabled, channel.TcpKeepAliveTime,
 					channel.TcpKeepAliveInterval, channel.MaxRetries, channel.RetryDelay);
 			}
 		}
@@ -52,11 +52,10 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				requestHeaders["__RequestUri"] = url;
 
 			Connection connection = Connection.GetConnection(server, channel, channel.TcpKeepAliveEnabled, channel.TcpKeepAliveTime, channel.TcpKeepAliveInterval, channel.MaxRetries,channel.RetryDelay);
+			System.Diagnostics.Debug.Assert(connection != null, "Manager.GetConnection returned null", "Manager.GetConnection returned null in ClientTransportSink.ProcessMessage for server - " + server);
 
 			IPEndPoint localEndPoint = (IPEndPoint)connection.Socket.LocalEndPoint;
 			requestHeaders["__IPAddress"] = localEndPoint.Address;
-
-			System.Diagnostics.Debug.Assert(connection != null, "Manager.GetConnection returned null", "Manager.GetConnection returned null in ClientTransportSink.ProcessMessage for server - " + server);
 			return connection;
 		}
 
@@ -94,7 +93,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 			Guid msgGuid = Guid.NewGuid();
 			IAsyncResult ar = Manager.BeginReadMessage(msgGuid, connection, null, null);
-			Message.Send(connection, msgGuid, requestHeaders, requestStream); 
+			Message.Send(connection, msgGuid, requestHeaders, requestStream);
 
 			ar.AsyncWaitHandle.WaitOne();
 			Connection replyConnection;

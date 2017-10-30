@@ -16,7 +16,7 @@ namespace Zyan.Communication.SessionMgmt
 	public abstract class SessionManagerBase : ISessionManager
 	{
 		private object timerLockObject = new object();
-		private Timer sessionSweepTimer = null;
+		private volatile Timer sessionSweepTimer = null;
 		private int sessionSweepInterval;
 
 		/// <summary>
@@ -267,8 +267,7 @@ namespace Zyan.Communication.SessionMgmt
 				{
 					try
 					{
-						if (ClientSessionTerminated != null)
-							ClientSessionTerminated(this, args);
+						ClientSessionTerminated?.Invoke(this, args);
 					}
 					catch (Exception ex)
 					{

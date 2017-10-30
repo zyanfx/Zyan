@@ -17,7 +17,7 @@ namespace Zyan.Communication.Discovery.Metadata
 
 		internal DiscoveryRequest()
 			: base(SignatureString)
-		{ 
+		{
 		}
 
 		/// <summary>
@@ -29,7 +29,7 @@ namespace Zyan.Communication.Discovery.Metadata
 			: base(SignatureString)
 		{
 			NamePattern = namePattern;
-			Version = null;
+			Version = version;
 		}
 
 		/// <summary>

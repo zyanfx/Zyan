@@ -100,7 +100,7 @@ namespace Zyan.Communication.Threading
 		private readonly int m_concurrencyLevel;
 		private readonly bool m_flowExecutionContext;
 		private readonly Queue<WorkItem> m_queue = new Queue<WorkItem>();
-		private Thread[] m_threads;
+		private volatile Thread[] m_threads;
 		private int m_threadsWaiting;
 		private bool m_shutdown;
 

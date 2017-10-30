@@ -55,10 +55,10 @@ namespace Zyan.Communication.Composition
 		public bool KeepSynchronizationContext { get { return Definition.KeepSynchronizationContext; } }
 
 		/// <summary>
-		/// Gets a collection of the <see cref="T:System.ComponentModel.Composition.Primitives.ExportDefinition"/> objects 
+		/// Gets a collection of the <see cref="T:System.ComponentModel.Composition.Primitives.ExportDefinition"/> objects
 		/// that describe the exported objects provided by the part.
 		/// </summary>
-		/// <returns>A collection of <see cref="T:System.ComponentModel.Composition.Primitives.ExportDefinition"/> objects that describe 
+		/// <returns>A collection of <see cref="T:System.ComponentModel.Composition.Primitives.ExportDefinition"/> objects that describe
 		/// the exported objects provided by the <see cref="T:System.ComponentModel.Composition.Primitives.ComposablePart"/>.</returns>
 		public override IEnumerable<ExportDefinition> ExportDefinitions
 		{
@@ -74,7 +74,7 @@ namespace Zyan.Communication.Composition
 		/// Method info for the ZyanConnection.CreateProxy{ComponentInterface}(string uniqueName, bool implicitTransactionTransfer) method.
 		/// This method info is created on demand.
 		/// </summary>
-		private MethodInfo CreateProxyMethodInfo = null;
+		private volatile MethodInfo CreateProxyMethodInfo = null;
 
 		/// <summary>
 		/// Gets the exported object described by the specified <see cref="T:System.ComponentModel.Composition.Primitives.ExportDefinition"/> object.
@@ -102,7 +102,7 @@ namespace Zyan.Communication.Composition
 		}
 
 		/// <summary>
-		/// Gets a collection of the <see cref="T:System.ComponentModel.Composition.Primitives.ImportDefinition"/> 
+		/// Gets a collection of the <see cref="T:System.ComponentModel.Composition.Primitives.ImportDefinition"/>
 		/// objects that describe the imported objects required by the part.
 		/// </summary>
 		/// <returns>A collection of <see cref="T:System.ComponentModel.Composition.Primitives.ImportDefinition"/> objects that describe

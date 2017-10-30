@@ -153,7 +153,7 @@ namespace Zyan.Communication
 		/// <param name="autoLoginOnExpiredSession">Specifies whether the proxy should relogin automatically when the session expired.</param>
 		/// <param name="keepSessionAlive">Specifies whether the session should be automaticly kept alive.</param>
 		public ZyanConnection(string serverUrl, Hashtable credentials, bool autoLoginOnExpiredSession, bool keepSessionAlive)
-			: this(serverUrl, ClientProtocolSetup.GetClientProtocol(serverUrl), null, autoLoginOnExpiredSession, true)
+			: this(serverUrl, ClientProtocolSetup.GetClientProtocol(serverUrl), credentials, autoLoginOnExpiredSession, true)
 		{
 		}
 
@@ -246,6 +246,8 @@ namespace Zyan.Communication
 				if (disposableChannel != null)
 					disposableChannel.Dispose();
 
+				_remotingChannel = null;
+				_remoteDispatcher = null;
 				throw ex.PreserveStackTrace();
 			}
 
@@ -511,8 +513,7 @@ namespace Zyan.Communication
 		/// <param name="e">Event arguments</param>
 		protected internal virtual void OnBeforeInvoke(BeforeInvokeEventArgs e)
 		{
-			if (BeforeInvoke != null)
-				BeforeInvoke(this, e);
+			BeforeInvoke?.Invoke(this, e);
 		}
 
 		/// <summary>
@@ -521,8 +522,7 @@ namespace Zyan.Communication
 		/// <param name="e">Event arguments</param>
 		protected internal virtual void OnAfterInvoke(AfterInvokeEventArgs e)
 		{
-			if (AfterInvoke != null)
-				AfterInvoke(this, e);
+			AfterInvoke?.Invoke(this, e);
 		}
 
 		/// <summary>
@@ -531,8 +531,7 @@ namespace Zyan.Communication
 		/// <param name="e">Event arguments</param>
 		protected internal virtual void OnInvokeCanceled(InvokeCanceledEventArgs e)
 		{
-			if (InvokeCanceled != null)
-				InvokeCanceled(this, e);
+			InvokeCanceled?.Invoke(this, e);
 		}
 
 		#endregion
@@ -574,8 +573,7 @@ namespace Zyan.Communication
 		/// <param name="e">Event arguments</param>
 		protected internal void OnError(ZyanErrorEventArgs e)
 		{
-			if (Error != null)
-				Error(this, e);
+			Error?.Invoke(this, e);
 		}
 
 		/// <summary>
@@ -701,14 +699,6 @@ namespace Zyan.Communication
 			}
 		}
 
-		/// <summary>
-		/// Called from CLR when the object is finalized.
-		/// </summary>
-		~ZyanConnection()
-		{
-			Dispose(false);
-		}
-
 		#endregion
 
 		#region Accessing connections
@@ -748,8 +738,7 @@ namespace Zyan.Communication
 		/// <param name="e">Event arguments.</param>
 		protected virtual void OnDisconnected(DisconnectedEventArgs e)
 		{
-			if (Disconnected != null)
-				Disconnected(this, e);
+			Disconnected?.Invoke(this, e);
 		}
 
 		/// <summary>
@@ -763,8 +752,7 @@ namespace Zyan.Communication
 		/// <param name="e">Event arguments.</param>
 		protected virtual void OnReconnected(EventArgs e)
 		{
-			if (Reconnected != null)
-				Reconnected(this, e);
+			Reconnected?.Invoke(this, e);
 		}
 
 		/// <summary>
@@ -779,9 +767,10 @@ namespace Zyan.Communication
 		/// <returns>True, if the event is handled, otherwise, false.</returns>
 		protected virtual bool OnNewLogonNeeded(NewLogonNeededEventArgs e)
 		{
-			if (NewLogonNeeded != null)
+			var newLogonNeeded = NewLogonNeeded;
+			if (newLogonNeeded != null)
 			{
-				NewLogonNeeded(this, e);
+				newLogonNeeded(this, e);
 				return true;
 			}
 

@@ -11,7 +11,7 @@ namespace Zyan.InterLinq.Types.Anonymous
 	{
 		#region Singleton (double locked)
 
-		private static DynamicAssemblyHolder instance;
+		private static volatile DynamicAssemblyHolder instance;
 
 		private static object padlock = new object();
 
@@ -48,7 +48,7 @@ namespace Zyan.InterLinq.Types.Anonymous
 		#region Properties
 
 		/// <summary>
-		/// Gets a <see cref="ModuleBuilder"/> to create types in it. 
+		/// Gets a <see cref="ModuleBuilder"/> to create types in it.
 		/// </summary>
 		public ModuleBuilder ModuleBuilder { get; private set; }
 

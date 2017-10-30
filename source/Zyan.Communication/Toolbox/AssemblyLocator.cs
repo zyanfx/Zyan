@@ -1,10 +1,10 @@
 ﻿/*
  THIS CODE IS BASED ON:
- -------------------------------------------------------------------------------------------------------------- 
+ --------------------------------------------------------------------------------------------------------------
  Solving the Assembly Load Context Problem
  http://ayende.com/blog/1376/solving-the-assembly-load-context-problem
 
- Copyright © 2006 Ayende @ Rahien. All Rights Reserved. 
+ Copyright © 2006 Ayende @ Rahien. All Rights Reserved.
  --------------------------------------------------------------------------------------------------------------
 */
 using System;
@@ -47,7 +47,7 @@ namespace Zyan.Communication.Toolbox
 
 		private static object lockObject = new object();
 
-		private static bool enabled = false;
+		private static volatile bool enabled = false;
 
 		/// <summary>
 		/// Initializes assembly locator.

@@ -495,11 +495,7 @@ namespace Zyan.Communication
 		/// <param name="e">Event arguments.</param>
 		protected internal virtual void OnBeforeInvoke(BeforeInvokeEventArgs e)
 		{
-			var beforeInvoke = BeforeInvoke;
-			if (beforeInvoke != null)
-			{
-				beforeInvoke(this, e);
-			}
+			BeforeInvoke?.Invoke(this, e);
 		}
 
 		/// <summary>
@@ -508,11 +504,7 @@ namespace Zyan.Communication
 		/// <param name="e">Event arguments.</param>
 		protected internal virtual void OnAfterInvoke(AfterInvokeEventArgs e)
 		{
-			var afterInvoke = AfterInvoke;
-			if (afterInvoke != null)
-			{
-				afterInvoke(this, e);
-			}
+			AfterInvoke?.Invoke(this, e);
 		}
 
 		/// <summary>
@@ -521,11 +513,7 @@ namespace Zyan.Communication
 		/// <param name="e">Event arguments.</param>
 		protected internal virtual void OnInvokeCanceled(InvokeCanceledEventArgs e)
 		{
-			var invokeCanceled = InvokeCanceled;
-			if (invokeCanceled != null)
-			{
-				InvokeCanceled(this, e);
-			}
+			InvokeCanceled?.Invoke(this, e);
 		}
 
 		/// <summary>
@@ -534,11 +522,7 @@ namespace Zyan.Communication
 		/// <param name="e">Event arguments</param>
 		protected internal virtual void OnInvokeRejected(InvokeCanceledEventArgs e)
 		{
-			var invokeRejected = InvokeRejected;
-			if (invokeRejected != null)
-			{
-				invokeRejected(this, e);
-			}
+			InvokeRejected?.Invoke(this, e);
 		}
 
 		/// <summary>
@@ -547,11 +531,7 @@ namespace Zyan.Communication
 		/// <param name="e">The <see cref="SubscriptionEventArgs"/> instance containing the event data.</param>
 		protected internal virtual void OnSubscriptionAdded(SubscriptionEventArgs e)
 		{
-			var subscriptionAdded = SubscriptionAdded;
-			if (subscriptionAdded != null)
-			{
-				subscriptionAdded(this, e);
-			}
+			SubscriptionAdded?.Invoke(this, e);
 		}
 
 		/// <summary>
@@ -560,11 +540,7 @@ namespace Zyan.Communication
 		/// <param name="e">The <see cref="SubscriptionEventArgs"/> instance containing the event data.</param>
 		protected internal virtual void OnSubscriptionRemoved(SubscriptionEventArgs e)
 		{
-			var subscriptionRemoved = SubscriptionRemoved;
-			if (subscriptionRemoved != null)
-			{
-				subscriptionRemoved(this, e);
-			}
+			SubscriptionRemoved?.Invoke(this, e);
 		}
 
 		/// <summary>
@@ -573,11 +549,7 @@ namespace Zyan.Communication
 		/// <param name="e">The <see cref="SubscriptionEventArgs"/> instance containing the event data.</param>
 		protected internal virtual void OnSubscriptionCanceled(SubscriptionEventArgs e)
 		{
-			var subscriptionCanceled = SubscriptionCanceled;
-			if (subscriptionCanceled != null)
-			{
-				subscriptionCanceled(this, e);
-			}
+			SubscriptionCanceled?.Invoke(this, e);
 		}
 
 		#endregion
@@ -619,11 +591,7 @@ namespace Zyan.Communication
 		/// <param name="e">Event arguments</param>
 		protected virtual void OnDisposing(EventArgs e)
 		{
-			var disposing = Disposing;
-			if (disposing != null)
-			{
-				disposing(this, e);
-			}
+			Disposing?.Invoke(this, e);
 		}
 
 		/// <summary>

@@ -92,7 +92,7 @@ namespace Zyan.Communication.Composition
 			return new ZyanComposablePart(this);
 		}
 
-		private IEnumerable<ExportDefinition> exportDefinitions = null;
+		private volatile IEnumerable<ExportDefinition> exportDefinitions = null;
 
 		/// <summary>
 		/// Gets a collection of <see cref="T:System.ComponentModel.Composition.Primitives.ExportDefinition" /> objects that describe the objects
@@ -132,8 +132,8 @@ namespace Zyan.Communication.Composition
 		/// Gets a collection of <see cref="T:System.ComponentModel.Composition.Primitives.ImportDefinition" /> objects that describe the imports
 		/// required by the part defined by this <see cref="T:System.ComponentModel.Composition.Primitives.ComposablePartDefinition" /> object.
 		/// </summary>
-		/// <returns>A collection of <see cref="T:System.ComponentModel.Composition.Primitives.ImportDefinition" /> objects 
-		/// that describe the imports required by <see cref="T:System.ComponentModel.Composition.Primitives.ComposablePart" /> objects 
+		/// <returns>A collection of <see cref="T:System.ComponentModel.Composition.Primitives.ImportDefinition" /> objects
+		/// that describe the imports required by <see cref="T:System.ComponentModel.Composition.Primitives.ComposablePart" /> objects
 		/// created by the <see cref="T:System.ComponentModel.Composition.Primitives.ComposablePartDefinition" />.</returns>
 		public override IEnumerable<ImportDefinition> ImportDefinitions
 		{

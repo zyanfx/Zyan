@@ -10,7 +10,7 @@ using System.Timers;
 namespace Zyan.Communication.ChannelSinks.Encryption
 {
 	/// <summary>
-	/// Server-side channel sink for encrypted communication. 
+	/// Server-side channel sink for encrypted communication.
 	/// </summary>
 	/// <remarks>
 	/// Requires the client-side CryptoClientChannelSink counterpart.
@@ -164,7 +164,7 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 
 				// Encrypt the response stream and close the original response stream now that we're done with it
 				Stream encryptedStream = CryptoTools.GetEncryptedStream(responseStream, connectionData.CryptoProvider);
-				responseStream.Close(); // 
+				responseStream.Close(); //
 
 				// Use encrypted data stream as a response stream
 				responseStream = encryptedStream;
@@ -367,6 +367,35 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 		#region Inactive connection sweeper
 
 		/// <summary>
+		/// Channel sinks are not disposable, so we can't use the disposable timer as is.
+		/// This class works around the problem using the weak reference to the owner.
+		/// </summary>
+		private class SweepTimerWrapper
+		{
+			public SweepTimerWrapper(CryptoServerChannelSink self)
+			{
+				Self = new WeakReference(self);
+				SweepTimer = self._sweepTimer;
+			}
+
+			public Timer SweepTimer { get; set; }
+			public WeakReference Self { get; set; }
+			public void SweepConnections(object sender, ElapsedEventArgs e)
+			{
+				var target = Self.Target as CryptoServerChannelSink;
+				if (target != null)
+				{
+					target.SweepConnections(sender, e);
+					return;
+				}
+
+				SweepTimer.Elapsed -= SweepConnections;
+				SweepTimer.Stop();
+				SweepTimer.Dispose();
+			}
+		}
+
+		/// <summary>
 		/// Starts the connection sweeper.
 		/// </summary>
 		private void StartConnectionSweeper()
@@ -374,7 +403,7 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 			if (_sweepTimer == null)
 			{
 				_sweepTimer = new System.Timers.Timer(_sweepFrequency * 1000);
-				_sweepTimer.Elapsed += new ElapsedEventHandler(SweepConnections);
+				_sweepTimer.Elapsed += new SweepTimerWrapper(this).SweepConnections;
 				_sweepTimer.Start();
 			}
 		}
