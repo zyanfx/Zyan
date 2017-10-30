@@ -1,10 +1,16 @@
 version: 1.0.{build}
 clone_folder: c:\projects\zyan
 image: Visual Studio 2017
+
+before_build:
+- choco install opencover.portable
+- choco install codecov
+
 build:
   project: source\Zyan.sln
   parallel: true
   verbosity: minimal
+
 before_test:
 - cmd: >-
     where vstest.console
@@ -13,7 +19,6 @@ before_test:
 
     copy C:\projects\zyan\bin\UnitTests\Zyan.Tests.dll "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\*.*"
 
-test:
-  assemblies:
-    only:
-    - bin\UnitTests\Zyan.Tests.dll
+test_script:
+- OpenCover.Console.exe -register:user -target:"vstest.console.exe" -targetargs:"C:\projects\zyan\bin\UnitTests\Zyan.Tests.dll" -filter:"+[*]* -[MemoDb]*" -output:".\Zyan_coverage.xml"
+- codecov -f "Zyan_coverage.xml" -t 896d0d84-e518-4af3-a67e-85f10b9d64cb
