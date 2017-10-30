@@ -35,7 +35,7 @@ namespace Zyan.Communication.Delegates
 		/// Combines several event filters into one.
 		/// </summary>
 		[Serializable]
-		private class CombinedEventFilter : IEventFilter
+		private class CombinedEventFilter : IEventTransformFilter
 		{
 			public CombinedEventFilter(params IEventFilter[] filters)
 			{
@@ -55,6 +55,23 @@ namespace Zyan.Communication.Delegates
 				}
 
 				return true;
+			}
+
+			public object[] TransformEventArguments(params object[] parameters)
+			{
+				var newParameters = parameters;
+
+				foreach (var filter in EventFilters.OfType<IEventTransformFilter>())
+				{
+					if (!filter.AllowInvocation(parameters))
+					{
+						return newParameters;
+					}
+
+					newParameters = filter.TransformEventArguments(parameters);
+				}
+
+				return newParameters;
 			}
 
 			public bool Contains<TEventFilter>() where TEventFilter : IEventFilter

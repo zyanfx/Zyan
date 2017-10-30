@@ -49,6 +49,18 @@ namespace Zyan.Communication.Delegates
 				{
 					return;
 				}
+
+				// transform event at the client side, if invoked locally
+				var transformer = EventFilter as IEventTransformFilter;
+				if (transformer != null)
+				{
+					var newArgs = transformer.TransformEventArguments(sender, args);
+					if (newArgs != null && newArgs.Length > 1)
+					{
+						sender = newArgs[0];
+						args = newArgs[1] as TEventArgs;
+					}
+				}
 			}
 
 			// invoke client handler

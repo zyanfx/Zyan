@@ -42,6 +42,10 @@ namespace Zyan.Communication.Delegates
 				if (EventFilter != null && !EventFilter.AllowInvocation(args))
 					return null;
 
+				var transformer = EventFilter as IEventTransformFilter;
+				if (transformer != null)
+					args = transformer.TransformEventArguments(args);
+
 				return Interceptor.InvokeClientDelegate(args);
 			}
 			catch (Exception ex)
