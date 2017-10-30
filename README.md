@@ -1,7 +1,7 @@
 # Zyan Communication Framework
 
 [![Appveyor](https://img.shields.io/appveyor/ci/yallie/Zyan.svg)](https://ci.appveyor.com/project/yallie/zyan)
-[![NuGet](https://img.shields.io/nuget/dt/Zyan.svg)](https://nuget.org/packages/Zyan)
+[![NuGet](https://img.shields.io/nuget/v/Zyan.svg)](https://nuget.org/packages/Zyan)
 
 Easy to use distributed application framework for .NET, Mono and Xamarin.Android.  
 NuGet package: [Zyan](http://nuget.org/packages/Zyan), website: [zyan.com.de](http://zyan.com.de).
