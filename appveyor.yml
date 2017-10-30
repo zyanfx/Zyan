@@ -1,4 +1,5 @@
 version: 1.0.{build}
+clone_folder: c:\projects\zyan
 image: Visual Studio 2017
 build:
   project: source\Zyan.sln
