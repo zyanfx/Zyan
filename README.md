@@ -1,7 +1,8 @@
 # Zyan Communication Framework
 
-[![Tests](https://img.shields.io/appveyor/tests/yallie/zyan.svg)](https://ci.appveyor.com/project/yallie/zyan)
+[![Appveyor](https://img.shields.io/appveyor/ci/yallie/Zyan.svg)](https://ci.appveyor.com/project/yallie/zyan)
 [![Coverage](https://img.shields.io/codecov/c/github/zyanfx/Zyan.svg)](https://codecov.io/gh/zyanfx/Zyan)
+[![Tests](https://img.shields.io/appveyor/tests/yallie/zyan.svg)](https://ci.appveyor.com/project/yallie/zyan)
 [![NuGet](https://img.shields.io/nuget/v/Zyan.svg)](https://nuget.org/packages/Zyan)
 [![Zyan.com.de](https://img.shields.io/website-up-down-green-red/http/zyan.sslk.ru.svg?label=zyan.com.de)](http://zyan.com.de)
 
