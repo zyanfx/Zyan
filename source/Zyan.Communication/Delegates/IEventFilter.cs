@@ -25,17 +25,4 @@ namespace Zyan.Communication.Delegates
 		/// <typeparam name="TEventFilter">Event filter type.</typeparam>
 		bool Contains<TEventFilter>() where TEventFilter : IEventFilter;
 	}
-
-	/// <summary>
-	/// Interface for transforming the event arguments.
-	/// </summary>
-	/// <seealso cref="IEventFilter" />
-	public interface IEventTransformFilter : IEventFilter
-	{
-		/// <summary>
-		/// Transforms the event arguments before sending them across the wire.
-		/// </summary>
-		/// <param name="parameters">The parameters.</param>
-		object[] TransformEventArguments(params object[] parameters);
-	}
 }
