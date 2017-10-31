@@ -21,6 +21,8 @@ before_test:
 
 test_script:
 - OpenCover.Console.exe -register:user -target:"C:\projects\zyan\bin\UnitTests\IntegrationTest_DistributedEvents.exe" -filter:"+[Zyan*]*" -output:".\ZyanIntegrationTestCoverage.xml"
+- OpenCover.Console.exe -register:user -target:"vstest.console.exe" -targetargs:"/logger:Appveyor C:\projects\zyan\bin\UnitTests\Zyan.Tests.dll" -filter:"+[*]* -[MemoDb]*" -output:".\ZyanUnitTestCoverage.xml"
+
+after_test:
 - codecov -f "ZyanIntegrationTestCoverage.xml"
-- OpenCover.Console.exe -register:user -target:"vstest.console.exe" -targetargs:"C:\projects\zyan\bin\UnitTests\Zyan.Tests.dll" -filter:"+[*]* -[MemoDb]*" -output:".\ZyanUnitTestCoverage.xml"
 - codecov -f "ZyanUnitTestCoverage.xml"
