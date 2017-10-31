@@ -20,5 +20,6 @@ before_test:
     copy C:\projects\zyan\bin\UnitTests\Zyan.Tests.dll "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\*.*"
 
 test_script:
+- C:\projects\zyan\bin\UnitTests\IntegrationTest_DistributedEvents.exe
 - OpenCover.Console.exe -register:user -target:"vstest.console.exe" -targetargs:"C:\projects\zyan\bin\UnitTests\Zyan.Tests.dll" -filter:"+[*]* -[MemoDb]*" -output:".\Zyan_coverage.xml"
 - codecov -f "Zyan_coverage.xml" -t 896d0d84-e518-4af3-a67e-85f10b9d64cb
