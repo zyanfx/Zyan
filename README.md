@@ -3,6 +3,7 @@
 [![Appveyor](https://img.shields.io/appveyor/ci/yallie/Zyan.svg)](https://ci.appveyor.com/project/yallie/zyan)
 [![Coverage](https://img.shields.io/codecov/c/github/yallie/Zyan.svg)](https://codecov.io/gh/yallie/Zyan/settings/badge)
 [![NuGet](https://img.shields.io/nuget/v/Zyan.svg)](https://nuget.org/packages/Zyan)
+[![Zyan.com.de](https://img.shields.io/website-up-down-green-red/http/zyan.sslk.ru.svg?label=zyan.com.de)](http://zyan.com.de)
 
 Easy to use distributed application framework for .NET, Mono and Xamarin.Android.  
 NuGet package: [Zyan](http://nuget.org/packages/Zyan), website: [zyan.com.de](http://zyan.com.de).
