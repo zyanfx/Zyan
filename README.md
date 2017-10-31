@@ -82,12 +82,6 @@ proxy.MyEvent += (sender, e) => Console.WriteLine("Hi!");
 * Zyan supports wiring distributed Event-Based Components. EBC is an architectural model which reduces dependencies between components. Components in EBC application communicate with each other by means of messages instead of invoking methods.
 * Other notable features of Zyan include call interception, deterministic resource cleanup, duplex TCP communication, server-side event filters, session-bound events, OneWay methods support, centralized exception handling, and many more.
 
-## Miscellaneous
-
-<details><summary>Code coverage grid report</summary>
- <a href="https://codecov.io/gh/zyanfx/Zyan"><img src="https://codecov.io/gh/yallie/zyan/branch/master/graphs/tree.svg"></a>
-</details>
-
 ## Links to Resources
 
 * [Project homepage: zyan.com.de](http://zyan.com.de)
