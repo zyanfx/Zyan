@@ -238,9 +238,13 @@ namespace Zyan.Tests
 			ZyanHost.SubscriptionCanceled -= canceledHandler;
 		}
 
-		[TestMethod, MyIgnore] // note: this test fails on Appveyor
+		[TestMethod]
 		public void ExceptionInEventHandlerCancelsSubscription()
 		{
+			ZyanSettings.LegacyBlockingEvents = true;
+			ZyanSettings.LegacyBlockingSubscriptions = true;
+			ZyanSettings.LegacyUnprotectedEventHandlers = true;
+
 			var handled = false;
 			var eventHandler = new EventHandler((s, e) =>
 			{
