@@ -36,7 +36,7 @@ namespace Zyan.Communication.Delegates
 		protected override bool AllowInvocation(object sender, SessionEventArgs args)
 		{
 			// check event arguments
-			if (args == null || args.SessionID == Guid.Empty)
+			if (args == null || Sessions == null || !Sessions.Any())
 			{
 				return true;
 			}
