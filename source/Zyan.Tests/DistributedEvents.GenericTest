@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<GenericTest name="GenericTest1" storage="c:\tfs\zyan\source\zyan.tests\distributedevents\generictest1.generictest" id="1ffe54b5-bb89-4ab2-8b20-997b65cb184a" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
-  <Command filename="C:\TFS\Zyan\source\IntegrationTest_DistributedEvents\bin\Release\IntegrationTest_DistributedEvents.exe" workingDirectory="%TestOutputDirectory%" />
+<GenericTest name="distributedevents" storage="d:\externals\zyan\source\zyan.tests\distributedevents.generictest" id="1ffe54b5-bb89-4ab2-8b20-997b65cb184a" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Command filename="%TestOutputDirectory%\..\..\..\..\..\..\bin\UnitTests\IntegrationTest_DistributedEvents.exe" workingDirectory="%TestOutputDirectory%\..\..\..\..\..\..\bin\UnitTests" />
   <SummaryXmlFile path="%TestOutputDirectory%\&lt;Namen der Zusammenfassungsdatei hier eingeben&gt;" />
 </GenericTest>

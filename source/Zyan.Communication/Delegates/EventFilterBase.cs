@@ -10,7 +10,7 @@ namespace Zyan.Communication.Delegates
 	/// </summary>
 	/// <typeparam name="TEventArgs">Event arguments type.</typeparam>
 	[Serializable]
-	public abstract class EventFilterBase<TEventArgs> : IEventTransformFilter where TEventArgs : EventArgs
+	public abstract class EventFilterBase<TEventArgs> : IEventFilter where TEventArgs : EventArgs
 	{
 		/// <summary>
 		/// Determines whether this filter allows invoking the event handler.
@@ -21,22 +21,20 @@ namespace Zyan.Communication.Delegates
 		/// </returns>
 		public bool AllowInvocation(object[] parameters)
 		{
-			var sender = parameters.First();
-			var args = parameters.Skip(1).OfType<TEventArgs>().FirstOrDefault();
-			return AllowInvocation(sender, args);
-		}
+			if (parameters == null)
+				throw new ArgumentNullException(nameof(parameters));
 
-		/// <summary>
-		/// Transforms the event arguments before sending them across the wire.
-		/// </summary>
-		/// <param name="parameters">The parameters (sender and arguments).</param>
-		public object[] TransformEventArguments(params object[] parameters)
-		{
-			// assume that parameters are: sender, args
-			var newParams = new[] { parameters.FirstOrDefault(), null };
-			var args = parameters.Skip(1).OfType<TEventArgs>().FirstOrDefault();
-			newParams[1] = TransformEventArguments(args);
-			return newParams;
+			if (parameters.Length != 2)
+				throw new InvalidOperationException("Event handler should have 2 parameters: object and EventArgs.");
+
+			var sender = parameters[0];
+			var originalArgs = parameters[1] as TEventArgs;
+			var modifiedArgs = originalArgs;
+			var result = AllowInvocation(sender, originalArgs, out modifiedArgs);
+
+			// replace the event arguments before sending
+			parameters[1] = modifiedArgs;
+			return result;
 		}
 
 		/// <summary>
@@ -50,13 +48,18 @@ namespace Zyan.Communication.Delegates
 		protected abstract bool AllowInvocation(object sender, TEventArgs args);
 
 		/// <summary>
-		/// Transforms the event arguments before sending them accross the wire.
+		/// Determines whether this filter allows invoking the event handler
+		/// and transforms the event arguments before sending them.
 		/// </summary>
-		/// <param name="args">The instance containing the event data.</param>
-		/// <returns>The updated instance containing the event data.</returns>
-		protected virtual TEventArgs TransformEventArguments(TEventArgs args)
+		/// <param name="sender">Event sender (typically null for the events initiated on the server side).</param>
+		/// <param name="originalArgs">Original event arguments.</param>
+		/// <param name="modifiedArgs">Modified event arguments.</param>
+		/// <returns>
+		///   <c>true</c> if invocation is allowed; otherwise, <c>false</c>.
+		/// </returns>
+		protected virtual bool AllowInvocation(object sender, TEventArgs originalArgs, out TEventArgs modifiedArgs)
 		{
-			return args;
+			return AllowInvocation(sender, modifiedArgs = originalArgs);
 		}
 
 		/// <summary>

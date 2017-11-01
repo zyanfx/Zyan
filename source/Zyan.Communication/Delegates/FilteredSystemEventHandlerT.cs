@@ -45,29 +45,18 @@ namespace Zyan.Communication.Delegates
 			if (FilterLocally)
 			{
 				// filter event at the client-side, if invoked locally
-				if (EventFilter != null && !EventFilter.AllowInvocation(sender, args))
+				var newArgs = new object[] { sender, args };
+				if (EventFilter != null && !EventFilter.AllowInvocation(newArgs))
 				{
 					return;
 				}
 
-				// transform event at the client side, if invoked locally
-				var transformer = EventFilter as IEventTransformFilter;
-				if (transformer != null)
-				{
-					var newArgs = transformer.TransformEventArguments(sender, args);
-					if (newArgs != null && newArgs.Length > 1)
-					{
-						sender = newArgs[0];
-						args = newArgs[1] as TEventArgs;
-					}
-				}
+				// replace the event arguments
+				args = newArgs[1] as TEventArgs;
 			}
 
 			// invoke client handler
-			if (EventHandler != null)
-			{
-				EventHandler(sender, args);
-			}
+			EventHandler?.Invoke(sender, args);
 		}
 
 		/// <summary>

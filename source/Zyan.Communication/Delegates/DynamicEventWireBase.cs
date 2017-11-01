@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using Zyan.Communication.SessionMgmt;
 using Zyan.Communication.Toolbox.Diagnostics;
@@ -39,14 +40,11 @@ namespace Zyan.Communication.Delegates
 				if (ValidateSession != null && !ValidateSession())
 					throw new InvalidSessionException();
 
-				if (EventFilter != null && !EventFilter.AllowInvocation(args))
+				var newArgs = args.ToArray();
+				if (EventFilter != null && !EventFilter.AllowInvocation(newArgs))
 					return null;
 
-				var transformer = EventFilter as IEventTransformFilter;
-				if (transformer != null)
-					args = transformer.TransformEventArguments(args);
-
-				return Interceptor.InvokeClientDelegate(args);
+				return Interceptor.InvokeClientDelegate(newArgs);
 			}
 			catch (Exception ex)
 			{

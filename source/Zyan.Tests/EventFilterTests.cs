@@ -153,16 +153,18 @@ namespace Zyan.Tests
 
 			protected override bool AllowInvocation(object sender, SampleEventArgs args)
 			{
-				return Values.Contains(args.Value);
+				return AllowInvocation(sender, args, out args);
 			}
 
-			protected override SampleEventArgs TransformEventArguments(SampleEventArgs args)
+			protected override bool AllowInvocation(object sender, SampleEventArgs originalArgs, out SampleEventArgs modifiedArgs)
 			{
-				return new SampleEventArgs
+				modifiedArgs = new SampleEventArgs
 				{
-					Value = args.Value,
+					Value = originalArgs.Value,
 					IsTransformed = true
 				};
+
+				return Values.Contains(originalArgs.Value);
 			}
 		}
 
