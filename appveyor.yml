@@ -21,8 +21,6 @@ before_test:
 
     copy C:\projects\zyan\bin\UnitTests\InterLinq.* "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\*.*"
 
-    cmd /c start InterLinq.UnitTests.Server.exe
-
 test_script:
 - OpenCover.Console.exe -register:user -target:"C:\projects\zyan\bin\UnitTests\IntegrationTest_DistributedEvents.exe" -filter:"+[Zyan*]*" -output:".\ZyanIntegrationTestCoverage.xml"
 - OpenCover.Console.exe -register:user -target:"vstest.console.exe" -targetargs:"/logger:Appveyor C:\projects\zyan\bin\UnitTests\Zyan.Tests.dll" -filter:"+[*]* -[MemoDb]*" -output:".\ZyanUnitTestCoverage.xml"
