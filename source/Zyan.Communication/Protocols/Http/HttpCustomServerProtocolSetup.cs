@@ -17,6 +17,7 @@ namespace Zyan.Communication.Protocols.Http
 	public sealed class HttpCustomServerProtocolSetup : CustomServerProtocolSetup
 	{
 		private int _httpPort = 0;
+		private string _ipAddress = "0.0.0.0";
 
 		/// <summary>
 		/// Gets or sets the HTTP port number.
@@ -31,6 +32,15 @@ namespace Zyan.Communication.Protocols.Http
 
 				_httpPort = value;
 			}
+		}
+
+		/// <summary>
+		/// Gets or sets the IP Address to listen for client calls.
+		/// </summary>
+		public string IpAddress
+		{
+			get { return _ipAddress; }
+			set { _ipAddress = value; }
 		}
 
 		/// <summary>
@@ -74,12 +84,41 @@ namespace Zyan.Communication.Protocols.Http
 		/// <summary>
 		/// Creates a new instance of the HttpCustomServerProtocolSetup class.
 		/// </summary>
+		/// <param name="ipAddress">IP address to bind</param>
+		/// <param name="httpPort">HTTP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		public HttpCustomServerProtocolSetup(string ipAddress, int httpPort, IAuthenticationProvider authProvider)
+			: this()
+		{
+			IpAddress = ipAddress;
+			HttpPort = httpPort;
+			AuthenticationProvider = authProvider;
+		}
+
+		/// <summary>
+		/// Creates a new instance of the HttpCustomServerProtocolSetup class.
+		/// </summary>
 		/// <param name="versioning">Versioning behavior</param>
 		/// <param name="httpPort">HTTP port number</param>
 		/// <param name="authProvider">Authentication provider</param>
 		public HttpCustomServerProtocolSetup(Versioning versioning, int httpPort, IAuthenticationProvider authProvider)
 			: this(versioning)
 		{
+			HttpPort = httpPort;
+			AuthenticationProvider = authProvider;
+		}
+
+		/// <summary>
+		/// Creates a new instance of the HttpCustomServerProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="ipAddress">IP address to bind</param>
+		/// <param name="httpPort">HTTP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		public HttpCustomServerProtocolSetup(Versioning versioning, string ipAddress, int httpPort, IAuthenticationProvider authProvider)
+			: this(versioning)
+		{
+			IpAddress = ipAddress;
 			HttpPort = httpPort;
 			AuthenticationProvider = authProvider;
 		}
@@ -101,6 +140,22 @@ namespace Zyan.Communication.Protocols.Http
 		/// <summary>
 		/// Creates a new instance of the HttpCustomServerProtocolSetup class.
 		/// </summary>
+		/// <param name="ipAddress">IP address to bind</param>
+		/// <param name="httpPort">HTTP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		public HttpCustomServerProtocolSetup(string ipAddress, int httpPort, IAuthenticationProvider authProvider, bool encryption)
+			: this()
+		{
+			IpAddress = ipAddress;
+			HttpPort = httpPort;
+			AuthenticationProvider = authProvider;
+			Encryption = encryption;
+		}
+
+		/// <summary>
+		/// Creates a new instance of the HttpCustomServerProtocolSetup class.
+		/// </summary>
 		/// <param name="versioning">Versioning behavior</param>
 		/// <param name="httpPort">HTTP port number</param>
 		/// <param name="authProvider">Authentication provider</param>
@@ -108,6 +163,23 @@ namespace Zyan.Communication.Protocols.Http
 		public HttpCustomServerProtocolSetup(Versioning versioning, int httpPort, IAuthenticationProvider authProvider, bool encryption)
 			: this(versioning)
 		{
+			HttpPort = httpPort;
+			AuthenticationProvider = authProvider;
+			Encryption = encryption;
+		}
+
+		/// <summary>
+		/// Creates a new instance of the HttpCustomServerProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="ipAddress">IP address to bind</param>
+		/// <param name="httpPort">HTTP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		public HttpCustomServerProtocolSetup(Versioning versioning, string ipAddress, int httpPort, IAuthenticationProvider authProvider, bool encryption)
+			: this(versioning)
+		{
+			IpAddress = ipAddress;
 			HttpPort = httpPort;
 			AuthenticationProvider = authProvider;
 			Encryption = encryption;
@@ -132,6 +204,24 @@ namespace Zyan.Communication.Protocols.Http
 		/// <summary>
 		/// Creates a new instance of the HttpCustomServerProtocolSetup class.
 		/// </summary>
+		/// <param name="ipAddress">IP address to bind</param>
+		/// <param name="httpPort">HTTP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+		public HttpCustomServerProtocolSetup(string ipAddress, int httpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm)
+			: this()
+		{
+			IpAddress = ipAddress;
+			HttpPort = httpPort;
+			AuthenticationProvider = authProvider;
+			Encryption = encryption;
+			Algorithm = algorithm;
+		}
+
+		/// <summary>
+		/// Creates a new instance of the HttpCustomServerProtocolSetup class.
+		/// </summary>
 		/// <param name="versioning">Versioning behavior</param>
 		/// <param name="httpPort">HTTP port number</param>
 		/// <param name="authProvider">Authentication provider</param>
@@ -140,6 +230,25 @@ namespace Zyan.Communication.Protocols.Http
 		public HttpCustomServerProtocolSetup(Versioning versioning, int httpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm)
 			: this(versioning)
 		{
+			HttpPort = httpPort;
+			AuthenticationProvider = authProvider;
+			Encryption = encryption;
+			Algorithm = algorithm;
+		}
+
+		/// <summary>
+		/// Creates a new instance of the HttpCustomServerProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="ipAddress">IP address to bind</param>
+		/// <param name="httpPort">HTTP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+		public HttpCustomServerProtocolSetup(Versioning versioning, string ipAddress, int httpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm)
+			: this(versioning)
+		{
+			IpAddress = ipAddress;
 			HttpPort = httpPort;
 			AuthenticationProvider = authProvider;
 			Encryption = encryption;
@@ -167,6 +276,26 @@ namespace Zyan.Communication.Protocols.Http
 		/// <summary>
 		/// Creates a new instance of the HttpCustomServerProtocolSetup class.
 		/// </summary>
+		/// <param name="ipAddress">IP address to bind</param>
+		/// <param name="httpPort">HTTP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+		/// <param name="oaep">Specifies if OAEP padding should be activated</param>
+		public HttpCustomServerProtocolSetup(string ipAddress, int httpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm, bool oaep)
+			: this()
+		{
+			IpAddress = ipAddress;
+			HttpPort = httpPort;
+			AuthenticationProvider = authProvider;
+			Encryption = encryption;
+			Algorithm = algorithm;
+			Oaep = oaep;
+		}
+
+		/// <summary>
+		/// Creates a new instance of the HttpCustomServerProtocolSetup class.
+		/// </summary>
 		/// <param name="versioning">Versioning behavior</param>
 		/// <param name="httpPort">HTTP port number</param>
 		/// <param name="authProvider">Authentication provider</param>
@@ -176,6 +305,27 @@ namespace Zyan.Communication.Protocols.Http
 		public HttpCustomServerProtocolSetup(Versioning versioning, int httpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm, bool oaep)
 			: this(versioning)
 		{
+			HttpPort = httpPort;
+			AuthenticationProvider = authProvider;
+			Encryption = encryption;
+			Algorithm = algorithm;
+			Oaep = oaep;
+		}
+
+		/// <summary>
+		/// Creates a new instance of the HttpCustomServerProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="ipAddress">IP address to bind</param>
+		/// <param name="httpPort">HTTP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+		/// <param name="oaep">Specifies if OAEP padding should be activated</param>
+		public HttpCustomServerProtocolSetup(Versioning versioning, string ipAddress, int httpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm, bool oaep)
+			: this(versioning)
+		{
+			IpAddress = ipAddress;
 			HttpPort = httpPort;
 			AuthenticationProvider = authProvider;
 			Encryption = encryption;
@@ -195,6 +345,7 @@ namespace Zyan.Communication.Protocols.Http
 			{
 				_channelSettings["name"] = _channelName;
 				_channelSettings["port"] = _httpPort;
+				_channelSettings["bindTo"] = _ipAddress;
 				_channelSettings["secure"] = false;
 
 				ConfigureEncryption();

@@ -17,6 +17,7 @@ namespace Zyan.Communication.Protocols.Tcp
 	public sealed class TcpCustomServerProtocolSetup : CustomServerProtocolSetup
 	{
 		private int _tcpPort = 0;
+		private string _ipAddress = "0.0.0.0";
 
 		/// <summary>
 		/// Gets or sets the TCP port to listen for client calls.
@@ -31,6 +32,15 @@ namespace Zyan.Communication.Protocols.Tcp
 
 				_tcpPort = value;
 			}
+		}
+
+		/// <summary>
+		/// Gets or sets the IP Address to listen for client calls.
+		/// </summary>
+		public string IpAddress
+		{
+			get { return _ipAddress; }
+			set { _ipAddress = value; }
 		}
 
 		/// <summary>
@@ -80,12 +90,41 @@ namespace Zyan.Communication.Protocols.Tcp
 		/// <summary>
 		/// Creates a new instance of the TcpCustomServerProtocolSetup class.
 		/// </summary>
+		/// <param name="ipAddress">IP address to bind</param>
+		/// <param name="tcpPort">TCP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		public TcpCustomServerProtocolSetup(string ipAddress, int tcpPort, IAuthenticationProvider authProvider)
+			: this()
+		{
+			IpAddress = ipAddress;
+			TcpPort = tcpPort;
+			AuthenticationProvider = authProvider;
+		}
+
+		/// <summary>
+		/// Creates a new instance of the TcpCustomServerProtocolSetup class.
+		/// </summary>
 		/// <param name="versioning">Versioning behavior</param>
 		/// <param name="tcpPort">TCP port number</param>
 		/// <param name="authProvider">Authentication provider</param>
 		public TcpCustomServerProtocolSetup(Versioning versioning, int tcpPort, IAuthenticationProvider authProvider)
 			: this(versioning)
 		{
+			TcpPort = tcpPort;
+			AuthenticationProvider = authProvider;
+		}
+
+		/// <summary>
+		/// Creates a new instance of the TcpCustomServerProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="ipAddress">IP address to bind</param>
+		/// <param name="tcpPort">TCP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		public TcpCustomServerProtocolSetup(Versioning versioning, string ipAddress, int tcpPort, IAuthenticationProvider authProvider)
+			: this(versioning)
+		{
+			IpAddress = ipAddress;
 			TcpPort = tcpPort;
 			AuthenticationProvider = authProvider;
 		}
@@ -107,6 +146,22 @@ namespace Zyan.Communication.Protocols.Tcp
 		/// <summary>
 		/// Creates a new instance of the TcpCustomServerProtocolSetup class.
 		/// </summary>
+		/// <param name="ipAddress">IP address to bind</param>
+		/// <param name="tcpPort">TCP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		public TcpCustomServerProtocolSetup(string ipAddress, int tcpPort, IAuthenticationProvider authProvider, bool encryption)
+			: this()
+		{
+			IpAddress = ipAddress;
+			TcpPort = tcpPort;
+			AuthenticationProvider = authProvider;
+			Encryption = encryption;
+		}
+
+		/// <summary>
+		/// Creates a new instance of the TcpCustomServerProtocolSetup class.
+		/// </summary>
 		/// <param name="versioning">Versioning behavior</param>
 		/// <param name="tcpPort">TCP port number</param>
 		/// <param name="authProvider">Authentication provider</param>
@@ -114,6 +169,23 @@ namespace Zyan.Communication.Protocols.Tcp
 		public TcpCustomServerProtocolSetup(Versioning versioning, int tcpPort, IAuthenticationProvider authProvider, bool encryption)
 			: this(versioning)
 		{
+			TcpPort = tcpPort;
+			AuthenticationProvider = authProvider;
+			Encryption = encryption;
+		}
+
+		/// <summary>
+		/// Creates a new instance of the TcpCustomServerProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="ipAddress">IP address to bind</param>
+		/// <param name="tcpPort">TCP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		public TcpCustomServerProtocolSetup(Versioning versioning, string ipAddress, int tcpPort, IAuthenticationProvider authProvider, bool encryption)
+			: this(versioning)
+		{
+			IpAddress = ipAddress;
 			TcpPort = tcpPort;
 			AuthenticationProvider = authProvider;
 			Encryption = encryption;
@@ -138,6 +210,24 @@ namespace Zyan.Communication.Protocols.Tcp
 		/// <summary>
 		/// Creates a new instance of the TcpCustomServerProtocolSetup class.
 		/// </summary>
+		/// <param name="ipAddress">IP address to bind</param>
+		/// <param name="tcpPort">TCP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+		public TcpCustomServerProtocolSetup(string ipAddress, int tcpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm)
+			: this()
+		{
+			IpAddress = ipAddress;
+			TcpPort = tcpPort;
+			AuthenticationProvider = authProvider;
+			Encryption = encryption;
+			Algorithm = algorithm;
+		}
+
+		/// <summary>
+		/// Creates a new instance of the TcpCustomServerProtocolSetup class.
+		/// </summary>
 		/// <param name="versioning">Versioning behavior</param>
 		/// <param name="tcpPort">TCP port number</param>
 		/// <param name="authProvider">Authentication provider</param>
@@ -146,6 +236,25 @@ namespace Zyan.Communication.Protocols.Tcp
 		public TcpCustomServerProtocolSetup(Versioning versioning, int tcpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm)
 			: this(versioning)
 		{
+			TcpPort = tcpPort;
+			AuthenticationProvider = authProvider;
+			Encryption = encryption;
+			Algorithm = algorithm;
+		}
+
+		/// <summary>
+		/// Creates a new instance of the TcpCustomServerProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="ipAddress">IP address to bind</param>
+		/// <param name="tcpPort">TCP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+		public TcpCustomServerProtocolSetup(Versioning versioning, string ipAddress, int tcpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm)
+			: this(versioning)
+		{
+			IpAddress = ipAddress;
 			TcpPort = tcpPort;
 			AuthenticationProvider = authProvider;
 			Encryption = encryption;
@@ -173,6 +282,26 @@ namespace Zyan.Communication.Protocols.Tcp
 		/// <summary>
 		/// Creates a new instance of the TcpCustomServerProtocolSetup class.
 		/// </summary>
+		/// <param name="ipAddress">IP address to bind</param>
+		/// <param name="tcpPort">TCP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+		/// <param name="oaep">Specifies if OAEP padding should be used</param>
+		public TcpCustomServerProtocolSetup(string ipAddress, int tcpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm, bool oaep)
+			: this()
+		{
+			IpAddress = ipAddress;
+			TcpPort = tcpPort;
+			AuthenticationProvider = authProvider;
+			Encryption = encryption;
+			Algorithm = algorithm;
+			Oaep = oaep;
+		}
+
+		/// <summary>
+		/// Creates a new instance of the TcpCustomServerProtocolSetup class.
+		/// </summary>
 		/// <param name="versioning">Versioning behavior</param>
 		/// <param name="tcpPort">TCP port number</param>
 		/// <param name="authProvider">Authentication provider</param>
@@ -182,6 +311,27 @@ namespace Zyan.Communication.Protocols.Tcp
 		public TcpCustomServerProtocolSetup(Versioning versioning, int tcpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm, bool oaep)
 			: this(versioning)
 		{
+			TcpPort = tcpPort;
+			AuthenticationProvider = authProvider;
+			Encryption = encryption;
+			Algorithm = algorithm;
+			Oaep = oaep;
+		}
+
+		/// <summary>
+		/// Creates a new instance of the TcpCustomServerProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="ipAddress">IP address to bind</param>
+		/// <param name="tcpPort">TCP port number</param>
+		/// <param name="authProvider">Authentication provider</param>
+		/// <param name="encryption">Specifies if the communication sould be encrypted</param>
+		/// <param name="algorithm">Encryption algorithm (e.G. "3DES")</param>
+		/// <param name="oaep">Specifies if OAEP padding should be used</param>
+		public TcpCustomServerProtocolSetup(Versioning versioning, string ipAddress, int tcpPort, IAuthenticationProvider authProvider, bool encryption, string algorithm, bool oaep)
+			: this(versioning)
+		{
+			IpAddress = ipAddress;
 			TcpPort = tcpPort;
 			AuthenticationProvider = authProvider;
 			Encryption = encryption;
@@ -201,6 +351,7 @@ namespace Zyan.Communication.Protocols.Tcp
 			{
 				_channelSettings["name"] = _channelName;
 				_channelSettings["port"] = _tcpPort;
+				_channelSettings["bindTo"] = _ipAddress;
 				_channelSettings["socketCacheTimeout"] = 0;
 				_channelSettings["socketCachePolicy"] = SocketCachingEnabled ? SocketCachePolicy.Default : SocketCachePolicy.AbsoluteTimeout;
 				_channelSettings["secure"] = false;
