@@ -18,6 +18,7 @@ namespace Zyan.Communication.Protocols.Tcp
 	public sealed class TcpBinaryServerProtocolSetup : ServerProtocolSetup
 	{
 		private int _tcpPort = 0;
+		private string _ipAddress = "0.0.0.0";
 		private bool _useWindowsSecurity = false;
 		private TokenImpersonationLevel _impersonationLevel = TokenImpersonationLevel.Identification;
 		private ProtectionLevel _protectionLevel = ProtectionLevel.EncryptAndSign;
@@ -35,6 +36,15 @@ namespace Zyan.Communication.Protocols.Tcp
 
 				_tcpPort = value;
 			}
+		}
+
+		/// <summary>
+		/// Gets or sets the IP Address to listen for client calls.
+		/// </summary>
+		public string IpAddress
+		{
+			get { return _ipAddress; }
+			set { _ipAddress = value; }
 		}
 
 		/// <summary>
@@ -113,11 +123,36 @@ namespace Zyan.Communication.Protocols.Tcp
 		/// <summary>
 		/// Creates a new instance of the TcpBinaryServerProtocolSetup class.
 		/// </summary>
+		/// <param name="ipAddress">IP address to bind</param>
+		/// <param name="tcpPort">TCP port number</param>
+		public TcpBinaryServerProtocolSetup(string ipAddress, int tcpPort)
+			: this()
+		{
+			IpAddress = ipAddress;
+			TcpPort = tcpPort;
+		}
+
+		/// <summary>
+		/// Creates a new instance of the TcpBinaryServerProtocolSetup class.
+		/// </summary>
 		/// <param name="versioning">Versioning behavior</param>
 		/// <param name="tcpPort">TCP port number</param>
 		public TcpBinaryServerProtocolSetup(Versioning versioning, int tcpPort)
 			: this(versioning)
 		{
+			TcpPort = tcpPort;
+		}
+
+		/// <summary>
+		/// Creates a new instance of the TcpBinaryServerProtocolSetup class.
+		/// </summary>
+		/// <param name="versioning">Versioning behavior</param>
+		/// <param name="ipAddress">IP address to bind</param>
+		/// <param name="tcpPort">TCP port number</param>
+		public TcpBinaryServerProtocolSetup(Versioning versioning, string ipAddress, int tcpPort)
+			: this(versioning)
+		{
+			IpAddress = ipAddress;
 			TcpPort = tcpPort;
 		}
 
@@ -133,6 +168,7 @@ namespace Zyan.Communication.Protocols.Tcp
 			{
 				_channelSettings["name"] = _channelName;
 				_channelSettings["port"] = _tcpPort;
+				_channelSettings["bindTo"] = _ipAddress;
 				_channelSettings["secure"] = _useWindowsSecurity;
 				_channelSettings["socketCacheTimeout"] = 0;
 				_channelSettings["socketCachePolicy"] = SocketCachingEnabled ? SocketCachePolicy.Default : SocketCachePolicy.AbsoluteTimeout;
