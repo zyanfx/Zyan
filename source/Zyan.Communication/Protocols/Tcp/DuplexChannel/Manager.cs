@@ -235,10 +235,18 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			object[] state = (object[])ar.AsyncState;
 			Socket listener = (Socket)state[0];
 			TcpExChannel channel = (TcpExChannel)state[1];
-			Socket client;
+			Socket client = null;
 			try
 			{
-				client = listener.EndAccept(ar);
+				try
+				{
+					client = listener.EndAccept(ar);
+				}
+				catch (SocketException x)
+				{
+					// connection forcibly closed by the client's host
+					Trace.WriteLine("TcpEx.Manager: invalid incoming connection. Got exception: {0}" + x.ToString());
+				}
 
 				// Wait for next Client request
 				listener.BeginAccept(new AsyncCallback(listener_Accept), new object[] { listener, channel });
@@ -247,6 +255,12 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			{
 				// the listener was closed
 				Trace.WriteLine("TcpEx.Manager: the listener was closed. Got exception: " + ex.ToString());
+				return;
+			}
+
+			// ignore invalid incoming connections
+			if (client == null)
+			{
 				return;
 			}
 
