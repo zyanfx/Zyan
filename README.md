@@ -1,5 +1,6 @@
 # Zyan Communication Framework
 
+[![GitQ](https://gitq.com/badge.svg)](https://gitq.com/zyanfx/Zyan)
 [![Appveyor](https://img.shields.io/appveyor/ci/yallie/Zyan.svg)](https://ci.appveyor.com/project/yallie/zyan)
 [![Coverage](https://img.shields.io/codecov/c/github/zyanfx/Zyan.svg)](https://codecov.io/gh/zyanfx/Zyan)
 [![Tests](https://img.shields.io/appveyor/tests/yallie/zyan.svg)](https://ci.appveyor.com/project/yallie/zyan/build/tests)
