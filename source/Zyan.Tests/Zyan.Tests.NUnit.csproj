@@ -55,6 +55,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Zyan.SafeDeserializationHelpers">
+      <HintPath>..\packages\Zyan.SafeDeserializationHelpers.0.1.0\lib\net35\Zyan.SafeDeserializationHelpers.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CallInterceptionTests.cs" />
@@ -92,6 +95,7 @@
     <Compile Include="StreamTests.cs" />
     <Compile Include="TransportHeaderWrapperTests.cs" />
     <Compile Include="TypeHelperTests.cs" />
+    <Compile Include="VulnerabilityTests.cs" />
     <Compile Include="ZyanProxyTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -99,6 +103,9 @@
       <Project>{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}</Project>
       <Name>Zyan.Communication</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

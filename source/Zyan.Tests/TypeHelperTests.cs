@@ -11,6 +11,7 @@ using Zyan.Communication;
 using Zyan.Communication.Toolbox;
 using Zyan.Communication.Toolbox.Compression;
 using Zyan.Communication.ChannelSinks.Compression;
+using Zyan.SafeDeserializationHelpers;
 
 namespace Zyan.Tests
 {
@@ -198,7 +199,7 @@ namespace Zyan.Tests
 		public void BinaryFormatter_DeserializationProblems()
 		{
 			var obj = Activator.CreateInstance(SecretClass.Value);
-			var fmt = new BinaryFormatter();
+			var fmt = new BinaryFormatter().Safe();
 
 			using (var ms = new MemoryStream())
 			{
@@ -219,6 +220,7 @@ namespace Zyan.Tests
 			var obj = Activator.CreateInstance(SecretClass.Value);
 			var fmt = new BinaryFormatter();
 			fmt.Binder = new DynamicTypeBinder();
+			fmt = fmt.Safe();
 
 			using (var ms = new MemoryStream())
 			{

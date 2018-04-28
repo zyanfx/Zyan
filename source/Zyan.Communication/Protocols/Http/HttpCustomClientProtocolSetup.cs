@@ -6,6 +6,7 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Http;
 using System.Runtime.Serialization.Formatters;
 using Zyan.Communication.Toolbox;
+using Zyan.SafeDeserializationHelpers.Channels;
 
 namespace Zyan.Communication.Protocols.Http
 {
@@ -54,8 +55,8 @@ namespace Zyan.Communication.Protocols.Http
 
 			WebRequest.DefaultWebProxy = webProxy;
 
-			ClientSinkChain.Add(new BinaryClientFormatterSinkProvider(formatterSettings, null));
-			ServerSinkChain.Add(new BinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
+			ClientSinkChain.Add(new SafeBinaryClientFormatterSinkProvider(formatterSettings, null));
+			ServerSinkChain.Add(new SafeBinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
 		}
 
 		/// <summary>

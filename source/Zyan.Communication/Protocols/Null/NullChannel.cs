@@ -4,6 +4,7 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Messaging;
 using System.Runtime.Serialization.Formatters;
 using System.Threading;
+using Zyan.SafeDeserializationHelpers.Channels;
 using IDictionary = System.Collections.IDictionary;
 
 namespace Zyan.Communication.Protocols.Null
@@ -21,7 +22,7 @@ namespace Zyan.Communication.Protocols.Null
 		/// <param name="serverSinkProvider">The server sink provider.</param>
 		public NullChannel(IDictionary properties, IClientChannelSinkProvider clientSinkProvider, IServerChannelSinkProvider serverSinkProvider)
 			: this(properties["name"] as string ?? "NullChannel", clientSinkProvider, serverSinkProvider)
-		{ 
+		{
 		}
 
 		/// <summary>
@@ -53,8 +54,8 @@ namespace Zyan.Communication.Protocols.Null
 
 		private void InitializeWithFormatters(IClientChannelSinkProvider clientSinkProvider, IServerChannelSinkProvider serverSinkProvider)
 		{
-			ClientSinkProvider = clientSinkProvider = clientSinkProvider ?? new BinaryClientFormatterSinkProvider();
-			serverSinkProvider = serverSinkProvider ?? new BinaryServerFormatterSinkProvider { TypeFilterLevel = TypeFilterLevel.Full };
+			ClientSinkProvider = clientSinkProvider = clientSinkProvider ?? new SafeBinaryClientFormatterSinkProvider();
+			serverSinkProvider = serverSinkProvider ?? new SafeBinaryServerFormatterSinkProvider { TypeFilterLevel = TypeFilterLevel.Full };
 
 			// add our client sink provider to the end of ClientSinkProvider chain
 			while (clientSinkProvider.Next != null)

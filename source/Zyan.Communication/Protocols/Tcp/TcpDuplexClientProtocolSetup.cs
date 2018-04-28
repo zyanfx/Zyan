@@ -5,6 +5,7 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Serialization.Formatters;
 using Zyan.Communication.Protocols.Tcp.DuplexChannel;
 using Zyan.Communication.Toolbox;
+using Zyan.SafeDeserializationHelpers.Channels;
 
 namespace Zyan.Communication.Protocols.Tcp
 {
@@ -58,8 +59,8 @@ namespace Zyan.Communication.Protocols.Tcp
 			formatterSettings.Add("includeVersions", _versioning == Versioning.Strict);
 			formatterSettings.Add("strictBinding", _versioning == Versioning.Strict);
 
-			ClientSinkChain.Add(new BinaryClientFormatterSinkProvider(formatterSettings, null));
-			ServerSinkChain.Add(new BinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
+			ClientSinkChain.Add(new SafeBinaryClientFormatterSinkProvider(formatterSettings, null));
+			ServerSinkChain.Add(new SafeBinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
 		}
 
 		/// <summary>

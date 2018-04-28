@@ -21,6 +21,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using Zyan.Communication.Toolbox;
 using Zyan.Communication.Toolbox.Diagnostics;
+using Zyan.SafeDeserializationHelpers;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
@@ -420,7 +421,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			var stream = Stream;
 			if (stream != null)
 			{
-				BinaryFormatter formatter = new BinaryFormatter();
+				var formatter = new BinaryFormatter().Safe();
 				formatter.Serialize(stream, _channel.ChannelData);
 
 				Trace.WriteLine("TcpEx.Connection sends ChannelInfo, this ChannelID: {0}", _channel.ChannelID);
@@ -439,7 +440,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			var stream = Stream;
 			if (stream != null)
 			{
-				BinaryFormatter formatter = new BinaryFormatter();
+				var formatter = new BinaryFormatter().Safe();
 				_remoteChannelData = (TcpExChannelData)formatter.Deserialize(stream);
 
 				Trace.WriteLine("TcpEx.Connection received remote ChannelInfo, ChannelID: {0}", _remoteChannelData.ChannelID);

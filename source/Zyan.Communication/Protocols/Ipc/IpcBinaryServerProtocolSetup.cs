@@ -9,6 +9,7 @@ using System.Security.Principal;
 using Zyan.Communication.ChannelSinks.ClientAddress;
 using Zyan.Communication.Security;
 using Zyan.Communication.Toolbox;
+using Zyan.SafeDeserializationHelpers.Channels;
 
 namespace Zyan.Communication.Protocols.Ipc
 {
@@ -102,8 +103,8 @@ namespace Zyan.Communication.Protocols.Ipc
 			formatterSettings.Add("includeVersions", _versioning == Versioning.Strict);
 			formatterSettings.Add("strictBinding", _versioning == Versioning.Strict);
 
-			ClientSinkChain.Add(new BinaryClientFormatterSinkProvider(formatterSettings, null));
-			ServerSinkChain.Add(new BinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
+			ClientSinkChain.Add(new SafeBinaryClientFormatterSinkProvider(formatterSettings, null));
+			ServerSinkChain.Add(new SafeBinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
 			ServerSinkChain.Add(new ClientAddressServerChannelSinkProvider());
 		}
 

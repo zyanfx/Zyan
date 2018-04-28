@@ -41,5 +41,24 @@ namespace Zyan.Tests
 			Assert.IsNotInstanceOfType(obj, typeof(T));
 #endif
 		}
+
+		public static void Throws<T>(Action action) where T : Exception
+		{
+			try
+			{
+				action();
+			}
+			catch (T)
+			{
+				// everything is fine!
+				return;
+			}
+			catch (Exception ex)
+			{
+				Assert.Fail($"Expected to caught an exception of type {typeof(T)}, but got {ex.GetType()} istead.");
+			}
+
+			Assert.Fail($"Expected to caught an exception of type {typeof(T)}, but no exception was thrown.");
+		}
 	}
 }

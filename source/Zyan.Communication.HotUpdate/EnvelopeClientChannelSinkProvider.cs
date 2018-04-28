@@ -12,7 +12,7 @@ using System.Text;
 namespace Zyan.Communication.HotUpdate
 {
     /// <summary>
-    /// Client side sink provider for envelope support. 
+    /// Client side sink provider for envelope support.
     /// </summary>
     public class EnvelopeClientChannelSinkProvider : IClientChannelSinkProvider
     {
@@ -90,7 +90,7 @@ namespace Zyan.Communication.HotUpdate
 			{
 				// Call CreateSink on the next sink provider in the chain.  This will return
 				// to us the actual next sink object.  If the next sink is null, uh oh!
-				if ((nextSink = _nextSink.CreateSink(channel, url, remoteChannelData)) == null) 
+				if ((nextSink = _nextSink.CreateSink(channel, url, remoteChannelData)) == null)
                     return null;
 			}
 
@@ -108,7 +108,7 @@ namespace Zyan.Communication.HotUpdate
             get { return _nextSink; }
             set { _nextSink = value; }
         }
-        
+
         /// <summary>
         /// Initializes the serializer for serializing envelopes.
         /// </summary>
@@ -125,7 +125,7 @@ namespace Zyan.Communication.HotUpdate
                                 AssemblyFormat = FormatterAssemblyStyle.Simple,
                                 FilterLevel = TypeFilterLevel.Full,
                                 TypeFormat = FormatterTypeStyle.TypesAlways
-                            };
+                            }.Safe();
                 }
             }
         }

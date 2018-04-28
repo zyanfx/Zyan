@@ -50,6 +50,9 @@
     <Reference Include="System.Transactions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
+    <Reference Include="Zyan.SafeDeserializationHelpers">
+      <HintPath>..\packages\Zyan.SafeDeserializationHelpers.0.1.0\lib\net35\Zyan.SafeDeserializationHelpers.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActivationType.cs" />
@@ -316,6 +319,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="InterLinq\Communication\Communication.cd" />
     <None Include="InterLinq\Expressions\Helpers\Visitor.cd" />
     <None Include="InterLinq\Expressions\SerializableExpressions.cd" />

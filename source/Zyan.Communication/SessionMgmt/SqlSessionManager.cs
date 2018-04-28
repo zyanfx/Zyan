@@ -8,6 +8,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Principal;
 using System.Text;
 using System.Transactions;
+using Zyan.SafeDeserializationHelpers;
 
 namespace Zyan.Communication.SessionMgmt
 {
@@ -275,8 +276,8 @@ namespace Zyan.Communication.SessionMgmt
 									if (raw.IsNull)
 										return null;
 
-									BinaryFormatter formatter = new BinaryFormatter();
-									MemoryStream stream = new MemoryStream(raw.Value);
+									var formatter = new BinaryFormatter().Safe();
+									var stream = new MemoryStream(raw.Value);
 
 									// Deserialize the binary data
 									object managedValue = formatter.Deserialize(stream);
@@ -333,8 +334,8 @@ namespace Zyan.Communication.SessionMgmt
 						}
 						else
 						{
-							BinaryFormatter formatter = new BinaryFormatter();
-							MemoryStream stream = new MemoryStream();
+							var formatter = new BinaryFormatter().Safe();
+							var stream = new MemoryStream();
 
 							// Serialize the binary data and set parameter value
 							formatter.Serialize(stream, variableValue);

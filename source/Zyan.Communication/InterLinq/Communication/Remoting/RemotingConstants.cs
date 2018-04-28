@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
+using Zyan.SafeDeserializationHelpers.Channels;
 
 namespace Zyan.InterLinq.Communication.Remoting
 {
@@ -41,7 +42,7 @@ namespace Zyan.InterLinq.Communication.Remoting
 		/// <returns>Retruns a default <see cref="IChannel"/>.</returns>
 		public static IChannel GetDefaultChannel(IDictionary properties)
 		{
-			return new TcpChannel(properties, new BinaryClientFormatterSinkProvider(), new BinaryServerFormatterSinkProvider());
+			return new TcpChannel(properties, new SafeBinaryClientFormatterSinkProvider(), new SafeBinaryServerFormatterSinkProvider());
 		}
 	}
 }

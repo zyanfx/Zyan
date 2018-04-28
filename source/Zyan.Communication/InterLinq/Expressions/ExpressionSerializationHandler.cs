@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization.Formatters.Binary;
 using Zyan.Communication;
+using Zyan.SafeDeserializationHelpers;
 
 namespace Zyan.InterLinq.Expressions
 {
@@ -19,7 +20,7 @@ namespace Zyan.InterLinq.Expressions
 		/// </summary>
 		public ExpressionSerializationHandler()
 		{
-			Formatter = new BinaryFormatter();
+			Formatter = new BinaryFormatter().Safe();
 			Formatter.AssemblyFormat = FormatterAssemblyStyle.Simple;
 			Formatter.FilterLevel = TypeFilterLevel.Low;
 		}

@@ -282,4 +282,13 @@
   <data name="ArgumentException_ServerUrlIsInvalid" xml:space="preserve">
     <value>URL сервера имеет недопустимый формат. Используйте метод FormatUrl класса клиентского протокола, чтобы сформировать корректный URL сервера.</value>
   </data>
+  <data name="RemotingException_MessageSinkNotSet" xml:space="preserve">
+    <value>Приемник сообщений не создан.</value>
+  </data>
+  <data name="RemotingException_ErrorReceivingChannelInfo" xml:space="preserve">
+    <value>Ошибка при получении информации о канале.</value>
+  </data>
+  <data name="RemotingException_ErrorSendingChannelInfo" xml:space="preserve">
+    <value>Ошибка при отправке информации о канале.</value>
+  </data>
 </root>

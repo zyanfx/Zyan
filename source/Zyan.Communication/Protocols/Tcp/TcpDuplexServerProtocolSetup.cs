@@ -1,17 +1,14 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Serialization.Formatters;
 using Zyan.Communication.ChannelSinks.ClientAddress;
-using Zyan.Communication.ChannelSinks.Encryption;
 using Zyan.Communication.Protocols.Tcp.DuplexChannel;
 using Zyan.Communication.Security;
 using Zyan.Communication.Toolbox;
-using System.Collections;
-using System.Net.NetworkInformation;
-using System.Collections.Generic;
-using System.Threading;
+using Zyan.SafeDeserializationHelpers.Channels;
 
 namespace Zyan.Communication.Protocols.Tcp
 {
@@ -90,8 +87,8 @@ namespace Zyan.Communication.Protocols.Tcp
 			formatterSettings.Add("includeVersions", _versioning == Versioning.Strict);
 			formatterSettings.Add("strictBinding", _versioning == Versioning.Strict);
 
-			ClientSinkChain.Add(new BinaryClientFormatterSinkProvider(formatterSettings, null));
-			ServerSinkChain.Add(new BinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
+			ClientSinkChain.Add(new SafeBinaryClientFormatterSinkProvider(formatterSettings, null));
+			ServerSinkChain.Add(new SafeBinaryServerFormatterSinkProvider(formatterSettings, null) { TypeFilterLevel = TypeFilterLevel.Full });
 			ServerSinkChain.Add(new ClientAddressServerChannelSinkProvider());
 		}
 

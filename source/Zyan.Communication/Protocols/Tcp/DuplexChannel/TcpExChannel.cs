@@ -11,15 +11,16 @@
 */
 using System;
 using System.Collections;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Messaging;
 using System.Runtime.Serialization.Formatters;
-using Zyan.Communication.Toolbox.Diagnostics;
-using System.Net;
-using System.Net.Sockets;
 using Zyan.Communication.Toolbox;
-using System.Linq;
+using Zyan.Communication.Toolbox.Diagnostics;
+using Zyan.SafeDeserializationHelpers.Channels;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
@@ -204,11 +205,11 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			_bindToAddress = bindToAddress;
 
 			if (clientSinkProvider == null)
-				clientSinkProvider = new BinaryClientFormatterSinkProvider();
+				clientSinkProvider = new SafeBinaryClientFormatterSinkProvider();
 			if (serverSinkProvider == null)
 			{
 				Trace.WriteLine("Setting serialization filter: {0}", typeFilterLevel);
-				BinaryServerFormatterSinkProvider tempProvider = new BinaryServerFormatterSinkProvider();
+				var tempProvider = new SafeBinaryServerFormatterSinkProvider();
 				tempProvider.TypeFilterLevel = typeFilterLevel;
 				serverSinkProvider = tempProvider;
 			}
