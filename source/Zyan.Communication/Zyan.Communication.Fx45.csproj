@@ -73,7 +73,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="Zyan.SafeDeserializationHelpers">
-      <HintPath>..\packages\Zyan.SafeDeserializationHelpers.0.1.0\lib\net35\Zyan.SafeDeserializationHelpers.dll</HintPath>
+      <HintPath>..\packages\Zyan.SafeDeserializationHelpers.0.2.0\lib\net35\Zyan.SafeDeserializationHelpers.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -370,13 +370,13 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="InterLinq\Communication\Communication.cd" />
     <None Include="InterLinq\Expressions\Helpers\Visitor.cd" />
     <None Include="InterLinq\Expressions\SerializableExpressions.cd" />
     <None Include="InterLinq\InterLinq.cd" />
     <None Include="InterLinq\Types\Anonymous\AnonymousTypes.cd" />
     <None Include="InterLinq\Types\InterLinqTypeSystem.cd" />
+    <None Include="packages.config" />
     <None Include="Protocols\Tcp\DuplexChannel\DuplexChannel.cd" />
   </ItemGroup>
   <ItemGroup>

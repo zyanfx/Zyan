@@ -9,7 +9,7 @@ obj.Android
 obj.fx3
 obj.fx4
 obj.fx45
-/source/Zyan.Key/zyan.snk
+/source/Zyan.Key/*.snk
 /source/Zyan.Communication/Zyan.Communication.xml
 /source/.vs/Zyan/v14/.suo
 /examples/Zyan.Examples.CallInterceptor/.vs/Zyan.Examples.CallInterceptor/v14/.suo
