@@ -317,6 +317,7 @@
     <Compile Include="Threading\IThreadPoolExtensions.cs" />
     <Compile Include="Threading\SimpleLockThreadPool.cs" />
     <Compile Include="Toolbox\AssemblyLocator.cs" />
+    <Compile Include="Toolbox\ConcurrentCollection.cs" />
     <Compile Include="Toolbox\LocalCallContextData.cs" />
     <Compile Include="Toolbox\Compression\CompressionHelper.cs" />
     <Compile Include="Toolbox\Compression\LZF.cs" />

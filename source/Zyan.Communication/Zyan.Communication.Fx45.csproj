@@ -313,6 +313,7 @@
     <Compile Include="SessionMgmt\SqlSessionManager.cs" />
     <Compile Include="SubscriptionEventArgs.cs" />
     <Compile Include="Toolbox\AssemblyLocator.cs" />
+    <Compile Include="Toolbox\ConcurrentCollection.cs" />
     <Compile Include="Toolbox\Crc32Calculator.cs" />
     <Compile Include="Toolbox\LocalCallContextData.cs" />
     <Compile Include="Toolbox\Compression\CompressionHelper.cs" />

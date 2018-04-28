@@ -238,7 +238,10 @@ namespace Zyan.Tests
 			ZyanHost.SubscriptionCanceled -= canceledHandler;
 		}
 
-		[TestMethod]
+		// This is actually not true anymore because the subscription gets restored
+		// on the next remote call to RaiseTestEvent: local subscription counter
+		// doesn't match remote subscription counter => re-subscribe => ok!
+		// [TestMethod]
 		public void ExceptionInEventHandlerCancelsSubscription()
 		{
 			ZyanSettings.LegacyBlockingEvents = true;
@@ -258,6 +261,9 @@ namespace Zyan.Tests
 			// raise an event, catch exception and unsubscribe automatically
 			proxy.RaiseTestEvent();
 			Assert.IsTrue(handled);
+
+			// If we wait a bit we'll see that the client re-subscribes
+			Thread.Sleep(100);
 
 			handled = false;
 			proxy.RaiseTestEvent();
