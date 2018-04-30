@@ -3,6 +3,7 @@
 *.log
 *.orig
 *.user
+tests.bat
 bin
 obj
 obj.Android
