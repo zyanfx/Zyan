@@ -51,7 +51,7 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
     <Reference Include="Zyan.SafeDeserializationHelpers">
-      <HintPath>..\packages\Zyan.SafeDeserializationHelpers.0.2.0\lib\net35\Zyan.SafeDeserializationHelpers.dll</HintPath>
+      <HintPath>..\packages\Zyan.SafeDeserializationHelpers.0.3.0\lib\net35\Zyan.SafeDeserializationHelpers.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -284,17 +284,11 @@
     <Compile Include="Toolbox\Asynchronizer.cs" />
     <Compile Include="Toolbox\SyncContextSwitcher.cs" />
     <Compile Include="Toolbox\TransactionStarter.cs" />
-    <Compile Include="Toolbox\Android\BinaryClientFormatterSink.cs" />
-    <Compile Include="Toolbox\Android\BinaryClientFormatterSinkProvider.cs" />
-    <Compile Include="Toolbox\Android\BinaryCore.cs" />
-    <Compile Include="Toolbox\Android\BinaryServerFormatterSink.cs" />
-    <Compile Include="Toolbox\Android\BinaryServerFormatterSinkProvider.cs" />
-    <Compile Include="Toolbox\Android\ChannelCore.cs" />
-    <Compile Include="Toolbox\Android\CommonTransportKeys.cs" />
     <Compile Include="Threading\ClrThreadPool.cs" />
     <Compile Include="Threading\IThreadPool.cs" />
     <Compile Include="Threading\IThreadPoolExtensions.cs" />
     <Compile Include="Threading\SimpleLockThreadPool.cs" />
+    <Compile Include="Toolbox\Android\CommonTransportKeys.cs" />
     <Compile Include="Toolbox\Android\Dummies.cs" />
     <Compile Include="Protocols\IConnectionNotification.cs" />
     <Compile Include="SubscriptionEventArgs.cs" />

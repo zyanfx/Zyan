@@ -64,7 +64,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Zyan.SafeDeserializationHelpers">
-      <HintPath>..\packages\Zyan.SafeDeserializationHelpers.0.2.0\lib\net35\Zyan.SafeDeserializationHelpers.dll</HintPath>
+      <HintPath>..\packages\Zyan.SafeDeserializationHelpers.0.3.0\lib\net35\Zyan.SafeDeserializationHelpers.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

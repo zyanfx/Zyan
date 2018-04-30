@@ -3,6 +3,7 @@
 *.log
 *.orig
 *.user
+*.nupkg
 tests.bat
 bin
 obj
