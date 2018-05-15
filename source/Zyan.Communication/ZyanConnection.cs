@@ -16,6 +16,7 @@ using Zyan.Communication.Notification;
 using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp.DuplexChannel;
 using Zyan.Communication.Protocols.Wrapper;
+using Zyan.Communication.Security;
 using Zyan.Communication.Toolbox;
 using Zyan.Communication.Toolbox.Diagnostics;
 using Zyan.InterLinq.Expressions;
@@ -101,7 +102,7 @@ namespace Zyan.Communication
 		/// </summary>
 		/// <param name="setup">Objekt mit Konfigurationseinstellungen für die Verbindung</param>
 		public ZyanConnection(ZyanConnectionSetup setup)
-			: this(setup.ServerUrl, setup.ProtocolSetup, setup.Credentials, setup.AutoLoginOnExpiredSession, setup.KeepSessionAlive)
+			: this(setup.ServerUrl, setup.ProtocolSetup, setup.Credentials, setup.AutoLoginOnExpiredSession, setup.KeepSessionAlive, setup.AuthenticationClient)
 		{
 		}
 
@@ -110,7 +111,7 @@ namespace Zyan.Communication
 		/// </summary>
 		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp")</param>
 		public ZyanConnection(string serverUrl)
-			: this(serverUrl, ClientProtocolSetup.GetClientProtocol(serverUrl), null, false, true)
+			: this(serverUrl, ClientProtocolSetup.GetClientProtocol(serverUrl), null, false, true, null)
 		{
 		}
 
@@ -120,7 +121,7 @@ namespace Zyan.Communication
 		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp")</param>
 		/// <param name="autoLoginOnExpiredSession">Specifies whether the proxy should relogin automatically when the session expired</param>
 		public ZyanConnection(string serverUrl, bool autoLoginOnExpiredSession)
-			: this(serverUrl, ClientProtocolSetup.GetClientProtocol(serverUrl), null, autoLoginOnExpiredSession, !autoLoginOnExpiredSession)
+			: this(serverUrl, ClientProtocolSetup.GetClientProtocol(serverUrl), null, autoLoginOnExpiredSession, !autoLoginOnExpiredSession, null)
 		{
 		}
 
@@ -130,7 +131,7 @@ namespace Zyan.Communication
 		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp")</param>
 		/// <param name="protocolSetup">Protocol an communication settings</param>
 		public ZyanConnection(string serverUrl, IClientProtocolSetup protocolSetup)
-			: this(serverUrl, protocolSetup, null, false, true)
+			: this(serverUrl, protocolSetup, null, false, true, null)
 		{
 		}
 
@@ -141,7 +142,7 @@ namespace Zyan.Communication
 		/// <param name="protocolSetup">Protocol an communication settings</param>
 		/// <param name="autoLoginOnExpiredSession">Specifies whether the proxy should relogin automatically when the session expired</param>
 		public ZyanConnection(string serverUrl, IClientProtocolSetup protocolSetup, bool autoLoginOnExpiredSession)
-			: this(serverUrl, protocolSetup, null, autoLoginOnExpiredSession, true)
+			: this(serverUrl, protocolSetup, null, autoLoginOnExpiredSession, true, null)
 		{
 		}
 
@@ -153,7 +154,7 @@ namespace Zyan.Communication
 		/// <param name="autoLoginOnExpiredSession">Specifies whether the proxy should relogin automatically when the session expired.</param>
 		/// <param name="keepSessionAlive">Specifies whether the session should be automaticly kept alive.</param>
 		public ZyanConnection(string serverUrl, Hashtable credentials, bool autoLoginOnExpiredSession, bool keepSessionAlive)
-			: this(serverUrl, ClientProtocolSetup.GetClientProtocol(serverUrl), credentials, autoLoginOnExpiredSession, true)
+			: this(serverUrl, ClientProtocolSetup.GetClientProtocol(serverUrl), credentials, autoLoginOnExpiredSession, true, null)
 		{
 		}
 
@@ -166,6 +167,20 @@ namespace Zyan.Communication
 		/// <param name="autoLoginOnExpiredSession">Specifies whether the proxy should relogin automatically when the session expired.</param>
 		/// <param name="keepSessionAlive">Specifies whether the session should be automaticly kept alive.</param>
 		public ZyanConnection(string serverUrl, IClientProtocolSetup protocolSetup, Hashtable credentials, bool autoLoginOnExpiredSession, bool keepSessionAlive)
+			: this(serverUrl, protocolSetup, credentials, autoLoginOnExpiredSession, keepSessionAlive, null)
+		{
+		}
+
+		/// <summary>
+		/// Creates a new instance of the ZyanConnection class.
+		/// </summary>
+		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp").</param>
+		/// <param name="protocolSetup">Protocol and communication settings.</param>
+		/// <param name="credentials">Login credentials.</param>
+		/// <param name="autoLoginOnExpiredSession">Specifies whether the proxy should relogin automatically when the session expired.</param>
+		/// <param name="keepSessionAlive">Specifies whether the session should be automaticly kept alive.</param>
+		/// <param name="authClient">Authentication client.</param>
+		public ZyanConnection(string serverUrl, IClientProtocolSetup protocolSetup, Hashtable credentials, bool autoLoginOnExpiredSession, bool keepSessionAlive, IAuthenticationClient authClient)
 		{
 			if (string.IsNullOrEmpty(serverUrl))
 				throw new ArgumentException(LanguageResource.ArgumentException_ServerUrlMissing, "serverUrl");
@@ -185,6 +200,7 @@ namespace Zyan.Communication
 			_protocolSetup = protocolSetup;
 			_sessionID = Guid.NewGuid();
 			_serverUrl = serverUrl;
+			_authenticationClient = authClient ?? new SimpleAuthenticationClient();
 			_autoLoginOnExpiredSession = autoLoginOnExpiredSession;
 			_keepSessionAlive = keepSessionAlive;
 
@@ -229,7 +245,7 @@ namespace Zyan.Communication
 
 			try
 			{
-				RemoteDispatcher.Logon(_sessionID, credentials);
+				_authenticationClient.Authenticate(_sessionID, credentials, RemoteDispatcher);
 
 				_registeredComponents = new List<ComponentInfo>(RemoteDispatcher.GetRegisteredComponents());
 				_sessionAgeLimit = RemoteDispatcher.SessionAgeLimit;
@@ -264,6 +280,9 @@ namespace Zyan.Communication
 
 		// Unique Session key
 		private Guid _sessionID = Guid.Empty;
+
+		// Authentication client
+		private IAuthenticationClient _authenticationClient = null;
 
 		// Switch for relogin after expired session
 		private bool _autoLoginOnExpiredSession = false;

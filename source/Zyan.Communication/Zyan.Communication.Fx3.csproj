@@ -272,6 +272,8 @@
     <Compile Include="Security\Exceptions\AccountLockedException.cs" />
     <Compile Include="Security\Exceptions\AccountNotFoundException.cs" />
     <Compile Include="Security\Exceptions\PasswordExpiredException.cs" />
+    <Compile Include="Security\IAuthenticationClient.cs" />
+    <Compile Include="Security\SimpleAuthenticationClient.cs" />
     <Compile Include="Security\WindowsSecurityTools.cs" />
     <Compile Include="CustomSerializationContainer.cs" />
     <Compile Include="SerializationHandlerRepository.cs" />

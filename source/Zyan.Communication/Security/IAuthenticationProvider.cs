@@ -2,15 +2,15 @@
 namespace Zyan.Communication.Security
 {
 	/// <summary>
-	/// Schnittstelle für Authentifzierungs-Anbieter.
+	/// Interface for the authentication provider.
 	/// </summary>
 	public interface IAuthenticationProvider
 	{
 		/// <summary>
-		/// Authentifiziert einen bestimmten Benutzer anhand seiner Anmeldeinformationen.
+		/// Authenticates a specific user based on their credentials.
 		/// </summary>
-		/// <param name="authRequest">Authentifizierungs-Anfragenachricht mit Anmeldeinformationen</param>
-		/// <returns>Antwortnachricht des Authentifizierungssystems</returns>
+		/// <param name="authRequest">Authentication request message with credentials</param>
+		/// <returns>Response message of the authentication system</returns>
 		AuthResponseMessage Authenticate(AuthRequestMessage authRequest);
 	}
 }

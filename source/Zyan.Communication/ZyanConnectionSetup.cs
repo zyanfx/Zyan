@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using Zyan.Communication.Protocols;
+using Zyan.Communication.Security;
 
 namespace Zyan.Communication
 {
@@ -22,7 +23,7 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Get or sets the server URL (e.G. "tcp://server1:46123/host1") 
+		/// Get or sets the server URL (e.G. "tcp://server1:46123/host1")
 		/// </summary>
 		public string ServerUrl { get; set; }
 
@@ -45,6 +46,11 @@ namespace Zyan.Communication
 		/// Gets or sets wether the session should be kept alive.
 		/// </summary>
 		public bool KeepSessionAlive { get; set; }
+
+		/// <summary>
+		/// Gets or sets the authentication client.
+		/// </summary>
+		public IAuthenticationClient AuthenticationClient { get; set; }
 
 		/// <summary>
 		/// Adds a new credential.
