@@ -6,6 +6,7 @@ using System.Net;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization.Formatters.Binary;
+using Zyan.SafeDeserializationHelpers;
 
 namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 {
@@ -21,7 +22,8 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			AssemblyFormat = FormatterAssemblyStyle.Simple,
 			FilterLevel = TypeFilterLevel.Low,
 			TypeFormat = FormatterTypeStyle.TypesWhenNeeded
-		};
+		}
+		.Safe();
 
 		object[] Keys = new object[0];
 

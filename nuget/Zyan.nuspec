@@ -13,6 +13,11 @@
     <description>Zyan is a framework that simplifies development of distributed applications for desktop and mobile platforms. With Zyan you can publish any .NET class for remote access over the network. Zyan is highly customizable and provides you with tools to build modular and plugable distributed applications.</description>
     <summary>Amazingly easy distributed application framework for .NET, Mono and Xamarin.Android</summary>
     <releaseNotes>What's new:
+
+      v2.11: Security fixes and new features.
+      - #45: Updated Zyan.SafeDeserializationHelpers package.
+      - #44: Support for multi-step authentication.
+
       v2.10: Security fixes and new features.
       - #43: Integrate Zyan.SafeDeserializationHelpers package.
       - #40: TcpEx: invalid TCP packet crashing a running server.
@@ -33,7 +38,7 @@
     <tags>mobile android xamarin duplex tcp tcpex http ipc remoting network communication socket sockets nat firewall distributed cloud wcf rpc linq mef composition event events ebc event-based-components binary flowdesign easy secure ldap authentication security compression server service services mono</tags>
     <dependencies>
       <group>
-        <dependency id="Zyan.SafeDeserializationHelpers" version="0.3.0" />
+        <dependency id="Zyan.SafeDeserializationHelpers" version="0.5.0" />
       </group>
     </dependencies>
   </metadata>
