@@ -642,7 +642,7 @@ namespace Zyan.Communication
 		/// </summary>
 		/// <param name="sessionID">Unique session key (created on client side)</param>
 		/// <param name="credentials">Logon credentials</param>
-		public void Logon(Guid sessionID, Hashtable credentials)
+		public AuthResponseMessage Logon(Guid sessionID, Hashtable credentials)
 		{
 			if (sessionID == Guid.Empty)
 				throw new ArgumentException(LanguageResource.ArgumentException_EmptySessionIDIsNotAllowed, "sessionID");
@@ -661,9 +661,17 @@ namespace Zyan.Communication
 					var authResponse = _host.Authenticate(new AuthRequestMessage
 					{
 						Credentials = credentials,
-						ClientAddress = clientAddress
+						ClientAddress = clientAddress,
+						SessionID = sessionID,
 					});
 
+					// authentication is not completed
+					if (!authResponse.Completed)
+					{
+						return authResponse;
+					}
+
+					// authentication is completed but failed
 					if (!authResponse.Success)
 					{
 						var exception = authResponse.Exception ?? new SecurityException(authResponse.ErrorMessage);
@@ -675,9 +683,12 @@ namespace Zyan.Communication
 					session.ClientAddress = clientAddress;
 					_host.SessionManager.StoreSession(session);
 					_host.SessionManager.SetCurrentSession(session);
-
 					_host.OnClientLoggedOn(new LoginEventArgs(LoginEventType.Logon, session.Identity, session.ClientAddress, session.Timestamp));
+					return authResponse;
 				}
+
+				// already authenticated, ignore the authentication attempt
+				return null;
 			}
 			catch (Exception ex)
 			{

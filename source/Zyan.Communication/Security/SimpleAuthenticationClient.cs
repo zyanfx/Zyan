@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Security;
 
 namespace Zyan.Communication.Security
 {
@@ -16,7 +17,17 @@ namespace Zyan.Communication.Security
 		/// <param name="dispatcher">Remote dispatcher</param>
 		public void Authenticate(Guid sessionId, Hashtable credentials, IZyanDispatcher dispatcher)
 		{
-			dispatcher.Logon(sessionId, credentials);
+			var response = dispatcher.Logon(sessionId, credentials);
+			if (!response.Completed)
+			{
+				throw new SecurityException(response.ErrorMessage ?? "Authentication is not completed.");
+			}
+
+			// this case is likely to be handled by ZyanDispatcher itself
+			if (!response.Success)
+			{
+				throw new SecurityException(response.ErrorMessage ?? "Authentication is not successful.");
+			}
 		}
 	}
 }

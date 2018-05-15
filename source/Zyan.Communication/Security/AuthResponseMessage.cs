@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Security.Principal;
 using System.Security;
+using System.Collections;
 
 namespace Zyan.Communication.Security
 {
@@ -10,6 +11,11 @@ namespace Zyan.Communication.Security
 	[Serializable]
 	public class AuthResponseMessage
 	{
+		/// <summary>
+		/// Gets or sets a value indicating whether the authentication procedure is completed.
+		/// </summary>
+		public bool Completed { get; set; } = true;
+
 		/// <summary>
 		/// Gets or sets value indicating whether the authentication procedure completed successfully.
 		/// </summary>
@@ -29,5 +35,10 @@ namespace Zyan.Communication.Security
 		/// Gets or sets security exception thrown on authentication failure.
 		/// </summary>
 		public SecurityException Exception { get; set; }
+
+		/// <summary>
+		/// Gets or sets the additional parameters.
+		/// </summary>
+		public Hashtable Parameters { get; set; }
 	}
 }

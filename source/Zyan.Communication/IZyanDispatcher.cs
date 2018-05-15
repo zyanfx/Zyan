@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Zyan.Communication.Notification;
 using Zyan.Communication.Delegates;
+using Zyan.Communication.Security;
 
 namespace Zyan.Communication
 {
@@ -36,7 +37,8 @@ namespace Zyan.Communication
 		/// </summary>
 		/// <param name="sessionID">Unique session key (created on client side)</param>
 		/// <param name="credentials">Logon credentials</param>
-		void Logon(Guid sessionID, Hashtable credentials);
+		/// <returns>Optional response from the authentication provider.</returns>
+		AuthResponseMessage Logon(Guid sessionID, Hashtable credentials);
 
 		/// <summary>
 		/// Process logoff.

@@ -35,6 +35,11 @@ namespace Zyan.Communication.Security
 		public Hashtable Credentials { get; set; }
 
 		/// <summary>
+		/// Gets or sets the session identity.
+		/// </summary>
+		public Guid SessionID { get; set; }
+
+		/// <summary>
 		/// Gets or sets the IP Address of the calling client.
 		/// </summary>
 		public string ClientAddress { get; set; }
