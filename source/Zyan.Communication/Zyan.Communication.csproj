@@ -61,6 +61,7 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
@@ -81,14 +82,10 @@
     <Compile Include="CallInterceptorHelper.cs" />
     <Compile Include="ChannelSinks\ClientAddress\ClientAddressServerChannelSink.cs" />
     <Compile Include="ChannelSinks\ClientAddress\ClientAddressServerChannelSinkProvider.cs" />
-    <Compile Include="ChannelSinks\Compression\CommonHeaders.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="ChannelSinks\Compression\CommonHeaders.cs" />
     <Compile Include="ChannelSinks\Compression\CompressionClientChannelSink.cs" />
     <Compile Include="ChannelSinks\Compression\CompressionClientChannelSinkProvider.cs" />
-    <Compile Include="ChannelSinks\Compression\CompressionMethod.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="ChannelSinks\Compression\CompressionMethod.cs" />
     <Compile Include="ChannelSinks\Compression\CompressionServerChannelSink.cs" />
     <Compile Include="ChannelSinks\Compression\CompressionServerChannelSinkProvider.cs" />
     <Compile Include="ChannelSinks\Compression\ICompressible.cs" />
@@ -152,24 +149,12 @@
     <Compile Include="InterLinq\Communication\Remoting\RemotingConstants.cs" />
     <Compile Include="InterLinq\Communication\Remoting\ServerQueryRemotingHandler.cs" />
     <Compile Include="InterLinq\Communication\ServerQueryHandler.cs" />
-    <Compile Include="InterLinq\Communication\Wcf\ClientQueryWcfHandler.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="InterLinq\Communication\Wcf\NetDataContractSerializer\NetDataContractFormat.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="InterLinq\Communication\Wcf\NetDataContractSerializer\NetDataContractSerializerOperationBehavior.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="InterLinq\Communication\Wcf\ServerQueryWcfHandler.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="InterLinq\Communication\Wcf\ServiceConstants.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="InterLinq\Communication\Wcf\ServiceHelper.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="InterLinq\Communication\Wcf\ClientQueryWcfHandler.cs" />
+    <Compile Include="InterLinq\Communication\Wcf\NetDataContractSerializer\NetDataContractFormat.cs" />
+    <Compile Include="InterLinq\Communication\Wcf\NetDataContractSerializer\NetDataContractSerializerOperationBehavior.cs" />
+    <Compile Include="InterLinq\Communication\Wcf\ServerQueryWcfHandler.cs" />
+    <Compile Include="InterLinq\Communication\Wcf\ServiceConstants.cs" />
+    <Compile Include="InterLinq\Communication\Wcf\ServiceHelper.cs" />
     <Compile Include="InterLinq\Communication\ZyanClientQueryHandler.cs" />
     <Compile Include="InterLinq\Communication\ZyanConstants.cs" />
     <Compile Include="InterLinq\Communication\ZyanEntityQueryHandler.cs" />
@@ -301,6 +286,9 @@
     <Compile Include="Security\Exceptions\AccountNotFoundException.cs" />
     <Compile Include="Security\Exceptions\PasswordExpiredException.cs" />
     <Compile Include="Security\IAuthenticationClient.cs" />
+    <Compile Include="Security\SecureRemotePassword\SrpHash.cs" />
+    <Compile Include="Security\SecureRemotePassword\SrpInteger.cs" />
+    <Compile Include="Security\SecureRemotePassword\SrpParameters.cs" />
     <Compile Include="Security\SimpleAuthenticationClient.cs" />
     <Compile Include="Security\WindowsSecurityTools.cs" />
     <Compile Include="CustomSerializationContainer.cs" />

@@ -46,6 +46,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Xml.Linq" />
@@ -61,14 +62,10 @@
     <Compile Include="CallInterceptorHelper.cs" />
     <Compile Include="ChannelSinks\ClientAddress\ClientAddressServerChannelSink.cs" />
     <Compile Include="ChannelSinks\ClientAddress\ClientAddressServerChannelSinkProvider.cs" />
-    <Compile Include="ChannelSinks\Compression\CommonHeaders.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="ChannelSinks\Compression\CommonHeaders.cs" />
     <Compile Include="ChannelSinks\Compression\CompressionClientChannelSink.cs" />
     <Compile Include="ChannelSinks\Compression\CompressionClientChannelSinkProvider.cs" />
-    <Compile Include="ChannelSinks\Compression\CompressionMethod.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="ChannelSinks\Compression\CompressionMethod.cs" />
     <Compile Include="ChannelSinks\Compression\CompressionServerChannelSink.cs" />
     <Compile Include="ChannelSinks\Compression\CompressionServerChannelSinkProvider.cs" />
     <Compile Include="ChannelSinks\Compression\ICompressible.cs" />
@@ -241,6 +238,9 @@
     <Compile Include="Security\Exceptions\AccountNotFoundException.cs" />
     <Compile Include="Security\Exceptions\PasswordExpiredException.cs" />
     <Compile Include="Security\IAuthenticationClient.cs" />
+    <Compile Include="Security\SecureRemotePassword\SrpHash.cs" />
+    <Compile Include="Security\SecureRemotePassword\SrpInteger.cs" />
+    <Compile Include="Security\SecureRemotePassword\SrpParameters.cs" />
     <Compile Include="Security\SimpleAuthenticationClient.cs" />
     <Compile Include="Security\WindowsSecurityTools.cs" />
     <Compile Include="CustomSerializationContainer.cs" />
