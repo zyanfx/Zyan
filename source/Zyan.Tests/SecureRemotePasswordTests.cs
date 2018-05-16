@@ -65,6 +65,23 @@ namespace Zyan.Tests
 		}
 
 		[TestMethod]
+		public void SrpIntegerModulo()
+		{
+			var result = SrpInteger.FromHex("10") % SrpInteger.FromHex("9");
+			Assert.AreEqual("07", result.ToHex());
+		}
+
+		[TestMethod]
+		public void SrpIntegerEqualityChecks()
+		{
+			Assert.AreEqual(SrpInteger.FromHex("0"), SrpInteger.Zero);
+			Assert.IsTrue(SrpInteger.FromHex("0") == SrpInteger.Zero);
+
+			Assert.AreNotEqual(SrpInteger.FromHex("1"), SrpInteger.Zero);
+			Assert.IsTrue(SrpInteger.FromHex("1") != SrpInteger.Zero);
+		}
+
+		[TestMethod]
 		public void SrpIntegerImplicitStringConversion()
 		{
 			var si = SrpInteger.FromHex("02");
@@ -115,6 +132,42 @@ namespace Zyan.Tests
 			Assert.AreEqual(hash512, sha512(sample));
 			Assert.AreEqual(hash512, sha512(parts));
 			Assert.AreEqual(512 / 8, SrpHash<SHA512>.HashSizeBytes);
+		}
+
+		[TestMethod]
+		public void SrpClientGenerateSaltReturnsRandomInteger()
+		{
+			var salt = SrpClient.GenerateSalt();
+			Assert.IsNotNull(salt);
+			Assert.AreNotEqual(string.Empty, salt);
+			Assert.AreEqual(SrpParameters.Default.HashSizeBytes * 2, salt.Length);
+		}
+
+		[TestMethod]
+		public void SrpClientDerivesThePrivateKeyAndVerifier()
+		{
+			// private key derivation is deterministic for the same s, I, p
+			var salt = "34ADA39BBABFA6E663F1AAD3D7814121";
+			var privateKey = SrpClient.DerivePrivateKey(salt, "hacker@example.com", "secret");
+			Assert.AreEqual("995C6C1473638C32EA246F4BD824079E23A32CE91F543C624C44EFC3F1558F16", privateKey);
+
+			// verifier
+			var verifier = SrpClient.DeriveVerifier(privateKey);
+			Assert.AreEqual("53B694356ACD49420DA2872391BB982B601A7EFA31B20E2D89CF910C2C65E56CF3A490B0CA3FA7547E88C2A91B941E8B4809E3A2437BB25DB3EFE5B6CBEB5593F51395A467F9E00B214CF12AA2454427A5650B3845EFE945DA9B8F2C6A13464DEC78F57ED5E1936CEEA493D690AFC0EEBFFED33F39C106C1F3FA33F843E2588EEE80B438CA46EB4188A466DD0CCDA615DD198DD2ED971A07D6322C52AF001C68C75A6F1CD7389570A4EB87FF6C5CB618147C00D54684291DD48E6621CD1D8E7480A174D2A708FB5DF44D7985896166B27682210CE3A8C0C5456A644AE5BA8E7C82283752C1008EE8CFC9DF8A43670C94DFBEFF80F03EA91EF0D0D437DED2E213", verifier);
+		}
+
+		[TestMethod]
+		public void SrpClientGeneratesEphemeralValue()
+		{
+			var ephemeral = SrpClient.GenerateEphemeral();
+			Assert.IsNotNull(ephemeral.Public);
+			Assert.AreNotEqual(string.Empty, ephemeral.Public);
+
+			Assert.IsNotNull(ephemeral.Secret);
+			Assert.AreNotEqual(string.Empty, ephemeral.Secret);
+
+			Assert.AreNotEqual(ephemeral.Secret, ephemeral.Public);
+			Assert.IsTrue(ephemeral.Secret.Length < ephemeral.Public.Length);
 		}
 	}
 }

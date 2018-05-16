@@ -11,7 +11,7 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 	/// Computes the hash of the specified <see cref="string"/> values.
 	/// </summary>
 	/// <param name="values">The values.</param>
-	public delegate string SrpHash(params string[] values);
+	public delegate SrpInteger SrpHash(params string[] values);
 
 	/// <summary>
 	/// Hashing algorithms for the SRP protocol.
@@ -28,7 +28,7 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		/// </summary>
 		public static int HashSizeBytes { get; } = CreateHasher().HashSize / 8;
 
-		private static string ComputeHash(params string[] values) =>
+		private static SrpInteger ComputeHash(params string[] values) =>
 			ComputeHash(Combine(values.Select(v => GetBytes(v))));
 
 		private static T CreateHasher()
@@ -37,11 +37,17 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 			return (T)CryptoConfig.CreateFromName(algorithm);
 		}
 
-		private static string ComputeHash(byte[] data)
+		private static SrpInteger ComputeHash(byte[] data)
 		{
 			var hasher = CreateHasher();
 			var hash = hasher.ComputeHash(data);
-			return string.Join(string.Empty, hash.Select(b => string.Format("{0:X2}", b)).ToArray());
+
+			// reverse the byte order for the little-endian encoding
+			return SrpInteger.FromBytes(hash.Reverse().ToArray());
+
+			// should yield the same result:
+			//var hex = hash.Aggregate(new StringBuilder(), (sb, b) => sb.Append(b.ToString("X2")), sb => sb.ToString());
+			//return SrpInteger.FromHex(hex);
 		}
 
 		private static byte[] EmptyBuffer = new byte[0];

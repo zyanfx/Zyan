@@ -13,7 +13,7 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 	/// A thin wrapper over the <see cref="BigInteger"/> class
 	/// represented as a fixed-length hexadecimal string (optional).
 	/// </summary>
-	public class SrpInteger
+	public class SrpInteger : IEquatable<SrpInteger>
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="SrpInteger"/> class.
@@ -43,6 +43,11 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		private static string NormalizeWhitespace(string hexNumber) =>
 			Regex.Replace(hexNumber ?? string.Empty, @"[\s_]", string.Empty);
 
+		/// <summary>
+		/// The <see cref="SrpInteger"/> value representing 0.
+		/// </summary>
+		public static SrpInteger Zero { get; } = FromHex("0");
+
 		private BigInteger Value { get; set; }
 
 		private int? HexLength { get; set; }
@@ -62,10 +67,27 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 			var randomBytes = new byte[bytes];
 			random.GetNonZeroBytes(randomBytes);
 
+			// make sure random number is positive
+			var result = FromBytes(randomBytes);
+			if (result.Value < 0)
+			{
+				result.Value = -result.Value;
+			}
+
+			return result;
+		}
+
+		/// <summary>
+		/// Raises the number to the power of the given exponent modulo given modulus.
+		/// </summary>
+		/// <param name="exponent">The exponent.</param>
+		/// <param name="modulus">The modulus.</param>
+		public SrpInteger ModPow(SrpInteger exponent, SrpInteger modulus)
+		{
 			return new SrpInteger
 			{
-				Value = new BigInteger(randomBytes),
-				HexLength = bytes * 2,
+				Value = BigInteger.ModPow(Value, exponent.Value, modulus.Value),
+				HexLength = HexLength,
 			};
 		}
 
@@ -90,7 +112,53 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		public static implicit operator string(SrpInteger srpint) => srpint.ToHex();
 
 		/// <summary>
+		/// Implements the operator ==.
+		/// </summary>
+		/// <param name="left">The left.</param>
+		/// <param name="right">The right.</param>
+		public static bool operator ==(SrpInteger left, SrpInteger right) => Equals(left, right);
+
+		/// <summary>
+		/// Implements the operator !=.
+		/// </summary>
+		/// <param name="left">The left.</param>
+		/// <param name="right">The right.</param>
+		public static bool operator !=(SrpInteger left, SrpInteger right) => !Equals(left, right);
+
+		/// <summary>
+		/// Implements the operator %.
+		/// </summary>
+		/// <param name="dividend">The dividend.</param>
+		/// <param name="divisor">The divisor.</param>
+		public static SrpInteger operator %(SrpInteger dividend, SrpInteger divisor)
+		{
+			return new SrpInteger
+			{
+				Value = dividend.Value % divisor.Value,
+				HexLength = dividend.HexLength,
+			};
+		}
+
+		/// <summary>
 		/// Returns a new <see cref="SrpInteger"/> instance from the given hexadecimal string.
+		/// </summary>
+		/// <param name="bytes">The array of bytes.</param>
+		public static SrpInteger FromBytes(byte[] bytes)
+		{
+			if (bytes == null || bytes.Length == 0)
+			{
+				return Zero;
+			}
+
+			return new SrpInteger
+			{
+				Value = new BigInteger(bytes),
+				HexLength = bytes.Length * 2,
+			};
+		}
+
+		/// <summary>
+		/// Returns a new <see cref="SrpInteger"/> instance from the given array of bytes.
 		/// </summary>
 		/// <param name="hex">The hexadecimal string.</param>
 		public static SrpInteger FromHex(string hex)
@@ -114,5 +182,18 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 
 			return $"<SrpInteger: {hex}>";
 		}
+
+		/// <inheritdoc/>
+		public bool Equals(SrpInteger other)
+		{
+			// ignore HexLength
+			return other != null && Value == other.Value;
+		}
+
+		/// <inheritdoc/>
+		public override bool Equals(object obj) => Equals(obj as SrpInteger);
+
+		/// <inheritdoc/>
+		public override int GetHashCode() => Value.GetHashCode();
 	}
 }

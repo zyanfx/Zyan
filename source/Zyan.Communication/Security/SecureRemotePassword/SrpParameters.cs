@@ -19,8 +19,8 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		/// </summary>
 		public SrpParameters()
 		{
-			N = new SrpInteger(LargeSafePrime);
-			G = new SrpInteger("02");
+			N = SrpInteger.FromHex(LargeSafePrime);
+			G = SrpInteger.FromHex("02");
 			H = SrpHash<SHA256>.HashFunction;
 			K = H(N, G);
 			HashSizeBytes = SrpHash<SHA256>.HashSizeBytes;
@@ -32,7 +32,7 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		public static SrpParameters Default { get; set; } = new SrpParameters();
 
 		// taken from the secure-remote-password npm package
-		private static string LargeSafePrime = @"
+		private const string LargeSafePrime = @"
 			AC6BDB41 324A9A9B F166DE5E 1389582F AF72B665 1987EE07 FC319294
 			3DB56050 A37329CB B4A099ED 8193E075 7767A13D D52312AB 4B03310D
 			CD7F48A9 DA04FD50 E8083969 EDB767B0 CF609517 9A163AB3 661A05FB
