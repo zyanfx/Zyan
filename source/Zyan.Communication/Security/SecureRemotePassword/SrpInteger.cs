@@ -34,6 +34,8 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		/// </summary>
 		private SrpInteger()
 		{
+			HexLength = 1;
+			Value = BigInteger.Zero;
 		}
 
 		/// <summary>
@@ -46,7 +48,7 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		/// <summary>
 		/// The <see cref="SrpInteger"/> value representing 0.
 		/// </summary>
-		public static SrpInteger Zero { get; } = FromHex("0");
+		public static SrpInteger Zero { get; } = new SrpInteger();
 
 		private BigInteger Value { get; set; }
 
@@ -102,7 +104,7 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 			}
 
 			// ToString may add extra leading zeros to the positive BigIntegers, so we trim them first
-			return Value.ToString("X").TrimStart('0').PadLeft(HexLength.Value, '0');
+			return Value.ToString("x").TrimStart('0').PadLeft(HexLength.Value, '0');
 		}
 
 		/// <summary>
@@ -126,6 +128,48 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		public static bool operator !=(SrpInteger left, SrpInteger right) => !Equals(left, right);
 
 		/// <summary>
+		/// Implements the operator -.
+		/// </summary>
+		/// <param name="left">The left.</param>
+		/// <param name="right">The right.</param>
+		public static SrpInteger operator -(SrpInteger left, SrpInteger right)
+		{
+			return new SrpInteger
+			{
+				Value = left.Value - right.Value,
+				HexLength = left.HexLength,
+			};
+		}
+
+		/// <summary>
+		/// Implements the operator +.
+		/// </summary>
+		/// <param name="left">The left.</param>
+		/// <param name="right">The right.</param>
+		public static SrpInteger operator +(SrpInteger left, SrpInteger right)
+		{
+			return new SrpInteger
+			{
+				Value = left.Value + right.Value,
+				HexLength = left.HexLength,
+			};
+		}
+
+		/// <summary>
+		/// Implements the operator /.
+		/// </summary>
+		/// <param name="dividend">The dividend.</param>
+		/// <param name="divisor">The divisor.</param>
+		public static SrpInteger operator /(SrpInteger dividend, SrpInteger divisor)
+		{
+			return new SrpInteger
+			{
+				Value = dividend.Value / divisor.Value,
+				HexLength = dividend.HexLength,
+			};
+		}
+
+		/// <summary>
 		/// Implements the operator %.
 		/// </summary>
 		/// <param name="dividend">The dividend.</param>
@@ -136,6 +180,34 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 			{
 				Value = dividend.Value % divisor.Value,
 				HexLength = dividend.HexLength,
+			};
+		}
+
+		/// <summary>
+		/// Implements the operator *.
+		/// </summary>
+		/// <param name="left">The left.</param>
+		/// <param name="right">The right.</param>
+		public static SrpInteger operator *(SrpInteger left, SrpInteger right)
+		{
+			return new SrpInteger
+			{
+				Value = left.Value * right.Value,
+				HexLength = left.HexLength,
+			};
+		}
+
+		/// <summary>
+		/// Implements the operator ^ (xor).
+		/// </summary>
+		/// <param name="left">The left.</param>
+		/// <param name="right">The right.</param>
+		public static SrpInteger operator ^(SrpInteger left, SrpInteger right)
+		{
+			return new SrpInteger
+			{
+				Value = left.Value ^ right.Value,
+				HexLength = left.HexLength,
 			};
 		}
 
@@ -174,7 +246,7 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		/// <inheritdoc/>
 		public override string ToString()
 		{
-			var hex = Value.ToString("X");
+			var hex = Value.ToString("x");
 			if (hex.Length > 16)
 			{
 				hex = hex.Substring(0, 16) + "...";

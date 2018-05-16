@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -82,6 +83,66 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 			{
 				Secret = a.ToHex(),
 				Public = A.ToHex(),
+			};
+		}
+
+		/// <summary>
+		/// Derives the client session.
+		/// </summary>
+		/// <param name="clientSecretEphemeral">The client secret ephemeral.</param>
+		/// <param name="serverPublicEphemeral">The server public ephemeral.</param>
+		/// <param name="salt">The salt.</param>
+		/// <param name="username">The username.</param>
+		/// <param name="privateKey">The private key.</param>
+		/// <returns>Session key and proof.</returns>
+		public static SrpSession DeriveSession(string clientSecretEphemeral, string serverPublicEphemeral, string salt, string username, string privateKey)
+		{
+			// N — A large safe prime (N = 2q+1, where q is prime)
+			// g — A generator modulo N
+			// k — Multiplier parameter (k = H(N, g) in SRP-6a, k = 3 for legacy SRP-6)
+			// H — One-way hash function
+			var N = SrpParameters.Default.N;
+			var g = SrpParameters.Default.G;
+			var k = SrpParameters.Default.K;
+			var H = SrpParameters.Default.H;
+
+			// a — Secret ephemeral value
+			// B — Public ephemeral value
+			// s — User's salt
+			// I — Username
+			// x — Private key (derived from p and s)
+			var a = SrpInteger.FromHex(clientSecretEphemeral);
+			var B = SrpInteger.FromHex(serverPublicEphemeral);
+			var s = SrpInteger.FromHex(salt);
+			var I = username + string.Empty;
+			var x = SrpInteger.FromHex(privateKey);
+
+			// A = g^a (a = random number)
+			var A = g.ModPow(a, N);
+
+			// B % N > 0
+			if (B % N == SrpInteger.Zero)
+			{
+				// fixme: .code, .statusCode, etc.
+				throw new SecurityException("The server sent an invalid public ephemeral");
+			}
+
+			// u = H(A, B)
+			var u = H(A, B);
+
+			// S = (B - kg^x) ^ (a + ux)
+			var S = (B - (k * (g.ModPow(x, N)))).ModPow(a + (u * x), N);
+
+			// K = H(S)
+			var K = H(S);
+
+			// M = H(H(N) xor H(g), H(I), s, A, B, K)
+			var M = H(H(N) ^ H(g), H(I), s, A, B, K);
+
+			return new SrpSession
+			{
+				Key = K.ToHex(),
+				Proof = M.ToHex()
 			};
 		}
 	}

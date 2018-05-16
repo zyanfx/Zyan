@@ -62,7 +62,7 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		/// <summary>
 		/// Gets or sets the multiplier parameter (k = H(N, g) in SRP-6a, k = 3 for legacy SRP-6).
 		/// </summary>
-		public string K { get; set; }
+		public SrpInteger K { get; set; }
 
 		/// <summary>
 		/// Gets or sets the hash size in bytes.

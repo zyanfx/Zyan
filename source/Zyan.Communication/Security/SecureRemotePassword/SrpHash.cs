@@ -42,12 +42,12 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 			var hasher = CreateHasher();
 			var hash = hasher.ComputeHash(data);
 
-			// reverse the byte order for the little-endian encoding
-			return SrpInteger.FromBytes(hash.Reverse().ToArray());
+			// reverse the byte order for the little-endian encoding — doesn't take the sign into account
+			//return SrpInteger.FromBytes(hash.Reverse().ToArray());
 
 			// should yield the same result:
-			//var hex = hash.Aggregate(new StringBuilder(), (sb, b) => sb.Append(b.ToString("X2")), sb => sb.ToString());
-			//return SrpInteger.FromHex(hex);
+			var hex = hash.Aggregate(new StringBuilder(), (sb, b) => sb.Append(b.ToString("X2")), sb => sb.ToString());
+			return SrpInteger.FromHex(hex);
 		}
 
 		private static byte[] EmptyBuffer = new byte[0];
