@@ -1464,6 +1464,7 @@ namespace System.Numerics {
 			case 'R':
 				return ToStringWithPadding (format, 10, provider);
 			case 'x':
+				return ToStringWithPadding(format, 16, null).ToLowerInvariant();
 			case 'X':
 				return ToStringWithPadding (format, 16, null);
 			default:

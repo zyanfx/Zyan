@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{76CC3893-3788-44DC-BB81-578696673666}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Zyan.Tests</RootNamespace>
+    <AssemblyName>Zyan.Tests.Fx3</AssemblyName>
+    <AssemblyOriginatorKeyFile>..\Zyan.Key\zyan.snk</AssemblyOriginatorKeyFile>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\bin\UnitTests3\</OutputPath>
+    <BaseIntermediateOutputPath>obj.fx3</BaseIntermediateOutputPath>
+    <DefineConstants>DEBUG;TRACE;FX3;NUNIT</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\bin\UnitTests3\</OutputPath>
+    <BaseIntermediateOutputPath>obj.fx3</BaseIntermediateOutputPath>
+    <DefineConstants>TRACE;FX3;NUNIT</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MemoDb">
+      <HintPath>..\..\libraries\MemoDb\MemoDb.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>..\..\libraries\NUnit\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Runtime.Remoting" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Zyan.SafeDeserializationHelpers">
+      <HintPath>..\packages\Zyan.SafeDeserializationHelpers.0.5.0\lib\net35\Zyan.SafeDeserializationHelpers.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <CodeAnalysisDependentAssemblyPaths Condition=" '$(VS100COMNTOOLS)' != '' " Include="$(VS100COMNTOOLS)..\IDE\PrivateAssemblies">
+      <Visible>False</Visible>
+    </CodeAnalysisDependentAssemblyPaths>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ChannelWrapperTests.cs" />
+    <Compile Include="CleanupTests.cs" />
+    <Compile Include="CompressionTests.cs" />
+    <Compile Include="CryptoToolsTests.cs" />
+    <Compile Include="CustomAuthenticationTests.cs" />
+    <Compile Include="DefaultProtocolTests.cs" />
+    <Compile Include="DiscoveryMetadataTests.cs" />
+    <Compile Include="DuckTypingTests.cs" />
+    <Compile Include="DynamicWireTests.cs" />
+    <Compile Include="EmptyDelegateFactoryTests.cs" />
+    <Compile Include="EventFilterTests.cs" />
+    <Compile Include="EventsTests.cs" />
+    <Compile Include="EventStubTests.cs" />
+    <Compile Include="GenericMethodsTests.cs" />
+    <Compile Include="HeartbeatSessionTests.cs" />
+    <Compile Include="InvocationDetailsTests.cs" />
+    <Compile Include="LinqTests.cs" />
+    <Compile Include="LocalCallContextDataTests.cs" />
+    <Compile Include="Misc\AssertEx.cs" />
+    <Compile Include="Misc\DataWrapper.cs" />
+    <Compile Include="Misc\DummyAttribute.cs" />
+    <Compile Include="Misc\Entities.cs" />
+    <Compile Include="Misc\SampleObjectSource.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="OneWayTests.cs" />
+    <Compile Include="ProtocolUrlTests.cs" />
+    <Compile Include="RecreateClientConnectionTests.cs" />
+    <Compile Include="RecreateComponentHostTests.cs" />
+    <Compile Include="SafeDynamicInvokerTests.cs" />
+    <Compile Include="SecureRemotePasswordTests.cs" />
+    <Compile Include="TransportHeaderWrapperTests.cs" />
+    <Compile Include="ZyanProxyTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DistributedEvents.GenericTest">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Zyan.Communication\Zyan.Communication.Fx3.csproj">
+      <Project>{260a24a8-69cf-4f36-8665-c6376f7ba16e}</Project>
+      <Name>Zyan.Communication.Fx3</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Communication", "Zyan.Communication\Zyan.Communication.csproj", "{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}"
 EndProject
@@ -35,6 +35,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Communication.Fx4", "Zyan.Communication\Zyan.Communication.Fx4.csproj", "{7E93E5E0-B1FB-48E9-9E83-0F07AED2A094}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Communication.Fx45", "Zyan.Communication\Zyan.Communication.Fx45.csproj", "{55116F3D-4F77-43AD-A4F9-B064E9D246C6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zyan.Tests.Fx3", "Zyan.Tests\Zyan.Tests.Fx3.csproj", "{76CC3893-3788-44DC-BB81-578696673666}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -110,6 +112,14 @@ Global
 		{55116F3D-4F77-43AD-A4F9-B064E9D246C6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{55116F3D-4F77-43AD-A4F9-B064E9D246C6}.Release|x64.ActiveCfg = Release|x64
 		{55116F3D-4F77-43AD-A4F9-B064E9D246C6}.Release|x64.Build.0 = Release|x64
+		{76CC3893-3788-44DC-BB81-578696673666}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76CC3893-3788-44DC-BB81-578696673666}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76CC3893-3788-44DC-BB81-578696673666}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{76CC3893-3788-44DC-BB81-578696673666}.Debug|x64.Build.0 = Debug|Any CPU
+		{76CC3893-3788-44DC-BB81-578696673666}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76CC3893-3788-44DC-BB81-578696673666}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76CC3893-3788-44DC-BB81-578696673666}.Release|x64.ActiveCfg = Release|Any CPU
+		{76CC3893-3788-44DC-BB81-578696673666}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -122,6 +132,7 @@ Global
 		{F2C28EEA-A38F-4BDB-A599-29B38D5FFF66} = {502B0A21-982C-48A4-81D7-6073B99194E0}
 		{52816D09-D5F2-470F-AB4E-DA2F9EA300FD} = {502B0A21-982C-48A4-81D7-6073B99194E0}
 		{37A20035-ABE1-44D1-901E-845157D85010} = {502B0A21-982C-48A4-81D7-6073B99194E0}
+		{76CC3893-3788-44DC-BB81-578696673666} = {DD15B030-587C-4A27-840B-2D7615608FD9}
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Zyan.vsmdi

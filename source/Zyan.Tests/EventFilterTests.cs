@@ -191,7 +191,7 @@ namespace Zyan.Tests
 				Values = new HashSet<int>(values);
 			}
 
-			private ISet<int> Values { get; set; }
+			private HashSet<int> Values { get; set; }
 
 			protected override bool AllowInvocation(object sender, CustomEventArgs args)
 			{
@@ -210,7 +210,7 @@ namespace Zyan.Tests
 				Templates = new HashSet<string>(templates);
 			}
 
-			private ISet<string> Templates { get; set; }
+			private HashSet<string> Templates { get; set; }
 
 			public bool AllowInvocation(params object[] parameters)
 			{

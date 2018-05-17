@@ -117,7 +117,7 @@ namespace Zyan.Tests
 
 		[ClassCleanupNonStatic]
 		public void Cleanup()
-		{ 
+		{
 		}
 
 		[ClassInitialize]
@@ -138,6 +138,7 @@ namespace Zyan.Tests
 
 		#endregion
 
+#if !FX3
 		[TestMethod]
 		public void OneWayMethodCallPreservesCurrentSession()
 		{
@@ -162,6 +163,7 @@ namespace Zyan.Tests
 				Assert.IsTrue(success);
 			}
 		}
+#endif
 
 		[TestMethod]
 		public void OneWayMethodCallShouldReturnImmediatelly()

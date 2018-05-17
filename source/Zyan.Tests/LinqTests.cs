@@ -163,7 +163,7 @@ namespace Zyan.Tests
 				orderby s
 				select s + s.ToUpper();
 
-			var result = String.Concat(query);
+			var result = String.Concat(query.ToArray());
 			Assert.AreEqual("exampleEXAMPLEthisTHIS", result);
 		}
 
@@ -176,7 +176,7 @@ namespace Zyan.Tests
 				where s == "fox" || s == "dog" || s == "frog" || s == "mouse"
 				select s.Replace('o', 'i');
 
-			var result = String.Join(" & ", query);
+			var result = String.Join(" & ", query.ToArray());
 			Assert.AreEqual("fix & dig", result);
 		}
 
@@ -189,7 +189,7 @@ namespace Zyan.Tests
 				where Regex.IsMatch(s, "[nyg]$")
 				select s;
 
-			var result = String.Join(" ", query);
+			var result = String.Join(" ", query.ToArray());
 			Assert.AreEqual("brown lazy dog", result);
 		}
 
@@ -202,7 +202,7 @@ namespace Zyan.Tests
 				where Regex.IsMatch(s.FirstName, "[rt]$")
 				select s.LastName;
 
-			var result = String.Join(" ", query);
+			var result = String.Join(" ", query.ToArray());
 			Assert.AreEqual("Einstein Friedmann Kapitsa Oppenheimer Compton Lawrence Wilson Kurchatov", result);
 		}
 
@@ -215,7 +215,7 @@ namespace Zyan.Tests
 				orderby s.FirstName.Length, s.FirstName
 				select s.FirstName;
 
-			var result = String.Join(", ", query);
+			var result = String.Join(", ", query.ToArray());
 			Assert.AreEqual(
 				"Leó, Lev, Hans, Igor, Glenn, James, Klaus, Leona, Niels, Pyotr, Ralph, Albert, Arthur, Edward, Emilio, " +
 				"Enrico, Ernest, George, Harold, Robert, Robert, Richard, William, Alexander, Stanislaw, Chien-Shiung", result);

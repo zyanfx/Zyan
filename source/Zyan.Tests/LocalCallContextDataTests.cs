@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using System.Threading;
-using System.Threading.Tasks;
 using Zyan.Communication;
 using Zyan.Communication.Toolbox;
 using Zyan.Communication.ChannelSinks.Compression;
@@ -28,6 +27,10 @@ namespace Zyan.Tests
 	using ClassInitializeNonStatic = DummyAttribute;
 #endif
 	#endregion
+
+#if !FX3
+using System.Threading.Tasks;
+#endif
 
 	/// <summary>
 	/// Test class for the local call context data store.
@@ -95,6 +98,7 @@ namespace Zyan.Tests
 			Assert.IsFalse(dataAccessible);
 		}
 
+#if !FX3
 		[TestMethod]
 		public void OrdinalCallContextDataDoesntFlowWithExecutionContextInTaskStartNew()
 		{
@@ -112,7 +116,7 @@ namespace Zyan.Tests
 			task.Wait();
 			Assert.IsFalse(dataAccessible);
 		}
-
+#endif
 		[TestMethod]
 		public void LocalCallContextDataFlowsWithExecutionContextInDeledateBeginInvoke()
 		{
@@ -173,6 +177,7 @@ namespace Zyan.Tests
 			Assert.IsTrue(dataAccessible);
 		}
 
+#if !FX3
 		[TestMethod]
 		public void LocalCallContextDataFlowsWithExecutionContextInTaskStartNew()
 		{
@@ -192,6 +197,7 @@ namespace Zyan.Tests
 			task.Wait();
 			Assert.IsTrue(dataAccessible);
 		}
+#endif
 
 		[TestMethod]
 		public void LocalCallContextDataDoestnLeaveApplicationDomain()

@@ -38,8 +38,8 @@ namespace Zyan.Tests
 			var randomized1 = ChannelWrapper.RandomizeUrl(originalUrl);
 			var randomized2 = ChannelWrapper.RandomizeUrl(originalUrl);
 
-			Assert.IsFalse(string.IsNullOrWhiteSpace(randomized1));
-			Assert.IsFalse(string.IsNullOrWhiteSpace(randomized2));
+			Assert.IsFalse(string.IsNullOrEmpty(randomized1));
+			Assert.IsFalse(string.IsNullOrEmpty(randomized2));
 
 			Assert.AreNotEqual(originalUrl, randomized1);
 			Assert.AreNotEqual(originalUrl, randomized2);
@@ -55,7 +55,7 @@ namespace Zyan.Tests
 			var randomizedUrl = "wrap://2354gfds45#tcpex://localhost:12356/CoolService";
 			var originalUrl = ChannelWrapper.NormalizeUrl(randomizedUrl);
 
-			Assert.IsFalse(string.IsNullOrWhiteSpace(originalUrl));
+			Assert.IsFalse(string.IsNullOrEmpty(originalUrl));
 			Assert.AreEqual("tcpex://localhost:12356/CoolService", originalUrl);
 		}
 	}

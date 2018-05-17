@@ -30,7 +30,9 @@ namespace Zyan.Tests
 	[TestClass]
 	public class CompressionTests
 	{
-		static Lazy<byte[]> SampleData = new Lazy<byte[]>(() =>
+		private static byte[] SampleData { get; } = CreateSampleData();
+
+		private static byte[] CreateSampleData()
 		{
 			// compressible data
 			using (var ms = new MemoryStream())
@@ -38,7 +40,7 @@ namespace Zyan.Tests
 				new BinaryFormatter().Serialize(ms, SampleEntity.GetSampleEntities());
 				return ms.ToArray();
 			}
-		});
+		}
 
 		[TestMethod]
 		public void CompressionHelper_CompressesData()
@@ -46,7 +48,7 @@ namespace Zyan.Tests
 			// test all available compression methods
 			foreach (var level in new[] { CompressionMethod.None, CompressionMethod.LZF, CompressionMethod.DeflateStream })
 			{
-				var inputStream = new MemoryStream(SampleData.Value);
+				var inputStream = new MemoryStream(SampleData);
 				var outputStream = CompressionHelper.Compress(inputStream, level);
 
 				Assert.IsNotNull(outputStream);
@@ -66,7 +68,7 @@ namespace Zyan.Tests
 			// test all available compression methods
 			foreach (var level in new[] { CompressionMethod.None, CompressionMethod.LZF, CompressionMethod.DeflateStream })
 			{
-				var source = SampleData.Value;
+				var source = SampleData;
 				var compressed = CompressionHelper.Compress(new MemoryStream(source), level);
 				var decompressed = CompressionHelper.Decompress(compressed, level);
 				var destination = new byte[(int)decompressed.Length];
