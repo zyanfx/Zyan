@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Security.Cryptography;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Zyan.Communication.Security.SecureRemotePassword;
 
 namespace Zyan.Tests
@@ -112,6 +111,43 @@ namespace Zyan.Tests
 
 			var result = left ^ right;
 			Assert.AreEqual(xor, result);
+		}
+
+		[TestMethod]
+		public void SrpIntegetModPowCompatibleWithJsbn()
+		{
+			// jsbn results:
+			//  5 ^ 3 % 1000 =  <SRPInteger 7d>  = 125
+			// -5 ^ 3 % 1000 =  <SRPInteger f83> = 0x1000-0x7d
+			// 5 ^ 33 % 1000 =  <SRPInteger 2bd> = 701
+			//-5 ^ 33 % 1000 =  <SRPInteger d43> = 0x1000-0x2bd,
+			// 5 ^ 90 % 1000 =  <SRPInteger dc1>
+			//-5 ^ 90 % 1000 =  <SRPInteger dc1>
+
+			var p5 = SrpInteger.FromHex("5");
+			var n5 = SrpInteger.FromHex("-5");
+			var x3 = SrpInteger.FromHex("3");
+			var x33 = SrpInteger.FromHex("33");
+			var x90 = SrpInteger.FromHex("90");
+			var m = SrpInteger.FromHex("1000");
+
+			var result = p5.ModPow(x3, m);
+			Assert.AreEqual("7d", result.ToHex());
+
+			result = p5.ModPow(x33, m);
+			Assert.AreEqual("2bd", result.ToHex());
+
+			result = p5.ModPow(x90, m);
+			Assert.AreEqual("dc1", result.ToHex());
+
+			result = n5.ModPow(x3, m);
+			Assert.AreEqual("f83", result.ToHex());
+
+			result = n5.ModPow(x33, m);
+			Assert.AreEqual("d43", result.ToHex());
+
+			result = n5.ModPow(x90, m);
+			Assert.AreEqual("dc1", result.ToHex());
 		}
 
 		[TestMethod]
@@ -311,8 +347,8 @@ namespace Zyan.Tests
 			var salt = "532ec0e523a7b19db660f00eb00e91f033697f0ab58a542c99be8e9a08f48d6e";
 			var username = "linus@folkdatorn.se";
 			var privateKey = "79c7aadce96da2387b01a48ce5b9e910eb3f9e1ac0f8574b314c3f0fe8106f08";
-			var clientSessionKey = "1080138ae545b14fe946f6d6b08e9eebdd8fcd2184bc513a5c1cc4c789b038f3";
-			var clientSessionProof = "c1cabf00aec302c97c233d1c50ab733b44d16482be5f6c65419081add8e576e1";
+			var clientSessionKey = "eb6ad82490fc5a31f3103e231540efa51cce4ae6c3c46102be7102151d778fb3";
+			var clientSessionProof = "392bf92426f122c4f9492c64c2b8ffd354787c73eb31c467eb1acc0c98983c48";
 
 			var clientSession = SrpClient.DeriveSession(clientEphemeralSecret, serverEphemeralPublic, salt, username, privateKey);
 			Assert.IsNotNull(clientSession);
@@ -353,23 +389,23 @@ namespace Zyan.Tests
 			Assert.AreEqual(serverSessionProof, serverSession.Proof);
 		}
 
-		//[TestMethod]
-		//public void SrpServerDeriveSessionRegressionTest()
-		//{
-		//	var serverSecretEphemeral = "10586d81ccecdce05f7a6ad2ed205b7f5615f84463fdcf584bfec2f288fad5f5";
-		//	var clientPublicEphemeral = "5bff094e878aa7aefb777fe78067a75d459223e58d2d41ea810017fee3e8b0fdd7085d94ce0db7935dcb81e78d14c7e8a3dcacad4c2d6aa29c23724fab4303131ef8e9f3ed13ccd2414be43e851abf6713060699d94137fda38b59e524dbc2caebc7e3cd388e14abed4e3e9e6e25744b708a4c6ee79a84009b81b1a2e69ba0c926856b0e1858597239ad230aa0b95070968833f357613d9dd69bd30a1450af284adea261eb383cf9c3ae1e992ed8382527e8d680c20b54ad46e24c55998a784fd55f4c37a64562cd8beee0f9f3ee607d7bf4199e05c37129364ab0daf9c4768070a54c5ed125184a56d659d05f8b6b66ede56da1f82f48ee3d272370edd876ff";
-		//	var salt = "4ea524accbfee7a2ba67301422b7c8ba4ce205a68bb8bfc36e32fab005c9f4f4";
-		//	var username = "linus@folkdatorn.se";
-		//	var verifier = "2052387840d2a36b5da0a0b74d1b4c5f3216003a00977681b2bad3b4b6005fcee73fcc644106018bcd090afc50455cbde18194b1ef34be4a44418624cd6a0b974cd7a890c9115bbe0f538806c2016b4db5b9dd8bd5f7e2819720c2e4a42479a06297eee9d8acb9326b49a9a16358b7fdd75ce20e7b03993f13f17747a5ea4c02b3b116632bcd34f1da265704a43d074845373b6fc528a858abb07c4ab162a8f30847628f19bc26149d43ecf7570c10463b2a3e886665cb3af7d186a209a4b8d9b85f6ba9c23852311856011e642633fde3bfd48cf43c2f54070b3340408d4f615e536f4bf1656b794d5bee861bb28f16c55e36025ebf3421db0f51682e03e2ea";
-		//	var clientSessionProof = "f33540a50cee1cc1c55b3292253ed4f8a2509dce58b6a7d0c906daf44e98a962";
-		//	var serverSessionKey = "?";
-		//	var serverSessionProof = "?";
+		[TestMethod]
+		public void SrpServerDeriveSessionRegressionTest()
+		{
+			var serverSecretEphemeral = "10586d81ccecdce05f7a6ad2ed205b7f5615f84463fdcf584bfec2f288fad5f5";
+			var clientPublicEphemeral = "5bff094e878aa7aefb777fe78067a75d459223e58d2d41ea810017fee3e8b0fdd7085d94ce0db7935dcb81e78d14c7e8a3dcacad4c2d6aa29c23724fab4303131ef8e9f3ed13ccd2414be43e851abf6713060699d94137fda38b59e524dbc2caebc7e3cd388e14abed4e3e9e6e25744b708a4c6ee79a84009b81b1a2e69ba0c926856b0e1858597239ad230aa0b95070968833f357613d9dd69bd30a1450af284adea261eb383cf9c3ae1e992ed8382527e8d680c20b54ad46e24c55998a784fd55f4c37a64562cd8beee0f9f3ee607d7bf4199e05c37129364ab0daf9c4768070a54c5ed125184a56d659d05f8b6b66ede56da1f82f48ee3d272370edd876ff";
+			var salt = "4ea524accbfee7a2ba67301422b7c8ba4ce205a68bb8bfc36e32fab005c9f4f4";
+			var username = "linus@folkdatorn.se";
+			var verifier = "2052387840d2a36b5da0a0b74d1b4c5f3216003a00977681b2bad3b4b6005fcee73fcc644106018bcd090afc50455cbde18194b1ef34be4a44418624cd6a0b974cd7a890c9115bbe0f538806c2016b4db5b9dd8bd5f7e2819720c2e4a42479a06297eee9d8acb9326b49a9a16358b7fdd75ce20e7b03993f13f17747a5ea4c02b3b116632bcd34f1da265704a43d074845373b6fc528a858abb07c4ab162a8f30847628f19bc26149d43ecf7570c10463b2a3e886665cb3af7d186a209a4b8d9b85f6ba9c23852311856011e642633fde3bfd48cf43c2f54070b3340408d4f615e536f4bf1656b794d5bee861bb28f16c55e36025ebf3421db0f51682e03e2ea";
+			var clientSessionProof = "6d3f15c993a5641e80dff0b08b76cd784b3474861d4a48f9776299058b1d6ce5";
+			var serverSessionKey = "bd62528eef34d53ab2c473f14357615e9224ab04ac8489b52ad7691ad0562d2d";
+			var serverSessionProof = "4f9e07d544222de11b7082edc0a98fa9f906aa38ebcfaac8371381a10eca931b";
 
-		//	var serverSession = SrpServer.DeriveSession(serverSecretEphemeral, clientPublicEphemeral, salt, username, verifier, clientSessionProof);
-		//	Assert.IsNotNull(serverSession);
-		//	Assert.AreEqual(serverSessionKey, serverSession.Key);
-		//	Assert.AreEqual(serverSessionProof, serverSession.Proof);
-		//}
+			var serverSession = SrpServer.DeriveSession(serverSecretEphemeral, clientPublicEphemeral, salt, username, verifier, clientSessionProof);
+			Assert.IsNotNull(serverSession);
+			Assert.AreEqual(serverSessionKey, serverSession.Key);
+			Assert.AreEqual(serverSessionProof, serverSession.Proof);
+		}
 
 		[TestMethod]
 		public void SrpClientVerifiesSession()
@@ -408,6 +444,15 @@ namespace Zyan.Tests
 
 			// make sure both the client and the server have the same session key
 			Assert.AreEqual(clientSession.Key, serverSession.Key);
+		}
+
+		public void SrpStressTest()
+		{
+			// takes about 25 seconds on my machine
+			for (var i = 0; i < 100; i++)
+			{
+				SrpShouldAuthenticateAUser();
+			}
 		}
 	}
 }

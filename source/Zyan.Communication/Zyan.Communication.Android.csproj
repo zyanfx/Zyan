@@ -243,6 +243,7 @@
     <Compile Include="Security\SecureRemotePassword\SrpHash.cs" />
     <Compile Include="Security\SecureRemotePassword\SrpInteger.cs" />
     <Compile Include="Security\SecureRemotePassword\SrpParameters.cs" />
+    <Compile Include="Security\SecureRemotePassword\SrpServer.cs" />
     <Compile Include="Security\SecureRemotePassword\SrpSession.cs" />
     <Compile Include="Security\SimpleAuthenticationClient.cs" />
     <Compile Include="Security\WindowsSecurityTools.cs" />

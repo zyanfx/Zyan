@@ -87,9 +87,15 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		/// <param name="modulus">The modulus.</param>
 		public SrpInteger ModPow(SrpInteger exponent, SrpInteger modulus)
 		{
+			var value = BigInteger.ModPow(Value, exponent.Value, modulus.Value);
+			if (value < 0)
+			{
+				value = modulus.Value + value;
+			}
+
 			return new SrpInteger
 			{
-				Value = BigInteger.ModPow(Value, exponent.Value, modulus.Value),
+				Value = value,
 				HexLength = HexLength,
 			};
 		}
