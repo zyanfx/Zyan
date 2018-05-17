@@ -8,10 +8,10 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 {
 	/// <summary>
 	/// Hash function signature.
-	/// Computes the hash of the specified <see cref="string"/> values.
+	/// Computes the hash of the specified <see cref="string"/> or <see cref="SrpInteger"/> values.
 	/// </summary>
 	/// <param name="values">The values.</param>
-	public delegate SrpInteger SrpHash(params string[] values);
+	public delegate SrpInteger SrpHash(params object[] values);
 
 	/// <summary>
 	/// Hashing algorithms for the SRP protocol.
@@ -28,7 +28,7 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		/// </summary>
 		public static int HashSizeBytes { get; } = CreateHasher().HashSize / 8;
 
-		private static SrpInteger ComputeHash(params string[] values) =>
+		private static SrpInteger ComputeHash(params object[] values) =>
 			ComputeHash(Combine(values.Select(v => GetBytes(v))));
 
 		private static T CreateHasher()
@@ -52,11 +52,23 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 
 		private static byte[] EmptyBuffer = new byte[0];
 
-		private static byte[] GetBytes(string value)
+		private static byte[] GetBytes(object obj)
 		{
+			if (obj == null)
+			{
+				return EmptyBuffer;
+			}
+
+			var value = obj as string;
 			if (!string.IsNullOrEmpty(value))
 			{
 				return Encoding.UTF8.GetBytes(value);
+			}
+
+			var integer = obj as SrpInteger;
+			if (integer != null)
+			{
+				return integer.ToByteArray();
 			}
 
 			return EmptyBuffer;

@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using System.Security.Cryptography;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Zyan.Communication.Security.SecureRemotePassword
@@ -108,7 +106,15 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		}
 
 		/// <summary>
-		/// Performs an implicit conversion from <see cref="SrpInteger"/> to <see cref="System.String"/>.
+		/// Returns the byte array representing the given value in big endian encoding.
+		/// </summary>
+		/// <remarks>
+		/// Skips leading zeros produced by BigInteger.ToByteArray(), if any.
+		/// </remarks>
+		public byte[] ToByteArray() => Value.ToByteArray().Reverse().SkipWhile(v => v == 0).ToArray();
+
+		/// <summary>
+		/// Performs an implicit conversion from <see cref="SrpInteger"/> to <see cref="string"/>.
 		/// </summary>
 		/// <param name="srpint">The <see cref="SrpInteger"/> instance.</param>
 		public static implicit operator string(SrpInteger srpint) => srpint.ToHex();

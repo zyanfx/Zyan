@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Linq;
+using System.Security.Cryptography;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Zyan.Communication.Security.SecureRemotePassword;
 
@@ -126,6 +127,22 @@ namespace Zyan.Tests
 		}
 
 		[TestMethod]
+		public void SrpIntegerToByteArrayConversion()
+		{
+			var si = SrpInteger.FromHex("02");
+			var arr = new byte[] { 0x02 };
+			Assert.IsTrue(Enumerable.SequenceEqual(arr, si.ToByteArray()));
+
+			si = SrpInteger.FromHex("01F2C3A4B506");
+			arr = new byte[] { 0x01, 0xF2, 0xC3, 0xA4, 0xB5, 0x06 };
+			Assert.IsTrue(Enumerable.SequenceEqual(arr, si.ToByteArray()));
+
+			si = SrpInteger.FromHex("ed3250071433e544b62b5dd0341564825a697357b5379f07aabca795a4e0a109");
+			arr = new byte[] { 0xed, 0x32, 0x50, 0x07, 0x14, 0x33, 0xe5, 0x44, 0xb6, 0x2b, 0x5d, 0xd0, 0x34, 0x15, 0x64, 0x82, 0x5a, 0x69, 0x73, 0x57, 0xb5, 0x37, 0x9f, 0x07, 0xaa, 0xbc, 0xa7, 0x95, 0xa4, 0xe0, 0xa1, 0x09 };
+			Assert.IsTrue(Enumerable.SequenceEqual(arr, si.ToByteArray()));
+		}
+
+		[TestMethod]
 		public void RandomIntegerReturnsAnIntegerOfTheGivenSize()
 		{
 			var rnd = SrpInteger.RandomInteger(1);
@@ -138,28 +155,28 @@ namespace Zyan.Tests
 		}
 
 		[TestMethod]
-		public void SrpHashComputesValidHashesUppercase()
+		public void SrpHashComputesValidStringHashes()
 		{
 			var parts = new[] { "D4C7F8A2B32", "C11B8FBA9581EC4BA4F1B0421", "", "5642EF7355E37C0FC0443EF7", "56EA2C6B8EEB755A1C72302", "7663CAA265EF785B8FF6A9B35227A52D86633DBDFCA43" };
 			var sample = string.Concat(parts);
 			var srpint = SrpInteger.FromHex(sample);
 
 			var md5 = SrpHash<MD5>.HashFunction;
-			var hashmd5 = "34ada39bbabfa6e663f1aad3d7814121";
+			var hashmd5 = SrpInteger.FromHex("34ada39bbabfa6e663f1aad3d7814121");
 			Assert.AreEqual(hashmd5, md5(srpint.ToHex().ToUpper()));
 			Assert.AreEqual(hashmd5, md5(sample));
 			Assert.AreEqual(hashmd5, md5(parts));
 			Assert.AreEqual(16, SrpHash<MD5>.HashSizeBytes);
 
 			var sha256 = SrpHash<SHA256>.HashFunction;
-			var hash256 = "1767fe8c94508ad3514b8332493fab5396757fe347023fc9d1fef6d26c3a70d3";
+			var hash256 = SrpInteger.FromHex("1767fe8c94508ad3514b8332493fab5396757fe347023fc9d1fef6d26c3a70d3");
 			Assert.AreEqual(hash256, sha256(srpint.ToHex().ToUpper()));
 			Assert.AreEqual(hash256, sha256(sample));
 			Assert.AreEqual(hash256, sha256(parts));
 			Assert.AreEqual(256 / 8, SrpHash<SHA256>.HashSizeBytes);
 
 			var sha512 = SrpHash<SHA512>.HashFunction;
-			var hash512 = "f2406fd4b33b15a6b47ff78ccac7cd80eec7944092425b640d740e7dc695fdd42f583a9b4a4b98ffa5409680181999bfe319f2a3b50ddb111e8405019a8c552a";
+			var hash512 = SrpInteger.FromHex("f2406fd4b33b15a6b47ff78ccac7cd80eec7944092425b640d740e7dc695fdd42f583a9b4a4b98ffa5409680181999bfe319f2a3b50ddb111e8405019a8c552a");
 			Assert.AreEqual(hash512, sha512(srpint.ToHex().ToUpper()));
 			Assert.AreEqual(hash512, sha512(sample));
 			Assert.AreEqual(hash512, sha512(parts));
@@ -167,28 +184,28 @@ namespace Zyan.Tests
 		}
 
 		[TestMethod]
-		public void SrpHashComputesValidHashesLowercase()
+		public void SrpHashComputesValidSrpIntegerHashes()
 		{
-			var parts = new[] { "d4c7f8a2b32", "c11b8fba9581ec4ba4f1b0421", "", "5642ef7355e37c0fc0443ef7", "56ea2c6b8eeb755a1c72302", "7663caa265ef785b8ff6a9b35227a52d86633dbdfca43" };
+			var parts = new[] { "Hello", " ", "world!" };
 			var sample = string.Concat(parts);
-			var srpint = SrpInteger.FromHex(sample);
+			var srpint = SrpInteger.FromHex("48 65 6C 6C 6F 20 77 6F 72 6c 64 21");
 
 			var md5 = SrpHash<MD5>.HashFunction;
-			var hashmd5 = "2726861e354282d16c466ef0cb71b0fa";
+			var hashmd5 = SrpInteger.FromHex("86FB269D190D2C85F6E0468CECA42A20");
 			Assert.AreEqual(hashmd5, md5(srpint));
 			Assert.AreEqual(hashmd5, md5(sample));
 			Assert.AreEqual(hashmd5, md5(parts));
 			Assert.AreEqual(16, SrpHash<MD5>.HashSizeBytes);
 
 			var sha256 = SrpHash<SHA256>.HashFunction;
-			var hash256 = "aea6c27fa2628f183f574b2803f4f21bb8cdd9defefeebb42f100aa4d22c78f7";
+			var hash256 = SrpInteger.FromHex("C0535E4BE2B79FFD93291305436BF889314E4A3FAEC05ECFFCBB7DF31AD9E51A");
 			Assert.AreEqual(hash256, sha256(srpint));
 			Assert.AreEqual(hash256, sha256(sample));
 			Assert.AreEqual(hash256, sha256(parts));
 			Assert.AreEqual(256 / 8, SrpHash<SHA256>.HashSizeBytes);
 
 			var sha512 = SrpHash<SHA512>.HashFunction;
-			var hash512 = "24cca3c827f70d6f6ccd732614d55b7e6e5d746f21c8d531e5711f0e88775ddb2c29361c2ffa6aead6a8e0cac5466e8b5baa63b9e1cfaf37de02a9dcd882074f";
+			var hash512 = SrpInteger.FromHex("F6CDE2A0F819314CDDE55FC227D8D7DAE3D28CC556222A0A8AD66D91CCAD4AAD6094F517A2182360C9AACF6A3DC323162CB6FD8CDFFEDB0FE038F55E85FFB5B6");
 			Assert.AreEqual(hash512, sha512(srpint));
 			Assert.AreEqual(hash512, sha512(sample));
 			Assert.AreEqual(hash512, sha512(parts));
@@ -207,14 +224,34 @@ namespace Zyan.Tests
 		[TestMethod]
 		public void SrpClientDerivesThePrivateKeyAndVerifier()
 		{
-			// private key derivation is deterministic for the same s, I, p
+			// validate intermediate steps
+			var userName = "hacker@example.com";
+			var password = "secret";
+			var H = SrpHash<SHA256>.HashFunction;
+			var step1 = H($"{userName}:{password}");
+			Assert.AreEqual(SrpInteger.FromHex("ed3250071433e544b62b5dd0341564825a697357b5379f07aabca795a4e0a109"), step1);
+
+			// step1.1
 			var salt = "34ada39bbabfa6e663f1aad3d7814121";
-			var privateKey = SrpClient.DerivePrivateKey(salt, "hacker@example.com", "secret");
-			Assert.AreEqual("fa1975d086e4c1723d0139df3b7345e2321e5d86e4737c0e09afd7ec2a20fb59", privateKey);
+			var s = SrpInteger.FromHex(salt);
+			var step11 = H(s);
+			Assert.AreEqual(SrpInteger.FromHex("a5acfc1292e1b8e171b7c9a0f7b5bcd9bbcd4a3485c18d9d4fcf4480e8573442"), step11);
+
+			// step1.2
+			var step12 = H(step1);
+			Assert.AreEqual(SrpInteger.FromHex("446d597ddf0e65ca0395926665e70f10a2b0f8194f633243e71359028895be6f"), step12);
+
+			// step2
+			var step2 = H(s, step1);
+			Assert.AreEqual(SrpInteger.FromHex("e2db59181003e48e326292b3b307a1173a5f1fd12c6ffde55f7289503065fd6c"), step2);
+
+			// private key derivation is deterministic for the same s, I, p
+			var privateKey = SrpClient.DerivePrivateKey(salt, userName, password);
+			Assert.AreEqual("e2db59181003e48e326292b3b307a1173a5f1fd12c6ffde55f7289503065fd6c", privateKey);
 
 			// verifier
 			var verifier = SrpClient.DeriveVerifier(privateKey);
-			Assert.AreEqual("32e3839d4db6871d81eb517287e99b2333403ab9af545b1c16a2169c8ea9a9ed0be65250b2168ad63836358aaf88a50153463259a3e7b0c47175b22b8a2f14f45335cfc3313d894c85d4d8361b69d033d6f4d45c0f88ad87f179c74523ee6d9bbd2a92f1e00910a7e2c053cac9cf85ef28c36736de1338618577fd6f40f2e703bd742c34c1cf587010d5dd213d09e7be0461327f5aff133400683a151cc9d2c2724aa6beb9c9a62fdc6cfb54bc83b496d38aaa6235af6d4c76d1d61628bcb33d56cace98cc31776cbff292e05368b2929fd72b87ac480db4fd3f49ce76179ee2c789319e9ff9c1d6a0302a6b7da3e38ca2158cb02b27eced069110eb93bc1881", verifier);
+			Assert.AreEqual("622dad56d6c282a949f9d2702941a9866b7dd277af92a6e538b2d7cca42583275a2f4b64bd61369a24b23170223faf212e2f3bdddc529204c61055687c4162aa2cd0fd41ced0186406b8a6dda4802fa941c54f5115ca69953a8e265210349a4cb89dda3febc96c86df08a87823235ff6c87a170cc1618f38ec493e758e2cac4c04db3dcdac8656458296dbcc3599fc1f66cde1e62e477dd1696c65dbeb413d8ed832adc7304e68566b46a7849126eea62c95d5561306f76fe1f8a77a3bd85db85e6b0262064d665890ff46170f96ce403a9b485abe387e91ca85e3522d6276e2fff41754d57a71dee6da62aea614725da100631efd7442cf68a294001d8134e9", verifier);
 		}
 
 		[TestMethod]
@@ -234,11 +271,11 @@ namespace Zyan.Tests
 		[TestMethod]
 		public void SrpClientDeriveSession()
 		{
-			var clientEphemeralSecret = SrpInteger.FromHex("27b282fc8fbf8d8a5a075ff4992406ec730bc80eea2f9b89a75bb95f1272265e");
-			var serverEphemeralPublic = SrpInteger.FromHex("084153f1c6374fbf166f99b870b771fbd4ce3d3455671d5ee974eae65a06d1791b263af47c7fc2b4288267b943f8c30d3c049f0627a60badb78be3708a76b7ab0d1a64235cf00e7376001e3bddaccfc90148752062e36d70a81a56d3b4446f258beb255d17bd1b3aa05bb6012ca306ab1342dcc558c66daa19d1169b7cefb6005fcd92fbc4d593f3e4fec3e356b214c89fe26508c49b11b9efa04ecf6f05a748a50464252909eca2e04c9623d0997273b28499b1ea8c42d5a022609e2a89f6906e13dd3c9142a92575424311448fdf588524a64488fb8d2fcd1a5f2b2c059515fe0c83fd499b7b3fb2fe46f42fa7fc8d72cc0c04a5c9b22ebceddebf8fac4d8e");
-			var salt = SrpInteger.FromHex("d420d13b7e510e9457fb59d03819c6475fe53f680b4abb963ef9f6d4f6ddb04e");
+			var clientEphemeralSecret = SrpInteger.FromHex("27b282fc8fbf8d8a5a075ff4992406ec730bc80eea2f9b89a75bb95f1272265e").ToHex();
+			var serverEphemeralPublic = SrpInteger.FromHex("084153f1c6374fbf166f99b870b771fbd4ce3d3455671d5ee974eae65a06d1791b263af47c7fc2b4288267b943f8c30d3c049f0627a60badb78be3708a76b7ab0d1a64235cf00e7376001e3bddaccfc90148752062e36d70a81a56d3b4446f258beb255d17bd1b3aa05bb6012ca306ab1342dcc558c66daa19d1169b7cefb6005fcd92fbc4d593f3e4fec3e356b214c89fe26508c49b11b9efa04ecf6f05a748a50464252909eca2e04c9623d0997273b28499b1ea8c42d5a022609e2a89f6906e13dd3c9142a92575424311448fdf588524a64488fb8d2fcd1a5f2b2c059515fe0c83fd499b7b3fb2fe46f42fa7fc8d72cc0c04a5c9b22ebceddebf8fac4d8e").ToHex();
+			var salt = SrpInteger.FromHex("d420d13b7e510e9457fb59d03819c6475fe53f680b4abb963ef9f6d4f6ddb04e").ToHex();
 			var username = "bozo";
-			var privateKey = SrpInteger.FromHex("f8af13ffc45b3c64a826e3a133b8a74d0484e47625c049b7f635dd233cbda124");
+			var privateKey = SrpInteger.FromHex("f8af13ffc45b3c64a826e3a133b8a74d0484e47625c049b7f635dd233cbda124").ToHex();
 			var clientSessionKey = SrpInteger.FromHex("b0c6a3e44d418636c4b0a8f0ff18f1f31621a703e3fae2220897b8bbc30f6e22");
 			var clientSessionProof = SrpInteger.FromHex("0ad3f708a49e44a46ca392ee4f6277d5c27dbc1147082fff8ac979ce6f7be732");
 
