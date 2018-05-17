@@ -23,8 +23,11 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 			hex = NormalizeWhitespace(hex);
 			HexLength = hexLength;
 
+			var sign = hex.StartsWith("-") ? -1 : 1;
+			hex = hex.TrimStart('-');
+
 			// append leading zero to make sure we get a positive BigInteger value
-			Value = BigInteger.Parse("0" + hex, NumberStyles.HexNumber);
+			Value = sign * BigInteger.Parse("0" + hex, NumberStyles.HexNumber);
 		}
 
 		/// <summary>
@@ -101,8 +104,16 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 				throw new InvalidOperationException("Hexadecimal length is not specified");
 			}
 
+			var sign = string.Empty;
+			var value = Value;
+			if (Value < 0)
+			{
+				sign = "-";
+				value = -Value;
+			}
+
 			// ToString may add extra leading zeros to the positive BigIntegers, so we trim them first
-			return Value.ToString("x").TrimStart('0').PadLeft(HexLength.Value, '0');
+			return sign + value.ToString("x").TrimStart('0').PadLeft(HexLength.Value, '0');
 		}
 
 		/// <summary>
@@ -118,6 +129,30 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		/// </summary>
 		/// <param name="srpint">The <see cref="SrpInteger"/> instance.</param>
 		public static implicit operator string(SrpInteger srpint) => srpint.ToHex();
+
+		/// <summary>
+		/// Performs an implicit conversion from <see cref="int"/> to <see cref="SrpInteger"/>.
+		/// </summary>
+		/// <param name="integer">The <see cref="int"/> value.</param>
+		public static implicit operator SrpInteger(int integer) => FromHex(integer.ToString("X"));
+
+		/// <summary>
+		/// Performs an implicit conversion from <see cref="uint"/> to <see cref="SrpInteger"/>.
+		/// </summary>
+		/// <param name="integer">The <see cref="uint"/> value.</param>
+		public static implicit operator SrpInteger(uint integer) => FromHex(integer.ToString("X"));
+
+		/// <summary>
+		/// Performs an implicit conversion from <see cref="long"/> to <see cref="SrpInteger"/>.
+		/// </summary>
+		/// <param name="integer">The <see cref="long"/> value.</param>
+		public static implicit operator SrpInteger(long integer) => FromHex(integer.ToString("X"));
+
+		/// <summary>
+		/// Performs an implicit conversion from <see cref="ulong"/> to <see cref="SrpInteger"/>.
+		/// </summary>
+		/// <param name="integer">The <see cref="ulong"/> value.</param>
+		public static implicit operator SrpInteger(ulong integer) => FromHex(integer.ToString("X"));
 
 		/// <summary>
 		/// Implements the operator ==.
@@ -246,7 +281,7 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 				hex = "0";
 			}
 
-			return new SrpInteger(hex, hex.Length);
+			return new SrpInteger(hex, hex.Trim(' ', '-').Length);
 		}
 
 		/// <inheritdoc/>
@@ -262,11 +297,7 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		}
 
 		/// <inheritdoc/>
-		public bool Equals(SrpInteger other)
-		{
-			// ignore HexLength
-			return other != null && Value == other.Value;
-		}
+		public bool Equals(SrpInteger other) => other != null && Value == other.Value; // ignore HexLength
 
 		/// <inheritdoc/>
 		public override bool Equals(object obj) => Equals(obj as SrpInteger);

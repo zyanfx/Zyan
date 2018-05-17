@@ -116,7 +116,7 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 			var A = g.ModPow(a, N);
 
 			// B % N > 0
-			if (B % N == SrpInteger.Zero)
+			if (B % N == 0)
 			{
 				// fixme: .code, .statusCode, etc.
 				throw new SecurityException("The server sent an invalid public ephemeral");
@@ -139,6 +139,35 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 				Key = K.ToHex(),
 				Proof = M.ToHex()
 			};
+		}
+
+		/// <summary>
+		/// Verifies the session using the server-provided session proof.
+		/// </summary>
+		/// <param name="clientPublicEphemeral">The client public ephemeral.</param>
+		/// <param name="clientSession">The client session.</param>
+		/// <param name="serverSessionProof">The server session proof.</param>
+		public static void VerifySession(string clientPublicEphemeral, SrpSession clientSession, string serverSessionProof)
+		{
+			// H — One-way hash function
+			var H = SrpParameters.Default.H;
+
+			// A — Public ephemeral values
+			// M — Proof of K
+			// K — Shared, strong session key
+			var A = SrpInteger.FromHex(clientPublicEphemeral);
+			var M = SrpInteger.FromHex(clientSession.Proof);
+			var K = SrpInteger.FromHex(clientSession.Key);
+
+			// H(A, M, K)
+			var expected = H(A, M, K);
+			var actual = SrpInteger.FromHex(serverSessionProof);
+
+			if (actual != expected)
+			{
+				// fixme: .code, .statusCode, etc.
+				throw new SecurityException("Server provided session proof is invalid");
+			}
 		}
 	}
 }
