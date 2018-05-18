@@ -197,6 +197,7 @@ namespace Zyan.Tests
 		[ClassCleanupNonStatic]
 		public void Cleanup()
 		{
+			StopServer();
 		}
 
 		// Application domain for TCP Duplex test environment Zyan host
