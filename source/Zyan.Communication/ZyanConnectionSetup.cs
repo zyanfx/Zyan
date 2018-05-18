@@ -35,7 +35,7 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Gets or sets the login credentials.
 		/// </summary>
-		public Hashtable Credentials { get; set; }
+		public AuthCredentials Credentials { get; set; }
 
 		/// <summary>
 		/// Gets or sets wether Zyan should login automatically with cached credentials after the session is expired.
@@ -46,11 +46,6 @@ namespace Zyan.Communication
 		/// Gets or sets wether the session should be kept alive.
 		/// </summary>
 		public bool KeepSessionAlive { get; set; }
-
-		/// <summary>
-		/// Gets or sets the authentication client.
-		/// </summary>
-		public IAuthenticationClient AuthenticationClient { get; set; }
 
 		/// <summary>
 		/// Adds a new credential.

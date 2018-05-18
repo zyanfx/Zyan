@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections;
+using Zyan.Communication.Security;
 
 namespace Zyan.Communication
 {
@@ -24,7 +25,7 @@ namespace Zyan.Communication
 		/// Creates a new instance of the NewLogonNeededEventArgs class.
 		/// </summary>
 		/// <param name="credentials">Credentials for logon</param>
-		public NewLogonNeededEventArgs(Hashtable credentials)
+		public NewLogonNeededEventArgs(AuthCredentials credentials)
 		{
 			Cancel = false;
 			Credentials = credentials;
@@ -35,7 +36,7 @@ namespace Zyan.Communication
 		/// </summary>
 		/// <param name="credentials">Security credentials</param>
 		/// <param name="cancel">Cancel flag</param>
-		public NewLogonNeededEventArgs(Hashtable credentials, bool cancel)
+		public NewLogonNeededEventArgs(AuthCredentials credentials, bool cancel)
 		{
 			Cancel = cancel;
 			Credentials = credentials;
@@ -44,7 +45,7 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Gets or sets the security credentials for the new logon.
 		/// </summary>
-		public Hashtable Credentials { get; set; }
+		public AuthCredentials Credentials { get; set; }
 
 		/// <summary>
 		/// Gets or sets the cancel flag. If set to true, the new logon will be canceled.

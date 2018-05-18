@@ -74,10 +74,20 @@ namespace Zyan.Tests
 		/// <summary>
 		/// Client-side: authentication client.
 		/// </summary>
-		public class CustomAuthenticationClient : IAuthenticationClient
+		public class SrpAuthenticationClient : AuthCredentials
 		{
-			public void Authenticate(Guid sessionId, Hashtable credentials, IZyanDispatcher dispatcher)
+			public SrpAuthenticationClient(string userName, string password)
 			{
+				CredentialsHashtable[AuthRequestMessage.CREDENTIAL_USERNAME] = userName;
+				CredentialsHashtable[AuthRequestMessage.CREDENTIAL_PASSWORD] = password;
+			}
+
+			public override void Authenticate(Guid sessionId, IZyanDispatcher dispatcher)
+			{
+				var credentials = CredentialsHashtable;
+				if (credentials == null)
+					throw new Exception();
+
 				// step 0
 				credentials["#"] = 0;
 				var reply = dispatcher.Logon(sessionId, credentials);
@@ -361,14 +371,9 @@ namespace Zyan.Tests
 		{
 			var url = "tcpex://localhost:8088/CustomAuthenticationTestHost_TcpDuplex";
 			var protocol = new TcpDuplexClientProtocolSetup(true);
-			var credentials = new Hashtable
-			{
-				{ AuthRequestMessage.CREDENTIAL_USERNAME, "bozo" },
-				{ AuthRequestMessage.CREDENTIAL_PASSWORD, "h4cker" }
-			};
+			var credentials = new SrpAuthenticationClient("bozo", "h4cker");
 
-			var authClient = new CustomAuthenticationClient();
-			using (var connection = new ZyanConnection(url, protocol, credentials, true, true, authClient))
+			using (var connection = new ZyanConnection(url, protocol, credentials, true, true))
 			{
 				var proxy1 = connection.CreateProxy<ISampleServer>("SampleServer");
 				Assert.AreEqual("Hallo", proxy1.Echo("Hallo"));
@@ -376,9 +381,9 @@ namespace Zyan.Tests
 			}
 
 			// re-populate credentials and reconnect
-			credentials = new Hashtable { { "@", "Hello" } };
+			credentials = new SrpAuthenticationClient("bozo", "h4cker");
 
-			using (var connection = new ZyanConnection(url, protocol, credentials, true, true, authClient))
+			using (var connection = new ZyanConnection(url, protocol, credentials, true, true))
 			{
 				var proxy2 = connection.CreateProxy<ISampleServer>("SampleServer");
 				Assert.AreEqual("Hallo", proxy2.Echo("Hallo"));
@@ -419,10 +424,9 @@ namespace Zyan.Tests
 		{
 			var url = "tcp://localhost:8089/CustomAuthenticationTestHost_TcpSimplex";
 			var protocol = new TcpCustomClientProtocolSetup(true);
-			var credentials = new Hashtable { { "@", "Hello" } };
-			var authClient = new CustomAuthenticationClient();
+			var credentials = new SrpAuthenticationClient("bozo", "h4cker");
 
-			using (var connection = new ZyanConnection(url, protocol, credentials, true, true, authClient))
+			using (var connection = new ZyanConnection(url, protocol, credentials, true, true))
 			{
 				var proxy1 = connection.CreateProxy<ISampleServer>("SampleServer");
 				Assert.AreEqual("Hallo", proxy1.Echo("Hallo"));
@@ -430,9 +434,9 @@ namespace Zyan.Tests
 			}
 
 			// re-populate credentials and reconnect
-			credentials = new Hashtable { { "@", "Hello" } };
+			credentials = new SrpAuthenticationClient("bozo", "h4cker");
 
-			using (var connection = new ZyanConnection(url, protocol, credentials, true, true, authClient))
+			using (var connection = new ZyanConnection(url, protocol, credentials, true, true))
 			{
 				var proxy2 = connection.CreateProxy<ISampleServer>("SampleServer");
 				Assert.AreEqual("Hallo", proxy2.Echo("Hallo"));

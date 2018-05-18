@@ -264,11 +264,11 @@
     <Compile Include="Protocols\Versioning.cs" />
     <Compile Include="Protocols\Wrapper\ChannelWrapper.cs" />
     <Compile Include="Protocols\Wrapper\MessageSinkWrapper.cs" />
+    <Compile Include="Security\AuthCredentials.cs" />
     <Compile Include="Security\BasicWindowsAuthProvider.cs" />
     <Compile Include="Security\Exceptions\AccountLockedException.cs" />
     <Compile Include="Security\Exceptions\AccountNotFoundException.cs" />
     <Compile Include="Security\Exceptions\PasswordExpiredException.cs" />
-    <Compile Include="Security\IAuthenticationClient.cs" />
     <Compile Include="Security\SecureRemotePassword\ISrpHash.cs" />
     <Compile Include="Security\SecureRemotePassword\SrpClient.cs" />
     <Compile Include="Security\SecureRemotePassword\SrpEphemeral.cs" />
@@ -277,7 +277,6 @@
     <Compile Include="Security\SecureRemotePassword\SrpParameters.cs" />
     <Compile Include="Security\SecureRemotePassword\SrpServer.cs" />
     <Compile Include="Security\SecureRemotePassword\SrpSession.cs" />
-    <Compile Include="Security\SimpleAuthenticationClient.cs" />
     <Compile Include="Security\WindowsSecurityTools.cs" />
     <Compile Include="CustomSerializationContainer.cs" />
     <Compile Include="SerializationHandlerRepository.cs" />
