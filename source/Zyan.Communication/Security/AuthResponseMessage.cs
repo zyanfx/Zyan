@@ -40,5 +40,16 @@ namespace Zyan.Communication.Security
 		/// Gets or sets the additional parameters.
 		/// </summary>
 		public Hashtable Parameters { get; set; }
+
+		/// <summary>
+		/// Adds a parameter.
+		/// </summary>
+		/// <param name="name">Parameter name.</param>
+		/// <param name="value">Parameter value.</param>
+		public void AddParameter(string name, string value)
+		{
+			Parameters = Parameters ?? new Hashtable();
+			Parameters.Add(name, value);
+		}
 	}
 }

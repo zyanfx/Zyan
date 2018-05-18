@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Security;
 using Zyan.Communication;
 using Zyan.Communication.Security;
+using Zyan.Communication.Security.SecureRemotePassword;
 using Zyan.Communication.Protocols.Tcp;
 
 namespace Zyan.Tests
@@ -29,47 +30,139 @@ namespace Zyan.Tests
 	/// <summary>
 	/// Test class for SRP-6a authentication protocol classes (just a stub yet).
 	/// </summary>
+	[TestClass]
 	public class SrpAuthenticationTests
 	{
 		#region Sample component classes and interfaces
+
+		public class SrpAuthenticationData
+		{
+			public string UserName { get; set; }
+			public string Salt { get; set; }
+			public string Verifier { get; set; }
+		}
 
 		/// <summary>
 		/// Server-side: authentication provider.
 		/// </summary>
 		public class SrpAuthenticationProvider : IAuthenticationProvider
 		{
+			public SrpAuthenticationProvider()
+			{
+				// create user
+				var userName = "bozo";
+				var password = "h4ck3r";
+				var srpClient = new SrpClient();
+				var salt = srpClient.GenerateSalt();
+				var privateKey = srpClient.DerivePrivateKey(salt, userName, password);
+				var verifier = srpClient.DeriveVerifier(privateKey);
+
+				// store user data
+				AuthRepository = new SrpAuthenticationData
+				{
+					UserName = userName,
+					Salt = salt,
+					Verifier = verifier,
+				};
+			}
+
+			private SrpAuthenticationData AuthRepository { get; set; }
+
+			private SrpServer SrpServer { get; set; } = new SrpServer();
+
+			// step1 variables
+			private string UserName { get; set; }
+
+			private string Salt { get; set; }
+
+			private string Verifier { get; set; }
+
+			private string ClientEphemeralPublic { get; set; }
+
+			private SrpEphemeral ServerEphemeral { get; set; }
+
 			public AuthResponseMessage Authenticate(AuthRequestMessage authRequest)
 			{
 				if (authRequest.Credentials == null)
 					return Error("No credentials specified");
 
-				var stepNumber = 0;
-				if (authRequest.Credentials.ContainsKey("#"))
-					stepNumber = (int)(authRequest.Credentials["#"]);
+				if (!authRequest.Credentials.ContainsKey(SRP_STEP_NUMBER))
+					return Error("Authentication step not specified");
 
-				var payload = string.Empty;
-				if (authRequest.Credentials.ContainsKey("@"))
-					payload = (string)(authRequest.Credentials["@"]);
+				// step number
+				var step = Convert.ToInt32(authRequest.Credentials[SRP_STEP_NUMBER]);
 
-				switch (stepNumber)
+				// first step never fails: User -> Host: I, A = g^a (identifies self, a = random number)
+				if (step == 1)
 				{
-					case 0: return payload == "Hello" ? Ok(false, "World") : Error("Failure on step 0");
-					case 1: return payload == "Icanhaz" ? Ok(true, "Cheezburger") : Error("Failure on step 1");
+					UserName = (string)authRequest.Credentials[SRP_USERNAME];
+					ClientEphemeralPublic = (string)authRequest.Credentials[SRP_CLIENT_PUBLIC_EPHEMERAL];
+					if (UserName == AuthRepository.UserName)
+					{
+						// Host -> User: s, B = kv + g^b (sends salt, b = random number)
+						Salt = AuthRepository.Salt;
+						Verifier = AuthRepository.Verifier;
+						ServerEphemeral = SrpServer.GenerateEphemeral(Verifier);
+						return ResponseStep1(Salt, ServerEphemeral.Public);
+					}
+
+					// generate fake salt and B values so that attacker cannot tell whether the given user exists or not
+					var fakeSalt = new SrpParameters().H(UserName).ToHex();
+					var fakeEphemeral = SrpServer.GenerateEphemeral(fakeSalt);
+					return ResponseStep1(fakeSalt, fakeEphemeral.Public);
 				}
 
-				return Error("Bad authentication");
+				// second step may fail: User -> Host: M = H(H(N) xor H(g), H(I), s, A, B, K)
+				if (step == 2)
+				{
+					try
+					{
+						// Host -> User: H(A, M, K)
+						var clientSessionProof = (string)authRequest.Credentials[SRP_CLIENT_SESSION_PROOF];
+						var serverSession = SrpServer.DeriveSession(ServerEphemeral.Secret, ClientEphemeralPublic, Salt, UserName, Verifier, clientSessionProof);
+						return ResponseStep2(serverSession.Proof);
+					}
+					catch (SecurityException ex)
+					{
+						return Error("Authentication failed: " + ex.Message);
+					}
+				}
+
+				// step number should be either 1 or 2
+				return Error("Unknown authentication step");
 			}
 
-			private AuthResponseMessage Error(string message)
+			private AuthResponseMessage ResponseStep1(string salt, string serverPublicEphemeral)
 			{
-				return new AuthResponseMessage { Success = false, ErrorMessage = message };
+				var result = new AuthResponseMessage { Completed = false, Success = true };
+				result.AddParameter(SRP_SALT, salt);
+				result.AddParameter(SRP_SERVER_PUBLIC_EPHEMERAL, serverPublicEphemeral);
+				return result;
 			}
 
-			private AuthResponseMessage Ok(bool completed, string message)
+			private AuthResponseMessage ResponseStep2(string serverSessionProof)
 			{
-				return new AuthResponseMessage { Completed = completed, Success = true, ErrorMessage = message };
+				var result = new AuthResponseMessage { Completed = true, Success = true };
+				result.AddParameter(SRP_SERVER_SESSION_PROOF, serverSessionProof);
+				return result;
 			}
+
+			private AuthResponseMessage Error(string message) => new AuthResponseMessage
+			{
+				Success = false,
+				Completed = true,
+				ErrorMessage = message,
+			};
 		}
+
+		private const string SRP_STEP_NUMBER = "Step";
+		private const string SRP_SESSION_ID = "SessionID";
+		private const string SRP_USERNAME = AuthRequestMessage.CREDENTIAL_USERNAME;
+		private const string SRP_SALT = "Salt";
+		private const string SRP_SERVER_PUBLIC_EPHEMERAL = "B";
+		private const string SRP_CLIENT_PUBLIC_EPHEMERAL = "A";
+		private const string SRP_CLIENT_SESSION_PROOF = "ClientProof";
+		private const string SRP_SERVER_SESSION_PROOF = "ServerProof";
 
 		/// <summary>
 		/// Client-side: authentication client.
@@ -78,37 +171,43 @@ namespace Zyan.Tests
 		{
 			public SrpAuthenticationClient(string userName, string password)
 			{
-				CredentialsHashtable[AuthRequestMessage.CREDENTIAL_USERNAME] = userName;
-				CredentialsHashtable[AuthRequestMessage.CREDENTIAL_PASSWORD] = password;
+				UserName = userName;
+				Password = password;
 			}
+
+			private SrpClient SrpClient { get; set; } = new SrpClient();
 
 			public override void Authenticate(Guid sessionId, IZyanDispatcher dispatcher)
 			{
-				var credentials = CredentialsHashtable;
-				if (credentials == null)
-					throw new Exception();
-
-				// step 0
-				credentials["#"] = 0;
-				var reply = dispatcher.Logon(sessionId, credentials);
-
-				// check the reply
-				var payload = reply.ErrorMessage;
-				if (reply.ErrorMessage != "World")
+				// step1: User -> Host: I, A = g^a (identifies self, a = random number)
+				var clientEphemeral = SrpClient.GenerateEphemeral();
+				var request1 = new Hashtable
 				{
-					throw new Exception("Bad reply for step 0");
-				}
+					{ SRP_STEP_NUMBER, 1 },
+					{ SRP_SESSION_ID, sessionId.ToString() },
+					{ SRP_USERNAME, UserName },
+					{ SRP_CLIENT_PUBLIC_EPHEMERAL, clientEphemeral.Public },
+				};
 
-				// step 1
-				credentials["#"] = 1;
-				credentials["@"] = "Icanhaz";
-				reply = dispatcher.Logon(sessionId, credentials);
+				// Host -> User: s, B = kv + g^b (sends salt, b = random number)
+				var response1 = dispatcher.Logon(sessionId, request1).Parameters;
+				var salt = (string)response1[SRP_SALT];
+				var serverPublicEphemeral = (string)response1[SRP_SERVER_PUBLIC_EPHEMERAL];
 
-				// check the reply
-				if (reply.ErrorMessage != "Cheezburger")
+				// step2: User -> Host: M = H(H(N) xor H(g), H(I), s, A, B, K)
+				var privateKey = SrpClient.DerivePrivateKey(salt, UserName, Password);
+				var clientSession = SrpClient.DeriveSession(clientEphemeral.Secret, serverPublicEphemeral, salt, UserName, privateKey);
+				var request2 = new Hashtable
 				{
-					throw new Exception("Bad reply for step 1");
-				}
+					{ SRP_STEP_NUMBER, 2 },
+					{ SRP_SESSION_ID, sessionId.ToString() },
+					{ SRP_CLIENT_SESSION_PROOF, clientSession.Proof },
+				};
+
+				// Host -> User: H(A, M, K)
+				var response2 = dispatcher.Logon(sessionId, request2).Parameters;
+				var serverSessionProof = (string)response2[SRP_SERVER_SESSION_PROOF];
+				SrpClient.VerifySession(clientEphemeral.Public, clientSession, serverSessionProof);
 			}
 		}
 
@@ -371,7 +470,7 @@ namespace Zyan.Tests
 		{
 			var url = "tcpex://localhost:8088/CustomAuthenticationTestHost_TcpDuplex";
 			var protocol = new TcpDuplexClientProtocolSetup(true);
-			var credentials = new SrpAuthenticationClient("bozo", "h4cker");
+			var credentials = new SrpAuthenticationClient("bozo", "h4ck3r");
 
 			using (var connection = new ZyanConnection(url, protocol, credentials, true, true))
 			{
@@ -380,9 +479,7 @@ namespace Zyan.Tests
 				proxy1 = null;
 			}
 
-			// re-populate credentials and reconnect
-			credentials = new SrpAuthenticationClient("bozo", "h4cker");
-
+			// reconnect using the same credentials
 			using (var connection = new ZyanConnection(url, protocol, credentials, true, true))
 			{
 				var proxy2 = connection.CreateProxy<ISampleServer>("SampleServer");
@@ -395,7 +492,7 @@ namespace Zyan.Tests
 		{
 			var url = "tcpex://localhost:8088/CustomAuthenticationTestHost_TcpDuplex";
 			var protocol = new TcpDuplexClientProtocolSetup(true);
-			var credentials = new Hashtable { { "@", "Hello" } };
+			var credentials = new AuthCredentials("bozo", "h4ck3r");
 
 			using (var connection = new ZyanConnection(url, protocol, credentials, true, true))
 			{
@@ -424,7 +521,7 @@ namespace Zyan.Tests
 		{
 			var url = "tcp://localhost:8089/CustomAuthenticationTestHost_TcpSimplex";
 			var protocol = new TcpCustomClientProtocolSetup(true);
-			var credentials = new SrpAuthenticationClient("bozo", "h4cker");
+			var credentials = new SrpAuthenticationClient("bozo", "h4ck3r");
 
 			using (var connection = new ZyanConnection(url, protocol, credentials, true, true))
 			{
@@ -433,9 +530,7 @@ namespace Zyan.Tests
 				proxy1 = null;
 			}
 
-			// re-populate credentials and reconnect
-			credentials = new SrpAuthenticationClient("bozo", "h4cker");
-
+			// reconnect
 			using (var connection = new ZyanConnection(url, protocol, credentials, true, true))
 			{
 				var proxy2 = connection.CreateProxy<ISampleServer>("SampleServer");
@@ -448,7 +543,7 @@ namespace Zyan.Tests
 		{
 			var url = "tcp://localhost:8089/CustomAuthenticationTestHost_TcpSimplex";
 			var protocol = new TcpCustomClientProtocolSetup(true);
-			var credentials = new Hashtable { { "@", "Hello" } };
+			var credentials = new AuthCredentials("bozo", "h4ck3r");
 
 			using (var connection = new ZyanConnection(url, protocol, credentials, true, true))
 			{
