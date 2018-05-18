@@ -90,8 +90,8 @@ namespace Zyan.Tests
 
 			public override void Authenticate(Guid sessionId, IZyanDispatcher dispatcher)
 			{
-				var credentials = CredentialsHashtable;
-				if (credentials == null || credentials.Count == 0)
+				var credentials = (Hashtable)CredentialsHashtable.Clone();
+				if (credentials.Count == 0)
 				{
 					throw new Exception("No credentials specified");
 				}
@@ -388,9 +388,7 @@ namespace Zyan.Tests
 				proxy1 = null;
 			}
 
-			// rebuild credentials and reconnect
-			credentials = new CustomAuthenticationClient("Hello");
-
+			// reconnect using the same credentials
 			using (var connection = new ZyanConnection(url, protocol, credentials, true, true))
 			{
 				var proxy2 = connection.CreateProxy<ISampleServer>("SampleServer");
@@ -441,9 +439,7 @@ namespace Zyan.Tests
 				proxy1 = null;
 			}
 
-			// rebuild credentials and reconnect
-			credentials = new CustomAuthenticationClient("Hello");
-
+			// reconnect using the same credentials
 			using (var connection = new ZyanConnection(url, protocol, credentials, true, true))
 			{
 				var proxy2 = connection.CreateProxy<ISampleServer>("SampleServer");
