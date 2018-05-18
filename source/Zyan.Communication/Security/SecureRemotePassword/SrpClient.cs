@@ -3,16 +3,30 @@
 namespace Zyan.Communication.Security.SecureRemotePassword
 {
 	/// <summary>
-	/// Client-side code of the SRP 6a protocol.
+	/// Client-side code of the SRP-6a protocol.
 	/// </summary>
 	public class SrpClient
 	{
 		/// <summary>
+		/// Initializes a new instance of the <see cref="SrpClient"/> class.
+		/// </summary>
+		/// <param name="parameters">The parameters of the SRP-6a protocol.</param>
+		public SrpClient(SrpParameters parameters = null)
+		{
+			Parameters = parameters ?? new SrpParameters();
+		}
+
+		/// <summary>
+		/// Gets or sets the protocol parameters.
+		/// </summary>
+		private SrpParameters Parameters { get; set; }
+
+		/// <summary>
 		/// Generates the random salt of the same size as a used hash.
 		/// </summary>
-		public static string GenerateSalt()
+		public string GenerateSalt()
 		{
-			var hashSize = SrpParameters.Default.HashSizeBytes;
+			var hashSize = Parameters.HashSizeBytes;
 			return SrpInteger.RandomInteger(hashSize).ToHex();
 		}
 
@@ -22,10 +36,10 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		/// <param name="salt">The salt.</param>
 		/// <param name="userName">The name of the user.</param>
 		/// <param name="password">The password.</param>
-		public static string DerivePrivateKey(string salt, string userName, string password)
+		public string DerivePrivateKey(string salt, string userName, string password)
 		{
 			// H() — One-way hash function
-			var H = SrpParameters.Default.H;
+			var H = Parameters.H;
 
 			// validate the parameters:
 			// s — User's salt, hexadecimal
@@ -44,12 +58,12 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		/// Derives the verifier from the private key.
 		/// </summary>
 		/// <param name="privateKey">The private key.</param>
-		public static string DeriveVerifier(string privateKey)
+		public string DeriveVerifier(string privateKey)
 		{
 			// N — A large safe prime (N = 2q+1, where q is prime)
 			// g — A generator modulo N
-			var N = SrpParameters.Default.N;
-			var g = SrpParameters.Default.G;
+			var N = Parameters.N;
+			var g = Parameters.G;
 
 			// x — Private key (derived from p and s)
 			var x = SrpInteger.FromHex(privateKey);
@@ -62,13 +76,13 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		/// <summary>
 		/// Generates the ephemeral value.
 		/// </summary>
-		public static SrpEphemeral GenerateEphemeral()
+		public SrpEphemeral GenerateEphemeral()
 		{
 			// N — A large safe prime (N = 2q+1, where q is prime)
 			// g — A generator modulo N
-			var N = SrpParameters.Default.N;
-			var g = SrpParameters.Default.G;
-			var hashSize = SrpParameters.Default.HashSizeBytes;
+			var N = Parameters.N;
+			var g = Parameters.G;
+			var hashSize = Parameters.HashSizeBytes;
 
 			// A = g^a (a = random number)
 			var a = SrpInteger.RandomInteger(hashSize);
@@ -90,16 +104,16 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		/// <param name="username">The username.</param>
 		/// <param name="privateKey">The private key.</param>
 		/// <returns>Session key and proof.</returns>
-		public static SrpSession DeriveSession(string clientSecretEphemeral, string serverPublicEphemeral, string salt, string username, string privateKey)
+		public SrpSession DeriveSession(string clientSecretEphemeral, string serverPublicEphemeral, string salt, string username, string privateKey)
 		{
 			// N — A large safe prime (N = 2q+1, where q is prime)
 			// g — A generator modulo N
 			// k — Multiplier parameter (k = H(N, g) in SRP-6a, k = 3 for legacy SRP-6)
 			// H — One-way hash function
-			var N = SrpParameters.Default.N;
-			var g = SrpParameters.Default.G;
-			var k = SrpParameters.Default.K;
-			var H = SrpParameters.Default.H;
+			var N = Parameters.N;
+			var g = Parameters.G;
+			var k = Parameters.K;
+			var H = Parameters.H;
 
 			// a — Secret ephemeral value
 			// B — Public ephemeral value
@@ -147,10 +161,10 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		/// <param name="clientPublicEphemeral">The client public ephemeral.</param>
 		/// <param name="clientSession">The client session.</param>
 		/// <param name="serverSessionProof">The server session proof.</param>
-		public static void VerifySession(string clientPublicEphemeral, SrpSession clientSession, string serverSessionProof)
+		public void VerifySession(string clientPublicEphemeral, SrpSession clientSession, string serverSessionProof)
 		{
 			// H — One-way hash function
-			var H = SrpParameters.Default.H;
+			var H = Parameters.H;
 
 			// A — Public ephemeral values
 			// M — Proof of K

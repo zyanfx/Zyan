@@ -286,6 +286,7 @@
     <Compile Include="Security\Exceptions\AccountNotFoundException.cs" />
     <Compile Include="Security\Exceptions\PasswordExpiredException.cs" />
     <Compile Include="Security\IAuthenticationClient.cs" />
+    <Compile Include="Security\SecureRemotePassword\ISrpHash.cs" />
     <Compile Include="Security\SecureRemotePassword\SrpClient.cs" />
     <Compile Include="Security\SecureRemotePassword\SrpEphemeral.cs" />
     <Compile Include="Security\SecureRemotePassword\SrpHash.cs" />

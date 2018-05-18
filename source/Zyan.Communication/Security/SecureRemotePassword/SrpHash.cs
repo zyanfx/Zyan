@@ -7,29 +7,24 @@ using System.Text;
 namespace Zyan.Communication.Security.SecureRemotePassword
 {
 	/// <summary>
-	/// Hash function signature.
-	/// Computes the hash of the specified <see cref="string"/> or <see cref="SrpInteger"/> values.
+	/// Hashing algorithms for the SRP-6a protocol.
 	/// </summary>
-	/// <param name="values">The values.</param>
-	public delegate SrpInteger SrpHash(params object[] values);
-
-	/// <summary>
-	/// Hashing algorithms for the SRP protocol.
-	/// </summary>
-	public static class SrpHash<T> where T : HashAlgorithm
+	public class SrpHash<T> : ISrpHash where T : HashAlgorithm
 	{
 		/// <summary>
 		/// Gets the hash function.
 		/// </summary>
-		public static SrpHash HashFunction { get; } = ComputeHash;
+		public SrpHash HashFunction { get; } = ComputeHash;
 
 		/// <summary>
 		/// Gets the size of the hash in bytes.
 		/// </summary>
-		public static int HashSizeBytes { get; } = CreateHasher().HashSize / 8;
+		public int HashSizeBytes { get; } = Hasher.HashSize / 8;
 
 		private static SrpInteger ComputeHash(params object[] values) =>
 			ComputeHash(Combine(values.Select(v => GetBytes(v))));
+
+		private static T Hasher { get; } = CreateHasher();
 
 		private static T CreateHasher()
 		{
@@ -39,8 +34,7 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 
 		private static SrpInteger ComputeHash(byte[] data)
 		{
-			var hasher = CreateHasher();
-			var hash = hasher.ComputeHash(data);
+			var hash = Hasher.ComputeHash(data);
 
 			// reverse the byte order for the little-endian encoding — doesn't take the sign into account
 			//return SrpInteger.FromBytes(hash.Reverse().ToArray());

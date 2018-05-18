@@ -3,22 +3,36 @@
 namespace Zyan.Communication.Security.SecureRemotePassword
 {
 	/// <summary>
-	/// Server-side code of the SRP 6a protocol.
+	/// Server-side code of the SRP-6a protocol.
 	/// </summary>
 	public class SrpServer
 	{
 		/// <summary>
+		/// Initializes a new instance of the <see cref="SrpServer"/> class.
+		/// </summary>
+		/// <param name="parameters">The parameters of the SRP-6a protocol.</param>
+		public SrpServer(SrpParameters parameters = null)
+		{
+			Parameters = parameters ?? new SrpParameters();
+		}
+
+		/// <summary>
+		/// Gets or sets the protocol parameters.
+		/// </summary>
+		private SrpParameters Parameters { get; set; }
+
+		/// <summary>
 		/// Generates the ephemeral value from the given verifier.
 		/// </summary>
-		public static SrpEphemeral GenerateEphemeral(string verifier)
+		public SrpEphemeral GenerateEphemeral(string verifier)
 		{
 			// N — A large safe prime (N = 2q+1, where q is prime)
 			// g — A generator modulo N
 			// k — Multiplier parameter (k = H(N, g) in SRP-6a, k = 3 for legacy SRP-6)
-			var N = SrpParameters.Default.N;
-			var g = SrpParameters.Default.G;
-			var k = SrpParameters.Default.K;
-			var size = SrpParameters.Default.HashSizeBytes;
+			var N = Parameters.N;
+			var g = Parameters.G;
+			var k = Parameters.K;
+			var size = Parameters.HashSizeBytes;
 
 			// v — Password verifier
 			var v = SrpInteger.FromHex(verifier);
@@ -44,16 +58,16 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		/// <param name="verifier">The verifier.</param>
 		/// <param name="clientSessionProof">The client session proof value.</param>
 		/// <returns>Session key and proof.</returns>
-		public static SrpSession DeriveSession(string serverSecretEphemeral, string clientPublicEphemeral, string salt, string username, string verifier, string clientSessionProof)
+		public SrpSession DeriveSession(string serverSecretEphemeral, string clientPublicEphemeral, string salt, string username, string verifier, string clientSessionProof)
 		{
 			// N — A large safe prime (N = 2q+1, where q is prime)
 			// g — A generator modulo N
 			// k — Multiplier parameter (k = H(N, g) in SRP-6a, k = 3 for legacy SRP-6)
 			// H — One-way hash function
-			var N = SrpParameters.Default.N;
-			var g = SrpParameters.Default.G;
-			var k = SrpParameters.Default.K;
-			var H = SrpParameters.Default.H;
+			var N = Parameters.N;
+			var g = Parameters.G;
+			var k = Parameters.K;
+			var H = Parameters.H;
 
 			// b — Secret ephemeral values
 			// A — Public ephemeral values

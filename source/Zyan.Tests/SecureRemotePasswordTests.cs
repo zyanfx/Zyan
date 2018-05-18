@@ -215,26 +215,26 @@ namespace Zyan.Tests
 			var sample = string.Concat(parts);
 			var srpint = SrpInteger.FromHex(sample);
 
-			var md5 = SrpHash<MD5>.HashFunction;
+			var md5 = new SrpHash<MD5>().HashFunction;
 			var hashmd5 = SrpInteger.FromHex("34ada39bbabfa6e663f1aad3d7814121");
 			Assert.AreEqual(hashmd5, md5(srpint.ToHex().ToUpper()));
 			Assert.AreEqual(hashmd5, md5(sample));
 			Assert.AreEqual(hashmd5, md5(parts));
-			Assert.AreEqual(16, SrpHash<MD5>.HashSizeBytes);
+			Assert.AreEqual(16, new SrpHash<MD5>().HashSizeBytes);
 
-			var sha256 = SrpHash<SHA256>.HashFunction;
+			var sha256 = new SrpHash<SHA256>().HashFunction;
 			var hash256 = SrpInteger.FromHex("1767fe8c94508ad3514b8332493fab5396757fe347023fc9d1fef6d26c3a70d3");
 			Assert.AreEqual(hash256, sha256(srpint.ToHex().ToUpper()));
 			Assert.AreEqual(hash256, sha256(sample));
 			Assert.AreEqual(hash256, sha256(parts));
-			Assert.AreEqual(256 / 8, SrpHash<SHA256>.HashSizeBytes);
+			Assert.AreEqual(256 / 8, new SrpHash<SHA256>().HashSizeBytes);
 
-			var sha512 = SrpHash<SHA512>.HashFunction;
+			var sha512 = new SrpHash<SHA512>().HashFunction;
 			var hash512 = SrpInteger.FromHex("f2406fd4b33b15a6b47ff78ccac7cd80eec7944092425b640d740e7dc695fdd42f583a9b4a4b98ffa5409680181999bfe319f2a3b50ddb111e8405019a8c552a");
 			Assert.AreEqual(hash512, sha512(srpint.ToHex().ToUpper()));
 			Assert.AreEqual(hash512, sha512(sample));
 			Assert.AreEqual(hash512, sha512(parts));
-			Assert.AreEqual(512 / 8, SrpHash<SHA512>.HashSizeBytes);
+			Assert.AreEqual(512 / 8, new SrpHash<SHA512>().HashSizeBytes);
 		}
 
 		[TestMethod]
@@ -244,35 +244,35 @@ namespace Zyan.Tests
 			var sample = string.Concat(parts);
 			var srpint = SrpInteger.FromHex("48 65 6C 6C 6F 20 77 6F 72 6c 64 21");
 
-			var md5 = SrpHash<MD5>.HashFunction;
+			var md5 = new SrpHash<MD5>().HashFunction;
 			var hashmd5 = SrpInteger.FromHex("86FB269D190D2C85F6E0468CECA42A20");
 			Assert.AreEqual(hashmd5, md5(srpint));
 			Assert.AreEqual(hashmd5, md5(sample));
 			Assert.AreEqual(hashmd5, md5(parts));
-			Assert.AreEqual(16, SrpHash<MD5>.HashSizeBytes);
+			Assert.AreEqual(16, new SrpHash<MD5>().HashSizeBytes);
 
-			var sha256 = SrpHash<SHA256>.HashFunction;
+			var sha256 = new SrpHash<SHA256>().HashFunction;
 			var hash256 = SrpInteger.FromHex("C0535E4BE2B79FFD93291305436BF889314E4A3FAEC05ECFFCBB7DF31AD9E51A");
 			Assert.AreEqual(hash256, sha256(srpint));
 			Assert.AreEqual(hash256, sha256(sample));
 			Assert.AreEqual(hash256, sha256(parts));
-			Assert.AreEqual(256 / 8, SrpHash<SHA256>.HashSizeBytes);
+			Assert.AreEqual(256 / 8, new SrpHash<SHA256>().HashSizeBytes);
 
-			var sha512 = SrpHash<SHA512>.HashFunction;
+			var sha512 = new SrpHash<SHA512>().HashFunction;
 			var hash512 = SrpInteger.FromHex("F6CDE2A0F819314CDDE55FC227D8D7DAE3D28CC556222A0A8AD66D91CCAD4AAD6094F517A2182360C9AACF6A3DC323162CB6FD8CDFFEDB0FE038F55E85FFB5B6");
 			Assert.AreEqual(hash512, sha512(srpint));
 			Assert.AreEqual(hash512, sha512(sample));
 			Assert.AreEqual(hash512, sha512(parts));
-			Assert.AreEqual(512 / 8, SrpHash<SHA512>.HashSizeBytes);
+			Assert.AreEqual(512 / 8, new SrpHash<SHA512>().HashSizeBytes);
 		}
 
 		[TestMethod]
 		public void SrpClientGenerateSaltReturnsRandomInteger()
 		{
-			var salt = SrpClient.GenerateSalt();
+			var salt = new SrpClient().GenerateSalt();
 			Assert.IsNotNull(salt);
 			Assert.AreNotEqual(string.Empty, salt);
-			Assert.AreEqual(SrpParameters.Default.HashSizeBytes * 2, salt.Length);
+			Assert.AreEqual(new SrpParameters().HashSizeBytes * 2, salt.Length);
 		}
 
 		[TestMethod]
@@ -281,7 +281,7 @@ namespace Zyan.Tests
 			// validate intermediate steps
 			var userName = "hacker@example.com";
 			var password = "secret";
-			var H = SrpHash<SHA256>.HashFunction;
+			var H = new SrpHash<SHA256>().HashFunction;
 			var step1 = H($"{userName}:{password}");
 			Assert.AreEqual(SrpInteger.FromHex("ed3250071433e544b62b5dd0341564825a697357b5379f07aabca795a4e0a109"), step1);
 
@@ -300,18 +300,18 @@ namespace Zyan.Tests
 			Assert.AreEqual(SrpInteger.FromHex("e2db59181003e48e326292b3b307a1173a5f1fd12c6ffde55f7289503065fd6c"), step2);
 
 			// private key derivation is deterministic for the same s, I, p
-			var privateKey = SrpClient.DerivePrivateKey(salt, userName, password);
+			var privateKey = new SrpClient().DerivePrivateKey(salt, userName, password);
 			Assert.AreEqual("e2db59181003e48e326292b3b307a1173a5f1fd12c6ffde55f7289503065fd6c", privateKey);
 
 			// verifier
-			var verifier = SrpClient.DeriveVerifier(privateKey);
+			var verifier = new SrpClient().DeriveVerifier(privateKey);
 			Assert.AreEqual("622dad56d6c282a949f9d2702941a9866b7dd277af92a6e538b2d7cca42583275a2f4b64bd61369a24b23170223faf212e2f3bdddc529204c61055687c4162aa2cd0fd41ced0186406b8a6dda4802fa941c54f5115ca69953a8e265210349a4cb89dda3febc96c86df08a87823235ff6c87a170cc1618f38ec493e758e2cac4c04db3dcdac8656458296dbcc3599fc1f66cde1e62e477dd1696c65dbeb413d8ed832adc7304e68566b46a7849126eea62c95d5561306f76fe1f8a77a3bd85db85e6b0262064d665890ff46170f96ce403a9b485abe387e91ca85e3522d6276e2fff41754d57a71dee6da62aea614725da100631efd7442cf68a294001d8134e9", verifier);
 		}
 
 		[TestMethod]
 		public void SrpClientGeneratesEphemeralValue()
 		{
-			var ephemeral = SrpClient.GenerateEphemeral();
+			var ephemeral = new SrpClient().GenerateEphemeral();
 			Assert.IsNotNull(ephemeral.Public);
 			Assert.AreNotEqual(string.Empty, ephemeral.Public);
 
@@ -333,7 +333,7 @@ namespace Zyan.Tests
 			var clientSessionKey = SrpInteger.FromHex("b0c6a3e44d418636c4b0a8f0ff18f1f31621a703e3fae2220897b8bbc30f6e22");
 			var clientSessionProof = SrpInteger.FromHex("0ad3f708a49e44a46ca392ee4f6277d5c27dbc1147082fff8ac979ce6f7be732");
 
-			var clientSession = SrpClient.DeriveSession(clientEphemeralSecret, serverEphemeralPublic, salt, username, privateKey);
+			var clientSession = new SrpClient().DeriveSession(clientEphemeralSecret, serverEphemeralPublic, salt, username, privateKey);
 			Assert.IsNotNull(clientSession);
 			Assert.AreEqual(clientSessionKey.ToHex(), clientSession.Key);
 			Assert.AreEqual(clientSessionProof.ToHex(), clientSession.Proof);
@@ -350,7 +350,7 @@ namespace Zyan.Tests
 			var clientSessionKey = "eb6ad82490fc5a31f3103e231540efa51cce4ae6c3c46102be7102151d778fb3";
 			var clientSessionProof = "392bf92426f122c4f9492c64c2b8ffd354787c73eb31c467eb1acc0c98983c48";
 
-			var clientSession = SrpClient.DeriveSession(clientEphemeralSecret, serverEphemeralPublic, salt, username, privateKey);
+			var clientSession = new SrpClient().DeriveSession(clientEphemeralSecret, serverEphemeralPublic, salt, username, privateKey);
 			Assert.IsNotNull(clientSession);
 			Assert.AreEqual(clientSessionKey, clientSession.Key);
 			Assert.AreEqual(clientSessionProof, clientSession.Proof);
@@ -360,7 +360,7 @@ namespace Zyan.Tests
 		public void SrpServerGeneratesEphemeralValue()
 		{
 			var verifier = "622dad56d6c282a949f9d2702941a9866b7dd277af92a6e538b2d7cca42583275a2f4b64bd61369a24b23170223faf212e2f3bdddc529204c61055687c4162aa2cd0fd41ced0186406b8a6dda4802fa941c54f5115ca69953a8e265210349a4cb89dda3febc96c86df08a87823235ff6c87a170cc1618f38ec493e758e2cac4c04db3dcdac8656458296dbcc3599fc1f66cde1e62e477dd1696c65dbeb413d8ed832adc7304e68566b46a7849126eea62c95d5561306f76fe1f8a77a3bd85db85e6b0262064d665890ff46170f96ce403a9b485abe387e91ca85e3522d6276e2fff41754d57a71dee6da62aea614725da100631efd7442cf68a294001d8134e9";
-			var ephemeral = SrpServer.GenerateEphemeral(verifier);
+			var ephemeral = new SrpServer().GenerateEphemeral(verifier);
 			Assert.IsNotNull(ephemeral.Public);
 			Assert.AreNotEqual(string.Empty, ephemeral.Public);
 
@@ -383,7 +383,7 @@ namespace Zyan.Tests
 			var serverSessionKey = "b5ef4d6a5fb1d56f4efe99212cffd858fcdca100907f61f962a751588e2cf564";
 			var serverSessionProof = "3f2718e7295c6cd54e35e3d4aed541daf799d4941e7dae87d2caa817651c5774";
 
-			var serverSession = SrpServer.DeriveSession(serverSecretEphemeral, clientPublicEphemeral, salt, username, verifier, clientSessionProof);
+			var serverSession = new SrpServer().DeriveSession(serverSecretEphemeral, clientPublicEphemeral, salt, username, verifier, clientSessionProof);
 			Assert.IsNotNull(serverSession);
 			Assert.AreEqual(serverSessionKey, serverSession.Key);
 			Assert.AreEqual(serverSessionProof, serverSession.Proof);
@@ -401,7 +401,7 @@ namespace Zyan.Tests
 			var serverSessionKey = "bd62528eef34d53ab2c473f14357615e9224ab04ac8489b52ad7691ad0562d2d";
 			var serverSessionProof = "4f9e07d544222de11b7082edc0a98fa9f906aa38ebcfaac8371381a10eca931b";
 
-			var serverSession = SrpServer.DeriveSession(serverSecretEphemeral, clientPublicEphemeral, salt, username, verifier, clientSessionProof);
+			var serverSession = new SrpServer().DeriveSession(serverSecretEphemeral, clientPublicEphemeral, salt, username, verifier, clientSessionProof);
 			Assert.IsNotNull(serverSession);
 			Assert.AreEqual(serverSessionKey, serverSession.Key);
 			Assert.AreEqual(serverSessionProof, serverSession.Proof);
@@ -420,27 +420,41 @@ namespace Zyan.Tests
 				Proof = clientSessionProof,
 			};
 
-			SrpClient.VerifySession(clientEphemeralPublic, clientSession, serverSessionProof);
+			new SrpClient().VerifySession(clientEphemeralPublic, clientSession, serverSessionProof);
 		}
 
 		[TestMethod]
 		public void SrpShouldAuthenticateAUser()
 		{
-			// https://github.com/LinusU/secure-remote-password/blob/master/test.js
-			var username = "linus@folkdatorn.se";
-			var password = "$uper$ecure";
+			// default parameters, taken from https://github.com/LinusU/secure-remote-password/blob/master/test.js
+			SrpAuthentication("linus@folkdatorn.se", "$uper$ecure");
+
+			// sha512, 512-bit prime number
+			var parameters = SrpParameters.Create<SHA512>("D4C7F8A2B32C11B8FBA9581EC4BA4F1B04215642EF7355E37C0FC0443EF756EA2C6B8EEB755A1C723027663CAA265EF785B8FF6A9B35227A52D86633DBDFCA43", "03");
+			SrpAuthentication("yallie@yandex.ru", "h4ck3r$", parameters);
+
+			// md5, 1024-bit prime number from wikipedia (generated using "openssl dhparam -text 1024")
+			parameters = SrpParameters.Create<MD5>("00c037c37588b4329887e61c2da3324b1ba4b81a63f9748fed2d8a410c2fc21b1232f0d3bfa024276cfd88448197aae486a63bfca7b8bf7754dfb327c7201f6fd17fd7fd74158bd31ce772c9f5f8ab584548a99a759b5a2c0532162b7b6218e8f142bce2c30d7784689a483e095e701618437913a8c39c3dd0d4ca3c500b885fe3", "07");
+			SrpAuthentication("bozo", "md5-is-not-secure", parameters);
+		}
+
+		private void SrpAuthentication(string username, string password, SrpParameters parameters = null)
+		{
+			// use default parameters if not specified: sha256, 2048-bit prime number
+			var client = new SrpClient(parameters);
+			var server = new SrpServer(parameters);
 
 			// sign up
-			var salt = SrpClient.GenerateSalt();
-			var privateKey = SrpClient.DerivePrivateKey(salt, username, password);
-			var verifier = SrpClient.DeriveVerifier(privateKey);
+			var salt = client.GenerateSalt();
+			var privateKey = client.DerivePrivateKey(salt, username, password);
+			var verifier = client.DeriveVerifier(privateKey);
 
 			// authenticate
-			var clientEphemeral = SrpClient.GenerateEphemeral();
-			var serverEphemeral = SrpServer.GenerateEphemeral(verifier);
-			var clientSession = SrpClient.DeriveSession(clientEphemeral.Secret, serverEphemeral.Public, salt, username, privateKey);
-			var serverSession = SrpServer.DeriveSession(serverEphemeral.Secret, clientEphemeral.Public, salt, username, verifier, clientSession.Proof);
-			SrpClient.VerifySession(clientEphemeral.Public, clientSession, serverSession.Proof);
+			var clientEphemeral = client.GenerateEphemeral();
+			var serverEphemeral = server.GenerateEphemeral(verifier);
+			var clientSession = client.DeriveSession(clientEphemeral.Secret, serverEphemeral.Public, salt, username, privateKey);
+			var serverSession = server.DeriveSession(serverEphemeral.Secret, clientEphemeral.Public, salt, username, verifier, clientSession.Proof);
+			client.VerifySession(clientEphemeral.Public, clientSession, serverSession.Proof);
 
 			// make sure both the client and the server have the same session key
 			Assert.AreEqual(clientSession.Key, serverSession.Key);
@@ -448,7 +462,7 @@ namespace Zyan.Tests
 
 		public void SrpStressTest()
 		{
-			// takes about 25 seconds on my machine
+			// takes about 30 seconds on my machine
 			for (var i = 0; i < 100; i++)
 			{
 				SrpShouldAuthenticateAUser();

@@ -3,7 +3,7 @@
 namespace Zyan.Communication.Security.SecureRemotePassword
 {
 	/// <summary>
-	/// Secure Remote Protocol parameters.
+	/// SRP-6a protocol parameters.
 	/// </summary>
 	public class SrpParameters
 	{
@@ -14,15 +14,35 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		{
 			N = SrpInteger.FromHex(LargeSafePrime);
 			G = SrpInteger.FromHex("02");
-			H = SrpHash<SHA256>.HashFunction;
-			K = H(N, G);
-			HashSizeBytes = SrpHash<SHA256>.HashSizeBytes;
+			Hasher = new SrpHash<SHA256>();
 		}
 
 		/// <summary>
-		/// Gets or sets the default SRP protocol parameters.
+		/// Creates the SRP-6a parameters using the specified hash function.
 		/// </summary>
-		public static SrpParameters Default { get; set; } = new SrpParameters();
+		/// <typeparam name="T"></typeparam>
+		/// <param name="largeSafePrime">Large safe prime number N (hexadecimal).</param>
+		/// <param name="generator">The generator value modulo N (hexadecimal).</param>
+		public static SrpParameters Create<T>(string largeSafePrime = null, string generator = null)
+			where T : HashAlgorithm
+		{
+			var result = new SrpParameters
+			{
+				Hasher = new SrpHash<T>()
+			};
+
+			if (largeSafePrime != null)
+			{
+				result.N = SrpInteger.FromHex(largeSafePrime);
+			}
+
+			if (generator != null)
+			{
+				result.G = SrpInteger.FromHex(generator);
+			}
+
+			return result;
+		}
 
 		// taken from the secure-remote-password npm package
 		private const string LargeSafePrime = @"
@@ -48,18 +68,23 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		public SrpInteger G { get; set; }
 
 		/// <summary>
-		/// Gets or sets the hashing function.
+		/// Gets or sets the SRP hasher.
 		/// </summary>
-		public SrpHash H { get; set; }
+		public ISrpHash Hasher { get; set; }
 
 		/// <summary>
-		/// Gets or sets the multiplier parameter (k = H(N, g) in SRP-6a, k = 3 for legacy SRP-6).
+		/// Gets the hashing function.
 		/// </summary>
-		public SrpInteger K { get; set; }
+		public SrpHash H => Hasher.HashFunction;
 
 		/// <summary>
-		/// Gets or sets the hash size in bytes.
+		/// Gets the hash size in bytes.
 		/// </summary>
-		public int HashSizeBytes { get; set; }
+		public int HashSizeBytes => Hasher.HashSizeBytes;
+
+		/// <summary>
+		/// Gets the multiplier parameter (k = H(N, g) in SRP-6a, k = 3 for legacy SRP-6).
+		/// </summary>
+		public SrpInteger K => H(N, G);
 	}
 }
