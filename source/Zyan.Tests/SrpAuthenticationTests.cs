@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Security.Cryptography;
@@ -338,6 +340,54 @@ namespace Zyan.Tests
 		}
 
 		#endregion
+
+		[TestMethod]
+		public void UnknownUsernameReturnsSameSaltAndNewEphemeralOnEachRequest()
+		{
+			var accounts = new SampleAccountRepository();
+			var authProvider = new SrpAuthenticationProvider(accounts);
+			var srpClient = new SrpClient();
+			var sessionId = Guid.NewGuid();
+			var request = new Hashtable
+			{
+				{ SrpProtocolConstants.SRP_STEP_NUMBER, 1 },
+				{ SrpProtocolConstants.SRP_SESSION_ID, sessionId.ToString() },
+				{ SrpProtocolConstants.SRP_USERNAME, "UnknownUser" },
+				{ SrpProtocolConstants.SRP_CLIENT_PUBLIC_EPHEMERAL, srpClient.GenerateEphemeral().Public },
+			};
+
+			var authRequest = new AuthRequestMessage
+			{
+				Credentials = request,
+				ClientAddress = "localhost",
+				SessionID = sessionId
+			};
+
+			var response = authProvider.Authenticate(authRequest);
+			Assert.IsNotNull(response);
+			Assert.IsNotNull(response.Parameters);
+			Assert.IsNotNull(response.Parameters[SrpProtocolConstants.SRP_SALT]);
+			Assert.IsNotNull(response.Parameters[SrpProtocolConstants.SRP_SERVER_PUBLIC_EPHEMERAL]);
+
+			// step1 is not performed because the user is unknown
+			Assert.IsFalse(authProvider.PendingAuthentications.Any());
+
+			// server returns salt even for the unknown user name so we can't tell whether the user exists or not
+			var salt1 = (string)response.Parameters[SrpProtocolConstants.SRP_SALT];
+			var ephemeral1 = (string)response.Parameters[SrpProtocolConstants.SRP_SERVER_PUBLIC_EPHEMERAL];
+
+			response = authProvider.Authenticate(authRequest);
+			Assert.IsNotNull(response);
+			Assert.IsNotNull(response.Parameters);
+			Assert.IsNotNull(response.Parameters[SrpProtocolConstants.SRP_SALT]);
+			Assert.IsNotNull(response.Parameters[SrpProtocolConstants.SRP_SERVER_PUBLIC_EPHEMERAL]);
+			var salt2 = (string)response.Parameters[SrpProtocolConstants.SRP_SALT];
+			var ephemeral2 = (string)response.Parameters[SrpProtocolConstants.SRP_SERVER_PUBLIC_EPHEMERAL];
+
+			// server returns the same salt for every unknown username, but new ephemeral on each request
+			Assert.AreEqual(salt1, salt2);
+			Assert.AreNotEqual(ephemeral1, ephemeral2);
+		}
 
 		[TestMethod]
 		public void ValidLoginUsingTcpDuplexChannel()

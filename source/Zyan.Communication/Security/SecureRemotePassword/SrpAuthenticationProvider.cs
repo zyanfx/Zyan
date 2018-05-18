@@ -27,11 +27,11 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		private SrpServer SrpServer { get; set; }
 
 		// fixme: add a timeout to clean up pending data from step1 requests not followed by step2
-		private ConcurrentDictionary<string, Step1Data> PendingAuthentications { get; } =
+		internal ConcurrentDictionary<string, Step1Data> PendingAuthentications { get; } =
 			new ConcurrentDictionary<string, Step1Data>();
 
 		// variables produced on the first authentication step
-		private class Step1Data
+		internal class Step1Data
 		{
 			public string UserName { get; set; }
 			public string Salt { get; set; }
