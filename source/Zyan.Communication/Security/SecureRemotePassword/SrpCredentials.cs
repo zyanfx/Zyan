@@ -31,7 +31,6 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 			var request1 = new Hashtable
 			{
 				{ SrpProtocolConstants.SRP_STEP_NUMBER, 1 },
-				{ SrpProtocolConstants.SRP_SESSION_ID, sessionId.ToString() },
 				{ SrpProtocolConstants.SRP_USERNAME, UserName },
 				{ SrpProtocolConstants.SRP_CLIENT_PUBLIC_EPHEMERAL, clientEphemeral.Public },
 			};
@@ -47,7 +46,6 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 			var request2 = new Hashtable
 			{
 				{ SrpProtocolConstants.SRP_STEP_NUMBER, 2 },
-				{ SrpProtocolConstants.SRP_SESSION_ID, sessionId.ToString() },
 				{ SrpProtocolConstants.SRP_CLIENT_SESSION_PROOF, clientSession.Proof },
 			};
 

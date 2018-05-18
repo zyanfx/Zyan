@@ -20,11 +20,14 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		{
 			AuthRepository = repository;
 			SrpServer = new SrpServer(parameters);
+			UnknownUserSalt = new SrpClient(parameters).GenerateSalt();
 		}
 
 		private ISrpAccountRepository AuthRepository { get; set; }
 
 		private SrpServer SrpServer { get; set; }
+
+		private string UnknownUserSalt { get; set; }
 
 		// fixme: add a timeout to clean up pending data from step1 requests not followed by step2
 		internal ConcurrentDictionary<string, Step1Data> PendingAuthentications { get; } =
@@ -49,12 +52,9 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 			if (!authRequest.Credentials.ContainsKey(SrpProtocolConstants.SRP_STEP_NUMBER))
 				return Error("Authentication step not specified");
 
-			if (!authRequest.Credentials.ContainsKey(SrpProtocolConstants.SRP_SESSION_ID))
-				return Error("Authentication session identity is not specified");
-
 			// step number and session identity
 			var step = Convert.ToInt32(authRequest.Credentials[SrpProtocolConstants.SRP_STEP_NUMBER]);
-			var sessionId = Convert.ToString(authRequest.Credentials[SrpProtocolConstants.SRP_SESSION_ID]);
+			var sessionId = authRequest.SessionID.ToString();
 
 			// first step never fails: User -> Host: I, A = g^a (identifies self, a = random number)
 			if (step == 1)
@@ -82,7 +82,7 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 				}
 
 				// generate fake salt and B values so that attacker cannot tell whether the given user exists or not
-				var fakeSalt = SrpServer.Parameters.H(userName).ToHex();
+				var fakeSalt = SrpServer.Parameters.H(userName + UnknownUserSalt).ToHex();
 				var fakeEphemeral = SrpServer.GenerateEphemeral(fakeSalt);
 				return ResponseStep1(fakeSalt, fakeEphemeral.Public);
 			}

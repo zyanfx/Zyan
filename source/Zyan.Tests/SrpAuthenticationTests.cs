@@ -351,7 +351,6 @@ namespace Zyan.Tests
 			var request = new Hashtable
 			{
 				{ SrpProtocolConstants.SRP_STEP_NUMBER, 1 },
-				{ SrpProtocolConstants.SRP_SESSION_ID, sessionId.ToString() },
 				{ SrpProtocolConstants.SRP_USERNAME, "UnknownUser" },
 				{ SrpProtocolConstants.SRP_CLIENT_PUBLIC_EPHEMERAL, srpClient.GenerateEphemeral().Public },
 			};

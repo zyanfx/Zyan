@@ -11,11 +11,6 @@
 		public const string SRP_STEP_NUMBER = "#";
 
 		/// <summary>
-		/// The SRP session identity.
-		/// </summary>
-		public const string SRP_SESSION_ID = "*";
-
-		/// <summary>
 		/// The SRP username.
 		/// </summary>
 		public const string SRP_USERNAME = "I";
