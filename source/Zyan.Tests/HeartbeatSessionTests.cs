@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Security.Principal;
-using System.Text;
 using System.Threading;
 using Zyan.Communication;
 using Zyan.Communication.Security;
-using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Null;
 
 namespace Zyan.Tests
@@ -71,6 +65,7 @@ namespace Zyan.Tests
 		[ClassCleanupNonStatic]
 		public void Cleanup()
 		{
+			StopServer();
 		}
 
 		[ClassInitialize]
@@ -124,7 +119,7 @@ namespace Zyan.Tests
 			{
 				conn.PollingInterval = TimeSpan.FromMilliseconds(5);
 				conn.PollingEnabled = true;
-				Thread.Sleep(100);
+				Thread.Sleep(500);
 			}
 
 			// validate heartbeat
