@@ -14,9 +14,11 @@ build:
 
 before_test:
 - where vstest.console
+- where nunit-console.exe
 - copy C:\projects\zyan\bin\UnitTests\Zyan.Communication.dll "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\*.*"
 - copy C:\projects\zyan\bin\UnitTests\Zyan.Tests.dll "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\*.*"
 - copy C:\projects\zyan\bin\UnitTests\InterLinq.* "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\*.*"
+- copy C:\projects\zyan\bin\UnitTests3\*.* C:\Tools\NUnit\bin\
 - cd C:\projects\zyan\bin\UnitTests\
 - InterLinq.UnitTests.Server.exe install
 - InterLinq.UnitTests.Server.exe start
@@ -25,11 +27,10 @@ test_script:
 - OpenCover.Console.exe -register:user -target:"C:\projects\zyan\bin\UnitTests\IntegrationTest_DistributedEvents.exe" -filter:"+[Zyan*]*" -output:".\ZyanIntegrationTestCoverage.xml"
 - OpenCover.Console.exe -register:user -target:"vstest.console.exe" -targetargs:"/logger:Appveyor C:\projects\zyan\bin\UnitTests\Zyan.Tests.dll" -filter:"+[*]* -[MemoDb]*" -output:".\ZyanUnitTestCoverage.xml"
 - OpenCover.Console.exe -register:user -target:"vstest.console.exe" -targetargs:"/logger:Appveyor C:\projects\zyan\bin\UnitTests\InterLinq.UnitTests.dll" -output:".\InterLinqUnitTestCoverage.xml"
-- rem OpenCover.Console.exe -register:user -target:"nunit3-console.exe" -targetargs:"C:\projects\zyan\bin\UnitTests3\Zyan.Tests.Fx3.dll --result=myresults.xml;format=AppVeyor" -output:".\ZyanUnitTestCoverageFx3.xml"
+- nunit-console.exe C:\projects\zyan\bin\UnitTests3\Zyan.Tests.Fx3.dll /domain=None /noshadow 
 
 after_test:
 - codecov -f "ZyanIntegrationTestCoverage.xml"
 - codecov -f "ZyanUnitTestCoverage.xml"
 - codecov -f "InterLinqUnitTestCoverage.xml"
-- rem codecov -f "ZyanUnitTestCoverageFx3.xml"
 - C:\projects\zyan\bin\UnitTests\InterLinq.UnitTests.Server.exe stop
