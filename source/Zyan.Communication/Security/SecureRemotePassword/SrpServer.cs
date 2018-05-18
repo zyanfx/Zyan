@@ -19,7 +19,7 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		/// <summary>
 		/// Gets or sets the protocol parameters.
 		/// </summary>
-		private SrpParameters Parameters { get; set; }
+		internal SrpParameters Parameters { get; set; }
 
 		/// <summary>
 		/// Generates the ephemeral value from the given verifier.

@@ -277,7 +277,9 @@
     <Compile Include="Security\SecureRemotePassword\ISrpAccount.cs" />
     <Compile Include="Security\SecureRemotePassword\ISrpAccountRepository.cs" />
     <Compile Include="Security\SecureRemotePassword\ISrpHash.cs" />
+    <Compile Include="Security\SecureRemotePassword\SrpAuthenticationProvider.cs" />
     <Compile Include="Security\SecureRemotePassword\SrpClient.cs" />
+    <Compile Include="Security\SecureRemotePassword\SrpCredentials.cs" />
     <Compile Include="Security\SecureRemotePassword\SrpEphemeral.cs" />
     <Compile Include="Security\SecureRemotePassword\SrpHash.cs" />
     <Compile Include="Security\SecureRemotePassword\SrpInteger.cs" />
