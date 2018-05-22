@@ -23,7 +23,8 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		/// <typeparam name="T"></typeparam>
 		/// <param name="largeSafePrime">Large safe prime number N (hexadecimal).</param>
 		/// <param name="generator">The generator value modulo N (hexadecimal).</param>
-		public static SrpParameters Create<T>(string largeSafePrime = null, string generator = null)
+		/// <param name="padGenerator">If true, pad generator to the same length as N, as required by RFC5054 (incompatible with secure-remote-password npm module).</param>
+		public static SrpParameters Create<T>(string largeSafePrime = null, string generator = null, bool padGenerator = false)
 			where T : HashAlgorithm
 		{
 			var result = new SrpParameters
@@ -39,6 +40,11 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 			if (generator != null)
 			{
 				result.G = SrpInteger.FromHex(generator);
+			}
+
+			if (padGenerator)
+			{
+				result.G = new SrpInteger(result.G, result.N.HexLength);
 			}
 
 			return result;

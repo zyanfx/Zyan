@@ -53,7 +53,10 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 
 		private BigInteger Value { get; set; }
 
-		private int? HexLength { get; set; }
+		/// <summary>
+		/// Gets the hexadecimal length.
+		/// </summary>
+		internal int? HexLength { get; private set; }
 
 		/// <summary>
 		/// Generates the random integer number.
@@ -126,9 +129,24 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		/// Returns the byte array representing the given value in big endian encoding.
 		/// </summary>
 		/// <remarks>
-		/// Skips leading zeros produced by BigInteger.ToByteArray(), if any.
+		/// Skips extra leading zeros produced by BigInteger.ToByteArray(), if any.
+		/// Pads the resulting value with leading zeros to match the HexLength property.
 		/// </remarks>
-		public byte[] ToByteArray() => Value.ToByteArray().Reverse().SkipWhile(v => v == 0).ToArray();
+		public byte[] ToByteArray()
+		{
+			var array = Value.ToByteArray().Reverse().SkipWhile(v => v == 0).ToArray();
+			if (!HexLength.HasValue || HexLength.Value <= array.Length * 2)
+			{
+				// no padding required
+				return array;
+			}
+
+			// pad with leading zeros
+			var length = HexLength.Value / 2;
+			var result = new byte[length];
+			Buffer.BlockCopy(array, 0, result, length - array.Length, array.Length);
+			return result;
+		}
 
 		/// <summary>
 		/// Performs an implicit conversion from <see cref="SrpInteger"/> to <see cref="string"/>.
@@ -287,7 +305,8 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 				hex = "0";
 			}
 
-			return new SrpInteger(hex, hex.Trim(' ', '-').Length);
+			var hexLength = NormalizeWhitespace(hex).Trim(' ', '-').Length;
+			return new SrpInteger(hex, hexLength);
 		}
 
 		/// <inheritdoc/>
