@@ -21,6 +21,11 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		/// </summary>
 		public int HashSizeBytes { get; } = Hasher.HashSize / 8;
 
+		/// <summary>
+		/// Gets the name of the algorithm.
+		/// </summary>
+		public string AlgorithmName { get; } = typeof(T).Name;
+
 		private static SrpInteger ComputeHash(params object[] values) =>
 			ComputeHash(Combine(values.Select(v => GetBytes(v))));
 

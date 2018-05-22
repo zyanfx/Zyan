@@ -21,5 +21,10 @@
 		/// Gets the hash size in bytes.
 		/// </summary>
 		int HashSizeBytes { get; }
+
+		/// <summary>
+		/// Gets the name of the algorithm.
+		/// </summary>
+		string AlgorithmName { get; }
 	}
 }

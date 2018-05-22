@@ -92,5 +92,8 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		/// Gets the multiplier parameter (k = H(N, g) in SRP-6a, k = 3 for legacy SRP-6).
 		/// </summary>
 		public SrpInteger K => H(N, G);
+
+		/// <inheritdoc/>
+		public override string ToString() => $"SrpParameters.Create<{Hasher.AlgorithmName}>(\"{N.ToHex()}\", \"{G.ToHex()}\")";
 	}
 }
