@@ -4,17 +4,17 @@ using System.Collections;
 namespace Zyan.Communication.Security.SecureRemotePassword
 {
 	/// <summary>
-	/// Client-side: authentication credentials for the SRP-6a protocol.
+	/// Client-side: credentials for the SRP-6a authentication protocol.
 	/// </summary>
-	public class SrpAuthCredentials : AuthCredentials
+	public class SrpCredentials : AuthCredentials
 	{
 		/// <summary>
-		/// Initializes a new instance of the <see cref="SrpAuthCredentials"/> class.
+		/// Initializes a new instance of the <see cref="SrpCredentials"/> class.
 		/// </summary>
 		/// <param name="userName">Name of the user.</param>
 		/// <param name="password">The password.</param>
 		/// <param name="parameters">Optional SRP-6a protocol parameters.</param>
-		public SrpAuthCredentials(string userName, string password, SrpParameters parameters = null)
+		public SrpCredentials(string userName, string password, SrpParameters parameters = null)
 		{
 			UserName = userName;
 			Password = password;

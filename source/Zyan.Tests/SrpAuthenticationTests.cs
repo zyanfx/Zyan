@@ -407,7 +407,7 @@ namespace Zyan.Tests
 		{
 			var url = "tcpex://localhost:8090/CustomAuthenticationTestHost_TcpDuplex";
 			var protocol = new TcpDuplexClientProtocolSetup(true);
-			var credentials = new SrpAuthCredentials(UserName, Password);
+			var credentials = new SrpCredentials(UserName, Password);
 
 			using (var connection = new ZyanConnection(url, protocol, credentials, true, true))
 			{
@@ -458,7 +458,7 @@ namespace Zyan.Tests
 		{
 			var url = "tcp://localhost:8091/CustomAuthenticationTestHost_TcpSimplex";
 			var protocol = new TcpCustomClientProtocolSetup(true);
-			var credentials = new SrpAuthCredentials(UserName, Password, CustomSrpParameters);
+			var credentials = new SrpCredentials(UserName, Password, CustomSrpParameters);
 
 			using (var connection = new ZyanConnection(url, protocol, credentials, true, true))
 			{
