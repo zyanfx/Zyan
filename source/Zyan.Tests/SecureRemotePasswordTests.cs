@@ -147,22 +147,35 @@ namespace Zyan.Tests
 			var m = SrpInteger.FromHex("1000");
 
 			var result = p5.ModPow(x3, m);
-			Assert.AreEqual("7d", result.ToHex());
+			Assert.AreEqual("007d", result.ToHex());
 
 			result = p5.ModPow(x33, m);
-			Assert.AreEqual("2bd", result.ToHex());
+			Assert.AreEqual("02bd", result.ToHex());
 
 			result = p5.ModPow(x90, m);
-			Assert.AreEqual("dc1", result.ToHex());
+			Assert.AreEqual("0dc1", result.ToHex());
 
 			result = n5.ModPow(x3, m);
-			Assert.AreEqual("f83", result.ToHex());
+			Assert.AreEqual("0f83", result.ToHex());
 
 			result = n5.ModPow(x33, m);
-			Assert.AreEqual("d43", result.ToHex());
+			Assert.AreEqual("0d43", result.ToHex());
 
 			result = n5.ModPow(x90, m);
-			Assert.AreEqual("dc1", result.ToHex());
+			Assert.AreEqual("0dc1", result.ToHex());
+		}
+
+		[TestMethod]
+		public void SrpIntegerModPowRegressionTest()
+		{
+			var p = new SrpParameters();
+			var g = p.G;
+			var N = p.N;
+
+			var a = SrpInteger.FromHex("64e1124e73967bb4806cf5e3f151c574d0012147255e10fca02e9b4bafc8f4ba");
+			var A = g.ModPow(a, N);
+
+			Assert.AreEqual("07be00c7e6aa8198eddc42cc2f251901f3bc05795fefd5f40f90f0a6bfe66743954ef18ece62d229095a704197be18c0d1ca3a280381c8a53b42173df36867c29c564e8c974cf4ff4718547d27bd9c08eb9a909fb984e8e23a109eaf4f57a337c9cbe1609e35b9fddbc9f847825b1c37167cb3f10b3b284a7370323818571e6369e91b4ac6f6eedcdbc1c7d8d57b2020d43be7fec3df14a120c76d27ebabc8d93cdc555362a4c7c08a1052e67647e9f3f879846389672e7a5d6e1ff93940d4196bef451e8d6a3b410a5062ac29cee3783e9a5aeac9724ad1375a2189c3b5a8dbf671dfad990132d2e5b73eb5a2e3d2034b6b908210f5fe61272b2cf4d1e3a4aa", A.ToHex());
 		}
 
 		[TestMethod]
@@ -427,6 +440,42 @@ namespace Zyan.Tests
 		}
 
 		[TestMethod]
+		public void SrpServerDeriveSessionRegressionTest2()
+		{
+			// regression test:
+			var parameters = new SrpParameters();
+			var serverEphemeral = new SrpEphemeral
+			{
+				Secret = "54f5f01dc134a3decef47e5e74feb20ce60716965c1908aa422ec701e5c2ce23",
+				Public = "82725f1b950c2df044a0514f5d683df96e698bf0d8b916390065d287134e17ea9840defb2358c90f39dd192698ffdc89f2e3282945d5c375249716a17bb11b522aab471724af2beb4db07378a1027a70f10491422274ef36f7b451212990873726d5fae657f5877d8125c60676241b9fbc06f79b3f159c87b37facd6d3cf0999febe8fc24642e4fc40af4351d25dce5e0f47763ff6c64fad9fbe03ad30697a15489ae4d528042ce463519cfe21b4692c6ced32bba130d95a05ba1cd6be23fe3062902652e18d109297434a6d0b2525302d8500f8cb04601bbb307b1fe9385553b461e0d78ef502135fffac19a50347a813443066df8b39ee3d430a912e7bba4d",
+			};
+
+			var clientEphemeral = new SrpEphemeral
+			{
+				Secret = "64e1124e73967bb4806cf5e3f151c574d0012147255e10fca02e9b4bafc8f4ba",
+				Public = "7be00c7e6aa8198eddc42cc2f251901f3bc05795fefd5f40f90f0a6bfe66743954ef18ece62d229095a704197be18c0d1ca3a280381c8a53b42173df36867c29c564e8c974cf4ff4718547d27bd9c08eb9a909fb984e8e23a109eaf4f57a337c9cbe1609e35b9fddbc9f847825b1c37167cb3f10b3b284a7370323818571e6369e91b4ac6f6eedcdbc1c7d8d57b2020d43be7fec3df14a120c76d27ebabc8d93cdc555362a4c7c08a1052e67647e9f3f879846389672e7a5d6e1ff93940d4196bef451e8d6a3b410a5062ac29cee3783e9a5aeac9724ad1375a2189c3b5a8dbf671dfad990132d2e5b73eb5a2e3d2034b6b908210f5fe61272b2cf4d1e3a4aa",
+			};
+
+			var salt = "31c3af4879262b1ee85295480b14800672cbb59870e7ae1980a07ee56eaa25fc";
+			var username = "hello";
+			var privateKey = "d3f37035827919d8803d246d0a81dcf0118e84f85e45c4c06f2c362262422118";
+			var verifier = "1786105be4cde9793d4896047cd178260ded3a0623491d18b0e942469107012f0a8d67d40c41d5b4863233ee5cd6b765bf3bffd56d0b429445be5af163303d42ae5ced9ff29e3cd275eeba482d3dad3bac3d6f2cf2113c6be5c50dfd2e3a2a9a1bbf2d829d4a5538c36e94197dfce12e990d030a124ee77ebb843c416701d85f0e00f1001a93051aef27d6e7c7120d00f08c52e4b1ea99b050c6d4080d59c0080af439f9291d07e384f13d121c1374d71f0d168e6fbfab9408974bf652844c7ac07b77b5dbc3cb53cb89de9d7fdcaf33f21e1e73c16bdc487732b2773aa34da0777b1d057a8aa3fc3a0679661956fa2ee01f69bcc1535d381feaaa973e7d802c";
+			var clientSessionProof = "ee9c71ea4488b72bd96c8e69aaae0cbd70fa750c896215c6db959c839796800e";
+			var serverSessionKey = "e6d0e03b679da78b674eb918abf91933c037fd26a388e14f7da9f793c572daac";
+			var serverSessionProof = "217dcd1b390e8e70dffca771a68d0dd1fba7b91f405c7163fb5fc01ddb1d91b3";
+
+			var clientSession = new SrpClient(parameters).DeriveSession(clientEphemeral.Secret, serverEphemeral.Public, salt, username, privateKey);
+			Assert.IsNotNull(clientSession);
+			Assert.AreEqual(serverSessionKey, clientSession.Key);
+			Assert.AreEqual(clientSessionProof, clientSession.Proof);
+
+			var serverSession = new SrpServer(parameters).DeriveSession(serverEphemeral.Secret, clientEphemeral.Public, salt, username, verifier, clientSessionProof);
+			Assert.IsNotNull(serverSession);
+			Assert.AreEqual(serverSessionKey, serverSession.Key);
+			Assert.AreEqual(serverSessionProof, serverSession.Proof);
+		}
+
+		[TestMethod]
 		public void SrpClientVerifiesSession()
 		{
 			var clientEphemeralPublic = "30fca5854c2391faa219fd863487c31f2591f5ba9988ce5129319906929ff2d23bc4e24c3f36f6ed12034111881ca705b033edfb782a1714e0f4d892f17c7d8432a1089c311c3170848bba0a0f64930d3f097c670b08384f1641a73833edaf9d1493744e655043df0d68f0c18a1571cc1c07c41ad817b57c262f48dde991d413628c0f3fa1de55afcf2d87e994c7f6e25c07cf1a803d41f555158997cd8703da68a48e54598b5b4947cc661d5c0138a5ecaa55996d5d6b566578f9de3b1ca1e128ff223c290595252497835646b9f8c0e330f4d6a3e61f31ff3eb8e305f563cb112ca90942e770f94cd02396041ab4c47e0c58675ded8bb0026640f9723b4d67";
@@ -617,65 +666,9 @@ namespace Zyan.Tests
 			}
 		}
 
-		[TestMethod]
-		public void SrpServerDeriveSessionRegressionTest2()
-		{
-			// regression test:
-			var parameters = new SrpParameters();
-			var serverEphemeral = new SrpEphemeral
-			{
-				Secret = "54f5f01dc134a3decef47e5e74feb20ce60716965c1908aa422ec701e5c2ce23",
-				Public = "82725f1b950c2df044a0514f5d683df96e698bf0d8b916390065d287134e17ea9840defb2358c90f39dd192698ffdc89f2e3282945d5c375249716a17bb11b522aab471724af2beb4db07378a1027a70f10491422274ef36f7b451212990873726d5fae657f5877d8125c60676241b9fbc06f79b3f159c87b37facd6d3cf0999febe8fc24642e4fc40af4351d25dce5e0f47763ff6c64fad9fbe03ad30697a15489ae4d528042ce463519cfe21b4692c6ced32bba130d95a05ba1cd6be23fe3062902652e18d109297434a6d0b2525302d8500f8cb04601bbb307b1fe9385553b461e0d78ef502135fffac19a50347a813443066df8b39ee3d430a912e7bba4d",
-			};
-
-			var clientEphemeral = new SrpEphemeral
-			{
-				Secret = "64e1124e73967bb4806cf5e3f151c574d0012147255e10fca02e9b4bafc8f4ba",
-				Public = "7be00c7e6aa8198eddc42cc2f251901f3bc05795fefd5f40f90f0a6bfe66743954ef18ece62d229095a704197be18c0d1ca3a280381c8a53b42173df36867c29c564e8c974cf4ff4718547d27bd9c08eb9a909fb984e8e23a109eaf4f57a337c9cbe1609e35b9fddbc9f847825b1c37167cb3f10b3b284a7370323818571e6369e91b4ac6f6eedcdbc1c7d8d57b2020d43be7fec3df14a120c76d27ebabc8d93cdc555362a4c7c08a1052e67647e9f3f879846389672e7a5d6e1ff93940d4196bef451e8d6a3b410a5062ac29cee3783e9a5aeac9724ad1375a2189c3b5a8dbf671dfad990132d2e5b73eb5a2e3d2034b6b908210f5fe61272b2cf4d1e3a4aa",
-			};
-
-			var salt = "31c3af4879262b1ee85295480b14800672cbb59870e7ae1980a07ee56eaa25fc";
-			var username = "hello";
-			var privateKey = "d3f37035827919d8803d246d0a81dcf0118e84f85e45c4c06f2c362262422118";
-			var verifier = "1786105be4cde9793d4896047cd178260ded3a0623491d18b0e942469107012f0a8d67d40c41d5b4863233ee5cd6b765bf3bffd56d0b429445be5af163303d42ae5ced9ff29e3cd275eeba482d3dad3bac3d6f2cf2113c6be5c50dfd2e3a2a9a1bbf2d829d4a5538c36e94197dfce12e990d030a124ee77ebb843c416701d85f0e00f1001a93051aef27d6e7c7120d00f08c52e4b1ea99b050c6d4080d59c0080af439f9291d07e384f13d121c1374d71f0d168e6fbfab9408974bf652844c7ac07b77b5dbc3cb53cb89de9d7fdcaf33f21e1e73c16bdc487732b2773aa34da0777b1d057a8aa3fc3a0679661956fa2ee01f69bcc1535d381feaaa973e7d802c";
-			var clientSessionProof = "ee9c71ea4488b72bd96c8e69aaae0cbd70fa750c896215c6db959c839796800e";
-			var serverSessionKey = "e6d0e03b679da78b674eb918abf91933c037fd26a388e14f7da9f793c572daac";
-			var serverSessionProof = "????";
-
-			var clientSession = new SrpClient(parameters).DeriveSession(clientEphemeral.Secret, serverEphemeral.Public, salt, username, privateKey);
-			Assert.IsNotNull(clientSession);
-			Assert.AreEqual(serverSessionKey, clientSession.Key);
-			Assert.AreEqual(clientSessionProof, clientSession.Proof);
-
-			var serverSession = new SrpServer(parameters).DeriveSession(serverEphemeral.Secret, clientEphemeral.Public, salt, username, verifier, clientSessionProof);
-			Assert.IsNotNull(serverSession);
-			Assert.AreEqual(serverSessionKey, serverSession.Key);
-			Assert.AreEqual(serverSessionProof, serverSession.Proof);
-
-			//// regression test:
-			//var parameters = SrpParameters.Create<SHA384>("00c037c37588b4329887e61c2da3324b1ba4b81a63f9748fed2d8a410c2fc21b1232f0d3bfa024276cfd88448197aae486a63bfca7b8bf7754dfb327c7201f6fd17fd7fd74158bd31ce772c9f5f8ab584548a99a759b5a2c0532162b7b6218e8f142bce2c30d7784689a483e095e701618437913a8c39c3dd0d4ca3c500b885fe3", "07");
-			//var serverSecretEphemeral = "05247db71ffa84c3527324f3d56cf69a4ebfe1f8107513936ca9a58398d99324a58676663002f23501f457d573b30a3e";
-			//var clientEphemeral = new SrpEphemeral
-			//{
-			//	Public = "7788070eb649f9b6dcdf53d9191d0b862ad881915f4e687f4a7dd5a056e99641ae46f5c9e930db6d90e9e2def0611c6096b5d33397dc72a6e7e272cd3573027739168bdfbad8ec167400889221f5e52bab452df0d24ddd7a852041fa72d95b8e80e66a048f841fb7fb3bd8295c029454d08c51eb347be220033d2a3964f0838",
-			//	Secret = "",
-			//};
-
-			//var salt = "5fd350e3945b575e032f4c3d6fde1eb26f203d33a128198a2665170e60fbc368182ef8b5820c51d8d04d666176705519";
-			//var username = "bozo";
-			//var verifier = "a39c2d0801fee40d66591d46c77b4c3aeefff9165e6af6a67ec8fc830d8603f1af7f72ee9e226f81db21a16155dc575abe5fef4805df340ae436f014b5fabb32af2ac789af6bc7cf1553c76a21d95a26064b60b230502a84af39007598afc2faccd0d908291ccf414a3a40797dfb72710f5e94c57990e23a2047267ec40e7544";
-			//var clientSessionProof = "8ce290516a327cdd78a7c81c18970134ba40fbce75d6a7f913efd7cd2ef63fdf8a6fdaae743fb8379d0a136b6a9e908e";
-			//var serverSessionKey = "ebb2c36cedb4e524bba1a91e08df00d80df6e3e694225342df40a822251751323d4eb185d9c42d0b5efd3e5d8e59e230";
-			//var serverSessionProof = "????";
-
-			//var serverSession = new SrpServer(parameters).DeriveSession(serverSecretEphemeral, clientPublicEphemeral, salt, username, verifier, clientSessionProof);
-			//Assert.IsNotNull(serverSession);
-			//Assert.AreEqual(serverSessionKey, serverSession.Key);
-			//Assert.AreEqual(serverSessionProof, serverSession.Proof);
-		}
-
 		public void SrpStressTest()
 		{
+			// 1000 iterations = 592 seconds on my machine
 			for (var i = 0; i < 1000; i++)
 			{
 				SrpShouldAuthenticateAUser();

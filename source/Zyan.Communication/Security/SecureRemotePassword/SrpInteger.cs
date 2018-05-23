@@ -99,7 +99,7 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 			return new SrpInteger
 			{
 				Value = value,
-				HexLength = HexLength,
+				HexLength = modulus.HexLength,
 			};
 		}
 
