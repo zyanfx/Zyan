@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System;
+using System.Security.Cryptography;
 
 namespace Zyan.Communication.Security.SecureRemotePassword
 {
@@ -14,7 +15,9 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		{
 			N = SrpInteger.FromHex(LargeSafePrime);
 			G = SrpInteger.FromHex("02");
+			PaddedLength = N.HexLength.Value;
 			Hasher = new SrpHash<SHA256>();
+			PAD = i => i.Pad(PaddedLength);
 		}
 
 		/// <summary>
@@ -23,8 +26,8 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		/// <typeparam name="T"></typeparam>
 		/// <param name="largeSafePrime">Large safe prime number N (hexadecimal).</param>
 		/// <param name="generator">The generator value modulo N (hexadecimal).</param>
-		/// <param name="padGenerator">If true, pad generator to the same length as N, as required by RFC5054 (incompatible with secure-remote-password npm module).</param>
-		public static SrpParameters Create<T>(string largeSafePrime = null, string generator = null, bool padGenerator = false)
+		/// <param name="paddedLength">The hexadecimal length of N and g.</param>
+		public static SrpParameters Create<T>(string largeSafePrime = null, string generator = null, int? paddedLength = null)
 			where T : HashAlgorithm
 		{
 			var result = new SrpParameters
@@ -35,6 +38,7 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 			if (largeSafePrime != null)
 			{
 				result.N = SrpInteger.FromHex(largeSafePrime);
+				result.PaddedLength = result.N.HexLength.Value;
 			}
 
 			if (generator != null)
@@ -42,9 +46,9 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 				result.G = SrpInteger.FromHex(generator);
 			}
 
-			if (padGenerator)
+			if (paddedLength.HasValue)
 			{
-				result.G = new SrpInteger(result.G, result.N.HexLength);
+				result.PaddedLength = paddedLength.Value;
 			}
 
 			return result;
@@ -62,6 +66,11 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 			03CE5329 9CCC041C 7BC308D8 2A5698F3 A8D0C382 71AE35F8 E9DBFBB6
 			94B5C803 D89F7AE4 35DE236D 525F5475 9B65E372 FCD68EF2 0FA7111F
 			9E4AFF73";
+
+		/// <summary>
+		/// Gets or sets the length of the padded N and g values.
+		/// </summary>
+		public int PaddedLength { get; set; }
 
 		/// <summary>
 		/// Gets or sets the large safe prime number (N = 2q+1, where q is prime).
@@ -84,14 +93,19 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		public SrpHash H => Hasher.HashFunction;
 
 		/// <summary>
+		/// Pads the specified integer value.
+		/// </summary>
+		public Func<SrpInteger, SrpInteger> PAD { get; }
+
+		/// <summary>
 		/// Gets the hash size in bytes.
 		/// </summary>
 		public int HashSizeBytes => Hasher.HashSizeBytes;
 
 		/// <summary>
-		/// Gets the multiplier parameter (k = H(N, g) in SRP-6a, k = 3 for legacy SRP-6).
+		/// Gets the multiplier parameter: k = H(N, g) in SRP-6a (k = 3 for legacy SRP-6).
 		/// </summary>
-		public SrpInteger K => H(N, G);
+		public SrpInteger K => H(N, PAD(G));
 
 		/// <inheritdoc/>
 		public override string ToString() => $"SrpParameters.Create<{Hasher.AlgorithmName}>(\"{N.ToHex()}\", \"{G.ToHex()}\")";

@@ -51,12 +51,25 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		/// </summary>
 		public static SrpInteger Zero { get; } = new SrpInteger();
 
+		/// <summary>
+		/// Gets or sets the value.
+		/// </summary>
 		private BigInteger Value { get; set; }
 
 		/// <summary>
 		/// Gets the hexadecimal length.
 		/// </summary>
 		internal int? HexLength { get; private set; }
+
+		/// <summary>
+		/// Pads the value to the specified new hexadecimal length.
+		/// </summary>
+		/// <param name="newLength">The new length.</param>
+		public SrpInteger Pad(int newLength) => new SrpInteger
+		{
+			Value = Value,
+			HexLength = newLength,
+		};
 
 		/// <summary>
 		/// Generates the random integer number.
