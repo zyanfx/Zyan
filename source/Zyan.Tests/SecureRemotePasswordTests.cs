@@ -599,9 +599,41 @@ namespace Zyan.Tests
 			parameters = SrpParameters.Create<SHA384>("00c037c37588b4329887e61c2da3324b1ba4b81a63f9748fed2d8a410c2fc21b1232f0d3bfa024276cfd88448197aae486a63bfca7b8bf7754dfb327c7201f6fd17fd7fd74158bd31ce772c9f5f8ab584548a99a759b5a2c0532162b7b6218e8f142bce2c30d7784689a483e095e701618437913a8c39c3dd0d4ca3c500b885fe3", "07");
 			SrpAuthentication("bozo", "h4ck3r", parameters);
 
-			// sha1 hash function, default N and g values
-			parameters = SrpParameters.Create<SHA1>();
-			SrpAuthentication("hello", "world");
+			// sha1 hash function, default N and g values for all standard groups
+			SrpAuthenticationUsingStandardParameters<SHA1>("hello", "world");
+		}
+
+		// [Test, Explicit]
+		public void SrpStressTest()
+		{
+			// 100 iterations take ~10 minutes on my machine
+			for (var i = 0; i < 100; i++)
+			{
+				SrpShouldAuthenticateAUser();
+			}
+		}
+
+		// [Test, Explicit]
+		public void SrpUsingStandardParameters()
+		{
+			// takes ~42 seconds on my machine
+			SrpAuthenticationUsingStandardParameters<SHA1>("user", "password");
+			SrpAuthenticationUsingStandardParameters<SHA256>("LongUser", "stronger-password");
+			SrpAuthenticationUsingStandardParameters<SHA384>("root", "$hacker$");
+			SrpAuthenticationUsingStandardParameters<SHA512>("Administrator", "123456");
+			SrpAuthenticationUsingStandardParameters<MD5>("not-safe", "dont-use");
+		}
+
+		private void SrpAuthenticationUsingStandardParameters<T>(string username, string password) where T : HashAlgorithm
+		{
+			// test all standard groups using the same hashing algorithm
+			SrpAuthentication(username, password, SrpParameters.Create1024<T>());
+			SrpAuthentication(username, password, SrpParameters.Create1536<T>());
+			SrpAuthentication(username, password, SrpParameters.Create2048<T>());
+			SrpAuthentication(username, password, SrpParameters.Create3072<T>());
+			SrpAuthentication(username, password, SrpParameters.Create4096<T>());
+			SrpAuthentication(username, password, SrpParameters.Create6144<T>());
+			SrpAuthentication(username, password, SrpParameters.Create8192<T>());
 		}
 
 		private void SrpAuthentication(string username, string password, SrpParameters parameters = null)
@@ -663,15 +695,6 @@ namespace Zyan.Tests
 				Console.WriteLine($"Assert.AreEqual(serverSessionKey, serverSession.Key);");
 				Console.WriteLine($"Assert.AreEqual(serverSessionProof, serverSession.Proof);");
 				throw;
-			}
-		}
-
-		public void SrpStressTest()
-		{
-			// 1000 iterations = 592 seconds on my machine
-			for (var i = 0; i < 1000; i++)
-			{
-				SrpShouldAuthenticateAUser();
 			}
 		}
 	}
