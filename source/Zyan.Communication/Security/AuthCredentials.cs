@@ -35,7 +35,7 @@ namespace Zyan.Communication.Security
 		/// <summary>
 		/// Gets or sets the name of the user.
 		/// </summary>
-		public string UserName
+		public virtual string UserName
 		{
 			get { return (string)CredentialsHashtable[AuthRequestMessage.CREDENTIAL_USERNAME]; }
 			set { CredentialsHashtable[AuthRequestMessage.CREDENTIAL_USERNAME] = value; }
@@ -44,7 +44,7 @@ namespace Zyan.Communication.Security
 		/// <summary>
 		/// Gets or sets the password.
 		/// </summary>
-		public string Password
+		public virtual string Password
 		{
 			get { return (string)CredentialsHashtable[AuthRequestMessage.CREDENTIAL_PASSWORD]; }
 			set { CredentialsHashtable[AuthRequestMessage.CREDENTIAL_PASSWORD] = value; }
@@ -53,7 +53,7 @@ namespace Zyan.Communication.Security
 		/// <summary>
 		/// Gets or sets the domain.
 		/// </summary>
-		public string Domain
+		public virtual string Domain
 		{
 			get { return (string)CredentialsHashtable[AuthRequestMessage.CREDENTIAL_DOMAIN]; }
 			set { CredentialsHashtable[AuthRequestMessage.CREDENTIAL_DOMAIN] = value; }
@@ -62,7 +62,7 @@ namespace Zyan.Communication.Security
 		/// <summary>
 		/// Gets or sets the Windows security token.
 		/// </summary>
-		public string WindowsSecurityToken
+		public virtual string WindowsSecurityToken
 		{
 			get { return (string)CredentialsHashtable[AuthRequestMessage.CREDENTIAL_WINDOWS_SECURITY_TOKEN]; }
 			set { CredentialsHashtable[AuthRequestMessage.CREDENTIAL_WINDOWS_SECURITY_TOKEN] = value; }
