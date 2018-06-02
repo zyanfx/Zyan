@@ -54,6 +54,10 @@
     <Reference Include="Zyan.SafeDeserializationHelpers">
       <HintPath>..\packages\Zyan.SafeDeserializationHelpers.0.3.0\lib\net35\Zyan.SafeDeserializationHelpers.dll</HintPath>
     </Reference>
+    <Reference Include="srp">
+      <HintPath>..\packages\srp.1.0.0\lib\net45\srp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActivationType.cs" />

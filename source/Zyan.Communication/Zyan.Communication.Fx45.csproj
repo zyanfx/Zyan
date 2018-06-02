@@ -77,6 +77,10 @@
       <HintPath>..\packages\Zyan.SafeDeserializationHelpers.0.5.0\lib\net35\Zyan.SafeDeserializationHelpers.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="srp">
+      <HintPath>..\packages\srp.1.0.0\lib\net45\srp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActivationType.cs" />
@@ -291,17 +295,9 @@
     <Compile Include="Security\Exceptions\PasswordExpiredException.cs" />
     <Compile Include="Security\SecureRemotePassword\ISrpAccount.cs" />
     <Compile Include="Security\SecureRemotePassword\ISrpAccountRepository.cs" />
-    <Compile Include="Security\SecureRemotePassword\ISrpHash.cs" />
     <Compile Include="Security\SecureRemotePassword\SrpAuthenticationProvider.cs" />
-    <Compile Include="Security\SecureRemotePassword\SrpClient.cs" />
     <Compile Include="Security\SecureRemotePassword\SrpCredentials.cs" />
-    <Compile Include="Security\SecureRemotePassword\SrpEphemeral.cs" />
-    <Compile Include="Security\SecureRemotePassword\SrpHash.cs" />
-    <Compile Include="Security\SecureRemotePassword\SrpInteger.cs" />
-    <Compile Include="Security\SecureRemotePassword\SrpParameters.cs" />
     <Compile Include="Security\SecureRemotePassword\SrpProtocolConstants.cs" />
-    <Compile Include="Security\SecureRemotePassword\SrpServer.cs" />
-    <Compile Include="Security\SecureRemotePassword\SrpSession.cs" />
     <Compile Include="Security\WindowsSecurityTools.cs" />
     <Compile Include="CustomSerializationContainer.cs" />
     <Compile Include="SerializationHandlerRepository.cs" />

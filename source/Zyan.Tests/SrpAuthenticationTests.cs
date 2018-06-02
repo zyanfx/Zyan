@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Security.Cryptography;
+using SecureRemotePassword;
 using Zyan.Communication;
 using Zyan.Communication.Protocols.Tcp;
 using Zyan.Communication.Security;

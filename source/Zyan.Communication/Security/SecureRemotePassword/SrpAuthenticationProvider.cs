@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Security;
+using SecureRemotePassword;
 using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication.Security.SecureRemotePassword
@@ -19,11 +20,14 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 		public SrpAuthenticationProvider(ISrpAccountRepository repository, SrpParameters parameters = null)
 		{
 			AuthRepository = repository;
-			SrpServer = new SrpServer(parameters);
+			SrpParameters = parameters ?? new SrpParameters();
+			SrpServer = new SrpServer(SrpParameters);
 			UnknownUserSalt = new SrpClient(parameters).GenerateSalt();
 		}
 
 		private ISrpAccountRepository AuthRepository { get; set; }
+
+		private SrpParameters SrpParameters { get; set; }
 
 		private SrpServer SrpServer { get; set; }
 
@@ -82,7 +86,7 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 				}
 
 				// generate fake salt and B values so that attacker cannot tell whether the given user exists or not
-				var fakeSalt = SrpServer.Parameters.H(userName + UnknownUserSalt).ToHex();
+				var fakeSalt = SrpParameters.H(userName + UnknownUserSalt).ToHex();
 				var fakeEphemeral = SrpServer.GenerateEphemeral(fakeSalt);
 				return ResponseStep1(fakeSalt, fakeEphemeral.Public);
 			}

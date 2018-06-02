@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Cryptography;
-using Zyan.Communication.Security.SecureRemotePassword;
+using SecureRemotePassword;
 
 namespace Zyan.Tests
 {
