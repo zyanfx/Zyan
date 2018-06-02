@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Security.Cryptography;
+using System.Security.Principal;
 using SecureRemotePassword;
 using Zyan.Communication;
 using Zyan.Communication.Protocols.Tcp;
@@ -85,6 +86,11 @@ namespace Zyan.Tests
 				}
 
 				return null;
+			}
+
+			public IIdentity GetIdentity(ISrpAccount account)
+			{
+				return new GenericIdentity(account.UserName);
 			}
 
 			private class SrpAccount : ISrpAccount
@@ -401,6 +407,62 @@ namespace Zyan.Tests
 			// server returns the same salt for every unknown username, but new ephemeral on each request
 			Assert.AreEqual(salt1, salt2);
 			Assert.AreNotEqual(ephemeral1, ephemeral2);
+		}
+
+		[TestMethod]
+		public void AuthenticationProviderSetsAuthenticatedIdentity()
+		{
+			var accounts = new SampleAccountRepository();
+			var authProvider = new SrpAuthenticationProvider(accounts);
+			var srpClient = new SrpClient();
+			var sessionId = Guid.NewGuid();
+			var clientEphemeral = srpClient.GenerateEphemeral();
+			var request = new Hashtable
+			{
+				{ SrpProtocolConstants.SRP_STEP_NUMBER, 1 },
+				{ SrpProtocolConstants.SRP_USERNAME, UserName },
+				{ SrpProtocolConstants.SRP_CLIENT_PUBLIC_EPHEMERAL, clientEphemeral.Public },
+			};
+
+			var authRequest = new AuthRequestMessage
+			{
+				Credentials = request,
+				ClientAddress = "localhost",
+				SessionID = sessionId
+			};
+
+			var response = authProvider.Authenticate(authRequest);
+			Assert.IsNotNull(response);
+			Assert.IsNotNull(response.Parameters);
+			Assert.IsNotNull(response.Parameters[SrpProtocolConstants.SRP_SALT]);
+			Assert.IsNotNull(response.Parameters[SrpProtocolConstants.SRP_SERVER_PUBLIC_EPHEMERAL]);
+
+			// step1 is performed
+			Assert.IsTrue(authProvider.PendingAuthentications.Any());
+
+			// server returns salt even for the unknown user name so we can't tell whether the user exists or not
+			var salt = (string)response.Parameters[SrpProtocolConstants.SRP_SALT];
+			var serverPublicEphemeral = (string)response.Parameters[SrpProtocolConstants.SRP_SERVER_PUBLIC_EPHEMERAL];
+			var privateKey = srpClient.DerivePrivateKey(salt, UserName, Password);
+			var clientSession = srpClient.DeriveSession(clientEphemeral.Secret, serverPublicEphemeral, salt, UserName, privateKey);
+
+			// perform step2
+			authRequest.Credentials[SrpProtocolConstants.SRP_STEP_NUMBER] = 2;
+			authRequest.Credentials[SrpProtocolConstants.SRP_CLIENT_SESSION_PROOF] = clientSession.Proof;
+
+			// make sure that identity is set
+			response = authProvider.Authenticate(authRequest);
+			Assert.IsNotNull(response);
+			Assert.IsNotNull(response.Parameters);
+			Assert.IsNotNull(response.Parameters[SrpProtocolConstants.SRP_SERVER_SESSION_PROOF]);
+			Assert.IsTrue(response.Completed);
+			Assert.IsTrue(response.Success);
+			Assert.IsNotNull(response.AuthenticatedIdentity);
+			Assert.IsNotNull(response.AuthenticatedIdentity.IsAuthenticated);
+			Assert.AreEqual(response.AuthenticatedIdentity.Name, UserName);
+
+			var serverProof = (string)response.Parameters[SrpProtocolConstants.SRP_SERVER_SESSION_PROOF];
+			srpClient.VerifySession(clientEphemeral.Public, clientSession, serverProof);
 		}
 
 		[TestMethod]
