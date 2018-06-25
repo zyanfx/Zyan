@@ -58,6 +58,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.configuration" />
@@ -78,8 +79,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="srp">
-      <HintPath>..\packages\srp.1.0.0\lib\net45\srp.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\srp.1.0.1\lib\net45\srp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -65,8 +65,7 @@
       <HintPath>..\packages\Zyan.SafeDeserializationHelpers.0.5.0\lib\net35\Zyan.SafeDeserializationHelpers.dll</HintPath>
     </Reference>
     <Reference Include="srp">
-      <HintPath>..\packages\srp.1.0.0\lib\net35\srp.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\srp.1.0.1\lib\net35\srp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -113,6 +112,7 @@
     <None Include="DistributedEvents.GenericTest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Zyan.Communication\Zyan.Communication.Fx3.csproj">

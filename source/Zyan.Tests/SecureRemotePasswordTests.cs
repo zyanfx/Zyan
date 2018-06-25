@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Security.Cryptography;
 using SecureRemotePassword;
+using H = SecureRemotePassword.SrpParameters.SrpHashFunction;
 
 namespace Zyan.Tests
 {
@@ -169,8 +170,8 @@ namespace Zyan.Tests
 		public void SrpIntegerModPowRegressionTest()
 		{
 			var p = new SrpParameters();
-			var g = p.G;
-			var N = p.N;
+			var g = p.Generator;
+			var N = p.Prime;
 
 			var a = SrpInteger.FromHex("64e1124e73967bb4806cf5e3f151c574d0012147255e10fca02e9b4bafc8f4ba");
 			var A = g.ModPow(a, N);
@@ -247,21 +248,21 @@ namespace Zyan.Tests
 			var sample = string.Concat(parts);
 			var srpint = SrpInteger.FromHex(sample);
 
-			var md5 = new SrpHash<MD5>().HashFunction;
+			H md5 = new SrpHash<MD5>().ComputeHash;
 			var hashmd5 = SrpInteger.FromHex("34ada39bbabfa6e663f1aad3d7814121");
 			Assert.AreEqual(hashmd5, md5(srpint.ToHex().ToUpper()));
 			Assert.AreEqual(hashmd5, md5(sample));
 			Assert.AreEqual(hashmd5, md5(parts));
 			Assert.AreEqual(16, new SrpHash<MD5>().HashSizeBytes);
 
-			var sha256 = new SrpHash<SHA256>().HashFunction;
+			H sha256 = new SrpHash<SHA256>().ComputeHash;
 			var hash256 = SrpInteger.FromHex("1767fe8c94508ad3514b8332493fab5396757fe347023fc9d1fef6d26c3a70d3");
 			Assert.AreEqual(hash256, sha256(srpint.ToHex().ToUpper()));
 			Assert.AreEqual(hash256, sha256(sample));
 			Assert.AreEqual(hash256, sha256(parts));
 			Assert.AreEqual(256 / 8, new SrpHash<SHA256>().HashSizeBytes);
 
-			var sha512 = new SrpHash<SHA512>().HashFunction;
+			H sha512 = new SrpHash<SHA512>().ComputeHash;
 			var hash512 = SrpInteger.FromHex("f2406fd4b33b15a6b47ff78ccac7cd80eec7944092425b640d740e7dc695fdd42f583a9b4a4b98ffa5409680181999bfe319f2a3b50ddb111e8405019a8c552a");
 			Assert.AreEqual(hash512, sha512(srpint.ToHex().ToUpper()));
 			Assert.AreEqual(hash512, sha512(sample));
@@ -276,21 +277,21 @@ namespace Zyan.Tests
 			var sample = string.Concat(parts);
 			var srpint = SrpInteger.FromHex("48 65 6C 6C 6F 20 77 6F 72 6c 64 21");
 
-			var md5 = new SrpHash<MD5>().HashFunction;
+			H md5 = new SrpHash<MD5>().ComputeHash;
 			var hashmd5 = SrpInteger.FromHex("86FB269D190D2C85F6E0468CECA42A20");
 			Assert.AreEqual(hashmd5, md5(srpint));
 			Assert.AreEqual(hashmd5, md5(sample));
 			Assert.AreEqual(hashmd5, md5(parts));
 			Assert.AreEqual(16, new SrpHash<MD5>().HashSizeBytes);
 
-			var sha256 = new SrpHash<SHA256>().HashFunction;
+			H sha256 = new SrpHash<SHA256>().ComputeHash;
 			var hash256 = SrpInteger.FromHex("C0535E4BE2B79FFD93291305436BF889314E4A3FAEC05ECFFCBB7DF31AD9E51A");
 			Assert.AreEqual(hash256, sha256(srpint));
 			Assert.AreEqual(hash256, sha256(sample));
 			Assert.AreEqual(hash256, sha256(parts));
 			Assert.AreEqual(256 / 8, new SrpHash<SHA256>().HashSizeBytes);
 
-			var sha512 = new SrpHash<SHA512>().HashFunction;
+			H sha512 = new SrpHash<SHA512>().ComputeHash;
 			var hash512 = SrpInteger.FromHex("F6CDE2A0F819314CDDE55FC227D8D7DAE3D28CC556222A0A8AD66D91CCAD4AAD6094F517A2182360C9AACF6A3DC323162CB6FD8CDFFEDB0FE038F55E85FFB5B6");
 			Assert.AreEqual(hash512, sha512(srpint));
 			Assert.AreEqual(hash512, sha512(sample));
@@ -313,7 +314,7 @@ namespace Zyan.Tests
 			// validate intermediate steps
 			var userName = "hacker@example.com";
 			var password = "secret";
-			var H = new SrpHash<SHA256>().HashFunction;
+			H H = new SrpHash<SHA256>().ComputeHash;
 			var step1 = H($"{userName}:{password}");
 			Assert.AreEqual(SrpInteger.FromHex("ed3250071433e544b62b5dd0341564825a697357b5379f07aabca795a4e0a109"), step1);
 
@@ -502,8 +503,8 @@ namespace Zyan.Tests
 				FD5138FE 8376435B 9FC61D2F C0EB06E3");
 			var g = SrpInteger.FromHex("02");
 			var p = SrpParameters.Create<SHA1>(N, g);
-			var H = p.H;
-			var k = p.K;
+			var H = p.Hash;
+			var k = p.Multiplier;
 			var kx = SrpInteger.FromHex(@"7556AA04 5AEF2CDD 07ABAF0F 665C3E81 8913186F");
 			Assert.AreEqual(kx, k);
 

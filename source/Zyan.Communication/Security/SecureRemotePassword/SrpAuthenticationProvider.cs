@@ -93,7 +93,7 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 			}
 
 			// generate fake salt and B values so that attacker cannot tell whether the given user exists or not
-			var fakeSalt = SrpParameters.H(userName + UnknownUserSalt).ToHex();
+			var fakeSalt = SrpParameters.Hash(userName + UnknownUserSalt).ToHex();
 			var fakeEphemeral = SrpServer.GenerateEphemeral(fakeSalt);
 			return ResponseStep1(fakeSalt, fakeEphemeral.Public);
 		}
