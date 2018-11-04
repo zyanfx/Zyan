@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>Zyan</id>
-    <version>2.10</version>
+    <version>2.11</version>
     <title>Zyan</title>
     <authors>Rainbird,yallie</authors>
     <owners>Hagen Siegel</owners>
@@ -16,7 +16,7 @@
 
       v2.11: Security fixes and new features.
       - #45: Updated Zyan.SafeDeserializationHelpers package.
-      - #44: Support for multi-step authentication.
+      - #44: Support for multi-step authentication and SRP-6a protocol.
 
       v2.10: Security fixes and new features.
       - #43: Integrate Zyan.SafeDeserializationHelpers package.
@@ -39,6 +39,7 @@
     <dependencies>
       <group>
         <dependency id="Zyan.SafeDeserializationHelpers" version="0.5.0" />
+        <dependency id="srp" version="1.0.2" />
       </group>
     </dependencies>
   </metadata>
