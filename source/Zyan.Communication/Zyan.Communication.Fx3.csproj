@@ -121,6 +121,7 @@
     <Compile Include="Delegates\SafeDynamicInvoker.cs" />
     <Compile Include="Delegates\SessionEventArgs.cs" />
     <Compile Include="Delegates\SessionEventFilter.cs" />
+    <Compile Include="Delegates\SubscriptionTracker.cs" />
     <Compile Include="DisconnectedEventArgs.cs" />
     <Compile Include="Discovery\DiscoveryClient.cs" />
     <Compile Include="Discovery\DiscoveryEventArgs.cs" />
@@ -297,6 +298,7 @@
     <Compile Include="Threading\IThreadPoolExtensions.cs" />
     <Compile Include="Threading\SimpleLockThreadPool.cs" />
     <Compile Include="Toolbox\AssemblyLocator.cs" />
+    <Compile Include="Toolbox\ChecksumHelper.cs" />
     <Compile Include="Toolbox\ConcurrentCollection.cs" />
     <Compile Include="Toolbox\Compression\CompressionHelper.cs" />
     <Compile Include="Toolbox\Compression\LZF.cs" />

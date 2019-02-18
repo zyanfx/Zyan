@@ -137,6 +137,7 @@
     <Compile Include="Delegates\IFilteredEventHandler.cs" />
     <Compile Include="Delegates\SessionEventArgs.cs" />
     <Compile Include="Delegates\SessionEventFilter.cs" />
+    <Compile Include="Delegates\SubscriptionTracker.cs" />
     <Compile Include="DisconnectedEventArgs.cs" />
     <Compile Include="Discovery\DiscoveryClient.cs" />
     <Compile Include="Discovery\DiscoveryEventArgs.cs" />
@@ -309,6 +310,7 @@
     <Compile Include="SessionMgmt\SqlSessionManager.cs" />
     <Compile Include="SubscriptionEventArgs.cs" />
     <Compile Include="Toolbox\AssemblyLocator.cs" />
+    <Compile Include="Toolbox\ChecksumHelper.cs" />
     <Compile Include="Toolbox\ConcurrentCollection.cs" />
     <Compile Include="Toolbox\Crc32Calculator.cs" />
     <Compile Include="Toolbox\LocalCallContextData.cs" />

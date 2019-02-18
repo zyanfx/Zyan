@@ -75,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChannelWrapperTests.cs" />
+    <Compile Include="ChecksumHelperTests.cs" />
     <Compile Include="CleanupTests.cs" />
     <Compile Include="CompressionTests.cs" />
     <Compile Include="CryptoToolsTests.cs" />
@@ -105,6 +106,7 @@
     <Compile Include="SafeDynamicInvokerTests.cs" />
     <Compile Include="SecureRemotePasswordTests.cs" />
     <Compile Include="SrpAuthenticationTests.cs" />
+    <Compile Include="SubscriptionTrackerTests.cs" />
     <Compile Include="TransportHeaderWrapperTests.cs" />
     <Compile Include="ZyanProxyTests.cs" />
   </ItemGroup>

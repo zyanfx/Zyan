@@ -233,5 +233,15 @@ namespace Zyan.Communication.Toolbox
 			sb.Append(")");
 			return sb.ToString();
 		}
+
+		/// <summary>
+		/// Returns an empty sequence of the specified type if the given sequence is null.
+		/// </summary>
+		/// <typeparam name="T">The type of the element.</typeparam>
+		/// <param name="enumerable">The enumerable sequence.</param>
+		public static IEnumerable<T> EmptyIfNull<T>(this IEnumerable<T> enumerable)
+		{
+			return enumerable ?? Enumerable.Empty<T>();
+		}
 	}
 }

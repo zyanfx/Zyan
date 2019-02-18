@@ -82,6 +82,7 @@
     <Compile Include="CallInterceptionTests.cs" />
     <Compile Include="CallInterceptorBuilderTests.cs" />
     <Compile Include="ChannelWrapperTests.cs" />
+    <Compile Include="ChecksumHelperTests.cs" />
     <Compile Include="CleanupTests.cs" />
     <Compile Include="CompressionTests.cs" />
     <Compile Include="CryptoToolsTests.cs" />
@@ -115,6 +116,7 @@
     <Compile Include="SecureRemotePasswordTests.cs" />
     <Compile Include="SrpAuthenticationTests.cs" />
     <Compile Include="StreamTests.cs" />
+    <Compile Include="SubscriptionTrackerTests.cs" />
     <Compile Include="TransportHeaderWrapperTests.cs" />
     <Compile Include="TypeHelperTests.cs" />
     <Compile Include="VulnerabilityTests.cs" />
