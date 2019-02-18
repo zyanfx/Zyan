@@ -9,9 +9,7 @@ using System.Threading;
 using System.Transactions;
 using Zyan.Communication.ChannelSinks.ClientAddress;
 using Zyan.Communication.Delegates;
-using Zyan.Communication.Notification;
 using Zyan.Communication.Security;
-using Zyan.Communication.SessionMgmt;
 using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication

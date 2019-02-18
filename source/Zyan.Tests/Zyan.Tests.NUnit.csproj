@@ -59,7 +59,7 @@
       <HintPath>..\packages\Zyan.SafeDeserializationHelpers.0.5.0\lib\net35\Zyan.SafeDeserializationHelpers.dll</HintPath>
     </Reference>
     <Reference Include="srp">
-      <HintPath>..\packages\srp.1.0.2\lib\net45\srp.dll</HintPath>
+      <HintPath>..\packages\srp.1.0.4\lib\net45\srp.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
