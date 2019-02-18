@@ -101,7 +101,7 @@ namespace Zyan.Tests
 		public void SrpIntegerMultiply()
 		{
 			var result = SrpInteger.FromHex("CAFE") * SrpInteger.FromHex("babe");
-			Assert.AreEqual("94133484", result.ToHex());
+			Assert.AreEqual("94133484", result.ToHex(8));
 		}
 
 		[TestMethod]
@@ -115,7 +115,7 @@ namespace Zyan.Tests
 		public void SrpIntegerModulo()
 		{
 			var result = SrpInteger.FromHex("10") % SrpInteger.FromHex("9");
-			Assert.AreEqual("07", result.ToHex());
+			Assert.AreEqual("7", result.ToHex());
 		}
 
 		[TestMethod]
