@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication.Delegates
@@ -20,6 +19,11 @@ namespace Zyan.Communication.Delegates
 		}
 
 		private HashSet<Guid> Subscriptions { get; } = new HashSet<Guid>();
+
+		/// <summary>
+		/// Gets the subscription count.
+		/// </summary>
+		public int Count => Subscriptions.Count;
 
 		private string checksum;
 
@@ -63,6 +67,19 @@ namespace Zyan.Communication.Delegates
 		internal string Remove(IEnumerable<Guid> guidsToRemove)
 		{
 			return Update(remove: guidsToRemove);
+		}
+
+		/// <summary>
+		/// Resets the subscription tracker, cleans all tracked subscriptions.
+		/// </summary>
+		/// <returns></returns>
+		public string Reset()
+		{
+			lock (Subscriptions)
+			{
+				Subscriptions.Clear();
+				return Update();
+			}
 		}
 
 		private string Update(IEnumerable<Guid> add = null, IEnumerable<Guid> remove = null)

@@ -43,6 +43,7 @@ namespace Zyan.Tests
 			var guids = new List<Guid>();
 			guids.Add(new Guid("d970d9f3-b15b-4c88-8bdc-34fb3f9d119c"));
 			Assert.AreEqual("1:e2a5278b5a85bfc1ec258003b697183d8a3330eb750ec3439cbcbfe19e285b87", subscriptionTracker.Add(guids));
+			Assert.AreEqual(1, subscriptionTracker.Count);
 
 			// add many
 			var moreGuids = @"
@@ -61,6 +62,7 @@ namespace Zyan.Tests
 				.Where(s => !string.IsNullOrEmpty(s))
 				.Select(s => new Guid(s));
 			Assert.AreEqual("11:5540cde62cf9871c1b8f69bfd7f2b0047c8ee6f0a613f4e10739ab059adbd618", subscriptionTracker.Add(moreGuids));
+			Assert.AreEqual(11, subscriptionTracker.Count);
 
 			// add a few guids already included in the set
 			var duplicates = @"
@@ -78,9 +80,11 @@ namespace Zyan.Tests
 
 			// checksum should not be changed
 			Assert.AreEqual("11:5540cde62cf9871c1b8f69bfd7f2b0047c8ee6f0a613f4e10739ab059adbd618", subscriptionTracker.Add(duplicates));
+			Assert.AreEqual(11, subscriptionTracker.Count);
 
 			// remove a few guids
 			Assert.AreEqual("4:854614224fd9c031cc2315959677c3796154f385afdba799a6088ab759bb83a8", subscriptionTracker.Remove(duplicates));
+			Assert.AreEqual(4, subscriptionTracker.Count);
 
 			// remove again already removed guid, checksum should not be changed
 			Assert.AreEqual("4:854614224fd9c031cc2315959677c3796154f385afdba799a6088ab759bb83a8", subscriptionTracker.Remove(new[]
@@ -90,15 +94,35 @@ namespace Zyan.Tests
 
 			// remove again the same guids, checksum should not be changed
 			Assert.AreEqual("4:854614224fd9c031cc2315959677c3796154f385afdba799a6088ab759bb83a8", subscriptionTracker.Remove(duplicates));
+			Assert.AreEqual(4, subscriptionTracker.Count);
 
 			// remove all except one
 			Assert.AreEqual("1:e2a5278b5a85bfc1ec258003b697183d8a3330eb750ec3439cbcbfe19e285b87", subscriptionTracker.Remove(moreGuids));
+			Assert.AreEqual(1, subscriptionTracker.Count);
 
 			// remove the first one
 			Assert.AreEqual("0:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", subscriptionTracker.Remove(new[]
 			{
 				new Guid("d970d9f3-b15b-4c88-8bdc-34fb3f9d119c")
 			}));
+
+			// nothing left
+			Assert.AreEqual(0, subscriptionTracker.Count);
+		}
+
+		[TestMethod]
+		public void SubscriptionTrackerCanReset()
+		{
+			// add one
+			var subscriptionTracker = new SubscriptionTracker();
+			var guids = new List<Guid>();
+			guids.Add(new Guid("d970d9f3-b15b-4c88-8bdc-34fb3f9d119c"));
+			Assert.AreEqual("1:e2a5278b5a85bfc1ec258003b697183d8a3330eb750ec3439cbcbfe19e285b87", subscriptionTracker.Add(guids));
+			Assert.AreEqual(1, subscriptionTracker.Count);
+
+			// clear
+			Assert.AreEqual("0:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", subscriptionTracker.Reset());
+			Assert.AreEqual(0, subscriptionTracker.Count);
 		}
 	}
 }

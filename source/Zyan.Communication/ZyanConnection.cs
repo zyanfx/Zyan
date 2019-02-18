@@ -10,6 +10,7 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using System.Transactions;
+using Zyan.Communication.Delegates;
 using Zyan.Communication.Discovery;
 using Zyan.Communication.Discovery.Metadata;
 using Zyan.Communication.Notification;
@@ -74,8 +75,8 @@ namespace Zyan.Communication
 			}
 		}
 
-		// Remote event subscriptions counter
-		private int _remoteSubscriptionCounter;
+		// Remote event subscriptions tracker
+		private SubscriptionTracker _remoteSubscriptionTracker = new SubscriptionTracker();
 
 		/// <summary>
 		/// Gets the URL of the remote server.
@@ -987,7 +988,7 @@ namespace Zyan.Communication
 		/// </summary>
 		private void ReconnectRemoteEvents()
 		{
-			Interlocked.Exchange(ref _remoteSubscriptionCounter, 0);
+			_remoteSubscriptionTracker.Reset();
 
 			foreach (var zyanProxy in AliveProxies)
 			{
@@ -1014,11 +1015,19 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Adds the specified count to the subscription counter.
+		/// Adds the specified correlation set to the subscription tracker.
 		/// </summary>
-		internal void UpdateSubscriptionCounter(int count)
+		internal void TrackRemoteSubscriptions(IEnumerable<DelegateCorrelationInfo> delegateCorrelationSet)
 		{
-			Interlocked.Add(ref _remoteSubscriptionCounter, count);
+			_remoteSubscriptionTracker.Add(delegateCorrelationSet);
+		}
+
+		/// <summary>
+		/// Removes the specified correlation set to the subscription tracker.
+		/// </summary>
+		internal void UntrackRemoteSubscriptions(IEnumerable<DelegateCorrelationInfo> delegateCorrelationSet)
+		{
+			_remoteSubscriptionTracker.Remove(delegateCorrelationSet);
 		}
 
 		/// <summary>
@@ -1030,8 +1039,8 @@ namespace Zyan.Communication
 			if (callContextData != null && callContextData.Store != null && callContextData.Store.ContainsKey("subscriptions"))
 			{
 				// if the server was restarted, is has less subscriptions than the client
-				var remoteCounter = Convert.ToInt32(callContextData.Store["subscriptions"]);
-				if (remoteCounter < _remoteSubscriptionCounter)
+				var remoteChecksum = callContextData.Store["subscriptions"].ToString();
+				if (remoteChecksum != _remoteSubscriptionTracker.Checksum)
 				{
 					// restore subscriptions asynchronously
 					ReconnectRemoteEventsAsync();
@@ -1042,7 +1051,7 @@ namespace Zyan.Communication
 		private void Channel_ConnectionEstablished(object sender, EventArgs e)
 		{
 			// restore subscriptions if necessary
-			if (_remoteSubscriptionCounter > 0)
+			if (_remoteSubscriptionTracker.Count > 0)
 			{
 				ReconnectRemoteEventsAsync();
 			}

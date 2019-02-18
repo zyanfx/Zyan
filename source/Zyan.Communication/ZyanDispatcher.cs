@@ -82,7 +82,7 @@ namespace Zyan.Communication
 						{
 							eventStub.RemoveHandler(correlationInfo.DelegateMemberName, dynamicEventWire.InDelegate);
 							wiringList.Remove(correlationInfo.CorrelationID);
-							currentSession.DecrementRemoteSubscriptionCounter();
+							currentSession.RemoveRemoteSubscription(correlationInfo);
 							_host.OnSubscriptionCanceled(new SubscriptionEventArgs
 							{
 								ComponentType = type,
@@ -102,7 +102,7 @@ namespace Zyan.Communication
 					}
 				}
 
-				currentSession.IncrementRemoteSubscriptionCounter();
+				currentSession.AddRemoteSubscription(correlationInfo);
 				_host.OnSubscriptionAdded(new SubscriptionEventArgs
 				{
 					ComponentType = type,
@@ -139,7 +139,7 @@ namespace Zyan.Communication
 						wiringList.Remove(correlationInfo.CorrelationID);
 						if (currentSession != null)
 						{
-							currentSession.DecrementRemoteSubscriptionCounter();
+							currentSession.RemoveRemoteSubscription(correlationInfo);
 						}
 					}
 
@@ -287,14 +287,14 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Sets the remote subscription counter.
+		/// Sets the remote subscription checksum.
 		/// </summary>
-		/// <param name="details">The details.</param>
-		private void Invoke_SetRemoteSubscriptionCounter(InvocationDetails details)
+		/// <param name="details">Invocation details.</param>
+		private void Invoke_SetRemoteSubscriptionChecksum(InvocationDetails details)
 		{
 			if (details.CallContextData != null && details.CallContextData.Store != null && ServerSession.CurrentSession != null)
 			{
-				details.CallContextData.Store["subscriptions"] = ServerSession.CurrentSession.RemoteSubscriptionCounter;
+				details.CallContextData.Store["subscriptions"] = ServerSession.CurrentSession.RemoteSubscriptionTracker.Checksum;
 			}
 		}
 
@@ -543,7 +543,7 @@ namespace Zyan.Communication
 			finally
 			{
 				Invoke_CompleteTransactionScope(details);
-				Invoke_SetRemoteSubscriptionCounter(details);
+				Invoke_SetRemoteSubscriptionChecksum(details);
 				Invoke_CleanUp(details);
 			}
 

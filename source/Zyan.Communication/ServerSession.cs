@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security.Principal;
 using System.Threading;
+using Zyan.Communication.Delegates;
 using Zyan.Communication.SessionMgmt;
 using Zyan.Communication.Toolbox;
 
@@ -16,7 +18,7 @@ namespace Zyan.Communication
 		private IIdentity _identity;
 		private DateTime _timestamp;
 		private string _clientAddress;
-		private int _remoteSubscriptionCounter;
+		private SubscriptionTracker _remoteSubscriptionTracker = new SubscriptionTracker();
 		private static string _serverSessionSlotName = Guid.NewGuid().ToString();
 
 		// Adapter for accessing session variables.
@@ -81,27 +83,27 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Gets the remote subscription counter.
+		/// Gets the remote subscription tracker.
 		/// </summary>
-		internal int RemoteSubscriptionCounter
+		internal SubscriptionTracker RemoteSubscriptionTracker
 		{
-			get { return _remoteSubscriptionCounter; }
+			get { return _remoteSubscriptionTracker; }
 		}
 
 		/// <summary>
-		/// Increments the remote subscription counter.
+		/// Adds remote subscription to the trackers.
 		/// </summary>
-		internal void IncrementRemoteSubscriptionCounter()
+		internal string AddRemoteSubscription(DelegateCorrelationInfo delegateCorrelationInfo)
 		{
- 			Interlocked.Increment(ref _remoteSubscriptionCounter);
+ 			return RemoteSubscriptionTracker.Add(new[] { delegateCorrelationInfo });
 		}
 
 		/// <summary>
-		/// Decrements the remote subscription counter.
+		/// Removes remote subscription from the tracker.
 		/// </summary>
-		internal void DecrementRemoteSubscriptionCounter()
+		internal string RemoveRemoteSubscription(DelegateCorrelationInfo delegateCorrelationInfo)
 		{
- 			Interlocked.Decrement(ref _remoteSubscriptionCounter);
+ 			return RemoteSubscriptionTracker.Remove(new[] { delegateCorrelationInfo });
 		}
 
 		/// <summary>

@@ -415,7 +415,7 @@ namespace Zyan.Communication
 			var count = correlationSet.Count;
 			if (count > 0)
 			{
-				_connection.UpdateSubscriptionCounter(count);
+				_connection.TrackRemoteSubscriptions(correlationSet);
 				_connection.PrepareCallContext(false);
 				_connection.RemoteDispatcher.AddEventHandlers(_interfaceType.FullName, correlationSet, _uniqueName);
 			}
@@ -433,7 +433,7 @@ namespace Zyan.Communication
 			var count = correlationSet.Count;
 			if (count > 0)
  			{
-				_connection.UpdateSubscriptionCounter(-count);
+				_connection.UntrackRemoteSubscriptions(correlationSet);
 				_connection.PrepareCallContext(false);
 				_connection.RemoteDispatcher.RemoveEventHandlers(_interfaceType.FullName, correlationSet, _uniqueName);
 			}
