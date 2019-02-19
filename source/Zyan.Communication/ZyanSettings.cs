@@ -52,5 +52,13 @@ namespace Zyan.Communication
 		/// Zyan v2.7 and below didn't update the existing component registrations.
 		/// </remarks>
 		public static bool LegacyIgnoreDuplicateRegistrations { get; set; }
+
+		/// <summary>
+		/// Gets or sets a value indicating whether ZyanConnection restores subscriptions asynchronously.
+		/// </summary>
+		/// <remarks>
+		/// Zyan v2.11 and below used to restore missing event subscriptions asynchronously.
+		/// </remarks>
+		public static bool LegacyAsyncResubscriptions { get; set; }
 	}
 }

@@ -70,15 +70,19 @@ namespace Zyan.Communication.Delegates
 		}
 
 		/// <summary>
-		/// Resets the subscription tracker, cleans all tracked subscriptions.
+		/// Resets the subscription tracker, cleans and re-adds all tracked subscriptions.
 		/// </summary>
-		/// <returns></returns>
-		public string Reset()
+		public string Reset(IEnumerable<DelegateCorrelationInfo> delegateCorrelationSet = null)
+		{
+			return Reset(delegateCorrelationSet.EmptyIfNull().Select(d => d.CorrelationID));
+		}
+
+		internal string Reset(IEnumerable<Guid> add)
 		{
 			lock (Subscriptions)
 			{
 				Subscriptions.Clear();
-				return Update();
+				return Update(add);
 			}
 		}
 

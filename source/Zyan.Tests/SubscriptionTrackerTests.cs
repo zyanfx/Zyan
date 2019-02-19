@@ -120,6 +120,24 @@ namespace Zyan.Tests
 			Assert.AreEqual("1:e2a5278b5a85bfc1ec258003b697183d8a3330eb750ec3439cbcbfe19e285b87", subscriptionTracker.Add(guids));
 			Assert.AreEqual(1, subscriptionTracker.Count);
 
+			// clear and re-add
+			var duplicates = @"
+				a3c9a21f-e6b4-43e6-a651-ec6c9afde1a0
+				a3c9a21f-e6b4-43e6-a651-ec6c9afde1a0
+				d4b506e5-c70f-47a7-902b-764d2c8ac64a
+				3ccc7db1-bc5e-476d-b348-752e3695a317
+				51dd1835-824f-49c7-be96-45f8cb768aa8
+				a3c9a21f-e6b4-43e6-a651-ec6c9afde1a0
+				a3c9a21f-e6b4-43e6-a651-ec6c9afde1a0
+				38edea28-9bca-419a-a85b-8393f468f354
+				5f21501d-4f10-4258-b7f5-a1979a124b7b
+				e45bbd78-93dd-42bc-bda9-137f204fbba4"
+				.Split('\n')
+				.Select(s => s.Trim())
+				.Where(s => !string.IsNullOrEmpty(s))
+				.Select(s => new Guid(s));
+			Assert.AreEqual("7:73f2e8b827163446542377ef1da37d9a2dc7b0c0d70f824ed9a06a92446bd78b", subscriptionTracker.Reset(duplicates));
+
 			// clear
 			Assert.AreEqual("0:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", subscriptionTracker.Reset());
 			Assert.AreEqual(0, subscriptionTracker.Count);

@@ -6,6 +6,7 @@ using System.Threading;
 using Zyan.Communication;
 using Zyan.Communication.Delegates;
 using Zyan.Communication.Protocols.Null;
+using Zyan.Communication.SessionMgmt;
 
 namespace Zyan.Tests
 {
@@ -156,19 +157,31 @@ namespace Zyan.Tests
 		[ClassInitialize]
 		public static void StartServer(TestContext ctx)
 		{
+			ZyanHost = CreateZyanHost(2345, "EventsServer");
+			ZyanConnection = CreateZyanConnection(2345, "EventsServer");
+		}
+
+		private static ISessionManager DummySessionManager { get; } = new InProcSessionManager();
+
+		private static ZyanComponentHost CreateZyanHost(int port, string name)
+		{
 			ZyanSettings.LegacyBlockingEvents = true;
 			ZyanSettings.LegacyBlockingSubscriptions = true;
 			ZyanSettings.LegacyUnprotectedEventHandlers = true;
 
-			var serverSetup = new NullServerProtocolSetup(2345);
-			ZyanHost = new ZyanComponentHost("EventsServer", serverSetup);
-			ZyanHost.RegisterComponent<ISampleServer, SampleServer<int>>("Singleton", ActivationType.Singleton);
-			ZyanHost.RegisterComponent<ISampleServer, SampleServer<short>>("Singleton2", ActivationType.Singleton);
-			ZyanHost.RegisterComponent<ISampleServer, SampleServer<long>>("Singleton3", ActivationType.Singleton);
-			ZyanHost.RegisterComponent<ISampleServer, SampleServer<byte>>("SingleCall", ActivationType.SingleCall);
-			ZyanHost.RegisterComponent<ISampleServer, SampleServer<char>>("SingletonExternal", new SampleServer<char>());
+			var serverSetup = new NullServerProtocolSetup(port);
+			var zyanHost = new ZyanComponentHost(name, serverSetup); //, DummySessionManager);
+			zyanHost.RegisterComponent<ISampleServer, SampleServer<int>>("Singleton", ActivationType.Singleton);
+			zyanHost.RegisterComponent<ISampleServer, SampleServer<short>>("Singleton2", ActivationType.Singleton);
+			zyanHost.RegisterComponent<ISampleServer, SampleServer<long>>("Singleton3", ActivationType.Singleton);
+			zyanHost.RegisterComponent<ISampleServer, SampleServer<byte>>("SingleCall", ActivationType.SingleCall);
+			zyanHost.RegisterComponent<ISampleServer, SampleServer<char>>("SingletonExternal", new SampleServer<char>());
+			return zyanHost;
+		}
 
-			ZyanConnection = new ZyanConnection("null://NullChannel:2345/EventsServer");
+		private static ZyanConnection CreateZyanConnection(int port, string name)
+		{
+			return new ZyanConnection("null://NullChannel:" + port + "/" + name, true);
 		}
 
 		[ClassCleanup]
@@ -183,6 +196,9 @@ namespace Zyan.Tests
 		[TestMethod]
 		public void ZyanHostSubscriptionRelatedEventsAreRaised()
 		{
+			Trace.WriteLine("ZyanHostSubscriptionRelatedEventsAreRaised");
+			ZyanSettings.LegacyBlockingEvents = true;
+
 			// set up server-side event handlers
 			var subscriptionAdded = false;
 			ZyanHost.SubscriptionAdded += (s, e) => subscriptionAdded = true;
@@ -238,15 +254,15 @@ namespace Zyan.Tests
 			ZyanHost.SubscriptionCanceled -= canceledHandler;
 		}
 
-		// This is actually not true anymore because the subscription gets restored
-		// on the next remote call to RaiseTestEvent: local subscription counter
-		// doesn't match remote subscription counter => re-subscribe => ok!
-		// [TestMethod]
-		public void ExceptionInEventHandlerCancelsSubscription()
+		// The subscription gets restored on the next remote call to RaiseTestEvent:
+		// local subscription checksum doesn't match remote checksum => re-subscribe => ok!
+		[TestMethod]
+		public void ExceptionInEventHandlerCancelsSubscriptionButTheConnetionResubscribesOnTheNextRemoteCall()
 		{
 			ZyanSettings.LegacyBlockingEvents = true;
 			ZyanSettings.LegacyBlockingSubscriptions = true;
 			ZyanSettings.LegacyUnprotectedEventHandlers = true;
+			ZyanSettings.LegacyAsyncResubscriptions = false;
 
 			var handled = false;
 			var eventHandler = new EventHandler((s, e) =>
@@ -255,19 +271,69 @@ namespace Zyan.Tests
 				throw new Exception();
 			});
 
+			var subscriptionCanceled = false;
+			var clientSideException = default(Exception);
+			var canceledHandler = new EventHandler<SubscriptionEventArgs>((s, e) =>
+			{
+				subscriptionCanceled = true;
+				clientSideException = e.Exception;
+			});
+			ZyanHost.SubscriptionCanceled += canceledHandler;
+
 			var proxy = ZyanConnection.CreateProxy<ISampleServer>("Singleton2");
 			proxy.TestEvent += eventHandler;
 
 			// raise an event, catch exception and unsubscribe automatically
 			proxy.RaiseTestEvent();
 			Assert.IsTrue(handled);
+			Assert.IsTrue(subscriptionCanceled);
 
-			// If we wait a bit we'll see that the client re-subscribes
-			Thread.Sleep(100);
-
+			// There is no need to wait because the client re-subscribes synchronously
 			handled = false;
 			proxy.RaiseTestEvent();
-			Assert.IsFalse(handled);
+			Assert.IsTrue(handled);
+
+			// detach event handler
+			ZyanHost.SubscriptionCanceled -= canceledHandler;
+		}
+
+		[TestMethod]
+		public void ZyanConnectionResubscribesAfterServerRestart()
+		{
+			Trace.WriteLine("ZyanConnectionResubscribesAfterServerRestart");
+			ZyanSettings.LegacyBlockingEvents = true;
+			ZyanSettings.LegacyBlockingSubscriptions = true;
+			ZyanSettings.LegacyUnprotectedEventHandlers = true;
+			ZyanSettings.LegacyAsyncResubscriptions = false;
+
+			var host = CreateZyanHost(5432, "SecondServer");
+			/*var conn = CreateZyanConnection(5432, "SecondServer");
+			var proxy = conn.CreateProxy<ISampleServer>("Singleton2");
+
+			var handled = false;
+			var eventHandler = new EventHandler((s, e) => handled = true);
+			proxy.TestEvent += eventHandler;
+
+			proxy.RaiseTestEvent();
+			Assert.IsTrue(handled);
+
+			// re-create host from scratch (discard all server-side subscriptions)
+			host.Dispose();
+			host = CreateZyanHost(5432, "SecondServer");
+
+			// the first call: event handlers are restored on reconnect
+			handled = false;
+			proxy.RaiseTestEvent();
+			Assert.IsTrue(handled);
+
+			// the second call: event handlers are restored
+			proxy.RaiseTestEvent();
+			Assert.IsTrue(handled);
+
+			// Note: dispose connection before the host
+			// so that it can unsubscribe from all remove events
+			conn.Dispose();
+			host.Dispose();*/
 		}
 
 		[TestMethod]

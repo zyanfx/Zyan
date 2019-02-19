@@ -961,7 +961,7 @@ namespace Zyan.Communication
 					}
 
 					credentials.Authenticate(_sessionID, RemoteDispatcher);
-					ReconnectRemoteEventsAsync();
+					ReconnectRemoteEvents();
 
 					RemoteDispatcher.ReceiveClientHeartbeat(_sessionID);
 					return true;
@@ -986,26 +986,34 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Reconnects to all remote events or delegates of any known proxy for this connection, after a server restart.
 		/// </summary>
-		private void ReconnectRemoteEvents()
+		/// <remarks>
+		/// Does not check, if the event handler registrations are truly lost.
+		/// </remarks>
+		private void ReconnectRemoteEventsCore()
 		{
-			_localSubscriptionTracker.Reset();
-
-			foreach (var zyanProxy in AliveProxies)
-			{
-				zyanProxy.ReconnectRemoteEvents();
-			}
+			var subscriptions = AliveProxies.Select(p => p.GetActiveSubscriptions()).ToArray();
+			var correlationSets = subscriptions.SelectMany(s => s.DelegateCorrelationSet).ToArray();
+			RemoteDispatcher.ReconnectEventHandlers(subscriptions);
+			_localSubscriptionTracker.Reset(correlationSets);
 		}
 
 		/// <summary>
-		/// Reconnects the remote events asynchronously.
+		/// Reconnects to all remote events or delegates after a server restart.
 		/// </summary>
-		private void ReconnectRemoteEventsAsync()
+		private void ReconnectRemoteEvents()
 		{
+			if (!ZyanSettings.LegacyAsyncResubscriptions)
+			{
+				ReconnectRemoteEventsCore();
+				return;
+			}
+
+			// legacy method is unsafe as it silently swallows the exceptions
 			ThreadPool.QueueUserWorkItem(x =>
 			{
 				try
 				{
-					ReconnectRemoteEvents();
+					ReconnectRemoteEventsCore();
 				}
 				catch (Exception ex)
 				{
@@ -1043,7 +1051,7 @@ namespace Zyan.Communication
 				if (remoteChecksum != _localSubscriptionTracker.Checksum)
 				{
 					// restore subscriptions asynchronously
-					ReconnectRemoteEventsAsync();
+					ReconnectRemoteEvents();
 				}
 			}
 		}
@@ -1053,7 +1061,7 @@ namespace Zyan.Communication
 			// restore subscriptions if necessary
 			if (_localSubscriptionTracker.Count > 0)
 			{
-				ReconnectRemoteEventsAsync();
+				ReconnectRemoteEvents();
 			}
 		}
 

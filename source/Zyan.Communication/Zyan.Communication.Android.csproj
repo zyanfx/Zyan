@@ -82,6 +82,7 @@
     <Compile Include="ClientHeartbeatEventArgs.cs" />
     <Compile Include="ComponentCatalog.cs" />
     <Compile Include="ComponentInfo.cs" />
+    <Compile Include="Delegates\ComponentDelegateCorrelationSet.cs" />
     <Compile Include="Delegates\DelegateCorrelationInfo.cs" />
     <Compile Include="Delegates\DelegateInterceptor.cs" />
     <Compile Include="Delegates\DynamicEventWireBase.cs" />

@@ -84,6 +84,12 @@ namespace Zyan.Communication
 		void RemoveEventHandlers(string interfaceName, IEnumerable<DelegateCorrelationInfo> correlationSet, string uniqueName);
 
 		/// <summary>
+		/// Reconnects remote handlers to events of a server component.
+		/// </summary>
+		/// <param name="subscriptions">Delegate correlation sets for all registered components.</param>
+		void ReconnectEventHandlers(IEnumerable<ComponentDelegateCorrelationSet> subscriptions);
+
+		/// <summary>
 		/// Event: Occours when a heartbeat signal is received from a client.
 		/// </summary>
 		event EventHandler<ClientHeartbeatEventArgs> ClientHeartbeatReceived;

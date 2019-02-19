@@ -114,6 +114,7 @@
     <Compile Include="Composition\ZyanCatalog.cs" />
     <Compile Include="Composition\ZyanComposablePartDefinition.cs" />
     <Compile Include="Composition\ZyanInterfaceAttribute.cs" />
+    <Compile Include="Delegates\ComponentDelegateCorrelationSet.cs" />
     <Compile Include="Delegates\DelegateCorrelationInfo.cs" />
     <Compile Include="Delegates\DelegateInterceptor.cs" />
     <Compile Include="Delegates\DynamicEventWireBase.cs" />

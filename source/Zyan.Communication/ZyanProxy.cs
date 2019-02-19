@@ -454,21 +454,21 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Reconnects to all remote events or delegates after a server restart.
-		/// <remarks>
-		/// Caution! This method does not check, if the event handler registrations are truly lost (caused by a server restart).
-		/// </remarks>
+		/// Returns all active subscriptions to the remote events.
 		/// </summary>
-		internal void ReconnectRemoteEvents()
+		internal ComponentDelegateCorrelationSet GetActiveSubscriptions()
 		{
-			// copy delegates
-			List<DelegateCorrelationInfo> correlationSet;
 			lock (_delegateCorrelationSet)
 			{
-				correlationSet = _delegateCorrelationSet.ToList();
+				// copy delegates
+				var correlationSet = _delegateCorrelationSet.ToArray();
+				return new ComponentDelegateCorrelationSet
+				{
+					InterfaceName = _interfaceType.FullName,
+					DelegateCorrelationSet = correlationSet,
+					UniqueName = _uniqueName,
+				};
 			}
-
-			AddRemoteEventHandlers(correlationSet);
 		}
 
 		/// <summary>

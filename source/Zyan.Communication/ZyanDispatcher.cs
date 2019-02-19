@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Runtime.Remoting.Messaging;
 using System.Security;
@@ -621,6 +622,25 @@ namespace Zyan.Communication
 
 			RemoveClientServerWires(details.Type, details.Registration.EventStub, correlationSet, details.Registration.EventWirings);
 			Invoke_CleanUp(details);
+		}
+
+		/// <summary>
+		/// Reconnects remote handlers to events of a server component.
+		/// </summary>
+		/// <param name="subscriptions">Delegate correlation sets for all registered components.</param>
+		public void ReconnectEventHandlers(IEnumerable<ComponentDelegateCorrelationSet> subscriptions)
+		{
+			var currentSession = ServerSession.CurrentSession;
+			if (currentSession != null)
+			{
+				currentSession.RemoteSubscriptionTracker.Reset();
+			}
+
+			// order subscriptions alphabetically to avoid deadlocks
+			foreach (var subscription in subscriptions.EmptyIfNull().OrderBy(s => s.InterfaceName).ThenBy(s => s.UniqueName))
+			{
+				AddEventHandlers(subscription.InterfaceName, subscription.DelegateCorrelationSet, subscription.UniqueName);
+			}
 		}
 
 		#endregion
