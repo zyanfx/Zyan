@@ -16,7 +16,6 @@ namespace Zyan.Communication
 		/// </summary>
 		public ComponentRegistration()
 		{
-			_eventWirings = new Dictionary<Guid, Delegate>();
 		}
 
 		/// <summary>
@@ -365,106 +364,60 @@ namespace Zyan.Communication
 
 		#region Properties
 
-		private object _syncLock = new object();
-
 		/// <summary>
 		/// Returns the lock object for thread synchronization.
 		/// </summary>
-		public object SyncLock
-		{
-			get { return _syncLock; }
-		}
-
-		private Dictionary<Guid, Delegate> _eventWirings;
+		public object SyncLock { get; } = new object();
 
 		/// <summary>
 		/// Returns a name-value-list of registered event wirings.
 		/// </summary>
-		internal Dictionary<Guid, Delegate> EventWirings
-		{
-			get { return _eventWirings; }
-		}
+		internal Dictionary<Guid, Delegate> EventWirings { get; } = new Dictionary<Guid, Delegate>();
 
 		/// <summary>
 		/// Gets or sets the unqiue name of the component.
 		/// </summary>
-		public string UniqueName
-		{
-			get;
-			set;
-		}
+		public string UniqueName { get; set; }
 
 		/// <summary>
-		/// Gets or sets the interface type of the component. 
+		/// Gets or sets the interface type of the component.
 		/// </summary>
-		public Type InterfaceType
-		{
-			get;
-			set;
-		}
+		public Type InterfaceType { get; set; }
 
 		/// <summary>
 		/// Gets or sets the implementation type of the component.
 		/// </summary>
-		public Type ImplementationType
-		{
-			get;
-			set;
-		}
+		public Type ImplementationType { get; set; }
 
 		/// <summary>
 		/// Gets or sets the delegate of the initialization method.
 		/// </summary>
-		public Func<object> InitializationHandler
-		{
-			get;
-			set;
-		}
+		public Func<object> InitializationHandler { get; set; }
 
 		/// <summary>
 		/// Gets or sets the current instance (Singleton activation only) of the registered component.
 		/// </summary>
-		public object SingletonInstance
-		{
-			get;
-			set;
-		}
+		public object SingletonInstance { get; set; }
 
 		/// <summary>
 		/// Gets or sets the event stub that caches all event handlers of the registered component.
 		/// </summary>
-		public EventStub EventStub
-		{
-			get;
-			set;
-		}
+		public EventStub EventStub { get; set; }
 
 		/// <summary>
 		/// Gets or sets the activation type (Singleton/SingleCall)
 		/// </summary>
-		public ActivationType ActivationType
-		{
-			get;
-			set;
-		}
+		public ActivationType ActivationType { get; set; }
 
 		/// <summary>
 		/// Gets or sets, if the components should be disposed together with its owning component catalog.
 		/// </summary>
-		public bool DisposeWithCatalog
-		{
-			get;
-			set;
-		}
+		public bool DisposeWithCatalog { get; set; }
 
 		/// <summary>
 		/// Gets or sets a delegate of a method for handling resource clean up explicitly.
 		/// </summary>
-		public Action<object> CleanUpHandler
-		{
-			get;
-			set;
-		}
+		public Action<object> CleanUpHandler { get; set; }
 
 		#endregion
 

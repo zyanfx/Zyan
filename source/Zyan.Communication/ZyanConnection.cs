@@ -75,8 +75,8 @@ namespace Zyan.Communication
 			}
 		}
 
-		// Remote event subscriptions tracker
-		private SubscriptionTracker _remoteSubscriptionTracker = new SubscriptionTracker();
+		// Local event subscriptions tracker
+		private SubscriptionTracker _localSubscriptionTracker = new SubscriptionTracker();
 
 		/// <summary>
 		/// Gets the URL of the remote server.
@@ -988,7 +988,7 @@ namespace Zyan.Communication
 		/// </summary>
 		private void ReconnectRemoteEvents()
 		{
-			_remoteSubscriptionTracker.Reset();
+			_localSubscriptionTracker.Reset();
 
 			foreach (var zyanProxy in AliveProxies)
 			{
@@ -1019,7 +1019,7 @@ namespace Zyan.Communication
 		/// </summary>
 		internal void TrackRemoteSubscriptions(IEnumerable<DelegateCorrelationInfo> delegateCorrelationSet)
 		{
-			_remoteSubscriptionTracker.Add(delegateCorrelationSet);
+			_localSubscriptionTracker.Add(delegateCorrelationSet);
 		}
 
 		/// <summary>
@@ -1027,7 +1027,7 @@ namespace Zyan.Communication
 		/// </summary>
 		internal void UntrackRemoteSubscriptions(IEnumerable<DelegateCorrelationInfo> delegateCorrelationSet)
 		{
-			_remoteSubscriptionTracker.Remove(delegateCorrelationSet);
+			_localSubscriptionTracker.Remove(delegateCorrelationSet);
 		}
 
 		/// <summary>
@@ -1040,7 +1040,7 @@ namespace Zyan.Communication
 			{
 				// if the server was restarted, is has less subscriptions than the client
 				var remoteChecksum = callContextData.Store["subscriptions"].ToString();
-				if (remoteChecksum != _remoteSubscriptionTracker.Checksum)
+				if (remoteChecksum != _localSubscriptionTracker.Checksum)
 				{
 					// restore subscriptions asynchronously
 					ReconnectRemoteEventsAsync();
@@ -1051,7 +1051,7 @@ namespace Zyan.Communication
 		private void Channel_ConnectionEstablished(object sender, EventArgs e)
 		{
 			// restore subscriptions if necessary
-			if (_remoteSubscriptionTracker.Count > 0)
+			if (_localSubscriptionTracker.Count > 0)
 			{
 				ReconnectRemoteEventsAsync();
 			}

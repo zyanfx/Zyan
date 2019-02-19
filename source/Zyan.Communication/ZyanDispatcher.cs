@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using System.Runtime.Remoting.Messaging;
@@ -80,9 +81,13 @@ namespace Zyan.Communication
 						dynamicEventWire.ValidateSession = () => sessionManager.ExistSession(sessionId);
 						dynamicEventWire.CancelSubscription = ex =>
 						{
-							eventStub.RemoveHandler(correlationInfo.DelegateMemberName, dynamicEventWire.InDelegate);
-							wiringList.Remove(correlationInfo.CorrelationID);
-							currentSession.RemoveRemoteSubscription(correlationInfo);
+							lock (wiringList)
+							{
+								eventStub.RemoveHandler(correlationInfo.DelegateMemberName, dynamicEventWire.InDelegate);
+								wiringList.Remove(correlationInfo.CorrelationID);
+								currentSession.RemoveRemoteSubscription(correlationInfo);
+							}
+
 							_host.OnSubscriptionCanceled(new SubscriptionEventArgs
 							{
 								ComponentType = type,
