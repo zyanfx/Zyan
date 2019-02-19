@@ -11,6 +11,11 @@ namespace Zyan.Communication.Delegates
 	public class SubscriptionTracker
 	{
 		/// <summary>
+		/// The call context slot name for the subscription checksum.
+		/// </summary>
+		public const string CallContextSlotName = "subscription-checksum";
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="SubscriptionTracker"/> class.
 		/// </summary>
 		public SubscriptionTracker()

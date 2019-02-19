@@ -300,7 +300,8 @@ namespace Zyan.Communication
 		{
 			if (details.CallContextData != null && details.CallContextData.Store != null && ServerSession.CurrentSession != null)
 			{
-				details.CallContextData.Store["subscriptions"] = ServerSession.CurrentSession.RemoteSubscriptionTracker.Checksum;
+				var key = SubscriptionTracker.CallContextSlotName;
+				details.CallContextData.Store[key] = ServerSession.CurrentSession.RemoteSubscriptionTracker.Checksum;
 			}
 		}
 

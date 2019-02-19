@@ -1043,11 +1043,12 @@ namespace Zyan.Communication
 		/// </summary>
 		internal void CheckRemoteSubscriptionCounter()
 		{
+			var key = SubscriptionTracker.CallContextSlotName;
 			var callContextData = CallContext.GetData("__ZyanContextData_" + _componentHostName) as LogicalCallContextData;
-			if (callContextData != null && callContextData.Store != null && callContextData.Store.ContainsKey("subscriptions"))
+			if (callContextData != null && callContextData.Store != null && callContextData.Store.ContainsKey(key))
 			{
 				// if the server was restarted, is has less subscriptions than the client
-				var remoteChecksum = callContextData.Store["subscriptions"].ToString();
+				var remoteChecksum = callContextData.Store[key].ToString();
 				if (remoteChecksum != _localSubscriptionTracker.Checksum)
 				{
 					// restore subscriptions asynchronously
