@@ -1,8 +1,11 @@
-﻿namespace Zyan.Communication.Delegates
+﻿using System;
+
+namespace Zyan.Communication.Delegates
 {
 	/// <summary>
-	///
+	/// Delegate correlation set for a single component.
 	/// </summary>
+	[Serializable]
 	public class ComponentDelegateCorrelationSet
 	{
 		/// <summary>
