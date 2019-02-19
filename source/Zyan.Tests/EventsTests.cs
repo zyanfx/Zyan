@@ -280,6 +280,10 @@ namespace Zyan.Tests
 			});
 			ZyanHost.SubscriptionCanceled += canceledHandler;
 
+			var subscriptionsRestored = false;
+			var restoredHandler = new EventHandler((s, e) => subscriptionsRestored = true);
+			ZyanHost.SubscriptionsRestored += restoredHandler;
+
 			var proxy = ZyanConnection.CreateProxy<ISampleServer>("Singleton2");
 			proxy.TestEvent += eventHandler;
 
@@ -287,14 +291,18 @@ namespace Zyan.Tests
 			proxy.RaiseTestEvent();
 			Assert.IsTrue(handled);
 			Assert.IsTrue(subscriptionCanceled);
+			Assert.IsTrue(subscriptionsRestored);
 
 			// There is no need to wait because the client re-subscribes synchronously
 			handled = false;
+			subscriptionsRestored = false;
 			proxy.RaiseTestEvent();
 			Assert.IsTrue(handled);
+			Assert.IsTrue(subscriptionsRestored);
 
 			// detach event handler
 			ZyanHost.SubscriptionCanceled -= canceledHandler;
+			ZyanHost.SubscriptionsRestored -= restoredHandler;
 		}
 
 		[TestMethod]
@@ -307,7 +315,7 @@ namespace Zyan.Tests
 			ZyanSettings.LegacyAsyncResubscriptions = false;
 
 			var host = CreateZyanHost(5432, "SecondServer");
-			/*var conn = CreateZyanConnection(5432, "SecondServer");
+			var conn = CreateZyanConnection(5432, "SecondServer");
 			var proxy = conn.CreateProxy<ISampleServer>("Singleton2");
 
 			var handled = false;
@@ -320,20 +328,25 @@ namespace Zyan.Tests
 			// re-create host from scratch (discard all server-side subscriptions)
 			host.Dispose();
 			host = CreateZyanHost(5432, "SecondServer");
+			var subscriptionsRestored = false;
+			host.SubscriptionsRestored += (s, e) => subscriptionsRestored = true;
 
 			// the first call: event handlers are restored on reconnect
 			handled = false;
 			proxy.RaiseTestEvent();
 			Assert.IsTrue(handled);
+			Assert.IsTrue(subscriptionsRestored);
 
-			// the second call: event handlers are restored
+			// the second call: event handlers are not restored again
+			subscriptionsRestored = false;
 			proxy.RaiseTestEvent();
 			Assert.IsTrue(handled);
+			Assert.IsFalse(subscriptionsRestored);
 
 			// Note: dispose connection before the host
 			// so that it can unsubscribe from all remove events
 			conn.Dispose();
-			host.Dispose();*/
+			host.Dispose();
 		}
 
 		[TestMethod]

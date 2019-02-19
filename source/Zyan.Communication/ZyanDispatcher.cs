@@ -636,11 +636,12 @@ namespace Zyan.Communication
 				currentSession.RemoteSubscriptionTracker.Reset();
 			}
 
-			// order subscriptions alphabetically to avoid deadlocks
 			foreach (var subscription in subscriptions.EmptyIfNull().OrderBy(s => s.InterfaceName).ThenBy(s => s.UniqueName))
 			{
 				AddEventHandlers(subscription.InterfaceName, subscription.DelegateCorrelationSet, subscription.UniqueName);
 			}
+
+			_host.OnSubscriptionsRestored(EventArgs.Empty);
 		}
 
 		#endregion

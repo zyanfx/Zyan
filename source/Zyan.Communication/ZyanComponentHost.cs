@@ -454,6 +454,11 @@ namespace Zyan.Communication
 		public event EventHandler<SubscriptionEventArgs> SubscriptionCanceled;
 
 		/// <summary>
+		/// Occurs when a client resubscribes to all event handlers at once (for example, when the server is restarted).
+		/// </summary>
+		public event EventHandler SubscriptionsRestored;
+
+		/// <summary>
 		/// Checks whether the BeforeInvoke event has subscriptions.
 		/// </summary>
 		/// <returns>True, if subsciptions exist, otherwise, false.</returns>
@@ -550,6 +555,15 @@ namespace Zyan.Communication
 		protected internal virtual void OnSubscriptionCanceled(SubscriptionEventArgs e)
 		{
 			SubscriptionCanceled?.Invoke(this, e);
+		}
+
+		/// <summary>
+		/// Raises the <see cref="E:SubscriptionsRestored" /> event.
+		/// </summary>
+		/// <param name="e">Empty <see cref="EventArgs"/> instance.</param>
+		protected internal virtual void OnSubscriptionsRestored(EventArgs e)
+		{
+			SubscriptionsRestored?.Invoke(this, e);
 		}
 
 		#endregion
