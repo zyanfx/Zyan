@@ -993,6 +993,7 @@ namespace Zyan.Communication
 		{
 			var subscriptions = AliveProxies.Select(p => p.GetActiveSubscriptions()).Where(s => !s.DelegateCorrelationSet.IsNullOrEmpty()).ToArray();
 			var correlationSets = subscriptions.SelectMany(s => s.DelegateCorrelationSet).ToArray();
+			PrepareCallContext(false);
 			RemoteDispatcher.ReconnectEventHandlers(subscriptions);
 			_localSubscriptionTracker.Reset(correlationSets);
 		}

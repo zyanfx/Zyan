@@ -91,19 +91,19 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Adds remote subscription to the trackers.
+		/// Adds remote subscriptions to the tracker.
 		/// </summary>
-		internal string AddRemoteSubscription(DelegateCorrelationInfo delegateCorrelationInfo)
+		internal string TrackRemoteSubscriptions(IEnumerable<DelegateCorrelationInfo> delegateCorrelationSet)
 		{
- 			return RemoteSubscriptionTracker.Add(new[] { delegateCorrelationInfo });
+ 			return RemoteSubscriptionTracker.Add(delegateCorrelationSet);
 		}
 
 		/// <summary>
-		/// Removes remote subscription from the tracker.
+		/// Removes remote subscriptions from the tracker.
 		/// </summary>
-		internal string RemoveRemoteSubscription(DelegateCorrelationInfo delegateCorrelationInfo)
+		internal string UntrackRemoteSubscriptions(IEnumerable<DelegateCorrelationInfo> delegateCorrelationSet)
 		{
- 			return RemoteSubscriptionTracker.Remove(new[] { delegateCorrelationInfo });
+ 			return RemoteSubscriptionTracker.Remove(delegateCorrelationSet);
 		}
 
 		/// <summary>

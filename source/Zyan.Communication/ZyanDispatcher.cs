@@ -86,7 +86,7 @@ namespace Zyan.Communication
 							{
 								eventStub.RemoveHandler(correlationInfo.DelegateMemberName, dynamicEventWire.InDelegate);
 								wiringList.Remove(correlationInfo.CorrelationID);
-								currentSession.RemoveRemoteSubscription(correlationInfo);
+								currentSession.UntrackRemoteSubscriptions(new[] { correlationInfo });
 							}
 
 							_host.OnSubscriptionCanceled(new SubscriptionEventArgs
@@ -108,7 +108,6 @@ namespace Zyan.Communication
 					}
 				}
 
-				currentSession.AddRemoteSubscription(correlationInfo);
 				_host.OnSubscriptionAdded(new SubscriptionEventArgs
 				{
 					ComponentType = type,
@@ -116,6 +115,8 @@ namespace Zyan.Communication
 					CorrelationID = correlationInfo.CorrelationID,
 				});
 			}
+
+			currentSession.TrackRemoteSubscriptions(delegateCorrelationSet);
 		}
 
 		/// <summary>
@@ -143,10 +144,6 @@ namespace Zyan.Communication
 						var dynamicWireDelegate = wiringList[correlationInfo.CorrelationID];
 						eventStub.RemoveHandler(correlationInfo.DelegateMemberName, dynamicWireDelegate);
 						wiringList.Remove(correlationInfo.CorrelationID);
-						if (currentSession != null)
-						{
-							currentSession.RemoveRemoteSubscription(correlationInfo);
-						}
 					}
 
 					_host.OnSubscriptionRemoved(new SubscriptionEventArgs
@@ -156,6 +153,11 @@ namespace Zyan.Communication
 						CorrelationID = correlationInfo.CorrelationID,
 					});
 				}
+			}
+
+			if (currentSession != null)
+			{
+				currentSession.UntrackRemoteSubscriptions(delegateCorrelationSet);
 			}
 		}
 
