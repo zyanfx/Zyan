@@ -23,6 +23,16 @@ namespace Zyan.Communication.Toolbox
 		/// </remarks>
 		public static Action Debounce(this Action action, int delayMs = DefaultDebounceInterval)
 		{
+			if (action == null)
+			{
+				throw new ArgumentNullException("action");
+			}
+
+			if (delayMs <= 0)
+			{
+				return action;
+			}
+
 			var timer = default(IDisposable);
 
 			return () =>
@@ -46,6 +56,11 @@ namespace Zyan.Communication.Toolbox
 		/// </remarks>
 		public static IDisposable SetInterval(Action action, int delayMs)
 		{
+			if (action == null)
+			{
+				throw new ArgumentNullException("action");
+			}
+
 			var timer = new SysTimer(delayMs)
 			{
 				AutoReset = true
@@ -74,6 +89,11 @@ namespace Zyan.Communication.Toolbox
 		/// </remarks>
 		public static IDisposable SetTimeout(Action action, int delayMs)
 		{
+			if (action == null)
+			{
+				throw new ArgumentNullException("action");
+			}
+
 			var timer = new SysTimer(delayMs)
 			{
 				AutoReset = false

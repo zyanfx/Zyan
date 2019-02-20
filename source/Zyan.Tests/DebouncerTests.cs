@@ -29,6 +29,12 @@ namespace Zyan.Tests
 	[TestClass]
 	public class DebouncerTests
 	{
+		[TestMethod, ExpectedException(typeof(ArgumentNullException))]
+		public void NullActionIsNotAllowedForSetTimeout()
+		{
+			Debouncer.SetTimeout(null, 10);
+		}
+
 		[TestMethod]
 		public void SetTimeoutExecutesTheGivenActionAfterAnInterval()
 		{
@@ -56,6 +62,12 @@ namespace Zyan.Tests
 
 			Thread.Sleep(50);
 			Assert.AreEqual(0, counter);
+		}
+
+		[TestMethod, ExpectedException(typeof(ArgumentNullException))]
+		public void NullActionIsNotAllowedForSetInterval()
+		{
+			Debouncer.SetInterval(null, 10);
 		}
 
 		[TestMethod]
@@ -91,6 +103,12 @@ namespace Zyan.Tests
 			Assert.AreEqual(lastCounter, counter);
 		}
 
+		[TestMethod, ExpectedException(typeof(ArgumentNullException))]
+		public void NullActionIsNotAllowedForDebounce()
+		{
+			Debouncer.Debounce(null);
+		}
+
 		[TestMethod]
 		public void DebouncedActionIsCalledOnce()
 		{
@@ -111,6 +129,25 @@ namespace Zyan.Tests
 
 			Thread.Sleep(50);
 			Assert.AreEqual(1, counter);
+		}
+
+		[TestMethod]
+		public void DebounceWithZeroIntervalMeansImmediateExecution()
+		{
+			// target function
+			var counter = 0;
+			Action inc = () => counter++;
+
+			// debounce the given function
+			var debounced = inc.Debounce(0).Debounce(-100);
+			Assert.AreSame(debounced, inc);
+
+			// try to call the debounced version and make sure the target is not yet called
+			debounced();
+			debounced();
+			debounced();
+			debounced();
+			Assert.AreEqual(4, counter);
 		}
 	}
 }
