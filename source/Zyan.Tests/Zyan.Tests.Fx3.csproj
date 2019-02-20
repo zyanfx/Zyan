@@ -88,6 +88,7 @@
     <Compile Include="EventFilterTests.cs" />
     <Compile Include="EventsTests.cs" />
     <Compile Include="EventStubTests.cs" />
+    <Compile Include="ExtensionsTests.cs" />
     <Compile Include="GenericMethodsTests.cs" />
     <Compile Include="HeartbeatSessionTests.cs" />
     <Compile Include="InvocationDetailsTests.cs" />

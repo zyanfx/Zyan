@@ -235,11 +235,21 @@ namespace Zyan.Communication.Toolbox
 		}
 
 		/// <summary>
+		/// Determines whether the specified enumerable sequence is null or empty.
+		/// </summary>
+		/// <typeparam name="T">The type of the element</typeparam>
+		/// <param name="enumerable">The enumerable sequence.</param>
+		internal static bool IsNullOrEmpty<T>(this IEnumerable<T> enumerable)
+		{
+			return enumerable == null || !enumerable.Any();
+		}
+
+		/// <summary>
 		/// Returns an empty sequence of the specified type if the given sequence is null.
 		/// </summary>
 		/// <typeparam name="T">The type of the element.</typeparam>
 		/// <param name="enumerable">The enumerable sequence.</param>
-		public static IEnumerable<T> EmptyIfNull<T>(this IEnumerable<T> enumerable)
+		internal static IEnumerable<T> EmptyIfNull<T>(this IEnumerable<T> enumerable)
 		{
 			return enumerable ?? Enumerable.Empty<T>();
 		}

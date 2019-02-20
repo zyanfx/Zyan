@@ -991,7 +991,7 @@ namespace Zyan.Communication
 		/// </remarks>
 		private void ReconnectRemoteEventsCore()
 		{
-			var subscriptions = AliveProxies.Select(p => p.GetActiveSubscriptions()).ToArray();
+			var subscriptions = AliveProxies.Select(p => p.GetActiveSubscriptions()).Where(s => !s.DelegateCorrelationSet.IsNullOrEmpty()).ToArray();
 			var correlationSets = subscriptions.SelectMany(s => s.DelegateCorrelationSet).ToArray();
 			RemoteDispatcher.ReconnectEventHandlers(subscriptions);
 			_localSubscriptionTracker.Reset(correlationSets);
