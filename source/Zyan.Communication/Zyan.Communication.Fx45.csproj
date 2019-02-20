@@ -314,6 +314,7 @@
     <Compile Include="Toolbox\ChecksumHelper.cs" />
     <Compile Include="Toolbox\ConcurrentCollection.cs" />
     <Compile Include="Toolbox\Crc32Calculator.cs" />
+    <Compile Include="Toolbox\Debouncer.cs" />
     <Compile Include="Toolbox\LocalCallContextData.cs" />
     <Compile Include="Toolbox\Compression\CompressionHelper.cs" />
     <Compile Include="Toolbox\Compression\LZF.cs" />

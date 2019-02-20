@@ -72,6 +72,7 @@
     <Compile Include="CompressionTests.cs" />
     <Compile Include="CryptoToolsTests.cs" />
     <Compile Include="CustomAuthenticationTests.cs" />
+    <Compile Include="DebouncerTests.cs" />
     <Compile Include="DefaultProtocolTests.cs" />
     <Compile Include="DiscoveryMetadataTests.cs" />
     <Compile Include="DuckTypingTests.cs" />
