@@ -54,11 +54,13 @@ namespace Zyan.Communication
 		public static bool LegacyIgnoreDuplicateRegistrations { get; set; }
 
 		/// <summary>
-		/// Gets or sets a value indicating whether ZyanConnection restores subscriptions asynchronously.
+		/// Gets or sets a delay before ZyanConnection restores subscriptions.
 		/// </summary>
 		/// <remarks>
-		/// Zyan v2.11 and below used to restore missing event subscriptions asynchronously.
+		/// Zyan v2.11 and below used to restore missing event subscriptions asynchronously, without any delay.
+		/// Zyan v2.12 optionally debounces this method, zero interval means that subscriptions are restored synchronously.
+		/// This setting affects new ZyanConnection instances and doesn't change any existing connections.
 		/// </remarks>
-		public static bool LegacyAsyncResubscriptions { get; set; }
+		public static TimeSpan ReconnectRemoteEventsDebounceInterval { get; set; } = TimeSpan.FromSeconds(1);
 	}
 }

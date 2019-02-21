@@ -179,8 +179,9 @@ namespace Zyan.Tests
 			return zyanHost;
 		}
 
-		private static ZyanConnection CreateZyanConnection(int port, string name)
+		private static ZyanConnection CreateZyanConnection(int port, string name, TimeSpan? debounceInterval = null)
 		{
+			ZyanSettings.ReconnectRemoteEventsDebounceInterval = debounceInterval ?? TimeSpan.Zero;
 			return new ZyanConnection("null://NullChannel:" + port + "/" + name, true);
 		}
 
@@ -254,6 +255,58 @@ namespace Zyan.Tests
 			ZyanHost.SubscriptionCanceled -= canceledHandler;
 		}
 
+		[TestMethod]
+		public void ExceptionInEventHandlerCancelsTheSubscription()
+		{
+			ZyanSettings.LegacyBlockingEvents = true;
+			ZyanSettings.LegacyBlockingSubscriptions = true;
+			ZyanSettings.LegacyUnprotectedEventHandlers = true;
+
+			var host = CreateZyanHost(5432, "ThirdServer");
+			var conn = CreateZyanConnection(5432, "ThirdServer", TimeSpan.FromSeconds(1));
+			var proxy = conn.CreateProxy<ISampleServer>("Singleton2");
+
+			var handled = false;
+			var eventHandler = new EventHandler((s, e) =>
+			{
+				handled = true;
+				throw new Exception();
+			});
+
+			proxy.TestEvent += eventHandler;
+
+			var subscriptionCanceled = false;
+			var clientSideException = default(Exception);
+			host.SubscriptionCanceled += (s, e) =>
+			{
+				subscriptionCanceled = true;
+				clientSideException = e.Exception;
+			};
+
+			var subscriptionsRestored = false;
+			var restoredHandler = new EventHandler((s, e) => subscriptionsRestored = true);
+			host.SubscriptionsRestored += restoredHandler;
+
+			// raise an event, catch exception and unsubscribe automatically
+			proxy.RaiseTestEvent();
+			Assert.IsTrue(handled);
+			Assert.IsTrue(subscriptionCanceled);
+			Assert.IsFalse(subscriptionsRestored);
+
+			// raise an event and check if it's ignored because reconnection isn't called yet
+			// due to the large debounce interval used in ZyanConnection
+			handled = false;
+			subscriptionsRestored = false;
+			proxy.RaiseTestEvent();
+			Assert.IsFalse(handled);
+			Assert.IsFalse(subscriptionsRestored);
+
+			// Note: dispose connection before the host
+			// so that it can unsubscribe from all remove events
+			conn.Dispose();
+			host.Dispose();
+		}
+
 		// The subscription gets restored on the next remote call to RaiseTestEvent:
 		// local subscription checksum doesn't match remote checksum => re-subscribe => ok!
 		[TestMethod]
@@ -262,7 +315,6 @@ namespace Zyan.Tests
 			ZyanSettings.LegacyBlockingEvents = true;
 			ZyanSettings.LegacyBlockingSubscriptions = true;
 			ZyanSettings.LegacyUnprotectedEventHandlers = true;
-			ZyanSettings.LegacyAsyncResubscriptions = false;
 
 			var handled = false;
 			var eventHandler = new EventHandler((s, e) =>
@@ -308,11 +360,9 @@ namespace Zyan.Tests
 		[TestMethod]
 		public void ZyanConnectionResubscribesAfterServerRestart()
 		{
-			Trace.WriteLine("ZyanConnectionResubscribesAfterServerRestart");
 			ZyanSettings.LegacyBlockingEvents = true;
 			ZyanSettings.LegacyBlockingSubscriptions = true;
 			ZyanSettings.LegacyUnprotectedEventHandlers = true;
-			ZyanSettings.LegacyAsyncResubscriptions = false;
 
 			var host = CreateZyanHost(5432, "SecondServer");
 			var conn = CreateZyanConnection(5432, "SecondServer");

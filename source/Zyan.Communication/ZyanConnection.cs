@@ -253,6 +253,10 @@ namespace Zyan.Communication
 				throw ex.PreserveStackTrace();
 			}
 
+			var reconnectEvents = new Action(ReconnectRemoteEventsCore);
+			var debounceInterval = ZyanSettings.ReconnectRemoteEventsDebounceInterval.TotalMilliseconds;
+			ReconnectRemoteEvents = reconnectEvents.Debounce((int)debounceInterval);
+
 			StartKeepSessionAliveTimer();
 			lock (_connections)
 			{
@@ -984,6 +988,16 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
+		/// Gets the remote events lock object.
+		/// </summary>
+		internal object RemoteEventsLock { get; } = new object();
+
+		/// <summary>
+		/// Reconnects to all remote events or delegates after a server restart.
+		/// </summary>
+		private Action ReconnectRemoteEvents { get; }
+
+		/// <summary>
 		/// Reconnects to all remote events or delegates of any known proxy for this connection, after a server restart.
 		/// </summary>
 		/// <remarks>
@@ -991,36 +1005,27 @@ namespace Zyan.Communication
 		/// </remarks>
 		private void ReconnectRemoteEventsCore()
 		{
-			var subscriptions = AliveProxies.Select(p => p.GetActiveSubscriptions()).Where(s => !s.DelegateCorrelationSet.IsNullOrEmpty()).ToArray();
-			var correlationSets = subscriptions.SelectMany(s => s.DelegateCorrelationSet).ToArray();
-			PrepareCallContext(false);
-			RemoteDispatcher.ReconnectEventHandlers(subscriptions);
-			_localSubscriptionTracker.Reset(correlationSets);
-		}
-
-		/// <summary>
-		/// Reconnects to all remote events or delegates after a server restart.
-		/// </summary>
-		private void ReconnectRemoteEvents()
-		{
-			if (!ZyanSettings.LegacyAsyncResubscriptions)
+			if (_isDisposed)
 			{
-				ReconnectRemoteEventsCore();
 				return;
 			}
 
-			// legacy method is unsafe as it silently swallows the exceptions
-			ThreadPool.QueueUserWorkItem(x =>
+			try
 			{
-				try
+				lock (RemoteEventsLock)
 				{
-					ReconnectRemoteEventsCore();
+					var subscriptions = AliveProxies.Select(p => p.GetActiveSubscriptions()).Where(s => !s.DelegateCorrelationSet.IsNullOrEmpty()).ToArray();
+					var correlationSets = subscriptions.SelectMany(s => s.DelegateCorrelationSet).ToArray();
+					_localSubscriptionTracker.Reset(correlationSets);
+
+					PrepareCallContext(false);
+					RemoteDispatcher.ReconnectEventHandlers(subscriptions);
 				}
-				catch (Exception ex)
-				{
-					Trace.WriteLine("Error while restoring client subscriptions: {0}", ex);
-				}
-			});
+			}
+			catch (Exception ex)
+			{
+				Trace.WriteLine("Error while restoring client subscriptions: {0}", ex);
+			}
 		}
 
 		/// <summary>
