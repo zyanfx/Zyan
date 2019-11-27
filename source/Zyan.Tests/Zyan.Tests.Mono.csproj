@@ -91,6 +91,7 @@
     <Compile Include="SrpAuthenticationTests.cs" />
     <Compile Include="StreamTests.cs" />
     <Compile Include="SubscriptionTrackerTests.cs" />
+    <Compile Include="ThreadPoolTests.cs" />
     <Compile Include="TransportHeaderWrapperTests.cs" />
     <Compile Include="TypeHelperTests.cs" />
     <Compile Include="VulnerabilityTests.cs" />
