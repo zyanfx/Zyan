@@ -109,6 +109,7 @@
     <Compile Include="SecureRemotePasswordTests.cs" />
     <Compile Include="SrpAuthenticationTests.cs" />
     <Compile Include="SubscriptionTrackerTests.cs" />
+    <Compile Include="ThreadPoolTests.cs" />
     <Compile Include="TransportHeaderWrapperTests.cs" />
     <Compile Include="ZyanProxyTests.cs" />
   </ItemGroup>
