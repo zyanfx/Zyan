@@ -1,7 +1,8 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Security.Permissions;
 using System.Threading;
+using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication.Threading
 {
@@ -99,7 +100,7 @@ namespace Zyan.Communication.Threading
 
 		private readonly int m_concurrencyLevel;
 		private readonly bool m_flowExecutionContext;
-		private readonly Queue<WorkItem> m_queue = new Queue<WorkItem>();
+		private readonly ConcurrentQueue<WorkItem> m_queue = new ConcurrentQueue<WorkItem>();
 		private volatile Thread[] m_threads;
 		private int m_threadsWaiting;
 		private bool m_shutdown;
@@ -168,7 +169,7 @@ namespace Zyan.Communication.Threading
 						return;
 
 					// Find a new work item to execute.
-					while (m_queue.Count == 0)
+					while (m_queue.TryDequeue(out wi) == false)
 					{
 						m_threadsWaiting++;
 						try { Monitor.Wait(m_queue); }
@@ -180,7 +181,6 @@ namespace Zyan.Communication.Threading
 					}
 
 					// We found a work item! Grab it ...
-					wi = m_queue.Dequeue();
 				}
 
 				// ...and Invoke it. Note: exceptions will go unhandled (and crash).
