@@ -42,6 +42,38 @@ namespace Zyan.Tests
 				pool.QueueUserWorkItem(callback);
 			}
 
+			Thread.Sleep(TimeSpan.FromSeconds(1));
+
+			pool.Dispose();
+			Assert.AreEqual(1000, count);
+		}
+
+		[TestMethod]
+		public void SimpleLockThreadPoolQueueFromMultipleThreads()
+		{
+			var count = 0;
+			var queueCount = 0;
+			var pool = new SimpleLockThreadPool();
+			var queuePool = new SimpleLockThreadPool();
+			var callback = new WaitCallback(obj => Interlocked.Increment(ref count));
+			var queueCallback = new WaitCallback(obj =>
+			{
+				Interlocked.Increment(ref queueCount);
+				pool.QueueUserWorkItem(callback);
+			});
+
+			for (var i = 0; i < 1000; i++)
+			{
+				queuePool.QueueUserWorkItem(queueCallback);
+			}
+
+			Thread.Sleep(TimeSpan.FromSeconds(2));
+
+			queuePool.Dispose();
+			Assert.AreEqual(1000, queueCount);
+
+			Thread.Sleep(TimeSpan.FromSeconds(1));
+
 			pool.Dispose();
 			Assert.AreEqual(1000, count);
 		}
