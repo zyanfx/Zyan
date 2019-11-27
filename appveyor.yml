@@ -24,9 +24,9 @@ before_test:
 - InterLinq.UnitTests.Server.exe start
 
 test_script:
-- OpenCover.Console.exe -returntargetcode -register:user -target:"C:\projects\zyan\bin\UnitTests\IntegrationTest_DistributedEvents.exe" -filter:"+[Zyan*]*" -output:".\ZyanIntegrationTestCoverage.xml"
-- OpenCover.Console.exe -returntargetcode -register:user -target:"vstest.console.exe" -targetargs:"/logger:Appveyor C:\projects\zyan\bin\UnitTests\Zyan.Tests.dll" -filter:"+[*]* -[MemoDb]*" -output:".\ZyanUnitTestCoverage.xml"
-- OpenCover.Console.exe -returntargetcode -register:user -target:"vstest.console.exe" -targetargs:"/logger:Appveyor C:\projects\zyan\bin\UnitTests\InterLinq.UnitTests.dll" -output:".\InterLinqUnitTestCoverage.xml"
+- OpenCover.Console.exe -returntargetcode -register:administrator -target:"C:\projects\zyan\bin\UnitTests\IntegrationTest_DistributedEvents.exe" -filter:"+[Zyan*]*" -output:".\ZyanIntegrationTestCoverage.xml"
+- OpenCover.Console.exe -returntargetcode -register:administrator -target:"vstest.console.exe" -targetargs:"/logger:Appveyor C:\projects\zyan\bin\UnitTests\Zyan.Tests.dll" -filter:"+[*]* -[MemoDb]*" -output:".\ZyanUnitTestCoverage.xml"
+- OpenCover.Console.exe -returntargetcode -register:administrator -target:"vstest.console.exe" -targetargs:"/logger:Appveyor C:\projects\zyan\bin\UnitTests\InterLinq.UnitTests.dll" -output:".\InterLinqUnitTestCoverage.xml"
 - nunit-console.exe C:\projects\zyan\bin\UnitTests3\Zyan.Tests.Fx3.dll /domain=None /noshadow 
 
 after_test:
