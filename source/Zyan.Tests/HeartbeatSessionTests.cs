@@ -117,8 +117,12 @@ namespace Zyan.Tests
 			// set up the connection
 			using (var conn = new ZyanConnection("null://NullChannel:5678/HeartbeatServer"))
 			{
-				conn.PollingInterval = TimeSpan.FromMilliseconds(5);
-				conn.PollingEnabled = true;
+				// the code below uses actual heartbeat timer to send heartbeats:
+				//conn.PollingInterval = TimeSpan.FromMilliseconds(5);
+				//conn.PollingEnabled = true;
+
+				// use the internal method to avoid using timer in unit tests
+				conn.SendHeartbeat(null);
 				Thread.Sleep(500);
 			}
 

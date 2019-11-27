@@ -23,6 +23,11 @@ namespace Zyan.Communication.Delegates
 		public Action<Exception> CancelSubscription { get; set; }
 
 		/// <summary>
+		/// Gets or sets a value indicating whether the subscription is canceled.
+		/// </summary>
+		public bool Canceled { get; private set; }
+
+		/// <summary>
 		/// Gets or sets the event filter.
 		/// </summary>
 		public IEventFilter EventFilter { get; set; }
@@ -37,6 +42,9 @@ namespace Zyan.Communication.Delegates
 		{
 			try
 			{
+				if (Canceled)
+					return null;
+
 				if (ValidateSession != null && !ValidateSession())
 					throw new InvalidSessionException();
 
@@ -48,6 +56,9 @@ namespace Zyan.Communication.Delegates
 			}
 			catch (Exception ex)
 			{
+				// canceled due to an exception
+				Canceled = true;
+
 				// unsubscribe
 				if (CancelSubscription != null)
 				{
