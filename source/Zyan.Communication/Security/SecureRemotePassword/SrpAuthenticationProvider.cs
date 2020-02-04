@@ -45,6 +45,13 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 			public SrpEphemeral ServerEphemeral { get; set; }
 		}
 
+		internal class MissingSrpAccount : ISrpAccount
+		{
+			public string UserName { get; set; }
+			public string Salt => "1234";
+			public string Verifier => "4321";
+		}
+
 		/// <inheritdoc/>
 		public AuthResponseMessage Authenticate(AuthRequestMessage authRequest)
 		{
@@ -95,6 +102,13 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 			// generate fake salt and B values so that attacker cannot tell whether the given user exists or not
 			var fakeSalt = SrpParameters.Hash(userName + UnknownUserSalt).ToHex();
 			var fakeEphemeral = SrpServer.GenerateEphemeral(fakeSalt);
+			PendingAuthentications[authRequest.SessionID] = new Step1Data
+			{
+				Account = new MissingSrpAccount { UserName = userName },
+				ClientEphemeralPublic = clientEphemeralPublic,
+				ServerEphemeral = fakeEphemeral
+			};
+
 			return ResponseStep1(fakeSalt, fakeEphemeral.Public);
 		}
 
@@ -109,6 +123,9 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 
 			try
 			{
+				if (vars.Account is MissingSrpAccount)
+					throw new SecurityException();
+
 				// second step may fail: User -> Host: M = H(H(N) xor H(g), H(I), s, A, B, K)
 				var clientSessionProof = (string)authRequest.Credentials[SrpProtocolConstants.SRP_CLIENT_SESSION_PROOF];
 				var serverSession = SrpServer.DeriveSession(vars.ServerEphemeral.Secret, vars.ClientEphemeralPublic,
@@ -117,9 +134,9 @@ namespace Zyan.Communication.Security.SecureRemotePassword
 				// Host -> User: H(A, M, K)
 				return ResponseStep2(serverSession.Proof, vars.Account);
 			}
-			catch (SecurityException ex)
+			catch (SecurityException)
 			{
-				return Error("Authentication failed: " + ex.Message);
+				return Error("Authentication failed: bad password or user name");
 			}
 		}
 

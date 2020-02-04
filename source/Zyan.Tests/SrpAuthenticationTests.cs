@@ -11,6 +11,7 @@ using Zyan.Communication;
 using Zyan.Communication.Protocols.Tcp;
 using Zyan.Communication.Security;
 using Zyan.Communication.Security.SecureRemotePassword;
+using Hashtable = System.Collections.Hashtable;
 
 namespace Zyan.Tests
 {
@@ -389,8 +390,7 @@ namespace Zyan.Tests
 			Assert.IsNotNull(response.Parameters[SrpProtocolConstants.SRP_SALT]);
 			Assert.IsNotNull(response.Parameters[SrpProtocolConstants.SRP_SERVER_PUBLIC_EPHEMERAL]);
 
-			// step1 is not performed because the user is unknown
-			Assert.IsFalse(authProvider.PendingAuthentications.Any());
+			Assert.IsTrue(authProvider.PendingAuthentications.Any());
 
 			// server returns salt even for the unknown user name so we can't tell whether the user exists or not
 			var salt1 = (string)response.Parameters[SrpProtocolConstants.SRP_SALT];
@@ -538,6 +538,40 @@ namespace Zyan.Tests
 			}
 		}
 
+		[TestMethod]
+		public void InvalidLoginUsingTcpSimplexChannel()
+		{
+			var url = "tcp://localhost:8091/CustomAuthenticationTestHost_TcpSimplex";
+			var protocol = new TcpCustomClientProtocolSetup(true);
+			var credentials = new SrpCredentials(UserName + "1", Password, CustomSrpParameters);
+
+			try
+			{
+				new ZyanConnection(url, protocol, credentials, true, true);
+			}
+			catch (SecurityException ex)
+			{
+				Assert.AreEqual("Authentication failed: bad password or user name", ex.Message);
+			}
+		}
+
+		[TestMethod]
+		public void InvalidPasswordUsingTcpSimplexChannel()
+		{
+			var url = "tcp://localhost:8091/CustomAuthenticationTestHost_TcpSimplex";
+			var protocol = new TcpCustomClientProtocolSetup(true);
+			var credentials = new SrpCredentials(UserName, Password + "1", CustomSrpParameters);
+
+			try
+			{
+				new ZyanConnection(url, protocol, credentials, true, true);
+			}
+			catch (SecurityException ex)
+			{
+				Assert.AreEqual("Authentication failed: bad password or user name", ex.Message);
+			}
+		}
+
 		[TestMethod, ExpectedException(typeof(SecurityException))]
 		public void InvalidLoginUsingTcpSimplexChannel_NoAuthClient()
 		{
@@ -560,6 +594,33 @@ namespace Zyan.Tests
 			var protocol = new TcpCustomClientProtocolSetup(true);
 
 			using (var connection = new ZyanConnection(url, protocol))
+			{
+				var proxy1 = connection.CreateProxy<ISampleServer>("SampleServer");
+				Assert.AreEqual("Hallo", proxy1.Echo("Hallo"));
+				proxy1 = null;
+			}
+		}
+
+		private class BrokenSrpCredentials : AuthCredentials
+		{
+			public override void Authenticate(Guid sessionId, IZyanDispatcher dispatcher)
+			{
+				dispatcher.Logon(sessionId, new Hashtable
+				{
+					{ SrpProtocolConstants.SRP_STEP_NUMBER, 2 },
+					{ SrpProtocolConstants.SRP_CLIENT_SESSION_PROOF, "woof" },
+				});
+			}
+		}
+
+		[TestMethod, ExpectedException(typeof(SecurityException))]
+		public void AuthenticationStep1WasNotPerformed()
+		{
+			var url = "tcp://localhost:8091/CustomAuthenticationTestHost_TcpSimplex";
+			var protocol = new TcpCustomClientProtocolSetup(true);
+			var credentials = new BrokenSrpCredentials();
+
+			using (var connection = new ZyanConnection(url, protocol, credentials, true, true))
 			{
 				var proxy1 = connection.CreateProxy<ISampleServer>("SampleServer");
 				Assert.AreEqual("Hallo", proxy1.Echo("Hallo"));
