@@ -619,13 +619,27 @@ namespace Zyan.Tests
 			var url = "tcp://localhost:8091/CustomAuthenticationTestHost_TcpSimplex";
 			var protocol = new TcpCustomClientProtocolSetup(true);
 			var credentials = new BrokenSrpCredentials();
+			var conn = new ZyanConnection(url, protocol, credentials, true, true);
+		}
 
-			using (var connection = new ZyanConnection(url, protocol, credentials, true, true))
+		private class AnotherBrokenSrpCredentials : AuthCredentials
+		{
+			public override void Authenticate(Guid sessionId, IZyanDispatcher dispatcher)
 			{
-				var proxy1 = connection.CreateProxy<ISampleServer>("SampleServer");
-				Assert.AreEqual("Hallo", proxy1.Echo("Hallo"));
-				proxy1 = null;
+				dispatcher.Logon(sessionId, new Hashtable
+				{
+					{ SrpProtocolConstants.SRP_STEP_NUMBER, 3 },
+				});
 			}
+		}
+
+		[TestMethod, ExpectedException(typeof(SecurityException))]
+		public void UnknownAuthenticationStep()
+		{
+			var url = "tcp://localhost:8091/CustomAuthenticationTestHost_TcpSimplex";
+			var protocol = new TcpCustomClientProtocolSetup(true);
+			var credentials = new AnotherBrokenSrpCredentials();
+			var conn = new ZyanConnection(url, protocol, credentials, true, true);
 		}
 	}
 }
