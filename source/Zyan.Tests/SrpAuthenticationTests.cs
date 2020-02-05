@@ -507,13 +507,7 @@ namespace Zyan.Tests
 		{
 			var url = "tcpex://localhost:8090/CustomAuthenticationTestHost_TcpDuplex";
 			var protocol = new TcpDuplexClientProtocolSetup(true);
-
-			using (var connection = new ZyanConnection(url, protocol))
-			{
-				var proxy1 = connection.CreateProxy<ISampleServer>("SampleServer");
-				Assert.AreEqual("Hallo", proxy1.Echo("Hallo"));
-				proxy1 = null;
-			}
+			var connection = new ZyanConnection(url, protocol);
 		}
 
 		[TestMethod]
@@ -578,13 +572,7 @@ namespace Zyan.Tests
 			var url = "tcp://localhost:8091/CustomAuthenticationTestHost_TcpSimplex";
 			var protocol = new TcpCustomClientProtocolSetup(true);
 			var credentials = new AuthCredentials(UserName, Password);
-
-			using (var connection = new ZyanConnection(url, protocol, credentials, true, true))
-			{
-				var proxy1 = connection.CreateProxy<ISampleServer>("SampleServer");
-				Assert.AreEqual("Hallo", proxy1.Echo("Hallo"));
-				proxy1 = null;
-			}
+			var connection = new ZyanConnection(url, protocol, credentials, true, true);
 		}
 
 		[TestMethod, ExpectedException(typeof(SecurityException))]
@@ -592,13 +580,7 @@ namespace Zyan.Tests
 		{
 			var url = "tcp://localhost:8091/CustomAuthenticationTestHost_TcpSimplex";
 			var protocol = new TcpCustomClientProtocolSetup(true);
-
-			using (var connection = new ZyanConnection(url, protocol))
-			{
-				var proxy1 = connection.CreateProxy<ISampleServer>("SampleServer");
-				Assert.AreEqual("Hallo", proxy1.Echo("Hallo"));
-				proxy1 = null;
-			}
+			var connection = new ZyanConnection(url, protocol);
 		}
 
 		private class BrokenSrpCredentials : AuthCredentials
