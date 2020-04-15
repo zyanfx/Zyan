@@ -42,8 +42,8 @@
     <tags>mobile android xamarin duplex tcp tcpex http ipc remoting network communication socket sockets nat firewall distributed cloud wcf rpc linq mef composition event events ebc event-based-components binary flowdesign easy secure ldap authentication security compression server service services mono</tags>
     <dependencies>
       <group>
-        <dependency id="Zyan.SafeDeserializationHelpers" version="0.5.0" />
-        <dependency id="srp" version="1.0.4" />
+        <dependency id="Zyan.SafeDeserializationHelpers" version="0.5.1" />
+        <dependency id="srp" version="1.0.5" />
       </group>
     </dependencies>
   </metadata>
