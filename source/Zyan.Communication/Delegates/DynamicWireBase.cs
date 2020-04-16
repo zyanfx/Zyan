@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 
 namespace Zyan.Communication.Delegates
@@ -8,8 +6,19 @@ namespace Zyan.Communication.Delegates
 	/// <summary>
 	/// Base class for dynamic wires.
 	/// </summary>
-	internal abstract class DynamicWireBase
+	internal abstract class DynamicWireBase : IDisposable
 	{
+		/// <inheritdoc/>
+		public virtual void Dispose()
+		{
+			IsDisposed = true;
+		}
+
+		/// <summary>
+		/// Gets or sets a value indicating whether this instance is disposed.
+		/// </summary>
+		protected bool IsDisposed { get; set; }
+
 		/// <summary>
 		/// Client delegate interceptor.
 		/// </summary>

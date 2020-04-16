@@ -187,6 +187,7 @@ namespace Zyan.Communication.Delegates
 
 			var dynamicInvoker = GetDynamicInvoker(deleg);
 			var invocationList = deleg.GetInvocationList();
+
 			foreach (var d in invocationList)
 			{
 				// avoid closing over the loop variable (not needed in C# v5)
@@ -202,7 +203,7 @@ namespace Zyan.Communication.Delegates
 					}
 					catch (Exception ex)
 					{
-						Trace.WriteLine("Exception in an event handler: {0}", ex);
+						Trace.Logger.Warning(ex, "Invocation failed: {Message}", ex.Message);
 					}
 				});
 			}
