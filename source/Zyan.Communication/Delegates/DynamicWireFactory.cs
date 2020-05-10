@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Zyan.Communication.Toolbox;
 
@@ -176,11 +177,26 @@ namespace Zyan.Communication.Delegates
 				return target;
 			}
 
-			var closure = @delegate.Target as System.Runtime.CompilerServices.Closure;
+			// System.Runtime.CompilerServices stuff is used by compiled LINQ expressions
+#if FX3
+			var closure = @delegate.Target as ExecutionScope;
+			if (closure != null && closure.Globals != null)
+			{
+				return closure.Globals
+					.OfType<IStrongBox>()
+					.Select(b => b.Value)
+					.OfType<DynamicWireBase>()
+					.FirstOrDefault();
+			}
+#else
+			var closure = @delegate.Target as Closure;
 			if (closure != null && closure.Constants != null)
 			{
-				return closure.Constants.OfType<DynamicWireBase>().First();
+				return closure.Constants
+					.OfType<DynamicWireBase>()
+					.FirstOrDefault();
 			}
+#endif
 
 			return null;
 		}
