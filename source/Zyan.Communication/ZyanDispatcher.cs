@@ -145,11 +145,10 @@ namespace Zyan.Communication
 						eventStub.RemoveHandler(correlationInfo.DelegateMemberName, dynamicWireDelegate);
 						wiringList.Remove(correlationInfo.CorrelationID);
 
-						// TODO: check if this is relevant
-						var target = dynamicWireDelegate.Target as DynamicWireBase;
-						if (target != null)
+						var dynamicWire = DynamicWireFactory.GetDynamicWire(dynamicWireDelegate);
+						if (dynamicWire != null)
 						{
-							target.Dispose();
+							dynamicWire.Dispose();
 						}
 					}
 

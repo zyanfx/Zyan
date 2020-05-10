@@ -184,5 +184,26 @@ namespace Zyan.Tests
 			Assert.IsTrue(executed);
 			Assert.AreEqual(res, result);
 		}
+
+		[TestMethod]
+		public void GetDynamicWireReturnsDynamicWire()
+		{
+			var executed = false;
+			var wire = new MockWire<VoidMethod>(args =>
+			{
+				executed = true;
+				Assert.IsNotNull(args);
+				Assert.AreEqual(2, args.Length);
+				Assert.AreEqual(123, args[0]);
+				return null;
+			});
+
+			Assert.IsFalse(executed);
+			wire.In(123, DateTime.MinValue);
+			Assert.IsTrue(executed);
+
+			Assert.AreSame(wire, DynamicWireFactory.GetDynamicWire(wire.In));
+			Assert.AreSame(wire, DynamicWireFactory.GetDynamicWire(wire.InDelegate));
+		}
 	}
 }

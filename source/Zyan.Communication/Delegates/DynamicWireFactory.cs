@@ -159,6 +159,33 @@ namespace Zyan.Communication.Delegates
 		}
 
 		/// <summary>
+		/// Extracts the <see cref="DynamicWireBase"/> from the given dynamic-invocable delegate.
+		/// </summary>
+		/// <param name="delegate">The delegate to extract.</param>
+		/// <returns></returns>
+		public static DynamicWireBase GetDynamicWire(Delegate @delegate)
+		{
+			if (@delegate == null)
+			{
+				return null;
+			}
+
+			var target = @delegate.Target as DynamicWireBase;
+			if (target != null)
+			{
+				return target;
+			}
+
+			var closure = @delegate.Target as System.Runtime.CompilerServices.Closure;
+			if (closure != null && closure.Constants != null)
+			{
+				return closure.Constants.OfType<DynamicWireBase>().First();
+			}
+
+			return null;
+		}
+
+		/// <summary>
 		/// Builds the strong-typed delegate for the dynamicInvoke: object DynamicInvoke(object[] args);
 		/// </summary>
 		/// <remarks>
