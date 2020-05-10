@@ -108,7 +108,7 @@ namespace Zyan.Communication.Delegates
 		}
 
 		/// <summary>
-		/// Dynamically invokes the method represented by the given delegate. The delegate can be null. 
+		/// Dynamically invokes the method represented by the given delegate. The delegate can be null.
 		/// </summary>
 		/// <remarks>
 		/// Ensures that all delegates of the invocation list are called (even if some exceptions occured).
@@ -174,7 +174,7 @@ namespace Zyan.Communication.Delegates
 		}
 
 		/// <summary>
-		/// Dynamically invokes the method represented by the given delegate as a one-way method. The delegate can be null. 
+		/// Dynamically invokes the method represented by the given delegate as a one-way method. The delegate can be null.
 		/// </summary>
 		/// <param name="deleg">The delegate to invoke.</param>
 		/// <param name="arguments">The arguments.</param>
@@ -203,7 +203,7 @@ namespace Zyan.Communication.Delegates
 					}
 					catch (Exception ex)
 					{
-						Trace.Logger.Warning(ex, "Invocation failed: {Message}", ex.Message);
+						Trace.WriteLine("Invocation failed: " + ex.ToString());
 					}
 				});
 			}

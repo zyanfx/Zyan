@@ -40,7 +40,6 @@ namespace Zyan.Communication.Delegates
 			// stop event routing
 			if (EventThreadPool.IsValueCreated)
 			{
-				Trace.Logger.Debug("Disposing of the event thread pool: session={OwnerSessionID}, event={EventDisplayName}", OwnerSessionID, EventDisplayName);
 				EventThreadPool.Value.Dispose();
 			}
 
@@ -74,8 +73,6 @@ namespace Zyan.Communication.Delegates
 
 		private object SyncInvokeClientDelegate(params object[] args)
 		{
-			var invocationResult = "OK";
-
 			try
 			{
 				if (Canceled)
