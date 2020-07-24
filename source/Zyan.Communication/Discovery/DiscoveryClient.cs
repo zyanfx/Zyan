@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using Zyan.Communication.Discovery.Metadata;
 using Zyan.Communication.Toolbox.Diagnostics;
+using System.Net.NetworkInformation;
 
 namespace Zyan.Communication.Discovery
 {
@@ -58,7 +59,7 @@ namespace Zyan.Communication.Discovery
 
 		private IPEndPoint DestinationEndpoint { get; set; }
 
-		private UdpClient UdpClient { get; set; }
+		private List<UdpClient> UdpSendClients { get; set; } = new List<UdpClient>();
 
 		private TimeSpan RetryTimeout { get; set; }
 
@@ -71,6 +72,8 @@ namespace Zyan.Communication.Discovery
 		private HashSet<DiscoveryMetadata> Results { get; set; }
 
 		private object lockObject = new object();
+
+		private bool isRunning = false;
 
 		/// <summary>
 		/// Occurs when <see cref="DiscoveryServer"/> response is acquired.
@@ -94,13 +97,33 @@ namespace Zyan.Communication.Discovery
 		/// Starts the discovery.
 		/// </summary>
 		public void StartDiscovery()
-		{ 
-			Stopped = false;
-			Counter = RetryCount;
-			Results.Clear();
+		{
+			SafePerform(() =>
+			{
+				Stopped = false;
+				Counter = RetryCount;
+				Results.Clear();
+				foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())
+				{
+					if (ni.OperationalStatus == OperationalStatus.Up && ni.SupportsMulticast &&
+						ni.GetIPProperties().GetIPv4Properties() != null)
+					{
+						int id = ni.GetIPProperties().GetIPv4Properties().Index;
+						if (NetworkInterface.LoopbackInterfaceIndex != id)
+						{
+							foreach (UnicastIPAddressInformation uip in ni.GetIPProperties().UnicastAddresses)
+							{
+								if (uip.Address.AddressFamily == AddressFamily.InterNetwork)
+								{
+									UdpSendClients.Add(new UdpClient(new IPEndPoint(uip.Address, 0)));
+								}
+							}
+						}
+					}
+				}
 
-			UdpClient = new UdpClient();
-			RetryTimer = new Timer(DiscoveryTimerCallback, null, TimeSpan.Zero, RetryTimeout);
+				RetryTimer = new Timer(DiscoveryTimerCallback, null, TimeSpan.Zero, RetryTimeout);
+			});
 		}
 
 		/// <summary>
@@ -109,17 +132,12 @@ namespace Zyan.Communication.Discovery
 		public void StopDiscovery()
 		{
 			Stopped = true;
+			RetryTimer?.Dispose();
+			RetryTimer = null;
 
-			if (UdpClient != null)
+			foreach (var udpClient in UdpSendClients)
 			{
-				UdpClient.Close();
-				UdpClient = null;
-			}
-
-			if (RetryTimer != null)
-			{
-				RetryTimer.Dispose();
-				RetryTimer = null;
+				udpClient.Close();
 			}
 		}
 
@@ -133,20 +151,33 @@ namespace Zyan.Communication.Discovery
 
 		private void DiscoveryTimerCallback(object state)
 		{
+			if (isRunning)
+			{
+				return;
+			}
+
+			isRunning = true;
+
 			if (Counter <= 0)
 			{
 				StopDiscovery();
 				return;
 			}
 
-			if (!Stopped && UdpClient != null && Counter > 0)
+			Counter--;
+			foreach (UdpClient client in UdpSendClients)
 			{
-				Counter--;
-				SafePerform(() =>
+				if (!Stopped && client != null && Counter > 0)
 				{
-					UdpClient.BeginSend(RequestMetadataPacket, RequestMetadataPacket.Length, DestinationEndpoint, SendCallback, UdpClient);
-				});
+					SafePerform(() =>
+					{
+						client.BeginSend(RequestMetadataPacket, RequestMetadataPacket.Length, DestinationEndpoint,
+							SendCallback, client);
+					});
+				}
 			}
+
+			isRunning = false;
 		}
 
 		private void SafePerform(Action udpAction)
@@ -191,9 +222,9 @@ namespace Zyan.Communication.Discovery
 			{
 				var udpClient = (UdpClient)asyncResult.AsyncState;
 				var remoteEndpoint = default(IPEndPoint);
-				var responseMetadata = udpClient.EndReceive(asyncResult, ref remoteEndpoint);
 				if (!Stopped)
 				{
+					var responseMetadata = udpClient.EndReceive(asyncResult, ref remoteEndpoint);
 					response = DiscoveryMetadataHelper.Decode(responseMetadata);
 				}
 			});
