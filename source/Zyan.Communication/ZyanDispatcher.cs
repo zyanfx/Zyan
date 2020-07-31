@@ -136,6 +136,7 @@ namespace Zyan.Communication
 			{
 				if (wiringList.ContainsKey(correlationInfo.CorrelationID))
 				{
+					var dynamicWire = default(DynamicWireBase);
 					lock (wiringList)
 					{
 						if (!wiringList.ContainsKey(correlationInfo.CorrelationID))
@@ -144,12 +145,12 @@ namespace Zyan.Communication
 						var dynamicWireDelegate = wiringList[correlationInfo.CorrelationID];
 						eventStub.RemoveHandler(correlationInfo.DelegateMemberName, dynamicWireDelegate);
 						wiringList.Remove(correlationInfo.CorrelationID);
+						dynamicWire = DynamicWireFactory.GetDynamicWire(dynamicWireDelegate);
+					}
 
-						var dynamicWire = DynamicWireFactory.GetDynamicWire(dynamicWireDelegate);
-						if (dynamicWire != null)
-						{
-							dynamicWire.Dispose();
-						}
+					if (dynamicWire != null)
+					{
+						dynamicWire.Dispose();
 					}
 
 					_host.OnSubscriptionRemoved(new SubscriptionEventArgs
