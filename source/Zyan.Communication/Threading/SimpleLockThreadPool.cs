@@ -195,16 +195,25 @@ namespace Zyan.Communication.Threading
 		/// </summary>
 		public void Dispose()
 		{
-			m_shutdown = true;
-			lock (m_queue)
-			{
-				Monitor.PulseAll(m_queue);
-			}
+			Stop();
 
 			if (m_threads != null)
 			{
 				for (int i = 0; i < m_threads.Length; i++)
 					m_threads[i].Join();
+			}
+		}
+
+		/// <summary>
+		/// Stops dispatching the work items.
+		/// Doesn't wait for the work threads to stop.
+		/// </summary>
+		public void Stop()
+		{
+			m_shutdown = true;
+			lock (m_queue)
+			{
+				Monitor.PulseAll(m_queue);
 			}
 		}
 	}

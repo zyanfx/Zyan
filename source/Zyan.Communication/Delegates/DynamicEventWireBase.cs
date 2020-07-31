@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using Zyan.Communication.SessionMgmt;
 using Zyan.Communication.Threading;
-using Zyan.Communication.Toolbox;
 using Zyan.Communication.Toolbox.Diagnostics;
 
 namespace Zyan.Communication.Delegates
@@ -34,14 +32,15 @@ namespace Zyan.Communication.Delegates
 		/// </summary>
 		public IEventFilter EventFilter { get; set; }
 
-		private Lazy<IThreadPool> EventThreadPool { get; } = new Lazy<IThreadPool>(() => new SimpleLockThreadPool(1));
+		private Lazy<SimpleLockThreadPool> EventThreadPool { get; } =
+			new Lazy<SimpleLockThreadPool>(() => new SimpleLockThreadPool(1));
 
 		public override void Dispose()
 		{
 			// stop event routing
 			if (EventThreadPool.IsValueCreated)
 			{
-				EventThreadPool.Value.Dispose();
+				EventThreadPool.Value.Stop();
 			}
 
 			base.Dispose();
