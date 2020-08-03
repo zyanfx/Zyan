@@ -211,7 +211,11 @@ namespace Zyan.Communication.Protocols
 				// everything but loopback is discoverable
 				var uri = new Uri(url);
 				var host = uri.Host.ToLower();
-				return host != "localhost" && host != IPAddress.Loopback.ToString() && host != IPAddress.IPv6Loopback.ToString();
+				return
+					host != "localhost" &&
+					host != "0.0.0.0" &&
+					host != IPAddress.Loopback.ToString() &&
+					host != IPAddress.IPv6Loopback.ToString();
 			}
 			catch (UriFormatException)
 			{
