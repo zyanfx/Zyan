@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Linq;
 using System.Net.Security;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
@@ -205,6 +206,19 @@ namespace Zyan.Communication.Protocols.Tcp
 			{
 				throw new NotSupportedException();
 			}
+		}
+
+		/// <inheritdoc/>
+		public override string GetDiscoverableUrl(string zyanHostName)
+		{
+			var channel = CreateChannel() as IChannelReceiver;
+			if (channel == null)
+			{
+				return null;
+			}
+
+			var url = channel.GetUrlsForUri(zyanHostName).FirstOrDefault();
+			return TryReplaceHostName(url, GetIpAddresses().FirstOrDefault()?.ToString());
 		}
 
 		#region Versioning settings

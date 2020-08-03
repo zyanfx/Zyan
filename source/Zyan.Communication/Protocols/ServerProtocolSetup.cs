@@ -223,5 +223,45 @@ namespace Zyan.Communication.Protocols
 				return false;
 			}
 		}
+
+		/// <summary>
+		/// Gets the current machine IP addresses.
+		/// TODO: move this method to a helper class.
+		/// </summary>
+		internal static IPAddress[] GetIpAddresses()
+		{
+			var invalid = new[]
+			{
+				IPAddress.Loopback, IPAddress.Any,
+				IPAddress.IPv6Loopback, IPAddress.IPv6Any
+			};
+
+			return Tcp.DuplexChannel.Manager.GetAddresses()
+				.Where(ip => !invalid.Contains(ip))
+				.ToArray();
+		}
+
+		/// <summary>
+		/// Replaces the host name within the given URL.
+		/// TODO: move this method to a helper class.
+		/// </summary>
+		/// <param name="url">URL to replace the host name.</param>
+		/// <param name="hostName">New host name.</param>
+		internal static string TryReplaceHostName(string url, string hostName)
+		{
+			try
+			{
+				// use Uri class to validate the input
+				var uri = new Uri(url ?? string.Empty);
+				var builder = new UriBuilder(uri);
+				builder.Host = hostName;
+				return builder.Uri.ToString();
+			}
+			catch (UriFormatException)
+			{
+				// fail to format the given url
+				return url;
+			}
+		}
 	}
 }

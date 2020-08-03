@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Configuration;
+using System.Linq;
+using System.Net;
 using Zyan.Communication;
+using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Http;
 using Zyan.Communication.Protocols.Ipc;
 using Zyan.Communication.Protocols.Null;
@@ -124,6 +128,43 @@ namespace Zyan.Tests
 			{
 				Assert.Fail("'hello' is not a valid url for the Ipc protocol.");
 			}
+		}
+
+		[TestMethod]
+		public void GetIpAddressesDoesntReturnLoopbackOrAnyIpAddresses()
+		{
+			var addresses = ServerProtocolSetup.GetIpAddresses();
+			Assert.IsFalse(addresses.Contains(IPAddress.Any));
+			Assert.IsFalse(addresses.Contains(IPAddress.IPv6Any));
+			Assert.IsFalse(addresses.Contains(IPAddress.Loopback));
+			Assert.IsFalse(addresses.Contains(IPAddress.IPv6Loopback));
+		}
+
+		[TestMethod]
+		public void TryReplaceHostNameReplacesValidHostNamesAndDoesntThrowOnInvalidInput()
+		{
+			var url = ServerProtocolSetup.TryReplaceHostName("http://1.2.3.4/5", "newhost");
+			Assert.AreEqual("http://newhost/5", url);
+			Assert.AreEqual("unsupported", ServerProtocolSetup.TryReplaceHostName("unsupported", "example"));
+			Assert.AreEqual(null, ServerProtocolSetup.TryReplaceHostName(null, null));
+		}
+
+		[TestMethod]
+		public void TcpCustomServerChannelDoesntReturn0000AsDiscoverableUrl()
+		{
+			var proto = new TcpCustomServerProtocolSetup(12346, null);
+			var url = proto.GetDiscoverableUrl("SomeServer");
+			Assert.IsFalse(string.IsNullOrEmpty(url));
+			Assert.AreNotEqual("tcp://0.0.0.0:12346/SomeServer", url);
+		}
+
+		[TestMethod]
+		public void TcpBinaryServerChannelDoesntReturn0000AsDiscoverableUrl()
+		{
+			var proto = new TcpBinaryServerProtocolSetup(12347);
+			var url = proto.GetDiscoverableUrl("SomeServer");
+			Assert.IsFalse(string.IsNullOrEmpty(url));
+			Assert.AreNotEqual("tcp://0.0.0.0:12347/SomeServer", url);
 		}
 	}
 }
