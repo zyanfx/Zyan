@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Reflection;
+using System.Runtime.Remoting.Messaging;
 using Zyan.Communication;
-using Zyan.Communication.Security;
 using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Null;
 using Zyan.Communication.Protocols.Tcp;
+using Zyan.Communication.Security;
+using Zyan.Communication.SessionMgmt;
 
 namespace Zyan.Tests
 {
