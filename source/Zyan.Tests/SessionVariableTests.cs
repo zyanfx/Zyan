@@ -40,13 +40,15 @@ namespace Zyan.Tests
 		public interface ISessionSample
 		{
 			string Get(string name);
+			string Get(string name, string defaultValue);
 			void Set(string name, string value);
 		}
 
 		public class SessionSample : ISessionSample
 		{
 			static ISessionVariableAdapter V => ServerSession.CurrentSession.SessionVariables;
-			public string Get(string name) => V.GetSessionVariable(name, "failed");
+			public string Get(string name) => V.GetSessionVariable<string>(name);
+			public string Get(string name, string defaultValue) => V.GetSessionVariable(name, defaultValue);
 			public void Set(string name, string value) => V[name] = value;
 		}
 
@@ -65,6 +67,11 @@ namespace Zyan.Tests
 					var proxy = conn.CreateProxy<ISessionSample>();
 					proxy.Set("Hello", "World");
 					Assert.AreEqual("World", proxy.Get("Hello"));
+
+					var temp = proxy.Get("Undefined");
+					Assert.IsNull(temp);
+					proxy.Set("Undefined", "Defined");
+					Assert.AreEqual("Defined", proxy.Get("Undefined"));
 				}
 			}
 		}
