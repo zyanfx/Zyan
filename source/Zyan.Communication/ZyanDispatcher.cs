@@ -234,17 +234,6 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
-		/// Puts the IP Address of the calling client to the current Server Session.
-		/// </summary>
-		private void PutClientAddressToCurrentSession()
-		{
-			if (ServerSession.CurrentSession == null)
-				return;
-
-			ServerSession.CurrentSession.ClientAddress = GetCallingClientIPAddress();
-		}
-
-		/// <summary>
 		/// Checks if the provided interface name belongs to a registered component.
 		/// </summary>
 		/// <param name="details">Invocation details</param>

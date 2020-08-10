@@ -257,7 +257,7 @@ namespace Zyan.Communication.SessionMgmt
 		/// <summary>
 		/// Raises the <see cref="E:ClientSessionTerminated"/> event.
 		/// </summary>
-		/// <param name="args">The <see cref="Zyan.Communication.LoginEventArgs"/> instance containing the event data.</param>
+		/// <param name="args">The <see cref="LoginEventArgs"/> instance containing the event data.</param>
 		protected void OnClientSessionTerminated(LoginEventArgs args)
 		{
 			if (ClientSessionTerminated != null)
