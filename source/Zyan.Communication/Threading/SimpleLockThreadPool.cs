@@ -98,6 +98,14 @@ namespace Zyan.Communication.Threading
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the worker thread names.
+		/// </summary>
+		/// <remarks>
+		/// Setting this property has no effect if worked threads are already started.
+		/// </remarks>
+		public string WorkerThreadName { get; set; }
+
 		private readonly int m_concurrencyLevel;
 		private readonly bool m_flowExecutionContext;
 		private readonly ConcurrentQueue<WorkItem> m_queue = new ConcurrentQueue<WorkItem>();
@@ -147,6 +155,13 @@ namespace Zyan.Communication.Threading
 						{
 							m_threads[i] = new Thread(DispatchLoop);
 							m_threads[i].IsBackground = true;
+
+							// annotate worker threads
+							if (!string.IsNullOrEmpty(WorkerThreadName))
+							{
+								m_threads[i].Name = WorkerThreadName;
+							}
+
 							m_threads[i].Start();
 						}
 					}

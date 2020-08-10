@@ -209,7 +209,10 @@ namespace Zyan.Communication.Delegates
 			}
 		}
 
-		private static IThreadPool threadPool = new SimpleLockThreadPool();
+		private static IThreadPool threadPool = new SimpleLockThreadPool
+		{
+			WorkerThreadName = "SafeDynamicInvoker",
+		};
 
 		/// <summary>
 		/// Gets or sets the thread pool used to send server events to remote subscribers.

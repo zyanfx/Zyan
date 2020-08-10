@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Principal;
-using System.Threading;
 using Zyan.Communication.Delegates;
 using Zyan.Communication.SessionMgmt;
 using Zyan.Communication.Toolbox;
@@ -21,7 +20,7 @@ namespace Zyan.Communication
 		private SubscriptionTracker _remoteSubscriptionTracker = new SubscriptionTracker();
 		private static string _serverSessionSlotName = Guid.NewGuid().ToString();
 
-		// Adapter for accessing session variables.
+		// Adapter for accessing session variables (server-side only).
 		[NonSerialized]
 		private SessionVariableAdapter _sessionVariableAdapter = null;
 
@@ -43,68 +42,52 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Gets the session ID.
 		/// </summary>
-		public Guid SessionID
-		{
-			get { return _sessionID; }
-		}
+		public Guid SessionID => _sessionID;
 
 		/// <summary>
 		/// Gets the identity of the client.
 		/// </summary>
-		public IIdentity Identity
-		{
-			get { return _identity; }
-		}
+		public IIdentity Identity => _identity;
 
 		/// <summary>
 		/// Gets or sets the timestamp of the session.
 		/// </summary>
 		public DateTime Timestamp
 		{
-			get { return _timestamp; }
-			set { _timestamp = value; }
+			get => _timestamp;
+			set => _timestamp = value;
 		}
 
 		/// <summary>
 		/// Gets the adapter for accessing session variables.
 		/// </summary>
-		public ISessionVariableAdapter SessionVariables
-		{
-			get { return _sessionVariableAdapter; }
-		}
+		public ISessionVariableAdapter SessionVariables => _sessionVariableAdapter;
 
 		/// <summary>
 		/// Gets or sets the IP Address of the calling client.
 		/// </summary>
 		public string ClientAddress
 		{
-			get { return _clientAddress; }
-			set { _clientAddress = value; }
+			get => _clientAddress;
+			set => _clientAddress = value;
 		}
 
 		/// <summary>
 		/// Gets the remote subscription tracker.
 		/// </summary>
-		internal SubscriptionTracker RemoteSubscriptionTracker
-		{
-			get { return _remoteSubscriptionTracker; }
-		}
+		internal SubscriptionTracker RemoteSubscriptionTracker => _remoteSubscriptionTracker;
 
 		/// <summary>
 		/// Adds remote subscriptions to the tracker.
 		/// </summary>
-		internal string TrackRemoteSubscriptions(IEnumerable<DelegateCorrelationInfo> delegateCorrelationSet)
-		{
- 			return RemoteSubscriptionTracker.Add(delegateCorrelationSet);
-		}
+		internal string TrackRemoteSubscriptions(IEnumerable<DelegateCorrelationInfo> delegateCorrelationSet) =>
+ 			RemoteSubscriptionTracker.Add(delegateCorrelationSet);
 
 		/// <summary>
 		/// Removes remote subscriptions from the tracker.
 		/// </summary>
-		internal string UntrackRemoteSubscriptions(IEnumerable<DelegateCorrelationInfo> delegateCorrelationSet)
-		{
- 			return RemoteSubscriptionTracker.Remove(delegateCorrelationSet);
-		}
+		internal string UntrackRemoteSubscriptions(IEnumerable<DelegateCorrelationInfo> delegateCorrelationSet) =>
+ 			RemoteSubscriptionTracker.Remove(delegateCorrelationSet);
 
 		/// <summary>
 		/// Gets the session of the current logical server thread.
@@ -114,8 +97,8 @@ namespace Zyan.Communication
 		/// </remarks>
 		public static ServerSession CurrentSession
 		{
-			get { return LocalCallContextData.GetData<ServerSession>(_serverSessionSlotName); }
-			internal set { LocalCallContextData.SetData(_serverSessionSlotName, value); }
+			get => LocalCallContextData.GetData<ServerSession>(_serverSessionSlotName);
+			internal set => LocalCallContextData.SetData(_serverSessionSlotName, value);
 		}
 	}
 }

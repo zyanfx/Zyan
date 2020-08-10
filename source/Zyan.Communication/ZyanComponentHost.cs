@@ -694,11 +694,7 @@ namespace Zyan.Communication
 		/// <param name="e">Arguments</param>
 		protected internal void OnClientLoggedOn(LoginEventArgs e)
 		{
-			var clientLoggedOn = ClientLoggedOn;
-			if (clientLoggedOn != null)
-			{
-				clientLoggedOn(this, e);
-			}
+			ClientLoggedOn?.Invoke(this, e);
 		}
 
 		/// <summary>
@@ -707,11 +703,7 @@ namespace Zyan.Communication
 		/// <param name="e">Arguments</param>
 		protected internal void OnClientLoggedOff(LoginEventArgs e)
 		{
-			var clientLoggedOff = ClientLoggedOff;
-			if (clientLoggedOff != null)
-			{
-				clientLoggedOff(this, e);
-			}
+			ClientLoggedOff?.Invoke(this, e);
 		}
 
 		/// <summary>
@@ -720,11 +712,7 @@ namespace Zyan.Communication
 		/// <param name="e">Arguments</param>
 		protected internal void OnClientLogonCanceled(LoginEventArgs e)
 		{
-			var clientLogonCanceled = ClientLogonCanceled;
-			if (clientLogonCanceled != null)
-			{
-				clientLogonCanceled(this, e);
-			}
+			ClientLogonCanceled?.Invoke(this, e);
 		}
 
 		/// <summary>
@@ -733,11 +721,7 @@ namespace Zyan.Communication
 		/// <param name="e">Arguments</param>
 		protected internal void OnClientSessionTerminated(LoginEventArgs e)
 		{
-			var clientSessionTerminated = ClientSessionTerminated;
-			if (clientSessionTerminated != null)
-			{
-				clientSessionTerminated(this, e);
-			}
+			ClientSessionTerminated?.Invoke(this, e);
 		}
 
 		#endregion

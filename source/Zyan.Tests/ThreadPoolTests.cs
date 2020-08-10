@@ -77,5 +77,30 @@ namespace Zyan.Tests
 			pool.Dispose();
 			Assert.AreEqual(1000, count);
 		}
+
+		[TestMethod]
+		public void SimpleLockThreadPoolWorkerThreadsAreNamed()
+		{
+			var pool = new SimpleLockThreadPool()
+			{
+				WorkerThreadName = "I'm not anonymous",
+			};
+
+			var count = 0;
+			var callback = new WaitCallback(obj =>
+			{
+				Assert.AreEqual(pool.WorkerThreadName, Thread.CurrentThread.Name);
+				Interlocked.Increment(ref count);
+			});
+
+			for (var i = 0; i < 10; i++)
+			{
+				pool.QueueUserWorkItem(callback);
+			}
+
+			Thread.Sleep(TimeSpan.FromSeconds(0.1));
+			pool.Dispose();
+			Assert.AreEqual(10, count);
+		}
 	}
 }
