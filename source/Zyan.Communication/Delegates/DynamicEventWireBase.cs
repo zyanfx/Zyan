@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using Zyan.Communication.Threading;
 using Zyan.Communication.Toolbox;
 using Zyan.Communication.Toolbox.Diagnostics;
@@ -19,6 +20,11 @@ namespace Zyan.Communication.Delegates
 		public Func<bool> ValidateSession { get; set; }
 
 		/// <summary>
+		/// Asynchronous event invocation handler.
+		/// </summary>
+		public Action<WaitCallback> QueueEventInvocation { get; set; }
+
+		/// <summary>
 		/// Gets or sets the method to cancel subscription.
 		/// </summary>
 		public Action<Exception> CancelSubscription { get; set; }
@@ -33,20 +39,6 @@ namespace Zyan.Communication.Delegates
 		/// </summary>
 		public IEventFilter EventFilter { get; set; }
 
-		private Lazy<SimpleLockThreadPool> EventThreadPool { get; } =
-			new Lazy<SimpleLockThreadPool>(() => new SimpleLockThreadPool(1));
-
-		public override void Dispose()
-		{
-			// stop event routing
-			if (EventThreadPool.IsValueCreated)
-			{
-				EventThreadPool.Value.Stop();
-			}
-
-			base.Dispose();
-		}
-
 		/// <summary>
 		/// Invokes client event handler.
 		/// If the handler throws an exception, event subsription is cancelled.
@@ -55,7 +47,7 @@ namespace Zyan.Communication.Delegates
 		/// <returns>Event handler return value.</returns>
 		protected override object InvokeClientDelegate(params object[] args)
 		{
-			if (IsDisposed || Canceled)
+			if (Canceled)
 			{
 				return null;
 			}
@@ -66,9 +58,8 @@ namespace Zyan.Communication.Delegates
 				return SyncInvokeClientDelegate(args);
 			}
 
-			// every dynamic event wire has its own invocation queue
-			// so that a broken remote client can't spoil the whole party
-			EventThreadPool.Value.QueueUserWorkItem(x => SyncInvokeClientDelegate(args));
+			// by default, events are triggered asynchronously
+			QueueEventInvocation?.Invoke(x => SyncInvokeClientDelegate(args));
 			return null;
 		}
 

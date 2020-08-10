@@ -6,19 +6,8 @@ namespace Zyan.Communication.Delegates
 	/// <summary>
 	/// Base class for dynamic wires.
 	/// </summary>
-	internal abstract class DynamicWireBase : IDisposable
+	internal abstract class DynamicWireBase
 	{
-		/// <inheritdoc/>
-		public virtual void Dispose()
-		{
-			IsDisposed = true;
-		}
-
-		/// <summary>
-		/// Gets or sets a value indicating whether this instance is disposed.
-		/// </summary>
-		protected bool IsDisposed { get; set; }
-
 		/// <summary>
 		/// Client delegate interceptor.
 		/// </summary>

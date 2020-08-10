@@ -242,6 +242,7 @@ namespace Zyan.Communication.SessionMgmt
 				timestamp = session.Timestamp;
 				clientAddress = session.ClientAddress;
 				identity = session.Identity;
+				session.StopEventInvocations();
 			}
 
 			RemoveSession(sessionID);

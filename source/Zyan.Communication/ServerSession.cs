@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Principal;
+using System.Threading;
 using Zyan.Communication.Delegates;
 using Zyan.Communication.SessionMgmt;
+using Zyan.Communication.Threading;
 using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication
@@ -24,6 +26,10 @@ namespace Zyan.Communication
 		[NonSerialized]
 		private SessionVariableAdapter _sessionVariableAdapter = null;
 
+		// Remote event invocation queue (server-side only).
+		[NonSerialized]
+		private SimpleLockThreadPool _eventInvocationQueue;
+
 		/// <summary>
 		/// Creates a new instance of the ServerSession class.
 		/// </summary>
@@ -37,6 +43,13 @@ namespace Zyan.Communication
 			_sessionID = sessionID;
 			_identity = identity;
 			_sessionVariableAdapter = sessionVariableAdapter;
+
+			// every server session has its own invocation queue
+			// so that a disconnected client can't affect the other clients
+			_eventInvocationQueue = new SimpleLockThreadPool
+			{
+				WorkerThreadName = $"Events for session {sessionID}/{identity?.Name}",
+			};
 		}
 
 		/// <summary>
@@ -71,6 +84,18 @@ namespace Zyan.Communication
 			get => _clientAddress;
 			set => _clientAddress = value;
 		}
+
+		/// <summary>
+		/// Enqueues an event invocation for this session.
+		/// </summary>
+		internal void QueueEventInvocation(WaitCallback callback) =>
+			_eventInvocationQueue.QueueUserWorkItem(callback);
+
+		/// <summary>
+		/// Stops the event invocation thread pool worker threads.
+		/// </summary>
+		internal void StopEventInvocations() =>
+			_eventInvocationQueue.Stop();
 
 		/// <summary>
 		/// Gets the remote subscription tracker.

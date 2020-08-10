@@ -80,6 +80,7 @@ namespace Zyan.Communication
 						var sessionId = currentSession.SessionID;
 						var sessionManager = _host.SessionManager;
 						dynamicEventWire.ValidateSession = () => sessionManager.ExistSession(sessionId);
+						dynamicEventWire.QueueEventInvocation = currentSession.QueueEventInvocation;
 						dynamicEventWire.CancelSubscription = ex =>
 						{
 							lock (wiringList)
@@ -146,11 +147,6 @@ namespace Zyan.Communication
 						eventStub.RemoveHandler(correlationInfo.DelegateMemberName, dynamicWireDelegate);
 						wiringList.Remove(correlationInfo.CorrelationID);
 						dynamicWire = DynamicWireFactory.GetDynamicWire(dynamicWireDelegate);
-					}
-
-					if (dynamicWire != null)
-					{
-						dynamicWire.Dispose();
 					}
 
 					_host.OnSubscriptionRemoved(new SubscriptionEventArgs
@@ -757,6 +753,7 @@ namespace Zyan.Communication
 				session.ClientAddress = clientAddress;
 				identity = session.Identity;
 				timestamp = session.Timestamp;
+				session.StopEventInvocations();
 			}
 
 			_host.SessionManager.SetCurrentSession(session);

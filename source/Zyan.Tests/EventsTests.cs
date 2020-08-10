@@ -667,5 +667,43 @@ namespace Zyan.Tests
 				Assert.IsFalse(proxy3handled);
 			}
 		}
+
+		[TestMethod]
+		public void SessionEventsAreRoutedByTheirOwnThreads()
+		{
+			var host = CreateZyanHost(5432, "SecondServer");
+			var conn1 = CreateZyanConnection(5432, "SecondServer");
+			var proxy1 = conn1.CreateProxy<ISampleServer>("Singleton2");
+			var conn2 = CreateZyanConnection(5432, "SecondServer");
+			var proxy2 = conn2.CreateProxy<ISampleServer>("Singleton2");
+
+			var handledCounter = 0;
+			EventHandler getEventHandler(Guid sessionId) => (s, e) =>
+			{
+				handledCounter++;
+
+				// note: this stuff works only on NullChannel because the client
+				// thread where the event is raised is the same server thread
+				var threadName = Thread.CurrentThread.Name;
+				Assert.IsTrue(threadName.Contains(sessionId.ToString()));
+			};
+
+			proxy1.TestEvent += getEventHandler(conn1.SessionID);
+			proxy2.TestEvent += getEventHandler(conn2.SessionID);
+
+			ZyanSettings.LegacyBlockingEvents = false;
+			proxy1.RaiseTestEvent();
+			proxy2.RaiseTestEvent();
+			Thread.Sleep(300);
+
+			ZyanSettings.LegacyBlockingEvents = true;
+			Assert.AreEqual(4, handledCounter); // each proxy handles 2 events, so 2 * 2 = 4
+
+			// Note: dispose connection before the host
+			// so that it can unsubscribe from all remove events
+			conn1.Dispose();
+			conn2.Dispose();
+			host.Dispose();
+		}
 	}
 }
