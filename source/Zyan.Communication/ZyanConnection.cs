@@ -30,16 +30,6 @@ namespace Zyan.Communication
 	{
 		#region Configuration
 
-		/// <summary>
-		/// Enables or disables URL randomization to work around Remoting Identity caching.
-		/// </summary>
-		[Obsolete("Use ZyanSettings.DisableUrlRandomization property instead.")]
-		public static bool AllowUrlRandomization
-		{
-			get { return !ZyanSettings.DisableUrlRandomization; }
-			set { ZyanSettings.DisableUrlRandomization = !value; }
-		}
-
 		// URL of server
 		private string _serverUrl = string.Empty;
 

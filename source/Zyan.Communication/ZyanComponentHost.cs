@@ -153,12 +153,6 @@ namespace Zyan.Communication
 
 		#region Component Hosting
 
-		/// <summary>
-		/// Gets or sets a value indicating whether legacy blocking events raising mode is enabled.
-		/// </summary>
-		[Obsolete("Use ZyanSettings.LegacyBlockingEvents static property instead.")]
-		public static bool LegacyBlockingEvents { get; set; }
-
 		private bool DisposeCatalogWithHost { get; set; }
 
 		private IComponentCatalog _catalog;
