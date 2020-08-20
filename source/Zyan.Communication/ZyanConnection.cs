@@ -13,7 +13,6 @@ using System.Transactions;
 using Zyan.Communication.Delegates;
 using Zyan.Communication.Discovery;
 using Zyan.Communication.Discovery.Metadata;
-using Zyan.Communication.Notification;
 using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Tcp.DuplexChannel;
 using Zyan.Communication.Protocols.Wrapper;
@@ -253,9 +252,9 @@ namespace Zyan.Communication
 				throw ex.PreserveStackTrace();
 			}
 
-			var reconnectEvents = new Action(ReconnectRemoteEventsCore);
+			var reconnectEvents = new Action(ReconnectRemoteEventsCore).ExecuteByOneThreadAtMost();
 			var debounceInterval = ZyanSettings.ReconnectRemoteEventsDebounceInterval.TotalMilliseconds;
-			ReconnectRemoteEvents = reconnectEvents.Debounce((int)debounceInterval);
+			ReconnectRemoteEvents = reconnectEvents.CancellableDebounce((int)debounceInterval);
 
 			StartKeepSessionAliveTimer();
 			lock (_connections)
@@ -995,7 +994,7 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Reconnects to all remote events or delegates after a server restart.
 		/// </summary>
-		private Action ReconnectRemoteEvents { get; }
+		private Debouncer.CancellableAction ReconnectRemoteEvents { get; }
 
 		/// <summary>
 		/// Reconnects to all remote events or delegates of any known proxy for this connection, after a server restart.
@@ -1059,6 +1058,12 @@ namespace Zyan.Communication
 				{
 					// restore subscriptions asynchronously
 					ReconnectRemoteEvents();
+				}
+				else
+				{
+					// checksums match on both ends, so pending
+					// ReconnectRemoteEvents call, if any, is canceled
+					ReconnectRemoteEvents(false);
 				}
 			}
 		}

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using SysTimer = System.Timers.Timer;
 
 namespace Zyan.Communication.Toolbox
@@ -11,7 +12,16 @@ namespace Zyan.Communication.Toolbox
 		public const int DefaultDebounceInterval = 300;
 
 		/// <summary>
-		/// Creates a new debounced version of the passed action.
+		/// A delegate to represent a debounced method which's pending execution can be canceled.
+		/// </summary>
+		/// <param name="execute">
+		/// If true, schedule the execution (this is the default, like normal debounce).
+		/// If false, cancel pending execution.
+		/// </param>
+		public delegate void CancellableAction(bool execute = true);
+
+		/// <summary>
+		/// Creates a new debounced version of the given action.
 		/// </summary>
 		/// <param name="action">Action to debounce.</param>
 		/// <param name="delayMs">Debounce interval in milliseconds.</param>
@@ -39,6 +49,38 @@ namespace Zyan.Communication.Toolbox
 			{
 				timer?.Dispose();
 				timer = SetTimeout(action, delayMs);
+			};
+		}
+
+		/// <summary>
+		/// Creates a new cancellable debounced version of the given action.
+		/// </summary>
+		/// <param name="action">Action to debounce.</param>
+		/// <param name="delayMs">Debounce interval in milliseconds.</param>
+		/// <returns>The debounced version of the given action.</returns>
+		public static CancellableAction CancellableDebounce(this Action action, int delayMs = DefaultDebounceInterval)
+		{
+			if (action == null)
+			{
+				throw new ArgumentNullException("action");
+			}
+
+			if (delayMs <= 0)
+			{
+				return execute =>
+				{
+					if (execute)
+					{
+						action();
+					}
+				};
+			}
+
+			var timer = default(IDisposable);
+			return execute =>
+			{
+				timer?.Dispose();
+				timer = execute ? SetTimeout(action, delayMs) : null;
 			};
 		}
 
@@ -107,6 +149,32 @@ namespace Zyan.Communication.Toolbox
 
 			timer.Start();
 			return timer;
+		}
+
+		/// <summary>
+		/// Returns the action that can be executed only by one thread at most.
+		/// While there is a thread that currently runs the original action,
+		/// all other threads will pass the execution.
+		/// </summary>
+		/// <param name="action">The action that should be executed by one thread at most.</param>
+		/// <returns>The converted action that cannot be executed by multiple threads at once.</returns>
+		public static Action ExecuteByOneThreadAtMost(this Action action)
+		{
+			var padlock = new object();
+			return () =>
+			{
+				if (Monitor.TryEnter(padlock))
+				{
+					try
+					{
+						action();
+					}
+					finally
+					{
+						Monitor.Exit(padlock);
+					}
+				}
+			};
 		}
 	}
 }

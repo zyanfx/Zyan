@@ -142,12 +142,153 @@ namespace Zyan.Tests
 			var debounced = inc.Debounce(0).Debounce(-100);
 			Assert.AreSame(debounced, inc);
 
-			// try to call the debounced version and make sure the target is not yet called
+			// try to call the debounced version and make sure the target is immediately called
 			debounced();
 			debounced();
 			debounced();
 			debounced();
 			Assert.AreEqual(4, counter);
+		}
+
+		[TestMethod, ExpectedException(typeof(ArgumentNullException))]
+		public void NullActionIsNotAllowedForCancellableDebounce()
+		{
+			Debouncer.CancellableDebounce(null);
+		}
+
+		[TestMethod]
+		public void CancellableDebouncedActionIsCalledOnce()
+		{
+			// target function
+			var counter = 0;
+			Action inc = () => counter++;
+
+			// debounce the given function
+			var debounced = inc.CancellableDebounce(10);
+			Assert.IsNotNull(debounced);
+
+			// try to call the debounced version and make sure the target is not yet called
+			debounced();
+			debounced();
+			debounced();
+			debounced();
+			Assert.AreEqual(0, counter);
+
+			Thread.Sleep(50);
+			Assert.AreEqual(1, counter);
+		}
+
+		[TestMethod]
+		public void CancellableDebounceWithZeroIntervalMeansImmediateExecution()
+		{
+			// target function
+			var counter = 0;
+			Action inc = () => counter++;
+
+			// debounce the given function
+			var debounced = inc.CancellableDebounce(0);
+			Assert.AreNotSame(debounced, inc);
+
+			// try to call the debounced version and make sure the target is immediately called
+			debounced();
+			debounced();
+			debounced();
+			debounced();
+			Assert.AreEqual(4, counter);
+		}
+
+		[TestMethod]
+		public void PendingCancellableDebouncedActionExecutionCanBeCanceled()
+		{
+			// target function
+			var counter = 0;
+			Action inc = () => counter++;
+
+			// debounce the given function
+			var debounced = inc.CancellableDebounce(10);
+			Assert.IsNotNull(debounced);
+
+			// try to call the debounced version and make sure the target is not yet called
+			debounced();
+			debounced();
+			debounced();
+			debounced();
+			Assert.AreEqual(0, counter);
+
+			// now cancel pending execution
+			debounced(false);
+			Thread.Sleep(50);
+
+			// the code wasn't executed
+			Assert.AreEqual(0, counter);
+		}
+
+		[TestMethod]
+		public void PendingCancellableDebounceWithZeroIntervalWithCancelArgumentDoesntExecuteTheAction()
+		{
+			// target function
+			var counter = 0;
+			Action inc = () => counter++;
+
+			// debounce the given function
+			var debounced = inc.CancellableDebounce(0);
+			Assert.AreNotSame(debounced, inc);
+
+			// try to call the debounced version and make sure the target is not called
+			debounced(false);
+			debounced(false);
+			debounced(false);
+			debounced(false);
+			Assert.AreEqual(0, counter);
+
+			debounced(true);
+			debounced(true);
+			Assert.AreEqual(2, counter);
+		}
+
+		[TestMethod]
+		public void ActionCanBeExecutedByOneThreadAtMost()
+		{
+			var counter = 0;
+			var action = new Action(() =>
+			{
+				Thread.Sleep(20);
+				Interlocked.Increment(ref counter); 
+			});
+
+			// the original action is executed by all worker threads
+			for (var i = 0; i < 5; i++)
+			{
+				ThreadPool.QueueUserWorkItem(x => action());
+			}
+
+			Thread.Sleep(100);
+			Assert.AreEqual(5, counter);
+
+			// convert it into an exclusive action
+			counter = 0;
+			action = action.ExecuteByOneThreadAtMost();
+
+			// the modified action is executed by only one thread
+			for (var i = 0; i < 4; i++)
+			{
+				// assume that all worker threads are started within
+				// the 20ms time span while the first action is still running
+				ThreadPool.QueueUserWorkItem(x => action());
+			}
+
+			// assume that all user work items are processed now
+			Thread.Sleep(100);
+			Assert.AreEqual(1, counter);
+
+			// the modified action is still executed by only one thread
+			for (var i = 0; i < 4; i++)
+			{
+				ThreadPool.QueueUserWorkItem(x => action());
+			}
+
+			Thread.Sleep(100);
+			Assert.AreEqual(2, counter);
 		}
 	}
 }
