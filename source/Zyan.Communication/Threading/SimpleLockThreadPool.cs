@@ -40,7 +40,17 @@ namespace Zyan.Communication.Threading
 		/// <summary>
 		/// Initializes a new instance of the <see cref="SimpleLockThreadPool" /> class.
 		/// </summary>
-		/// <param name="flowExecutionContext">if set to <c>true</c> [flow execution context].</param>
+		/// <param name="concurrencyLevel">The concurrency level.</param>
+		/// <param name="limit">High watermark limit for the work item queue size.</param>
+		public SimpleLockThreadPool(int concurrencyLevel, int limit) :
+			this(concurrencyLevel, true, limit)
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="SimpleLockThreadPool" /> class.
+		/// </summary>
+		/// <param name="flowExecutionContext">if set to <c>true</c> the execution context is flown.</param>
 		public SimpleLockThreadPool(bool flowExecutionContext) :
 			this(Environment.ProcessorCount, flowExecutionContext)
 		{
@@ -50,15 +60,16 @@ namespace Zyan.Communication.Threading
 		/// Initializes a new instance of the <see cref="SimpleLockThreadPool" /> class.
 		/// </summary>
 		/// <param name="concurrencyLevel">The concurrency level.</param>
-		/// <param name="flowExecutionContext">if set to <c>true</c> [flow execution context].</param>
-		/// <exception cref="System.ArgumentOutOfRangeException"></exception>
-		public SimpleLockThreadPool(int concurrencyLevel, bool flowExecutionContext)
+		/// <param name="flowExecutionContext">if set to <c>true</c>, the execution context is flown.</param>
+		/// <param name="limit">High watermark limit for the work item queue size.</param>
+		public SimpleLockThreadPool(int concurrencyLevel, bool flowExecutionContext, int limit = 0)
 		{
 			if (concurrencyLevel <= 0)
 				throw new ArgumentOutOfRangeException("concurrencyLevel");
 
 			m_concurrencyLevel = concurrencyLevel;
 			m_flowExecutionContext = flowExecutionContext;
+			m_queue = new LimitedSizeQueue<WorkItem>(limit);
 
 #if !XAMARIN
 			// If suppressing flow, we need to demand permissions.
@@ -108,7 +119,7 @@ namespace Zyan.Communication.Threading
 
 		private readonly int m_concurrencyLevel;
 		private readonly bool m_flowExecutionContext;
-		private readonly ConcurrentQueue<WorkItem> m_queue = new ConcurrentQueue<WorkItem>();
+		private readonly LimitedSizeQueue<WorkItem> m_queue;
 		private volatile Thread[] m_threads;
 		private int m_threadsWaiting;
 		private bool m_shutdown;
@@ -134,7 +145,7 @@ namespace Zyan.Communication.Threading
 			// Now insert the work item into the queue, possibly waking a thread.
 			lock (m_queue)
 			{
-				m_queue.Enqueue(wi);
+				m_queue.TryEnqueue(wi);
 				if (m_threadsWaiting > 0)
 					Monitor.Pulse(m_queue);
 			}
@@ -175,7 +186,7 @@ namespace Zyan.Communication.Threading
 		{
 			while (true)
 			{
-				WorkItem wi = default(WorkItem);
+				var wi = default(WorkItem);
 
 				lock (m_queue)
 				{
@@ -231,7 +242,7 @@ namespace Zyan.Communication.Threading
 				Monitor.PulseAll(m_queue);
 			}
 
-			while (m_queue.TryDequeue(out _)) ;
+			m_queue.Clear();
 		}
 	}
 }

@@ -34,7 +34,12 @@ namespace Zyan.Communication.Toolbox
 
 		public bool TryEnqueue(T item)
 		{
-			if (Count < Limit)
+			if (Limit <= 0)
+			{
+				Queue.Enqueue(item);
+				return true;
+			}
+			else if (Count < Limit)
 			{
 				lock (queueLock)
 				{

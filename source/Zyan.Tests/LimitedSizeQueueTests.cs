@@ -43,7 +43,7 @@ namespace Zyan.Tests
 			Assert.IsFalse(q.TryEnqueue(4));
 			Assert.IsFalse(q.TryEnqueue(5));
 
-			var items = string.Join(", ", q.ToArray());
+			var items = string.Join(", ", q.Select(i => i.ToString()).ToArray());
 			Assert.AreEqual("1, 2, 3", items);
 
 			Assert.IsTrue(q.TryDequeue(out var item));
@@ -84,8 +84,22 @@ namespace Zyan.Tests
 			Assert.AreEqual(0, q.Count);
 			Assert.AreEqual(3, q.Limit);
 
-			var items = string.Join(", ", q.ToArray());
+			var items = string.Join(", ", q.Select(i => i.ToString()).ToArray());
 			Assert.AreEqual(string.Empty, items);
+		}
+
+		[TestMethod]
+		public void ZeroLimitMeansUnlimitedSize()
+		{
+			var q = new LimitedSizeQueue<int>(0);
+			foreach (var item in Enumerable.Range(1, 1000))
+			{
+				Assert.IsTrue(q.TryEnqueue(item));
+			}
+
+			q.Clear();
+			Assert.AreEqual(0, q.Count);
+			Assert.AreEqual(0, q.Limit);
 		}
 	}
 }

@@ -46,7 +46,9 @@ namespace Zyan.Communication
 
 			// every server session has its own invocation queue
 			// so that a disconnected client can't affect the other clients
-			_eventInvocationQueue = new SimpleLockThreadPool
+			var threads = ZyanSettings.EventQueueThreadCount;
+			var highWatermark = ZyanSettings.EventQueueMaximumSize;
+			_eventInvocationQueue = new SimpleLockThreadPool(threads, highWatermark)
 			{
 				WorkerThreadName = $"Events for session {sessionID}/{identity?.Name}",
 			};

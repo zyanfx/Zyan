@@ -62,5 +62,15 @@ namespace Zyan.Communication
 		/// This setting affects new ZyanConnection instances and doesn't change any existing connections.
 		/// </remarks>
 		public static TimeSpan ReconnectRemoteEventsDebounceInterval { get; set; } = TimeSpan.FromSeconds(1);
+
+		/// <summary>
+		/// Gets or sets the number of threads used for sending out events for a single session.
+		/// </summary>
+		public static int EventQueueThreadCount { get; set; } = 1;
+
+		/// <summary>
+		/// Gets or sets the maximal number of events that can be enqueues for a single session.
+		/// </summary>
+		public static int EventQueueMaximumSize { get; set; } = 1 << 14;
 	}
 }
