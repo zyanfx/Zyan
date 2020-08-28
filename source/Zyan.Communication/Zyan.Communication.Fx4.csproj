@@ -304,6 +304,7 @@
     <Compile Include="Toolbox\DynamicTypeBinder.cs" />
     <Compile Include="Toolbox\ExceptionHelper.cs" />
     <Compile Include="Toolbox\Extensions.cs" />
+    <Compile Include="Toolbox\LimitedSizeQueue.cs" />
     <Compile Include="Toolbox\MessageHelpers.cs" />
     <Compile Include="Toolbox\MonoCheck.cs" />
     <Compile Include="Threading\ClrThreadPool.cs" />

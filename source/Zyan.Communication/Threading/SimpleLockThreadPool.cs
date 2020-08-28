@@ -220,7 +220,7 @@ namespace Zyan.Communication.Threading
 		}
 
 		/// <summary>
-		/// Stops dispatching the work items.
+		/// Stops dispatching the work items and clears the work item queue.
 		/// Doesn't wait for the work threads to stop.
 		/// </summary>
 		public void Stop()
@@ -230,6 +230,8 @@ namespace Zyan.Communication.Threading
 			{
 				Monitor.PulseAll(m_queue);
 			}
+
+			while (m_queue.TryDequeue(out _)) ;
 		}
 	}
 }
