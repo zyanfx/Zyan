@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication
@@ -28,7 +29,7 @@ namespace Zyan.Communication
 		public CallInterceptor(Type interfaceType, string uniqueName, MemberTypes memberType, string memberName, Type[] parameterTypes, CallInterceptionDelegate onInterception)
 		{
 			InterfaceType = interfaceType;
-			UniqueNameFilter = string.IsNullOrEmpty(uniqueName) ? interfaceType.FullName : uniqueName;
+			UniqueNameFilter = string.IsNullOrEmpty(uniqueName) ? Regex.Escape(interfaceType.FullName) : uniqueName;
 			MemberType = memberType;
 			MemberName = memberName;
 			ParameterTypes = parameterTypes;
