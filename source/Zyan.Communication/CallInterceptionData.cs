@@ -22,11 +22,13 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Creates a new instance of the CallInterceptionData class.
 		/// </summary>
+		/// <param name="invokerName">Inform interceptor about proxy unique name.</param>
 		/// <param name="parameters">Parameter values of the intercepted call</param>
 		/// <param name="remoteInvoker">Delegate for remote invocation</param>
 		/// <param name="remotingMessage">Remoting message</param>
-		public CallInterceptionData(object[] parameters, InvokeRemoteMethodDelegate remoteInvoker, IMethodCallMessage remotingMessage)
+		public CallInterceptionData(string invokerName, object[] parameters, InvokeRemoteMethodDelegate remoteInvoker, IMethodCallMessage remotingMessage)
 		{
+			InvokerUniqueName = invokerName;
 			Intercepted = false;
 			ReturnValue = null;
 			Parameters = parameters;
@@ -52,6 +54,11 @@ namespace Zyan.Communication
 
 			return null;
 		}
+
+		/// <summary>
+		/// Proxy caller name.
+		/// </summary>
+		public string InvokerUniqueName { get; }
 
 		/// <summary>
 		/// Gets or sets wether the call was intercepted.

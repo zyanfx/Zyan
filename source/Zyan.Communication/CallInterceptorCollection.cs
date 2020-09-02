@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
+using System.Text.RegularExpressions;
 using Zyan.Communication.Toolbox;
 
 namespace Zyan.Communication
@@ -60,16 +61,14 @@ namespace Zyan.Communication
 			if (Count == 0)
 				return null;
 
-			var matchingInterceptors =
-				from interceptor in this
-				where
-					interceptor.Enabled &&
-					interceptor.InterfaceType.Equals(interfaceType) &&
-					interceptor.UniqueName == uniqueName &&
-					interceptor.MemberType == remotingMessage.MethodBase.MemberType &&
-					interceptor.MemberName == remotingMessage.MethodName &&
-					GetTypeList(interceptor.ParameterTypes) == GetTypeList(remotingMessage.MethodBase.GetParameters())
-				select interceptor;
+			var matchingInterceptors = this
+				.Where(ic => ic.Enabled)
+				.Where(ic => Regex.IsMatch(uniqueName, ic.UniqueNameFilter))
+				.Where(ic => Equals(ic.InterfaceType, interfaceType))
+				.Where(ic => ic.MemberType == remotingMessage.MethodBase.MemberType)
+				.Where(ic => ic.MemberName == remotingMessage.MethodName)
+				.Where(ic => GetTypeList(ic.ParameterTypes) == GetTypeList(remotingMessage.MethodBase.GetParameters()))
+				.ToList();
 
 			lock (SyncRoot)
 			{

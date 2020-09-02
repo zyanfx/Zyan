@@ -18,7 +18,7 @@ namespace Zyan.Communication
 		/// <param name="uniqueName">Unique name of the intercepted component.</param>
 		public CallInterceptorBuilder(string uniqueName)
 		{
-			UniqueName = string.IsNullOrEmpty(uniqueName) ? typeof(T).FullName : uniqueName;
+			UniqueNameFilter = string.IsNullOrEmpty(uniqueName) ? typeof(T).FullName : uniqueName;
 		}
 
 		/// <summary>
@@ -32,7 +32,18 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Gets the unique name of the intercepted component.
 		/// </summary>
-		public string UniqueName { get; private set; }
+		public string UniqueNameFilter { get; private set; }
+
+		/// <summary>
+		/// Filters unique names with regex pattern.
+		/// </summary>
+		/// <param name="nameFilter"></param>
+		/// <returns></returns>
+		public CallInterceptorBuilder<T> WithUniqueNameFilter(string nameFilter)
+		{
+			UniqueNameFilter = nameFilter;
+			return this;
+		}
 
 		/// <summary>
 		/// Creates new CallInterceptor for the given method.
@@ -47,7 +58,7 @@ namespace Zyan.Communication
 			string memberName;
 			Parse(expression, out memberType, out memberName);
 
-			return new CallInterceptor(typeof(T), UniqueName, memberType, memberName, new Type[0], handler);
+			return new CallInterceptor(typeof(T), UniqueNameFilter, memberType, memberName, new Type[0], handler);
 		}
 
 		/// <summary>
@@ -63,7 +74,7 @@ namespace Zyan.Communication
 			string memberName;
 			Parse(expression, out memberType, out memberName);
 
-			return new CallInterceptor(typeof(T), UniqueName, memberType, memberName, new Type[0],
+			return new CallInterceptor(typeof(T), UniqueNameFilter, memberType, memberName, new Type[0],
 				data => data.ReturnValue = handler(data));
 		}
 

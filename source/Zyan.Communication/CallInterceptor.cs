@@ -28,7 +28,7 @@ namespace Zyan.Communication
 		public CallInterceptor(Type interfaceType, string uniqueName, MemberTypes memberType, string memberName, Type[] parameterTypes, CallInterceptionDelegate onInterception)
 		{
 			InterfaceType = interfaceType;
-			UniqueName = string.IsNullOrEmpty(uniqueName) ? interfaceType.FullName : uniqueName;
+			UniqueNameFilter = string.IsNullOrEmpty(uniqueName) ? interfaceType.FullName : uniqueName;
 			MemberType = memberType;
 			MemberName = memberName;
 			ParameterTypes = parameterTypes;
@@ -55,9 +55,9 @@ namespace Zyan.Communication
 		public Type InterfaceType { get; private set; }
 
 		/// <summary>
-		/// Gets the unique name of intercepted component.
+		/// Gets the unique name filter of intercepted component.
 		/// </summary>
-		public string UniqueName { get; private set; }
+		public string UniqueNameFilter { get; internal set; }
 
 		/// <summary>
 		/// Gets the Type of the intercepted member.
@@ -138,6 +138,17 @@ namespace Zyan.Communication
 			}
 
 			return string.Format("{0}.{1}{2}", InterfaceType, MemberName, parameters);
+		}
+
+		/// <summary>
+		/// Filters unique name over regex.
+		/// </summary>
+		/// <param name="nameFilter"></param>
+		/// <returns></returns>
+		public CallInterceptor WithUniqueNameFilter(string nameFilter)
+		{
+			UniqueNameFilter = nameFilter;
+			return this;
 		}
 	}
 }
