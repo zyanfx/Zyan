@@ -67,8 +67,7 @@ namespace Zyan.Communication
 				.Where(ic => Equals(ic.InterfaceType, interfaceType))
 				.Where(ic => ic.MemberType == remotingMessage.MethodBase.MemberType)
 				.Where(ic => ic.MemberName == remotingMessage.MethodName)
-				.Where(ic => GetTypeList(ic.ParameterTypes) == GetTypeList(remotingMessage.MethodBase.GetParameters()))
-				.ToList();
+				.Where(ic => GetTypeList(ic.ParameterTypes) == GetTypeList(remotingMessage.MethodBase.GetParameters()));
 
 			lock (SyncRoot)
 			{
