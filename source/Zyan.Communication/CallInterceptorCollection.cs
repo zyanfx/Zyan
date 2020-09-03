@@ -63,7 +63,7 @@ namespace Zyan.Communication
 
 			var matchingInterceptors = this
 				.Where(ic => ic.Enabled)
-				.Where(ic => Regex.IsMatch(uniqueName, ic.UniqueNameFilter))
+				.Where(ic => ic.IsNameMatch(uniqueName))
 				.Where(ic => Equals(ic.InterfaceType, interfaceType))
 				.Where(ic => ic.MemberType == remotingMessage.MethodBase.MemberType)
 				.Where(ic => ic.MemberName == remotingMessage.MethodName)

@@ -51,6 +51,19 @@ namespace Zyan.Communication
 		}
 
 		/// <summary>
+		/// Compare unique name via regex.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
+		public bool IsNameMatch(string name)
+		{
+			// performance optimization
+			if (name == UniqueNameFilter)
+				return true;
+			return Regex.IsMatch(name, UniqueNameFilter);
+		}
+
+		/// <summary>
 		/// Gets the interface type of the intercepted component.
 		/// </summary>
 		public Type InterfaceType { get; private set; }

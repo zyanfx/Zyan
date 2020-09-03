@@ -51,6 +51,10 @@ namespace Zyan.Tests
 			bool GenericFunction<T>(int a, T b);
 
 			event EventHandler ProcedureCalled;
+
+			void EmitGenericHandlerEvent();
+
+			event EventHandler<EventArgs> GenericHandlerEvent;
 		}
 
 		public class InterceptableComponent : IInterceptableComponent
@@ -84,8 +88,20 @@ namespace Zyan.Tests
 
 			private void OnProcedureCalled()
 			{
-				if (ProcedureCalled != null)
-					ProcedureCalled(null, EventArgs.Empty);
+				ProcedureCalled?.Invoke(null, EventArgs.Empty);
+			}
+
+			public event EventHandler<EventArgs> GenericHandlerEvent;
+
+			public void EmitGenericHandlerEvent()
+			{
+				RaiseGenericHandlerEvent();
+			}
+
+			private void RaiseGenericHandlerEvent()
+			{
+				var h = GenericHandlerEvent;
+				h?.Invoke(null, new EventArgs());
 			}
 		}
 
@@ -294,7 +310,10 @@ namespace Zyan.Tests
 			ZyanConnection.CallInterceptors.Add(interceptor);
 
 			var proxy = ZyanConnection.CreateProxy<IInterceptableComponent>();
-			proxy.ProcedureCalled += (sender, args) => procedureCalled = true;
+			proxy.ProcedureCalled += (sender, args) =>
+			{
+				procedureCalled = true;
+			};
 			Assert.IsFalse(procedureCalled);
 			Assert.IsTrue(intercepted);
 
@@ -362,6 +381,33 @@ namespace Zyan.Tests
 			});
 
 			Task.WaitAll(Task.Run(action1), Task.Run(action2));
+		}
+
+		[TestMethod]
+		public void GenericEventHandlerInterceptionTest()
+		{
+			var intercepted = false;
+			var procedureCalled = false;
+
+			var interceptor = new CallInterceptor(typeof(IInterceptableComponent),
+				MemberTypes.Method, "add_GenericHandlerEvent", new[] { typeof(EventHandler<EventArgs>) }, data =>
+				{
+					intercepted = true;
+				});
+
+			ZyanConnection.CallInterceptors.Add(interceptor);
+
+			var proxy = ZyanConnection.CreateProxy<IInterceptableComponent>();
+			proxy.GenericHandlerEvent += (sender, args) =>
+			{
+				procedureCalled = true;
+			};
+
+			Assert.IsFalse(procedureCalled);
+			Assert.IsTrue(intercepted);
+
+			proxy.EmitGenericHandlerEvent();
+			Assert.IsTrue(procedureCalled);
 		}
 
 		[TestMethod]
