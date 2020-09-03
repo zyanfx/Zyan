@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -50,6 +51,10 @@ namespace Zyan.Tests
 			bool GenericFunction<T>(int a, T b);
 
 			event EventHandler ProcedureCalled;
+
+			void EmitGenericHandlerEvent();
+
+			event EventHandler<EventArgs> GenericHandlerEvent;
 		}
 
 		public class InterceptableComponent : IInterceptableComponent
@@ -76,10 +81,27 @@ namespace Zyan.Tests
 
 			public event EventHandler ProcedureCalled;
 
+			public IEnumerable<string> EnumerateProcedure()
+			{
+				return Enumerable.Repeat("test", 2);
+			}
+
 			private void OnProcedureCalled()
 			{
-				if (ProcedureCalled != null)
-					ProcedureCalled(null, EventArgs.Empty);
+				ProcedureCalled?.Invoke(null, EventArgs.Empty);
+			}
+
+			public event EventHandler<EventArgs> GenericHandlerEvent;
+
+			public void EmitGenericHandlerEvent()
+			{
+				RaiseGenericHandlerEvent();
+			}
+
+			private void RaiseGenericHandlerEvent()
+			{
+				var h = GenericHandlerEvent;
+				h?.Invoke(null, new EventArgs());
 			}
 		}
 
@@ -288,7 +310,10 @@ namespace Zyan.Tests
 			ZyanConnection.CallInterceptors.Add(interceptor);
 
 			var proxy = ZyanConnection.CreateProxy<IInterceptableComponent>();
-			proxy.ProcedureCalled += (sender, args) => procedureCalled = true;
+			proxy.ProcedureCalled += (sender, args) =>
+			{
+				procedureCalled = true;
+			};
 			Assert.IsFalse(procedureCalled);
 			Assert.IsTrue(intercepted);
 
@@ -359,39 +384,226 @@ namespace Zyan.Tests
 		}
 
 		[TestMethod]
+		public void GenericEventHandlerInterceptionTest()
+		{
+			var intercepted = false;
+			var procedureCalled = false;
+
+			var interceptor = new CallInterceptor(typeof(IInterceptableComponent),
+				MemberTypes.Method, "add_GenericHandlerEvent", new[] { typeof(EventHandler<EventArgs>) }, data =>
+				{
+					intercepted = true;
+				});
+
+			ZyanConnection.CallInterceptors.Add(interceptor);
+
+			var proxy = ZyanConnection.CreateProxy<IInterceptableComponent>();
+			proxy.GenericHandlerEvent += (sender, args) =>
+			{
+				procedureCalled = true;
+			};
+
+			Assert.IsFalse(procedureCalled);
+			Assert.IsTrue(intercepted);
+
+			proxy.EmitGenericHandlerEvent();
+			Assert.IsTrue(procedureCalled);
+		}
+
+		[TestMethod]
 		public void CallInterceptionBug()
 		{
-			using (var host = new ZyanComponentHost("FirstTestServer", 18888))
-			{
-				host.RegisterComponent<ITestService, TestService>(ActivationType.Singleton);
+			const string instanceName = "FirstTestServer";
+			const int port = 18888;
 
-				using (var connection = new ZyanConnection("tcp://127.0.0.1:18888/FirstTestServer") { CallInterceptionEnabled = true })
+			var namedService1 = nameof(NamedService1);
+			var namedService2 = nameof(NamedService2);
+
+			using (var host = new ZyanComponentHost(instanceName, port))
+			{
+				// register 3 service instances by the same interface: 2 with unique name, one is unnamed
+				// named service1 has reference to service2 as child
+				host.RegisterComponent<ITestService, NamedService1>(namedService1, ActivationType.Singleton);
+				host.RegisterComponent<ITestService, NamedService2>(namedService2, ActivationType.Singleton);
+				host.RegisterComponent<ITestService, UnnamedService>(ActivationType.Singleton);
+
+				using (var connection = new ZyanConnection($"tcp://127.0.0.1:{port}/{instanceName}")
+				{
+					CallInterceptionEnabled = true
+				})
 				{
 					// add a call interceptor for the TestService.TestMethod
-					connection.CallInterceptors.Add(CallInterceptor.For<ITestService>().Action(service => service.TestMethod(), data =>
-					{
-						data.Intercepted = true;
-						data.MakeRemoteCall();
-						data.ReturnValue = nameof(TestService);
-					}));
+					connection.CallInterceptors.Add(CallInterceptor.For<ITestService>()
+						.WithUniqueNameFilter(@"NamedService\d+")
+						.Action(service => service.TestMethod(), data =>
+						{
+							data.ReturnValue = $"intercepted_{data.MakeRemoteCall()}";
+							data.Intercepted = true;
+						}));
 
-					var testService = connection.CreateProxy<ITestService>(null);
-					var result = testService.TestMethod();
-					Assert.AreEqual(nameof(TestService), result);
+					// for unnamed service
+					connection.CallInterceptors
+						.For<ITestService>()
+						.Add(c => c.TestMethod(), data =>
+						{
+							data.ReturnValue = $"intercepted_unnamed_{data.MakeRemoteCall()}";
+							data.Intercepted = true;
+						});
+
+					connection.CallInterceptors
+						.For<ITestService>()
+						.WithUniqueNameFilter(".*") // for all services does not matter named or not
+						.Add(c => c.EnumerateProcedure(), action =>
+						{
+							var result = (IEnumerable<string>) action.MakeRemoteCall();
+							var intercepted = result.Select(r => $"intercepted_{r}");
+							action.ReturnValue = intercepted.ToList();
+							action.Intercepted = true;
+						});
+
+					// intercept and return children like a collection of proxies on client side
+					// suppress remote call
+					connection.CallInterceptors.For<ITestService>()
+						.WithUniqueNameFilter(".*")
+						.Add(c => c.GetChildren(), action =>
+						{
+							action.Intercepted = true;
+							var childNames = connection.CreateProxy<ITestService>(action.InvokerUniqueName)?
+								.GetChildrenName()
+								.ToList();
+
+							var children = new List<ITestService>();
+							foreach (var childName in childNames)
+							{
+								children.Add(connection.CreateProxy<ITestService>(childName));
+							}
+							// prevent remote call
+							//action.MakeRemoteCall();
+							action.ReturnValue = children;
+						});
+
+					var namedClient1 = connection.CreateProxy<ITestService>(namedService1);
+					var namedClient2 = connection.CreateProxy<ITestService>(namedService2);
+					var unnamedClient = connection.CreateProxy<ITestService>();
+
+					// assert names
+					Assert.AreEqual(namedClient1.Name, namedService1);
+					Assert.AreEqual(namedClient2.Name, namedService2);
+					Assert.AreEqual(unnamedClient.Name, nameof(UnnamedService));
+
+					// assert method class interception result
+					var named1_TestMethod_Result = namedClient1.TestMethod();
+					var named2_TestMethod_Result = namedClient2.TestMethod();
+					var unnamed_TestMethod_Result = unnamedClient.TestMethod();
+
+					Assert.AreEqual($"intercepted_{namedService1}", named1_TestMethod_Result);
+					Assert.AreEqual($"intercepted_{namedService2}", named2_TestMethod_Result);
+					Assert.AreEqual($"intercepted_unnamed_{nameof(UnnamedService)}", unnamed_TestMethod_Result);
+
+					// enumerate procedure: all class are handled by single interceptor
+					var named1_enumerate_result = namedClient1.EnumerateProcedure();
+					var named2_enumerate_result = namedClient2.EnumerateProcedure();
+					var unnnamed_enumerate_result = unnamedClient.EnumerateProcedure();
+
+					Assert.AreEqual(1, named1_enumerate_result.Count());
+					Assert.IsTrue(named1_enumerate_result.All(r => string.Equals(r, $"intercepted_{namedService1}")));
+
+					Assert.AreEqual(2, named2_enumerate_result.Count());
+					Assert.IsTrue(named2_enumerate_result.All(r => string.Equals(r, $"intercepted_{namedService2}")));
+
+					Assert.IsFalse(unnnamed_enumerate_result.Any());
 				}
 			}
 		}
 
 		public interface ITestService
 		{
+			string Name { get; }
+
 			string TestMethod();
+
+			IEnumerable<ITestService> GetChildren();
+
+			IEnumerable<string> GetChildrenName();
+
+			IEnumerable<string> EnumerateProcedure();
 		}
 
-		public class TestService : ITestService
+		public class NamedService1 : ITestService
 		{
+			[NonSerialized]
+			private NamedService2 child = new NamedService2();
+
+			public string Name => nameof(NamedService1);
+
 			public string TestMethod()
 			{
-				return string.Empty;
+				return nameof(NamedService1);
+			}
+
+			public IEnumerable<string> GetChildrenName()
+			{
+				return GetChildren().Select(c => c.Name).ToList();
+			}
+
+			public IEnumerable<string> EnumerateProcedure()
+			{
+				return Enumerable.Repeat(nameof(NamedService1), 1).ToArray();
+			}
+
+			public IEnumerable<ITestService> GetChildren()
+			{
+				return Enumerable.Repeat(child, 1).ToArray();
+			}
+		}
+
+		public class NamedService2 : ITestService
+		{
+			public string Name => nameof(NamedService2);
+
+			public string TestMethod()
+			{
+				return nameof(NamedService2);
+			}
+
+			public IEnumerable<ITestService> GetChildren()
+			{
+				return Enumerable.Empty<ITestService>().ToArray();
+			}
+
+			public IEnumerable<string> GetChildrenName()
+			{
+				return Enumerable.Empty<string>().ToList();
+			}
+
+			public IEnumerable<string> EnumerateProcedure()
+			{
+				return Enumerable.Repeat(nameof(NamedService2), 2).ToArray();
+			}
+		}
+
+		public class UnnamedService : ITestService
+		{
+			public string Name => nameof(UnnamedService);
+
+			public string TestMethod()
+			{
+				return nameof(UnnamedService);
+			}
+
+			public IEnumerable<ITestService> GetChildren()
+			{
+				return Enumerable.Empty<ITestService>().ToList();
+			}
+
+			public IEnumerable<string> GetChildrenName()
+			{
+				return Enumerable.Empty<string>().ToArray();
+			}
+
+			public IEnumerable<string> EnumerateProcedure()
+			{
+				return Enumerable.Empty<string>().ToList();
 			}
 		}
 	}

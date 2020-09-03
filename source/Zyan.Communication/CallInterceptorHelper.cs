@@ -11,6 +11,7 @@ namespace Zyan.Communication
 	/// </summary>
 	public class CallInterceptorHelper<T> : IEnumerable<CallInterceptor>
 	{
+		private string _uniqueNameFilter;
 		CallInterceptorCollection Interceptors { get; set; }
 
 		/// <summary>
@@ -20,6 +21,20 @@ namespace Zyan.Communication
 		public CallInterceptorHelper(CallInterceptorCollection interceptors)
 		{
 			Interceptors = interceptors;
+		}
+
+		/// <summary>
+		/// Unique name regex filter. Once again... Some refactoring required.
+		/// </summary>
+		public string UniqueNameFilter
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(_uniqueNameFilter))
+					return ".*";
+				return _uniqueNameFilter;
+			}
+			private set => _uniqueNameFilter = value;
 		}
 
 		/// <summary>
@@ -36,7 +51,8 @@ namespace Zyan.Communication
 			Parse(expression, out memberType, out memberName);
 
 			Interceptors.Add(new CallInterceptor(typeof(T),
-				memberType, memberName, new Type[0], handler));
+				memberType, memberName, new Type[0], handler)
+				.WithUniqueNameFilter(UniqueNameFilter));
 
 			return this;
 		}
@@ -57,7 +73,7 @@ namespace Zyan.Communication
 			Interceptors.Add(new CallInterceptor(typeof(T),
 				memberType, memberName, new Type[0],
 				data => data.ReturnValue = handler(data)
-			));
+			).WithUniqueNameFilter(UniqueNameFilter));
 
 			return this;
 		}
@@ -78,7 +94,7 @@ namespace Zyan.Communication
 			Interceptors.Add(new CallInterceptor(typeof(T),
 				memberType, memberName, new[] { typeof(T1) },
 				data => handler(data, (T1)data.Parameters[0])
-			));
+			).WithUniqueNameFilter(UniqueNameFilter));
 
 			return this;
 		}
@@ -99,7 +115,7 @@ namespace Zyan.Communication
 			Interceptors.Add(new CallInterceptor(typeof(T),
 				memberType, memberName, new[] { typeof(T1) },
 				data => data.ReturnValue = handler(data, (T1)data.Parameters[0])
-			));
+			).WithUniqueNameFilter(UniqueNameFilter));
 
 			return this;
 		}
@@ -120,7 +136,7 @@ namespace Zyan.Communication
 			Interceptors.Add(new CallInterceptor(typeof(T),
 				memberType, memberName, new[] { typeof(T1), typeof(T2) },
 				data => handler(data, (T1)data.Parameters[0], (T2)data.Parameters[1])
-			));
+			).WithUniqueNameFilter(UniqueNameFilter));
 
 			return this;
 		}
@@ -141,7 +157,7 @@ namespace Zyan.Communication
 			Interceptors.Add(new CallInterceptor(typeof(T),
 				memberType, memberName, new[] { typeof(T1), typeof(T2) },
 				data => data.ReturnValue = handler(data, (T1)data.Parameters[0], (T2)data.Parameters[1])
-			));
+			).WithUniqueNameFilter(UniqueNameFilter));
 
 			return this;
 		}
@@ -162,7 +178,7 @@ namespace Zyan.Communication
 			Interceptors.Add(new CallInterceptor(typeof(T),
 				memberType, memberName, new[] { typeof(T1), typeof(T2), typeof(T3) },
 				data => handler(data, (T1)data.Parameters[0], (T2)data.Parameters[1], (T3)data.Parameters[2])
-			));
+			).WithUniqueNameFilter(UniqueNameFilter));
 
 			return this;
 		}
@@ -183,8 +199,19 @@ namespace Zyan.Communication
 			Interceptors.Add(new CallInterceptor(typeof(T),
 				memberType, memberName, new[] { typeof(T1), typeof(T2), typeof(T3) },
 				data => data.ReturnValue = handler(data, (T1)data.Parameters[0], (T2)data.Parameters[1], (T3)data.Parameters[2])
-			));
+			).WithUniqueNameFilter(UniqueNameFilter));
 
+			return this;
+		}
+
+		/// <summary>
+		/// Feature to filter interceptor unique name.
+		/// </summary>
+		/// <param name="nameRegex"></param>
+		/// <returns></returns>
+		public CallInterceptorHelper<T> WithUniqueNameFilter(string nameRegex)
+		{
+			UniqueNameFilter = nameRegex;
 			return this;
 		}
 
