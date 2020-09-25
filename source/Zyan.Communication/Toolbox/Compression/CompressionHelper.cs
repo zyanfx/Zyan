@@ -17,6 +17,7 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using Zyan.Communication.ChannelSinks.Compression;
+using Zyan.Communication.Toolbox.IO;
 
 namespace Zyan.Communication.Toolbox.Compression
 {
@@ -42,7 +43,7 @@ namespace Zyan.Communication.Toolbox.Compression
 				// average compression using DeflateStream
 				case CompressionMethod.DeflateStream:
 				{
-					var stream = new MemoryStream();
+					var stream = new SmallBlockMemoryStream();
 					using (var output = new DeflateStream(stream, CompressionMode.Compress, true))
 					{
 						int read;
@@ -63,7 +64,7 @@ namespace Zyan.Communication.Toolbox.Compression
 				{
 					var buffer = new byte[BufferSize];
 					var output = new byte[BufferSize * 2]; // safe value for uncompressible data
-					var outStream = new MemoryStream();
+					var outStream = new SmallBlockMemoryStream();
 					var lzf = new LZF();
 
 					while (true)
@@ -113,7 +114,7 @@ namespace Zyan.Communication.Toolbox.Compression
 				// decompress using DeflateStream
 				case CompressionMethod.DeflateStream:
 				{
-					var stream = new MemoryStream();
+					var stream = new SmallBlockMemoryStream();
 					using (var output = new DeflateStream(inputStream, CompressionMode.Decompress, true))
 					{
 						int read;
@@ -135,7 +136,7 @@ namespace Zyan.Communication.Toolbox.Compression
 					var buffer = new byte[BufferSize * 2];
 					var output = new byte[BufferSize];
 					var temp = new byte[ShortSize * 2];
-					var outStream = new MemoryStream();
+					var outStream = new SmallBlockMemoryStream();
 					var lzf = new LZF();
 
 					while (true)

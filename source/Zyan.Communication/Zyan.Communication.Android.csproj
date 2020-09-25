@@ -306,6 +306,8 @@
     <Compile Include="SubscriptionEventArgs.cs" />
     <Compile Include="ZyanSettings.cs" />
     <Compile Include="Toolbox\LocalCallContextData.cs" />
+    <Compile Include="Toolbox\IO\__Error.cs" />
+    <Compile Include="Toolbox\IO\SmallBlockMemoryStream.cs" />
     <Compile Include="IComponentRegistry.cs" />
     <Compile Include="ComponentRegistry.cs" />
   </ItemGroup>

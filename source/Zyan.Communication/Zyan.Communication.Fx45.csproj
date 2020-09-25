@@ -354,6 +354,8 @@
     <Compile Include="Toolbox\Asynchronizer.cs" />
     <Compile Include="Toolbox\SyncContextSwitcher.cs" />
     <Compile Include="Toolbox\TransactionStarter.cs" />
+    <Compile Include="Toolbox\IO\__Error.cs" />
+    <Compile Include="Toolbox\IO\SmallBlockMemoryStream.cs" />
     <Compile Include="ZyanSettings.cs" />
   </ItemGroup>
   <ItemGroup>
