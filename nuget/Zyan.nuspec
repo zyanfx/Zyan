@@ -48,6 +48,7 @@
     </releaseNotes>
     <language>en-US</language>
     <tags>mobile android xamarin duplex tcp tcpex http ipc remoting network communication socket sockets nat firewall distributed cloud wcf rpc linq mef composition event events ebc event-based-components binary flowdesign easy secure ldap authentication security compression server service services mono</tags>
+    <repository type="git" url="https://github.com/zyanfx/Zyan.git" />
     <dependencies>
       <group>
         <dependency id="Zyan.SafeDeserializationHelpers" version="0.5.1" />
