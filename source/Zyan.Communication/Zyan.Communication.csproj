@@ -12,6 +12,11 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
 
+  <!-- generate key file if it's missing -->
+  <PropertyGroup>
+    <PreBuildEvent>$(SolutionDir)..\tools\SnTools\sngen.bat $(SolutionDir)</PreBuildEvent>
+  </PropertyGroup>
+
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
