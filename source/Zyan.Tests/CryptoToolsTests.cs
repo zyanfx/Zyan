@@ -71,10 +71,11 @@ namespace Zyan.Tests
 			Assert.AreEqual(typeof(RC2CryptoServiceProvider), prov.GetType());
 		}
 
-		[TestMethod, ExpectedException(typeof(ArgumentException))]
+		[TestMethod]
 		public void CryptoTools_UnknownAlgorithm()
 		{
-			CryptoTools.CreateSymmetricCryptoProvider("nicetry");
+			Assert.Throws<ArgumentException>(() =>
+				CryptoTools.CreateSymmetricCryptoProvider("nicetry"));
 		}
 	}
 }

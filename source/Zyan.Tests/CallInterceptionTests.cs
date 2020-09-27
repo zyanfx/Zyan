@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
 using Zyan.Communication;
 using Zyan.Communication.Protocols.Null;
 using Zyan.Communication.Protocols.Tcp;
@@ -13,14 +12,18 @@ using Zyan.Communication.Security;
 
 namespace Zyan.Tests
 {
-	#region Unit testing platform abstraction layer
+#if !FX3
+	using System.Threading.Tasks;
+#endif
+
+#region Unit testing platform abstraction layer
 #if NUNIT
 	using NUnit.Framework;
 	using TestClass = NUnit.Framework.TestFixtureAttribute;
 	using TestMethod = NUnit.Framework.TestAttribute;
-	using ClassInitializeNonStatic = NUnit.Framework.TestFixtureSetUpAttribute;
+	using ClassInitializeNonStatic = NUnit.Framework.OneTimeSetUpAttribute;
 	using ClassInitialize = DummyAttribute;
-	using ClassCleanupNonStatic = NUnit.Framework.TestFixtureTearDownAttribute;
+	using ClassCleanupNonStatic = NUnit.Framework.OneTimeTearDownAttribute;
 	using ClassCleanup = DummyAttribute;
 	using TestContext = System.Object;
 	using TestInitialize = NUnit.Framework.SetUpAttribute;
@@ -30,7 +33,7 @@ namespace Zyan.Tests
 	using ClassInitializeNonStatic = DummyAttribute;
 	using ClassCleanupNonStatic = DummyAttribute;
 #endif
-	#endregion
+#endregion
 
 	/// <summary>
 	/// Test class for strong-typed call interceptor builder.
@@ -38,7 +41,7 @@ namespace Zyan.Tests
 	[TestClass]
 	public class CallInterceptionTests
 	{
-		#region Interfaces and components
+#region Interfaces and components
 
 		public interface IInterceptableComponent
 		{
@@ -105,9 +108,9 @@ namespace Zyan.Tests
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region Initialization and cleanup
+#region Initialization and cleanup
 
 		public TestContext TestContext { get; set; }
 
@@ -153,7 +156,7 @@ namespace Zyan.Tests
 			ZyanConnection.CallInterceptors.Clear();
 		}
 
-		#endregion
+#endregion
 
 		[TestMethod]
 		public void ParameterlessVoidMethod_IsIntercepted()
@@ -257,7 +260,7 @@ namespace Zyan.Tests
 
 			// not intercepted
 			var result = proxy.Function(321, DateTime.Now, TimeSpan.FromSeconds(1));
-			Assert.IsFalse(string.IsNullOrWhiteSpace(result));
+			Assert.IsFalse(string.IsNullOrEmpty(result));
 			Assert.IsFalse(result.StartsWith(interceptPrefix));
 
 			// intercepted
@@ -350,6 +353,7 @@ namespace Zyan.Tests
 			Assert.IsTrue(intercepted);
 		}
 
+#if !FX3 && !FX4
 		[TestMethod]
 		public void CallInterceptorRegistrationThreadingTest()
 		{
@@ -382,6 +386,7 @@ namespace Zyan.Tests
 
 			Task.WaitAll(Task.Run(action1), Task.Run(action2));
 		}
+#endif
 
 		[TestMethod]
 		public void GenericEventHandlerInterceptionTest()

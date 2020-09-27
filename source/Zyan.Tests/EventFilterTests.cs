@@ -13,9 +13,9 @@ namespace Zyan.Tests
 	using NUnit.Framework;
 	using TestClass = NUnit.Framework.TestFixtureAttribute;
 	using TestMethod = NUnit.Framework.TestAttribute;
-	using ClassInitializeNonStatic = NUnit.Framework.TestFixtureSetUpAttribute;
+	using ClassInitializeNonStatic = NUnit.Framework.OneTimeSetUpAttribute;
 	using ClassInitialize = DummyAttribute;
-	using ClassCleanupNonStatic = NUnit.Framework.TestFixtureTearDownAttribute;
+	using ClassCleanupNonStatic = NUnit.Framework.OneTimeTearDownAttribute;
 	using ClassCleanup = DummyAttribute;
 	using TestContext = System.Object;
 	using AssertFailedException = NUnit.Framework.AssertionException;

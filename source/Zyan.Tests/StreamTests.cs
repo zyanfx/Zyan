@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !FX3
+
+using System;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -16,9 +18,9 @@ namespace Zyan.Tests
 	using NUnit.Framework;
 	using TestClass = NUnit.Framework.TestFixtureAttribute;
 	using TestMethod = NUnit.Framework.TestAttribute;
-	using ClassInitializeNonStatic = NUnit.Framework.TestFixtureSetUpAttribute;
+	using ClassInitializeNonStatic = NUnit.Framework.OneTimeSetUpAttribute;
 	using ClassInitialize = DummyAttribute;
-	using ClassCleanupNonStatic = NUnit.Framework.TestFixtureTearDownAttribute;
+	using ClassCleanupNonStatic = NUnit.Framework.OneTimeTearDownAttribute;
 	using ClassCleanup = DummyAttribute;
 	using TestContext = System.Object;
 #else
@@ -65,7 +67,7 @@ namespace Zyan.Tests
 
 			public Stream OpenRead(string fileName)
 			{
-				if (string.IsNullOrWhiteSpace(fileName))
+				if (string.IsNullOrEmpty(fileName))
 				{
 					return new MemoryStream(SampleData);
 				}
@@ -75,7 +77,7 @@ namespace Zyan.Tests
 
 			public Stream Create(string fileName)
 			{
-				if (string.IsNullOrWhiteSpace(fileName))
+				if (string.IsNullOrEmpty(fileName))
 				{
 					return new MemoryStream();
 				}
@@ -326,3 +328,5 @@ namespace Zyan.Tests
 		}
 	}
 }
+
+#endif

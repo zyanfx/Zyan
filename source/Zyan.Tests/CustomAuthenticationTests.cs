@@ -14,9 +14,9 @@ namespace Zyan.Tests
 	using NUnit.Framework;
 	using TestClass = NUnit.Framework.TestFixtureAttribute;
 	using TestMethod = NUnit.Framework.TestAttribute;
-	using ClassInitializeNonStatic = NUnit.Framework.TestFixtureSetUpAttribute;
+	using ClassInitializeNonStatic = NUnit.Framework.OneTimeSetUpAttribute;
 	using ClassInitialize = DummyAttribute;
-	using ClassCleanupNonStatic = NUnit.Framework.TestFixtureTearDownAttribute;
+	using ClassCleanupNonStatic = NUnit.Framework.OneTimeTearDownAttribute;
 	using ClassCleanup = DummyAttribute;
 	using TestContext = System.Object;
 #else
@@ -397,33 +397,39 @@ namespace Zyan.Tests
 			}
 		}
 
-		[TestMethod, ExpectedException(typeof(SecurityException))]
+		[TestMethod]
 		public void InvalidLoginUsingTcpDuplexChannel_NoAuthClient()
 		{
 			var url = "tcpex://localhost:8088/CustomAuthenticationTestHost_TcpDuplex";
 			var protocol = new TcpDuplexClientProtocolSetup(true);
 			var credentials = new Hashtable { { "@", "Hello" } };
 
-			using (var connection = new ZyanConnection(url, protocol, credentials, true, true))
+			Assert.Throws<SecurityException>(() =>
 			{
-				var proxy1 = connection.CreateProxy<ISampleServer>("SampleServer");
-				Assert.AreEqual("Hallo", proxy1.Echo("Hallo"));
-				proxy1 = null;
-			}
+				using (var connection = new ZyanConnection(url, protocol, credentials, true, true))
+				{
+					var proxy1 = connection.CreateProxy<ISampleServer>("SampleServer");
+					Assert.AreEqual("Hallo", proxy1.Echo("Hallo"));
+					proxy1 = null;
+				}
+			});
 		}
 
-		[TestMethod, ExpectedException(typeof(SecurityException))]
+		[TestMethod]
 		public void InvalidLoginUsingTcpDuplexChannel_NoCredentials()
 		{
 			var url = "tcpex://localhost:8088/CustomAuthenticationTestHost_TcpDuplex";
 			var protocol = new TcpDuplexClientProtocolSetup(true);
 
-			using (var connection = new ZyanConnection(url, protocol))
+			Assert.Throws<SecurityException>(() =>
 			{
-				var proxy1 = connection.CreateProxy<ISampleServer>("SampleServer");
-				Assert.AreEqual("Hallo", proxy1.Echo("Hallo"));
-				proxy1 = null;
-			}
+				using (var connection = new ZyanConnection(url, protocol))
+				{
+					var proxy1 = connection.CreateProxy<ISampleServer>("SampleServer");
+					Assert.AreEqual("Hallo", proxy1.Echo("Hallo"));
+					proxy1 = null;
+				}
+			});
 		}
 
 		[TestMethod]
@@ -448,33 +454,39 @@ namespace Zyan.Tests
 			}
 		}
 
-		[TestMethod, ExpectedException(typeof(SecurityException))]
+		[TestMethod]
 		public void InvalidLoginUsingTcpSimplexChannel_NoAuthClient()
 		{
 			var url = "tcp://localhost:8089/CustomAuthenticationTestHost_TcpSimplex";
 			var protocol = new TcpCustomClientProtocolSetup(true);
 			var credentials = new Hashtable { { "@", "Hello" } };
 
-			using (var connection = new ZyanConnection(url, protocol, credentials, true, true))
+			Assert.Throws<SecurityException>(() =>
 			{
-				var proxy1 = connection.CreateProxy<ISampleServer>("SampleServer");
-				Assert.AreEqual("Hallo", proxy1.Echo("Hallo"));
-				proxy1 = null;
-			}
+				using (var connection = new ZyanConnection(url, protocol, credentials, true, true))
+				{
+					var proxy1 = connection.CreateProxy<ISampleServer>("SampleServer");
+					Assert.AreEqual("Hallo", proxy1.Echo("Hallo"));
+					proxy1 = null;
+				}
+			});
 		}
 
-		[TestMethod, ExpectedException(typeof(SecurityException))]
+		[TestMethod]
 		public void InvalidLoginUsingTcpSimplexChannel_NoCredentials()
 		{
 			var url = "tcp://localhost:8089/CustomAuthenticationTestHost_TcpSimplex";
 			var protocol = new TcpCustomClientProtocolSetup(true);
 
-			using (var connection = new ZyanConnection(url, protocol))
+			Assert.Throws<SecurityException>(() =>
 			{
-				var proxy1 = connection.CreateProxy<ISampleServer>("SampleServer");
-				Assert.AreEqual("Hallo", proxy1.Echo("Hallo"));
-				proxy1 = null;
-			}
+				using (var connection = new ZyanConnection(url, protocol))
+				{
+					var proxy1 = connection.CreateProxy<ISampleServer>("SampleServer");
+					Assert.AreEqual("Hallo", proxy1.Echo("Hallo"));
+					proxy1 = null;
+				}
+			});
 		}
 	}
 }

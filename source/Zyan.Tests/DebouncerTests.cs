@@ -11,9 +11,9 @@ namespace Zyan.Tests
 	using NUnit.Framework;
 	using TestClass = NUnit.Framework.TestFixtureAttribute;
 	using TestMethod = NUnit.Framework.TestAttribute;
-	using ClassInitializeNonStatic = NUnit.Framework.TestFixtureSetUpAttribute;
+	using ClassInitializeNonStatic = NUnit.Framework.OneTimeSetUpAttribute;
 	using ClassInitialize = DummyAttribute;
-	using ClassCleanupNonStatic = NUnit.Framework.TestFixtureTearDownAttribute;
+	using ClassCleanupNonStatic = NUnit.Framework.OneTimeTearDownAttribute;
 	using ClassCleanup = DummyAttribute;
 	using TestContext = System.Object;
 #else
@@ -29,10 +29,10 @@ namespace Zyan.Tests
 	[TestClass]
 	public class DebouncerTests
 	{
-		[TestMethod, ExpectedException(typeof(ArgumentNullException))]
+		[TestMethod]
 		public void NullActionIsNotAllowedForSetTimeout()
 		{
-			Debouncer.SetTimeout(null, 10);
+			Assert.Throws<ArgumentNullException>(() => Debouncer.SetTimeout(null, 10));
 		}
 
 		[TestMethod]
@@ -64,10 +64,13 @@ namespace Zyan.Tests
 			Assert.AreEqual(0, counter);
 		}
 
-		[TestMethod, ExpectedException(typeof(ArgumentNullException))]
+		[TestMethod]
 		public void NullActionIsNotAllowedForSetInterval()
 		{
-			Debouncer.SetInterval(null, 10);
+			Assert.Throws<ArgumentNullException>(() =>
+			{
+				Debouncer.SetInterval(null, 10);
+			});
 		}
 
 		[TestMethod]
@@ -103,10 +106,13 @@ namespace Zyan.Tests
 			Assert.AreEqual(lastCounter, counter);
 		}
 
-		[TestMethod, ExpectedException(typeof(ArgumentNullException))]
+		[TestMethod]
 		public void NullActionIsNotAllowedForDebounce()
 		{
-			Debouncer.Debounce(null);
+			Assert.Throws<ArgumentNullException>(() =>
+			{
+				Debouncer.Debounce(null);
+			});
 		}
 
 		[TestMethod]
@@ -150,10 +156,13 @@ namespace Zyan.Tests
 			Assert.AreEqual(4, counter);
 		}
 
-		[TestMethod, ExpectedException(typeof(ArgumentNullException))]
+		[TestMethod]
 		public void NullActionIsNotAllowedForCancellableDebounce()
 		{
-			Debouncer.CancellableDebounce(null);
+			Assert.Throws<ArgumentNullException>(() =>
+			{
+				Debouncer.CancellableDebounce(null);
+			});
 		}
 
 		[TestMethod]

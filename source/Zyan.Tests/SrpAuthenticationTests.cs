@@ -20,9 +20,9 @@ namespace Zyan.Tests
 	using NUnit.Framework;
 	using TestClass = NUnit.Framework.TestFixtureAttribute;
 	using TestMethod = NUnit.Framework.TestAttribute;
-	using ClassInitializeNonStatic = NUnit.Framework.TestFixtureSetUpAttribute;
+	using ClassInitializeNonStatic = NUnit.Framework.OneTimeSetUpAttribute;
 	using ClassInitialize = DummyAttribute;
-	using ClassCleanupNonStatic = NUnit.Framework.TestFixtureTearDownAttribute;
+	using ClassCleanupNonStatic = NUnit.Framework.OneTimeTearDownAttribute;
 	using ClassCleanup = DummyAttribute;
 	using TestContext = System.Object;
 #else
@@ -487,27 +487,33 @@ namespace Zyan.Tests
 			}
 		}
 
-		[TestMethod, ExpectedException(typeof(SecurityException))]
+		[TestMethod]
 		public void InvalidLoginUsingTcpDuplexChannel_NoAuthClient()
 		{
 			var url = "tcpex://localhost:8090/CustomAuthenticationTestHost_TcpDuplex";
 			var protocol = new TcpDuplexClientProtocolSetup(true);
 			var credentials = new AuthCredentials(UserName, Password);
 
-			using (var connection = new ZyanConnection(url, protocol, credentials, true, true))
+			Assert.Throws<SecurityException>(() =>
 			{
-				var proxy1 = connection.CreateProxy<ISampleServer>("SampleServer");
-				Assert.AreEqual("Hallo", proxy1.Echo("Hallo"));
-				proxy1 = null;
-			}
+				using (var connection = new ZyanConnection(url, protocol, credentials, true, true))
+				{
+					var proxy1 = connection.CreateProxy<ISampleServer>("SampleServer");
+					Assert.AreEqual("Hallo", proxy1.Echo("Hallo"));
+					proxy1 = null;
+				}
+			});
 		}
 
-		[TestMethod, ExpectedException(typeof(SecurityException))]
+		[TestMethod]
 		public void InvalidLoginUsingTcpDuplexChannel_NoCredentials()
 		{
 			var url = "tcpex://localhost:8090/CustomAuthenticationTestHost_TcpDuplex";
 			var protocol = new TcpDuplexClientProtocolSetup(true);
-			var connection = new ZyanConnection(url, protocol);
+			Assert.Throws<SecurityException>(() =>
+			{
+				var connection = new ZyanConnection(url, protocol);
+			});
 		}
 
 		[TestMethod]
@@ -566,21 +572,27 @@ namespace Zyan.Tests
 			}
 		}
 
-		[TestMethod, ExpectedException(typeof(SecurityException))]
+		[TestMethod]
 		public void InvalidLoginUsingTcpSimplexChannel_NoAuthClient()
 		{
 			var url = "tcp://localhost:8091/CustomAuthenticationTestHost_TcpSimplex";
 			var protocol = new TcpCustomClientProtocolSetup(true);
 			var credentials = new AuthCredentials(UserName, Password);
-			var connection = new ZyanConnection(url, protocol, credentials, true, true);
+			Assert.Throws<SecurityException>(() =>
+			{
+				var connection = new ZyanConnection(url, protocol, credentials, true, true);
+			});
 		}
 
-		[TestMethod, ExpectedException(typeof(SecurityException))]
+		[TestMethod]
 		public void InvalidLoginUsingTcpSimplexChannel_NoCredentials()
 		{
 			var url = "tcp://localhost:8091/CustomAuthenticationTestHost_TcpSimplex";
 			var protocol = new TcpCustomClientProtocolSetup(true);
-			var connection = new ZyanConnection(url, protocol);
+			Assert.Throws<SecurityException>(() =>
+			{
+				var connection = new ZyanConnection(url, protocol);
+			});
 		}
 
 		private class BrokenSrpCredentials : AuthCredentials
@@ -595,13 +607,16 @@ namespace Zyan.Tests
 			}
 		}
 
-		[TestMethod, ExpectedException(typeof(SecurityException))]
+		[TestMethod]
 		public void AuthenticationStep1WasNotPerformed()
 		{
 			var url = "tcp://localhost:8091/CustomAuthenticationTestHost_TcpSimplex";
 			var protocol = new TcpCustomClientProtocolSetup(true);
 			var credentials = new BrokenSrpCredentials();
-			var conn = new ZyanConnection(url, protocol, credentials, true, true);
+			Assert.Throws<SecurityException>(() =>
+			{
+				var conn = new ZyanConnection(url, protocol, credentials, true, true);
+			});
 		}
 
 		private class AnotherBrokenSrpCredentials : AuthCredentials
@@ -615,13 +630,16 @@ namespace Zyan.Tests
 			}
 		}
 
-		[TestMethod, ExpectedException(typeof(SecurityException))]
+		[TestMethod]
 		public void UnknownAuthenticationStep()
 		{
 			var url = "tcp://localhost:8091/CustomAuthenticationTestHost_TcpSimplex";
 			var protocol = new TcpCustomClientProtocolSetup(true);
 			var credentials = new AnotherBrokenSrpCredentials();
-			var conn = new ZyanConnection(url, protocol, credentials, true, true);
+			Assert.Throws<SecurityException>(() =>
+			{
+				var conn = new ZyanConnection(url, protocol, credentials, true, true);
+			});
 		}
 	}
 }

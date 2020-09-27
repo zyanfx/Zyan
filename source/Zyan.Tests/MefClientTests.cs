@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !FX3
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
@@ -18,9 +20,9 @@ namespace Zyan.Tests
 	using NUnit.Framework;
 	using TestClass = NUnit.Framework.TestFixtureAttribute;
 	using TestMethod = NUnit.Framework.TestAttribute;
-	using ClassInitializeNonStatic = NUnit.Framework.TestFixtureSetUpAttribute;
+	using ClassInitializeNonStatic = NUnit.Framework.OneTimeSetUpAttribute;
 	using ClassInitialize = DummyAttribute;
-	using ClassCleanupNonStatic = NUnit.Framework.TestFixtureTearDownAttribute;
+	using ClassCleanupNonStatic = NUnit.Framework.OneTimeTearDownAttribute;
 	using ClassCleanup = DummyAttribute;
 	using TestContext = System.Object;
 #else
@@ -36,7 +38,7 @@ namespace Zyan.Tests
 	[TestClass]
 	public class MefClientTests
 	{
-		#region Interfaces and components
+#region Interfaces and components
 
 		public interface IMefClientSample
 		{
@@ -84,9 +86,9 @@ namespace Zyan.Tests
 			public IMefClientSample Sample2 { get; set; }
 		}
 
-		#endregion
+#endregion
 
-		#region Initialization and cleanup
+#region Initialization and cleanup
 
 		public TestContext TestContext { get; set; }
 
@@ -125,7 +127,7 @@ namespace Zyan.Tests
 			ZyanHost.Dispose();
 		}
 
-		#endregion
+#endregion
 
 		[TestMethod]
 		public void MefClientSample_IsDiscovered()
@@ -162,3 +164,5 @@ namespace Zyan.Tests
 		}
 	}
 }
+
+#endif

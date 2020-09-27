@@ -10,9 +10,9 @@ namespace Zyan.Tests
 	using NUnit.Framework;
 	using TestClass = NUnit.Framework.TestFixtureAttribute;
 	using TestMethod = NUnit.Framework.TestAttribute;
-	using ClassInitializeParameterless = NUnit.Framework.TestFixtureSetUpAttribute;
+	using ClassInitializeParameterless = NUnit.Framework.OneTimeSetUpAttribute;
 	using ClassInitialize = DummyAttribute;
-	using ClassCleanup = NUnit.Framework.TestFixtureTearDownAttribute;
+	using ClassCleanup = NUnit.Framework.OneTimeTearDownAttribute;
 #else
 	using Microsoft.VisualStudio.TestTools.UnitTesting;
 	using ClassInitializeParameterless = DummyAttribute;
@@ -27,7 +27,7 @@ namespace Zyan.Tests
 		public static void IsInstanceOf<T>(object obj)
 		{
 #if NUNIT
-			Assert.IsInstanceOfType(typeof(T), obj);
+			Assert.IsInstanceOf<T>(obj);
 #else
 			Assert.IsInstanceOfType(obj, typeof(T));
 #endif
@@ -36,7 +36,7 @@ namespace Zyan.Tests
 		public static void IsNotInstanceOf<T>(object obj)
 		{
 #if NUNIT
-			Assert.IsNotInstanceOfType(typeof(T), obj);
+			Assert.IsNotInstanceOf<T>(obj);
 #else
 			Assert.IsNotInstanceOfType(obj, typeof(T));
 #endif

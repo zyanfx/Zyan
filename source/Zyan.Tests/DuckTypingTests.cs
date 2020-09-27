@@ -14,9 +14,9 @@ namespace Zyan.Tests
 	using NUnit.Framework;
 	using TestClass = NUnit.Framework.TestFixtureAttribute;
 	using TestMethod = NUnit.Framework.TestAttribute;
-	using ClassInitializeNonStatic = NUnit.Framework.TestFixtureSetUpAttribute;
+	using ClassInitializeNonStatic = NUnit.Framework.OneTimeSetUpAttribute;
 	using ClassInitialize = DummyAttribute;
-	using ClassCleanupNonStatic = NUnit.Framework.TestFixtureTearDownAttribute;
+	using ClassCleanupNonStatic = NUnit.Framework.OneTimeTearDownAttribute;
 	using ClassCleanup = DummyAttribute;
 	using TestContext = System.Object;
 #else
@@ -174,10 +174,11 @@ namespace Zyan.Tests
 			new TypeComparer<IDuck, Platypus>().Validate();
 		}
 
-		[TestMethod, ExpectedException(typeof(MissingMethodException))]
+		[TestMethod]
 		public void TypeComparer_ChickenIsNotAValidIDuck()
 		{
-			new TypeComparer<IDuck, Chicken>().Validate();
+			Assert.Throws<MissingMethodException>(() =>
+				new TypeComparer<IDuck, Chicken>().Validate());
 		}
 
 		[TestMethod]
@@ -186,29 +187,33 @@ namespace Zyan.Tests
 			new TypeComparer<IDisposable, Chicken>().Validate();
 		}
 
-		[TestMethod, ExpectedException(typeof(MissingMethodException))]
+		[TestMethod]
 		public void TypeComparer_PlatypusIsNotDisposable()
 		{
-			new TypeComparer<IDisposable, Platypus>().Validate();
+			Assert.Throws<MissingMethodException>(() =>
+				new TypeComparer<IDisposable, Platypus>().Validate());
 		}
 
-		[TestMethod, ExpectedException(typeof(MissingMethodException))]
+		[TestMethod]
 		public void ZyanComponentHost_ChickenWillNotBeRegisteredV1()
 		{
-			ZyanHost.RegisterComponent<IDuck, Chicken>();
+			Assert.Throws<MissingMethodException>(() =>
+				ZyanHost.RegisterComponent<IDuck, Chicken>());
 		}
 
-		[TestMethod, ExpectedException(typeof(MissingMethodException))]
+		[TestMethod]
 		public void ZyanComponentHost_ChickenWillNotBeRegisteredV2()
 		{
-			ZyanHost.RegisterComponent<IDuck, Chicken>(new Chicken());
+			Assert.Throws<MissingMethodException>(() =>
+				ZyanHost.RegisterComponent<IDuck, Chicken>(new Chicken()));
 		}
 
-		[TestMethod, ExpectedException(typeof(MissingMethodException))]
+		[TestMethod]
 		public void ZyanComponentHost_ChickenCannotQuack()
 		{
 			var proxy = ZyanConnection.CreateProxy<IDuck>("Chicken");
-			proxy.Quack(String.Empty, default(int));
+			Assert.Throws<MissingMethodException>(() =>
+				proxy.Quack(String.Empty, default(int)));
 		}
 
 		[TestMethod]

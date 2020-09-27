@@ -20,9 +20,9 @@ namespace Zyan.Tests
 	using NUnit.Framework;
 	using TestClass = NUnit.Framework.TestFixtureAttribute;
 	using TestMethod = NUnit.Framework.TestAttribute;
-	using ClassInitializeNonStatic = NUnit.Framework.TestFixtureSetUpAttribute;
+	using ClassInitializeNonStatic = NUnit.Framework.OneTimeSetUpAttribute;
 	using ClassInitialize = DummyAttribute;
-	using ClassCleanupNonStatic = NUnit.Framework.TestFixtureTearDownAttribute;
+	using ClassCleanupNonStatic = NUnit.Framework.OneTimeTearDownAttribute;
 	using ClassCleanup = DummyAttribute;
 	using TestContext = System.Object;
 #else
@@ -81,8 +81,8 @@ namespace Zyan.Tests
 			Assert.IsNotNull(SecretAssembly.Value);
 			Assert.IsNotNull(SecretClass.Value);
 
-			Assert.IsFalse(string.IsNullOrWhiteSpace(SecretAssemblyFullName.Value));
-			Assert.IsFalse(string.IsNullOrWhiteSpace(SecretClassFullName.Value));
+			Assert.IsFalse(string.IsNullOrEmpty(SecretAssemblyFullName.Value));
+			Assert.IsFalse(string.IsNullOrEmpty(SecretClassFullName.Value));
 
 			Assert.IsTrue(SecretAssemblyFullName.Value.StartsWith(SecretAssemblyName));
 			Assert.IsTrue(SecretClassFullName.Value.StartsWith(SecretClassName));
@@ -195,22 +195,25 @@ namespace Zyan.Tests
 		}
 
 #if !MONO
-		[TestMethod, ExpectedException(typeof(SerializationException))]
+		[TestMethod]
 		public void BinaryFormatter_DeserializationProblems()
 		{
 			var obj = Activator.CreateInstance(SecretClass.Value);
 			var fmt = new BinaryFormatter().Safe();
 
-			using (var ms = new MemoryStream())
+			Assert.Throws<SerializationException>(() =>
 			{
-				fmt.Serialize(ms, obj);
+				using (var ms = new MemoryStream())
+				{
+					fmt.Serialize(ms, obj);
 
-				Assert.IsTrue(ms.Length > 0);
-				ms.Seek(0, SeekOrigin.Begin);
+					Assert.IsTrue(ms.Length > 0);
+					ms.Seek(0, SeekOrigin.Begin);
 
-				var newObj = fmt.Deserialize(ms);
-				Assert.IsNotNull(newObj);
-			}
+					var newObj = fmt.Deserialize(ms);
+					Assert.IsNotNull(newObj);
+				}
+			});
 		}
 #endif
 

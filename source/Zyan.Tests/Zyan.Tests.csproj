@@ -1,150 +1,58 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>
-    </ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{6D0167F8-9611-410F-9212-3D8AE9FF95E4}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFrameworks>net35;net40;net45;net46</TargetFrameworks>
     <RootNamespace>Zyan.Tests</RootNamespace>
     <AssemblyName>Zyan.Tests</AssemblyName>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <OutputPath>..\..\bin\UnitTests\$(Configuration)\</OutputPath>
+    <DefineConstants>$(DefineConstants);NUNIT</DefineConstants>
+    <RuntimeIdentifiers>win</RuntimeIdentifiers>
     <AssemblyOriginatorKeyFile>..\Zyan.Key\zyan.snk</AssemblyOriginatorKeyFile>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\bin\UnitTests\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <UseVSHostingProcess>true</UseVSHostingProcess>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\..\bin\UnitTests\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
+
+  <!-- override .NET v3.5 assembly paths -->
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net35' ">
+    <DefineConstants>$(DefineConstants);FX3</DefineConstants>
+    <FrameworkPathOverride>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v3.5\Profile\Client</FrameworkPathOverride>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net40' ">
+    <DefineConstants>$(DefineConstants);FX4</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
+    <Compile Remove="SmallBlockMemoryStreamTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Runtime.Remoting" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
     <Reference Include="MemoDb">
       <HintPath>..\..\libraries\MemoDb\MemoDb.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="System" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' != 'net35' ">
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.configuration" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Runtime.Remoting" />
-    <Reference Include="System.Transactions" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="Zyan.SafeDeserializationHelpers">
-      <HintPath>..\packages\Zyan.SafeDeserializationHelpers.0.5.1\lib\net35\Zyan.SafeDeserializationHelpers.dll</HintPath>
-    </Reference>
-    <Reference Include="srp">
-      <HintPath>..\packages\srp.1.0.5\lib\net45\srp.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
+
   <ItemGroup>
-    <CodeAnalysisDependentAssemblyPaths Condition=" '$(VS100COMNTOOLS)' != '' " Include="$(VS100COMNTOOLS)..\IDE\PrivateAssemblies">
-      <Visible>False</Visible>
-    </CodeAnalysisDependentAssemblyPaths>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
+    <PackageReference Include="NUnit" Version="3.12.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+    <PackageReference Include="srp" Version="1.0.6" />
+    <PackageReference Include="Zyan.SafeDeserializationHelpers" Version="0.5.1" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="CallInterceptionTests.cs" />
-    <Compile Include="CallInterceptorBuilderTests.cs" />
-    <Compile Include="ChannelWrapperTests.cs" />
-    <Compile Include="ChecksumHelperTests.cs" />
-    <Compile Include="CleanupTests.cs" />
-    <Compile Include="CompressionTests.cs" />
-    <Compile Include="CryptoToolsTests.cs" />
-    <Compile Include="CustomAuthenticationTests.cs" />
-    <Compile Include="DebouncerTests.cs" />
-    <Compile Include="DefaultProtocolTests.cs" />
-    <Compile Include="DiscoveryMetadataTests.cs" />
-    <Compile Include="DuckTypingTests.cs" />
-    <Compile Include="DynamicWireTests.cs" />
-    <Compile Include="EmptyDelegateFactoryTests.cs" />
-    <Compile Include="EventFilterTests.cs" />
-    <Compile Include="EventsTests.cs" />
-    <Compile Include="EventStubTests.cs" />
-    <Compile Include="ExtensionsTests.cs" />
-    <Compile Include="GenericMethodsTests.cs" />
-    <Compile Include="HeartbeatSessionTests.cs" />
-    <Compile Include="InvocationDetailsTests.cs" />
-    <Compile Include="LimitedSizeQueueTests.cs" />
-    <Compile Include="LinqTests.cs" />
-    <Compile Include="LocalCallContextDataTests.cs" />
-    <Compile Include="MefClientTests.cs" />
-    <Compile Include="MefServerTests.cs" />
-    <Compile Include="Misc\AssertEx.cs" />
-    <Compile Include="Misc\DataWrapper.cs" />
-    <Compile Include="Misc\DummyAttribute.cs" />
-    <Compile Include="Misc\Entities.cs" />
-    <Compile Include="Misc\SampleObjectSource.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="OneWayTests.cs" />
-    <Compile Include="ProtocolUrlTests.cs" />
-    <Compile Include="RecreateClientConnectionTests.cs" />
-    <Compile Include="RecreateComponentHostTests.cs" />
-    <Compile Include="SafeDynamicInvokerTests.cs" />
-    <Compile Include="SecureRemotePasswordTests.cs" />
-    <Compile Include="SessionVariableTests.cs" />
-    <Compile Include="SrpAuthenticationTests.cs" />
-    <Compile Include="StreamTests.cs" />
-    <Compile Include="SubscriptionTrackerTests.cs" />
-    <Compile Include="ThreadPoolTests.cs" />
-    <Compile Include="TransportHeaderWrapperTests.cs" />
-    <Compile Include="TypeHelperTests.cs" />
-    <Compile Include="VulnerabilityTests.cs" />
-    <Compile Include="ZyanProxyTests.cs" />
+
+  <ItemGroup Condition=" '$(TargetFramework)' != 'net35' ">
+    <ProjectReference Include="..\Zyan.Communication\Zyan.Communication.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="DistributedEvents.GenericTest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="packages.config" />
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net35' ">
+    <ProjectReference Include="..\Zyan.Communication\Zyan.Communication.Fx3.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Zyan.Communication\Zyan.Communication.csproj">
-      <Project>{EFC96CDA-BF8D-4B94-B4DE-882F841ABCCE}</Project>
-      <Name>Zyan.Communication</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

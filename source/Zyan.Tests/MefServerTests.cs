@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !FX3
+
+using System;
 using System.Linq;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
@@ -11,14 +13,14 @@ using Zyan.InterLinq;
 
 namespace Zyan.Tests
 {
-	#region Unit testing platform abstraction layer
+#region Unit testing platform abstraction layer
 #if NUNIT
 	using NUnit.Framework;
 	using TestClass = NUnit.Framework.TestFixtureAttribute;
 	using TestMethod = NUnit.Framework.TestAttribute;
-	using ClassInitializeNonStatic = NUnit.Framework.TestFixtureSetUpAttribute;
+	using ClassInitializeNonStatic = NUnit.Framework.OneTimeSetUpAttribute;
 	using ClassInitialize = DummyAttribute;
-	using ClassCleanupNonStatic = NUnit.Framework.TestFixtureTearDownAttribute;
+	using ClassCleanupNonStatic = NUnit.Framework.OneTimeTearDownAttribute;
 	using ClassCleanup = DummyAttribute;
 	using TestContext = System.Object;
 #else
@@ -26,7 +28,7 @@ namespace Zyan.Tests
 	using ClassInitializeNonStatic = DummyAttribute;
 	using ClassCleanupNonStatic = DummyAttribute;
 #endif
-	#endregion
+#endregion
 
 	/// <summary>
 	/// Test class for server-side MEF integration.
@@ -34,7 +36,7 @@ namespace Zyan.Tests
 	[TestClass]
 	public class MefServerTests
 	{
-		#region Interfaces and components
+#region Interfaces and components
 
 		/// <summary>
 		/// Sample interface
@@ -357,9 +359,9 @@ namespace Zyan.Tests
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region Initialization and cleanup
+#region Initialization and cleanup
 
 		public TestContext TestContext { get; set; }
 
@@ -380,7 +382,7 @@ namespace Zyan.Tests
 			MefContainer = new CompositionContainer(MefCatalog);
 		}
 
-		#endregion
+#endregion
 
 		[TestMethod]
 		public void ZyanComponentFromMefCatalog_IsRegisteredAsSingleCall()
@@ -522,7 +524,7 @@ namespace Zyan.Tests
 			}
 		}
 
-		[TestMethod, ExpectedException(typeof(KeyNotFoundException))]
+		[TestMethod]
 		public void PrivateExportedPartFromMefCatalog_IsNotRegistered()
 		{
 			using (var cat = new ComponentCatalog())
@@ -536,11 +538,12 @@ namespace Zyan.Tests
 				Assert.AreEqual(1, exports.Count());
 
 				// component is not registered in Zyan ComponentCatalog
-				cat.GetRegistration("UniqueName_MefSample4");
+				Assert.Throws<KeyNotFoundException>(() =>
+					cat.GetRegistration("UniqueName_MefSample4"));
 			}
 		}
 
-		[TestMethod, ExpectedException(typeof(KeyNotFoundException))]
+		[TestMethod]
 		public void PrivateExportedPartFromFromMefContainer_IsNotRegistered()
 		{
 			using (var cat = new ComponentCatalog())
@@ -553,7 +556,8 @@ namespace Zyan.Tests
 				AssertEx.IsInstanceOf<MefSample4>(obj);
 
 				// component is not registered in Zyan ComponentCatalog
-				cat.GetRegistration("UniqueName_MefSample4");
+				Assert.Throws<KeyNotFoundException>(() =>
+					cat.GetRegistration("UniqueName_MefSample4"));
 			}
 		}
 
@@ -603,7 +607,7 @@ namespace Zyan.Tests
 			}
 		}
 
-		[TestMethod, ExpectedException(typeof(KeyNotFoundException))]
+		[TestMethod]
 		public void PrivateInheritedExportFromMefCatalog_IsNotRegistered()
 		{
 			using (var cat = new ComponentCatalog())
@@ -617,11 +621,12 @@ namespace Zyan.Tests
 				Assert.AreEqual(1, exports.Count());
 
 				// component is not registered in Zyan ComponentCatalog
-				cat.GetRegistration("UniqueName_MefSample6");
+				Assert.Throws<KeyNotFoundException>(() =>
+					cat.GetRegistration("UniqueName_MefSample6"));
 			}
 		}
 
-		[TestMethod, ExpectedException(typeof(KeyNotFoundException))]
+		[TestMethod]
 		public void PrivateInheritedExportFromFromMefContainer_IsNotRegistered()
 		{
 			using (var cat = new ComponentCatalog())
@@ -634,7 +639,8 @@ namespace Zyan.Tests
 				AssertEx.IsInstanceOf<MefSample6>(obj);
 
 				// component is not registered in Zyan ComponentCatalog
-				cat.GetRegistration("UniqueName_MefSample6");
+				Assert.Throws<KeyNotFoundException>(() =>
+					cat.GetRegistration("UniqueName_MefSample6"));
 			}
 		}
 
@@ -880,3 +886,5 @@ namespace Zyan.Tests
 		}
 	}
 }
+
+#endif
