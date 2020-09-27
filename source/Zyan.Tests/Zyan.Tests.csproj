@@ -22,6 +22,10 @@
     <DefineConstants>$(DefineConstants);FX4</DefineConstants>
   </PropertyGroup>
 
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net35' ">
+    <Compile Remove="StreamTests.cs" />
+  </ItemGroup>
+
   <ItemGroup>
     <Compile Remove="SmallBlockMemoryStreamTests.cs" />
   </ItemGroup>

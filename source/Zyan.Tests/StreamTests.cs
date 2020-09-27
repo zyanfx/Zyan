@@ -1,6 +1,4 @@
-﻿#if !FX3
-
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -229,7 +227,7 @@ namespace Zyan.Tests
 		public void CopyRemoteFileStreamToLocalFileStream()
 		{
 			var inputName = typeof(StreamTests).Assembly.Location;
-			var outputName = "TempFile" + Guid.NewGuid();
+			var outputName = Path.Combine(Path.GetTempPath(), "TempFile" + Guid.NewGuid());
 
 			var proxy = ZyanConnection.CreateProxy<IStreamService>();
 			using (var input = proxy.OpenRead(inputName))
@@ -258,7 +256,7 @@ namespace Zyan.Tests
 		public void CopyLocalFileStreamToRemoteFileStream()
 		{
 			var inputName = typeof(StreamTests).Assembly.Location;
-			var outputName = "TempFile" + Guid.NewGuid();
+			var outputName = Path.Combine(Path.GetTempPath(), "TempFile" + Guid.NewGuid());
 
 			var proxy = ZyanConnection.CreateProxy<IStreamService>();
 			using (var input = File.OpenRead(inputName))
@@ -280,7 +278,7 @@ namespace Zyan.Tests
 		public void CopyRemoteFileStreamToRemoteFileStream()
 		{
 			var inputName = typeof(StreamTests).Assembly.Location;
-			var outputName = "TempFile" + Guid.NewGuid();
+			var outputName = Path.Combine(Path.GetTempPath(), "TempFile" + Guid.NewGuid());
 
 			var proxy = ZyanConnection.CreateProxy<IStreamService>();
 			using (var input = proxy.OpenRead(inputName))
@@ -302,7 +300,7 @@ namespace Zyan.Tests
 		public void CopyLocalFileStreamsUsingRemoteService()
 		{
 			var inputName = typeof(StreamTests).Assembly.Location;
-			var outputName = "TempFile" + Guid.NewGuid();
+			var outputName = Path.Combine(Path.GetTempPath(), "TempFile" + Guid.NewGuid());
 
 			var proxy = ZyanConnection.CreateProxy<IStreamService>();
 			using (var input = File.OpenRead(inputName))
@@ -328,5 +326,3 @@ namespace Zyan.Tests
 		}
 	}
 }
-
-#endif

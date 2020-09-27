@@ -2,15 +2,12 @@
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using Microsoft.CSharp;
 using Zyan.Communication;
 using Zyan.Communication.Toolbox;
-using Zyan.Communication.Toolbox.Compression;
-using Zyan.Communication.ChannelSinks.Compression;
 using Zyan.SafeDeserializationHelpers;
 
 namespace Zyan.Tests
@@ -40,7 +37,7 @@ namespace Zyan.Tests
 	{
 		#region Dynamically-compiled secret assembly
 
-		private const string SecretAssemblyName = "SecretAssembly";
+		private const string SecretAssemblyName = "ZyanTests_SecretAssembly";
 
 		private const string SecretClassName = "SecretClass";
 
@@ -62,11 +59,11 @@ namespace Zyan.Tests
 			var options = new CompilerParameters
 			{
 				GenerateExecutable = false,
-				OutputAssembly = SecretAssemblyName
+				OutputAssembly = Path.Combine(Path.GetTempPath(), SecretAssemblyName),
 			};
 
 			var result = compiler.CompileAssemblyFromSource(options, sourceCode);
-			return result.CompiledAssembly;
+			return Assembly.LoadFile(result.PathToAssembly);
 		});
 
 		private static Lazy<string> SecretAssemblyFullName = new Lazy<string>(() => SecretAssembly.Value.GetName().FullName);
@@ -75,8 +72,8 @@ namespace Zyan.Tests
 
 		private static Lazy<string> SecretClassFullName = new Lazy<string>(() => SecretClass.Value.AssemblyQualifiedName);
 
-		[ClassInitialize]
-		public static void ValidateSecretAssembly(TestContext dummy)
+		[TestMethod]
+		public void ValidateSecretAssembly()
 		{
 			Assert.IsNotNull(SecretAssembly.Value);
 			Assert.IsNotNull(SecretClass.Value);
@@ -86,12 +83,6 @@ namespace Zyan.Tests
 
 			Assert.IsTrue(SecretAssemblyFullName.Value.StartsWith(SecretAssemblyName));
 			Assert.IsTrue(SecretClassFullName.Value.StartsWith(SecretClassName));
-		}
-
-		[ClassInitializeNonStatic]
-		public void ValidateSecretAssemblyNonStatic()
-		{
-			ValidateSecretAssembly(null);
 		}
 
 		#endregion
