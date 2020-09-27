@@ -2,9 +2,6 @@ version: 1.0.{build}
 clone_folder: c:\projects\zyan
 image: Visual Studio 2019
 
-cache:
-- C:\ProgramData\chocolatey\lib -> appveyor.yml
-  
 before_build:
 - nuget restore source\Zyan.sln
 - choco install opencover.portable
