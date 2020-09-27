@@ -6,7 +6,7 @@
 // Zyan Communications Framework - http://zyan.codeplex.com
 
 // Compilation:
-// C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc sntools.cs 
+// C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc sntools.cs
 
 using System;
 using System.IO;
@@ -38,19 +38,19 @@ class StrongNameTools
 				case "g":
 				case "G":
 					return GenerateKeyFile(args.Skip(1).FirstOrDefault());
-   
+
 				case "x":
 				case "X":
 					return ExtractPublicKey(args.Skip(1).FirstOrDefault(), args.Skip(1).LastOrDefault());
-   
-            case "d":
-            case "D":
-            	return DisplayToken(args.Skip(1).FirstOrDefault());
+
+				case "d":
+				case "D":
+					return DisplayToken(args.Skip(1).FirstOrDefault());
 
 				case "p":
 				case "P":
 					return PatchFile(args.Skip(1).FirstOrDefault(), args.Length > 2 ? args.Skip(1).LastOrDefault() : String.Empty);
-   
+
 				default:
 					return DisplayHelp();
 			}
@@ -82,10 +82,13 @@ class StrongNameTools
 
 	static int GenerateKeyFile(string fileName)
 	{
+		Console.WriteLine("Generating key file: {0}...", fileName);
+
 		// do not overwrite if the file already exists
 		var keyFile = GetFileName(fileName);
 		if (File.Exists(keyFile))
 		{
+			Console.WriteLine("Key file {0} already exists.", fileName);
 			return 0;
 		}
 
@@ -96,6 +99,7 @@ class StrongNameTools
 		var array = provider.ExportCspBlob(!provider.PublicOnly);
 
 		File.WriteAllBytes(keyFile, array);
+		Console.WriteLine("Key file {0} generated.", fileName);
 		return 0;
 	}
 
@@ -109,8 +113,10 @@ class StrongNameTools
 		}
 
 		// do not overwrite output file
+		Console.WriteLine("Extracting public key from file {0}...", inFile);
 		if (File.Exists(outputName))
 		{
+			Console.WriteLine("Output file {0} already exists.", outputName);
 			return 0;
 		}
 
@@ -120,6 +126,7 @@ class StrongNameTools
 		var publicKey = snk.PublicKey;
 
 		File.WriteAllBytes(outputName, publicKey);
+		Console.WriteLine("Public key file {0} generated.", outputName);
 		return 0;
 	}
 
@@ -141,6 +148,8 @@ class StrongNameTools
 
 	static int PatchFile(string srcFileName, string publicKeyFile)
 	{
+		Console.WriteLine("Patching the file: {0}...", srcFileName);
+
 		// prepare new public key token
 		var tempFileName = srcFileName + ".sntools-patch-tmp";
 		var keyFile = GetFileName(publicKeyFile, Path.ChangeExtension(KeyName, "public.snk"));
@@ -152,6 +161,7 @@ class StrongNameTools
 		if (newText == text)
 		{
 			// public key wasn't changed
+			Console.WriteLine("Public key wasn't changed: file {0} is not modified.", srcFileName);
 			return 0;
 		}
 
@@ -159,6 +169,7 @@ class StrongNameTools
 		File.WriteAllText(tempFileName, newText);
 		File.Delete(srcFileName);
 		File.Move(tempFileName, srcFileName);
+		Console.WriteLine("Patched the file: {0}.", srcFileName);
 		return 0;
 	}
 }
