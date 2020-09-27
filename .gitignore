@@ -4,6 +4,7 @@
 *.orig
 *.user
 *.nupkg
+.temp
 tests.bat
 bin
 obj

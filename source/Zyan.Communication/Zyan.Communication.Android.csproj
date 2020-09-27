@@ -13,32 +13,33 @@
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Zyan.Key\zyan.snk</AssemblyOriginatorKeyFile>
-    <BaseIntermediateOutputPath>obj.Android</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>obj\android</BaseIntermediateOutputPath>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\bin\DebugAndroid\</OutputPath>
-    <BaseIntermediateOutputPath>obj.Android</BaseIntermediateOutputPath>
+    <OutputPath>..\..\bin\Debug\android\</OutputPath>
+    <BaseIntermediateOutputPath>obj\android</BaseIntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE;XAMARIN</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AndroidLinkMode>None</AndroidLinkMode>
+    <DocumentationFile>..\..\bin\Debug\android\Zyan.Communication.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
-    <OutputPath>..\..\bin\ReleaseAndroid\</OutputPath>
-    <BaseIntermediateOutputPath>obj.Android</BaseIntermediateOutputPath>
+    <OutputPath>..\..\bin\Release\android\</OutputPath>
+    <BaseIntermediateOutputPath>obj\android</BaseIntermediateOutputPath>
     <DefineConstants>TRACE;XAMARIN</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentation>True</GenerateDocumentation>
-    <DocumentationFile>..\..\bin\ReleaseAndroid\Zyan.Communication.xml</DocumentationFile>
-    <NoWarn>1591</NoWarn>
+    <DocumentationFile>..\..\bin\Release\android\Zyan.Communication.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Android" />

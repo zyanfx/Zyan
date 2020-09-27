@@ -23,19 +23,19 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\bin\Debug3\</OutputPath>
-    <BaseIntermediateOutputPath>obj.fx3</BaseIntermediateOutputPath>
+    <OutputPath>..\..\bin\Debug\net35\</OutputPath>
+    <BaseIntermediateOutputPath>obj\Debug\net35</BaseIntermediateOutputPath>
     <DefineConstants>TRACE;DEBUG;FX3</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\..\bin\Debug3\Zyan.Communication.xml</DocumentationFile>
+    <DocumentationFile>..\..\bin\Debug\net35\Zyan.Communication.xml</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\bin\Release3\</OutputPath>
-    <BaseIntermediateOutputPath>obj.fx3</BaseIntermediateOutputPath>
+    <OutputPath>..\..\bin\Release\net35\</OutputPath>
+    <BaseIntermediateOutputPath>obj\Release\net35</BaseIntermediateOutputPath>
     <DefineConstants>TRACE;FX3</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>

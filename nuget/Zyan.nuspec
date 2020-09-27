@@ -6,7 +6,7 @@
     <title>Zyan</title>
     <authors>Rainbird,yallie</authors>
     <owners>Hagen Siegel</owners>
-    <licenseUrl>https://github.com/zyanfx/Zyan/blob/master/LICENSE</licenseUrl>
+    <license type="file">LICENSE</license>
     <projectUrl>http://zyan.com.de</projectUrl>
     <iconUrl>https://avatars1.githubusercontent.com/u/24500337?v=3&amp;s=200</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -52,43 +52,45 @@
     <dependencies>
       <group>
         <dependency id="Zyan.SafeDeserializationHelpers" version="0.5.1" />
-        <dependency id="srp" version="1.0.5" />
+        <dependency id="srp" version="1.0.6" />
       </group>
     </dependencies>
   </metadata>
   <files>
+    <file src="..\LICENSE"                                                 target="LICENSE" />
+
     <!-- v3.5 -->
-    <file src="..\bin\Release3\de\Zyan.Communication.resources.dll"       target="lib\net35\de\Zyan.Communication.resources.dll" />
-    <file src="..\bin\Release3\ru\Zyan.Communication.resources.dll"       target="lib\net35\ru\Zyan.Communication.resources.dll" />
-    <file src="..\bin\Release3\Zyan.Communication.dll"                    target="lib\net35\Zyan.Communication.dll" />
-    <file src="..\bin\Release3\Zyan.Communication.pdb"                    target="lib\net35\Zyan.Communication.pdb" />
-    <file src="..\bin\Release3\Zyan.Communication.xml"                    target="lib\net35\Zyan.Communication.xml" />
+    <file src="..\bin\Release\net35\de\Zyan.Communication.resources.dll"   target="lib\net35\de\Zyan.Communication.resources.dll" />
+    <file src="..\bin\Release\net35\ru\Zyan.Communication.resources.dll"   target="lib\net35\ru\Zyan.Communication.resources.dll" />
+    <file src="..\bin\Release\net35\Zyan.Communication.dll"                target="lib\net35\Zyan.Communication.dll" />
+    <file src="..\bin\Release\net35\Zyan.Communication.pdb"                target="lib\net35\Zyan.Communication.pdb" />
+    <file src="..\bin\Release\net35\Zyan.Communication.xml"                target="lib\net35\Zyan.Communication.xml" />
 
     <!-- v4.0 -->
-    <file src="..\bin\Release4\de\Zyan.Communication.resources.dll"       target="lib\net40\de\Zyan.Communication.resources.dll" />
-    <file src="..\bin\Release4\ru\Zyan.Communication.resources.dll"       target="lib\net40\ru\Zyan.Communication.resources.dll" />
-    <file src="..\bin\Release4\Zyan.Communication.dll"                    target="lib\net40\Zyan.Communication.dll" />
-    <file src="..\bin\Release4\Zyan.Communication.pdb"                    target="lib\net40\Zyan.Communication.pdb" />
-    <file src="..\bin\Release4\Zyan.Communication.xml"                    target="lib\net40\Zyan.Communication.xml" />
+    <file src="..\bin\Release\net40\de\Zyan.Communication.resources.dll"   target="lib\net40\de\Zyan.Communication.resources.dll" />
+    <file src="..\bin\Release\net40\ru\Zyan.Communication.resources.dll"   target="lib\net40\ru\Zyan.Communication.resources.dll" />
+    <file src="..\bin\Release\net40\Zyan.Communication.dll"                target="lib\net40\Zyan.Communication.dll" />
+    <file src="..\bin\Release\net40\Zyan.Communication.pdb"                target="lib\net40\Zyan.Communication.pdb" />
+    <file src="..\bin\Release\net40\Zyan.Communication.xml"                target="lib\net40\Zyan.Communication.xml" />
 
     <!-- v4.5 -->
-    <file src="..\bin\Release45\de\Zyan.Communication.resources.dll"      target="lib\net45\de\Zyan.Communication.resources.dll" />
-    <file src="..\bin\Release45\ru\Zyan.Communication.resources.dll"      target="lib\net45\ru\Zyan.Communication.resources.dll" />
-    <file src="..\bin\Release45\Zyan.Communication.dll"                   target="lib\net45\Zyan.Communication.dll" />
-    <file src="..\bin\Release45\Zyan.Communication.pdb"                   target="lib\net45\Zyan.Communication.pdb" />
-    <file src="..\bin\Release45\Zyan.Communication.xml"                   target="lib\net45\Zyan.Communication.xml" />
+    <file src="..\bin\Release\net45\de\Zyan.Communication.resources.dll"   target="lib\net45\de\Zyan.Communication.resources.dll" />
+    <file src="..\bin\Release\net45\ru\Zyan.Communication.resources.dll"   target="lib\net45\ru\Zyan.Communication.resources.dll" />
+    <file src="..\bin\Release\net45\Zyan.Communication.dll"                target="lib\net45\Zyan.Communication.dll" />
+    <file src="..\bin\Release\net45\Zyan.Communication.pdb"                target="lib\net45\Zyan.Communication.pdb" />
+    <file src="..\bin\Release\net45\Zyan.Communication.xml"                target="lib\net45\Zyan.Communication.xml" />
 
     <!-- v4.6 -->
-    <file src="..\bin\Release\de\Zyan.Communication.resources.dll"        target="lib\net46\de\Zyan.Communication.resources.dll" />
-    <file src="..\bin\Release\ru\Zyan.Communication.resources.dll"        target="lib\net46\ru\Zyan.Communication.resources.dll" />
-    <file src="..\bin\Release\Zyan.Communication.dll"                     target="lib\net46\Zyan.Communication.dll" />
-    <file src="..\bin\Release\Zyan.Communication.pdb"                     target="lib\net46\Zyan.Communication.pdb" />
-    <file src="..\bin\Release\Zyan.Communication.xml"                     target="lib\net46\Zyan.Communication.xml" />
+    <file src="..\bin\Release\net46\de\Zyan.Communication.resources.dll"   target="lib\net46\de\Zyan.Communication.resources.dll" />
+    <file src="..\bin\Release\net46\ru\Zyan.Communication.resources.dll"   target="lib\net46\ru\Zyan.Communication.resources.dll" />
+    <file src="..\bin\Release\net46\Zyan.Communication.dll"                target="lib\net46\Zyan.Communication.dll" />
+    <file src="..\bin\Release\net46\Zyan.Communication.pdb"                target="lib\net46\Zyan.Communication.pdb" />
+    <file src="..\bin\Release\net46\Zyan.Communication.xml"                target="lib\net46\Zyan.Communication.xml" />
 
     <!-- Xamarin -->
-    <file src="..\bin\ReleaseAndroid\de\Zyan.Communication.resources.dll" target="lib\MonoAndroid10\de\Zyan.Communication.resources.dll" />
-    <file src="..\bin\ReleaseAndroid\ru\Zyan.Communication.resources.dll" target="lib\MonoAndroid10\ru\Zyan.Communication.resources.dll" />
-    <file src="..\bin\ReleaseAndroid\Zyan.Communication.dll"              target="lib\MonoAndroid10\Zyan.Communication.dll" />
-    <file src="..\bin\ReleaseAndroid\Zyan.Communication.xml"              target="lib\MonoAndroid10\Zyan.Communication.xml" />
+    <file src="..\bin\Release\android\de\Zyan.Communication.resources.dll" target="lib\MonoAndroid10\de\Zyan.Communication.resources.dll" />
+    <file src="..\bin\Release\android\ru\Zyan.Communication.resources.dll" target="lib\MonoAndroid10\ru\Zyan.Communication.resources.dll" />
+    <file src="..\bin\Release\android\Zyan.Communication.dll"              target="lib\MonoAndroid10\Zyan.Communication.dll" />
+    <file src="..\bin\Release\android\Zyan.Communication.xml"              target="lib\MonoAndroid10\Zyan.Communication.xml" />
   </files>
 </package>
