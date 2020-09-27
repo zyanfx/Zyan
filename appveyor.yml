@@ -18,9 +18,9 @@ build:
 before_test:
 - where vstest.console
 - where nunit-console.exe
-- copy C:\projects\zyan\bin\net46\Zyan.Communication.dll "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\*.*"
-- copy C:\projects\zyan\bin\UnitTests\Zyan.Tests.dll "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\*.*"
-- copy C:\projects\zyan\bin\UnitTests\InterLinq.* "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\*.*"
+- copy C:\projects\zyan\bin\UnitTests\Zyan.Communication.dll "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\*.*"
+- copy C:\projects\zyan\bin\UnitTests\Zyan.Tests.dll "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\*.*"
+- copy C:\projects\zyan\bin\UnitTests\InterLinq.* "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\*.*"
 - copy C:\projects\zyan\bin\UnitTests3\*.* C:\Tools\NUnit\bin\
 - cd C:\projects\zyan\bin\UnitTests\
 - InterLinq.UnitTests.Server.exe install
