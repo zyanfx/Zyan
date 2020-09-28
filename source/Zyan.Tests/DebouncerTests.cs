@@ -29,6 +29,11 @@ namespace Zyan.Tests
 	[TestClass]
 	public class DebouncerTests
 	{
+		public DebouncerTests()
+		{
+			ThreadPool.SetMinThreads(50, 50);
+		}
+
 		[TestMethod]
 		public void NullActionIsNotAllowedForSetTimeout()
 		{
