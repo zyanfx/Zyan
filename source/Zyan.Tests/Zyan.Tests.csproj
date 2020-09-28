@@ -43,7 +43,7 @@
 
   <!-- FluentAssertions minimal requirement is .NET 4.5 -->
   <ItemGroup Condition=" '$(TargetFramework)' != 'net35' and '$(TargetFramework)' != 'net40' ">
-    <PackageReference Include="FluentAssertions" Version="3.2.1" />
+    <PackageReference Include="FluentAssertions" Version="5.10.3" />
   </ItemGroup>
 
   <ItemGroup>

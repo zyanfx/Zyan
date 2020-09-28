@@ -81,8 +81,11 @@ namespace Zyan.Tests
 		private static EquivalencyAssertionOptions<SmallBlockMemoryStream> EqOpts(
 			EquivalencyAssertionOptions<SmallBlockMemoryStream> options)
 		{
-			return options.ExcludingMissingProperties();
+			return options.ExcludingMissingMembers();
 		}
+
+		private EquivalencyAssertionOptions<SmallBlockMemoryStream> EqOptions =>
+			new EquivalencyAssertionOptions<SmallBlockMemoryStream>().ExcludingMissingMembers();
 
 		#region Construction
 		[Test]
@@ -108,8 +111,8 @@ namespace Zyan.Tests
 		[Test]
 		public void CtorWithCapacity_WithBadParameter_throws()
 		{
-			((Action)(() => new MemoryStream(-1))).ShouldThrow<ArgumentOutOfRangeException>();
-			((Action)(() => new SmallBlockMemoryStream(-1))).ShouldThrow<ArgumentOutOfRangeException>();
+			((Action)(() => new MemoryStream(-1))).Should().Throw<ArgumentOutOfRangeException>();
+			((Action)(() => new SmallBlockMemoryStream(-1))).Should().Throw<ArgumentOutOfRangeException>();
 		}
 		#endregion
 
@@ -214,7 +217,7 @@ namespace Zyan.Tests
 		{
 			var subject = new SmallBlockMemoryStream();
 			Action action = () => subject.Seek(0, (SeekOrigin)123);
-			action.ShouldThrow<ArgumentException>();
+			action.Should().Throw<ArgumentException>();
 		}
 
 		[TestCase(0)]
@@ -313,13 +316,13 @@ namespace Zyan.Tests
 
 			subject.Dispose();
 
-			subject.ShouldBeEquivalentTo(new
+			subject.Should().BeEquivalentTo(new
 			{
 				CanRead = false,
 				CanSeek = false,
 				CanWrite = false,
-			}, EqOpts);
-			subject.GetAllocationSizes().ShouldBeEquivalentTo(NoAllocations);
+			}, null, EqOptions);
+			subject.GetAllocationSizes().Should().BeEquivalentTo(NoAllocations);
 		}
 
 		[Test]
@@ -360,7 +363,7 @@ namespace Zyan.Tests
 			};
 
 			foreach (var action in actions)
-				action.ShouldThrow<ObjectDisposedException>();
+				action.Should().Throw<ObjectDisposedException>();
 		}
 		#endregion
 
@@ -372,16 +375,16 @@ namespace Zyan.Tests
 			var data = MakeTestData(10);
 
 			Action action = () => subject.Write(null, 0, 0);
-			action.ShouldThrow<ArgumentException>();
+			action.Should().Throw<ArgumentException>();
 
 			action = () => subject.Write(data, -10, 0);
-			action.ShouldThrow<ArgumentException>();
+			action.Should().Throw<ArgumentException>();
 
 			action = () => subject.Write(data, 0, -10);
-			action.ShouldThrow<ArgumentException>();
+			action.Should().Throw<ArgumentException>();
 
 			action = () => subject.Write(data, 0, 20);
-			action.ShouldThrow<ArgumentException>();
+			action.Should().Throw<ArgumentException>();
 		}
 
 		[TestCase(0, 0)]
@@ -444,16 +447,16 @@ namespace Zyan.Tests
 			var data = new byte[10];
 
 			Action action = () => subject.Read(null, 0, 0);
-			action.ShouldThrow<ArgumentException>();
+			action.Should().Throw<ArgumentException>();
 
 			action = () => subject.Read(data, -10, 0);
-			action.ShouldThrow<ArgumentException>();
+			action.Should().Throw<ArgumentException>();
 
 			action = () => subject.Read(data, 0, -10);
-			action.ShouldThrow<ArgumentException>();
+			action.Should().Throw<ArgumentException>();
 
 			action = () => subject.Read(data, 0, 20);
-			action.ShouldThrow<ArgumentException>();
+			action.Should().Throw<ArgumentException>();
 		}
 
 		[Test]
@@ -542,7 +545,7 @@ namespace Zyan.Tests
 		{
 			var subject = new SmallBlockMemoryStream();
 			Action action = () => subject.Position = -10;
-			action.ShouldThrow<ArgumentOutOfRangeException>();
+			action.Should().Throw<ArgumentOutOfRangeException>();
 		}
 
 		[Test]
@@ -583,8 +586,8 @@ namespace Zyan.Tests
 			using (var standard = new MemoryStream())
 			using (var subject = new SmallBlockMemoryStream())
 			{
-				((Action)(() => action(standard))).ShouldThrow<T>();
-				((Action)(() => action(subject))).ShouldThrow<T>();
+				((Action)(() => action(standard))).Should().Throw<T>();
+				((Action)(() => action(subject))).Should().Throw<T>();
 			}
 		}
 
@@ -605,7 +608,7 @@ namespace Zyan.Tests
 			using (var standard = new MemoryStream())
 			using (var subject = new SmallBlockMemoryStream())
 			{
-				func(standard).ShouldBeEquivalentTo(func(subject));
+				func(standard).Should().BeEquivalentTo(func(subject));
 
 				AssertEquivalent(standard, subject);
 			}
