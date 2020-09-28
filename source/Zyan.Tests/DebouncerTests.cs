@@ -261,7 +261,7 @@ namespace Zyan.Tests
 			var counter = 0;
 			var action = new Action(() =>
 			{
-				Thread.Sleep(20);
+				Thread.Sleep(100);
 				Interlocked.Increment(ref counter); 
 			});
 
@@ -271,7 +271,7 @@ namespace Zyan.Tests
 				ThreadPool.QueueUserWorkItem(x => action());
 			}
 
-			Thread.Sleep(100);
+			Thread.Sleep(200);
 			Assert.AreEqual(5, counter);
 
 			// convert it into an exclusive action
@@ -282,12 +282,12 @@ namespace Zyan.Tests
 			for (var i = 0; i < 4; i++)
 			{
 				// assume that all worker threads are started within
-				// the 20ms time span while the first action is still running
+				// the 100ms time span while the first action is still running
 				ThreadPool.QueueUserWorkItem(x => action());
 			}
 
 			// assume that all user work items are processed now
-			Thread.Sleep(100);
+			Thread.Sleep(200);
 			Assert.AreEqual(1, counter);
 
 			// the modified action is still executed by only one thread

@@ -178,25 +178,40 @@ namespace Zyan.Communication.Delegates
 			}
 
 			// System.Runtime.CompilerServices stuff is used by compiled LINQ expressions
-#if FX3
-			var closure = @delegate.Target as ExecutionScope;
-			if (closure != null && closure.Globals != null)
+			var scope = @delegate.Target as ExecutionScope;
+			if (scope != null && scope.Globals != null)
 			{
-				return closure.Globals
+				return scope.Globals
 					.OfType<IStrongBox>()
 					.Select(b => b.Value)
 					.OfType<DynamicWireBase>()
 					.FirstOrDefault();
 			}
+
+#if FX3
+			// .NET3 assembly running under .NET4+ runtime doesn't have Closure type yet
+			var closure = @delegate.Target;
+			var closureType = closure?.GetType();
+			var closureConstants = default(object[]);
+			if (closureType?.Name == "Closure")
+			{
+				var constants = closureType.GetField("Constants");
+				if (constants != null)
+				{
+					closureConstants = constants.GetValue(closure) as object[];
+				}
+			}
 #else
 			var closure = @delegate.Target as Closure;
-			if (closure != null && closure.Constants != null)
+			var closureConstants = closure?.Constants;
+#endif
+
+			if (closureConstants != null)
 			{
-				return closure.Constants
+				return closureConstants
 					.OfType<DynamicWireBase>()
 					.FirstOrDefault();
 			}
-#endif
 
 			return null;
 		}
