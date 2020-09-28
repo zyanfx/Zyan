@@ -45,7 +45,7 @@ namespace Zyan.Tests
 			Debouncer.SetTimeout(inc, 10);
 			Assert.AreEqual(0, counter);
 
-			Thread.Sleep(50);
+			Thread.Sleep(100);
 			Assert.AreEqual(1, counter);
 		}
 
@@ -60,7 +60,7 @@ namespace Zyan.Tests
 			Assert.AreEqual(0, counter);
 			timer.Dispose();
 
-			Thread.Sleep(50);
+			Thread.Sleep(100);
 			Assert.AreEqual(0, counter);
 		}
 
@@ -83,7 +83,7 @@ namespace Zyan.Tests
 			Debouncer.SetInterval(inc, 10);
 			Assert.AreEqual(0, counter);
 
-			Thread.Sleep(50);
+			Thread.Sleep(100);
 			Assert.IsTrue(counter > 1);
 		}
 
@@ -97,12 +97,12 @@ namespace Zyan.Tests
 			var timer = Debouncer.SetInterval(inc, 10);
 			Assert.AreEqual(0, counter);
 
-			Thread.Sleep(50);
+			Thread.Sleep(100);
 			Assert.IsTrue(counter > 1);
 			timer.Dispose();
 
 			var lastCounter = counter;
-			Thread.Sleep(50);
+			Thread.Sleep(100);
 			Assert.AreEqual(lastCounter, counter);
 		}
 
@@ -133,7 +133,7 @@ namespace Zyan.Tests
 			debounced();
 			Assert.AreEqual(0, counter);
 
-			Thread.Sleep(50);
+			Thread.Sleep(100);
 			Assert.AreEqual(1, counter);
 		}
 
@@ -183,7 +183,7 @@ namespace Zyan.Tests
 			debounced();
 			Assert.AreEqual(0, counter);
 
-			Thread.Sleep(50);
+			Thread.Sleep(100);
 			Assert.AreEqual(1, counter);
 		}
 
@@ -226,7 +226,7 @@ namespace Zyan.Tests
 
 			// now cancel pending execution
 			debounced(false);
-			Thread.Sleep(50);
+			Thread.Sleep(100);
 
 			// the code wasn't executed
 			Assert.AreEqual(0, counter);
@@ -261,7 +261,7 @@ namespace Zyan.Tests
 			var counter = 0;
 			var action = new Action(() =>
 			{
-				Thread.Sleep(100);
+				Thread.Sleep(50);
 				Interlocked.Increment(ref counter); 
 			});
 
@@ -271,7 +271,7 @@ namespace Zyan.Tests
 				ThreadPool.QueueUserWorkItem(x => action());
 			}
 
-			Thread.Sleep(200);
+			Thread.Sleep(300);
 			Assert.AreEqual(5, counter);
 
 			// convert it into an exclusive action
@@ -282,12 +282,12 @@ namespace Zyan.Tests
 			for (var i = 0; i < 4; i++)
 			{
 				// assume that all worker threads are started within
-				// the 100ms time span while the first action is still running
+				// the 50ms time span while the first action is still running
 				ThreadPool.QueueUserWorkItem(x => action());
 			}
 
 			// assume that all user work items are processed now
-			Thread.Sleep(200);
+			Thread.Sleep(300);
 			Assert.AreEqual(1, counter);
 
 			// the modified action is still executed by only one thread
@@ -296,7 +296,7 @@ namespace Zyan.Tests
 				ThreadPool.QueueUserWorkItem(x => action());
 			}
 
-			Thread.Sleep(100);
+			Thread.Sleep(300);
 			Assert.AreEqual(2, counter);
 		}
 	}
