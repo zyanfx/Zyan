@@ -27,10 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="SmallBlockMemoryStreamTests.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Transactions" />
@@ -39,8 +35,15 @@
     </Reference>
   </ItemGroup>
 
+  <!-- MEF is not compatible with .NET 3.5 -->
   <ItemGroup Condition=" '$(TargetFramework)' != 'net35' ">
+    <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
+  </ItemGroup>
+
+  <!-- FluentAssertions minimal requirement is .NET 4.5 -->
+  <ItemGroup Condition=" '$(TargetFramework)' != 'net35' and '$(TargetFramework)' != 'net40' ">
+    <PackageReference Include="FluentAssertions" Version="3.2.1" />
   </ItemGroup>
 
   <ItemGroup>

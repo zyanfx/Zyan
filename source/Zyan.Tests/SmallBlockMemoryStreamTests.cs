@@ -10,13 +10,17 @@
  --------------------------------------------------------------------------------------------------------------
 */
 
+#if !FX3 && !FX4
+
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using FluentAssertions;
+using FluentAssertions.Equivalency;
 using Zyan.Communication.Toolbox.IO;
 
-namespace Tests
+namespace Zyan.Tests
 {
 	#region Unit testing platform abstraction layer
 #if NUNIT
@@ -43,7 +47,7 @@ namespace Tests
 	/// <summary>
 	/// Test class for SmallBlockMemoryStream
 	/// </summary>
-	[TestFixture, ExcludeFromCodeCoverage]
+	[TestFixture]
 	public class SmallBlockMemoryStreamTests
 	{
 		private static readonly int[] NoAllocations = new int[0];
@@ -683,3 +687,5 @@ namespace Tests
 		}
 	}
 }
+
+#endif
