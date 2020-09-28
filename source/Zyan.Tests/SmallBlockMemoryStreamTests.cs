@@ -18,32 +18,11 @@ using System.IO;
 using System.Linq;
 using FluentAssertions;
 using FluentAssertions.Equivalency;
+using NUnit.Framework;
 using Zyan.Communication.Toolbox.IO;
 
 namespace Zyan.Tests
 {
-	#region Unit testing platform abstraction layer
-#if NUNIT
-	using FluentAssertions;
-	using FluentAssertions.Equivalency;
-	using NUnit.Framework;
-	//using TestClass = NUnit.Framework.TestFixtureAttribute;
-	//using TestMethod = NUnit.Framework.TestAttribute;
-	//using ClassInitializeNonStatic = NUnit.Framework.TestFixtureSetUpAttribute;
-	//using ClassInitialize = DummyAttribute;
-	//using ClassCleanupNonStatic = NUnit.Framework.TestFixtureTearDownAttribute;
-	//using ClassCleanup = DummyAttribute;
-	//using TestContext = System.Object;
-	//using TestInitialize = NUnit.Framework.SetUpAttribute;
-	//using TestCleanup = NUnit.Framework.TearDownAttribute;
-#else
-	using Microsoft.VisualStudio.TestTools.UnitTesting;
-	using TestFixture = Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute;
-	using Test = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
-	using TestCase = Microsoft.VisualStudio.TestTools.UnitTesting.DataSourceAttribute;
-#endif
-	#endregion
-
 	/// <summary>
 	/// Test class for SmallBlockMemoryStream
 	/// </summary>
@@ -77,15 +56,6 @@ namespace Zyan.Tests
 		private const int OneBlock = SmallBlockMemoryStream.MinBlockSize;
 		private const int BlockPlus = SmallBlockMemoryStream.MinBlockSize + 1;
 		private const int LargeBlock = 5000;
-
-		private static EquivalencyAssertionOptions<SmallBlockMemoryStream> EqOpts(
-			EquivalencyAssertionOptions<SmallBlockMemoryStream> options)
-		{
-			return options.ExcludingMissingMembers();
-		}
-
-		private EquivalencyAssertionOptions<SmallBlockMemoryStream> EqOptions =>
-			new EquivalencyAssertionOptions<SmallBlockMemoryStream>().ExcludingMissingMembers();
 
 		#region Construction
 		[Test]
@@ -321,7 +291,8 @@ namespace Zyan.Tests
 				CanRead = false,
 				CanSeek = false,
 				CanWrite = false,
-			}, null, EqOptions);
+			});
+
 			subject.GetAllocationSizes().Should().BeEquivalentTo(NoAllocations);
 		}
 
