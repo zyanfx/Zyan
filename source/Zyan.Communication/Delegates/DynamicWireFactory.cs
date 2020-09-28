@@ -177,7 +177,8 @@ namespace Zyan.Communication.Delegates
 				return target;
 			}
 
-			// System.Runtime.CompilerServices stuff is used by compiled LINQ expressions
+#if FX3
+			// System.Runtime.CompilerServices.ExecutionScope class is used by compiled LINQ expressions on FX3
 			var scope = @delegate.Target as ExecutionScope;
 			if (scope != null && scope.Globals != null)
 			{
@@ -188,7 +189,6 @@ namespace Zyan.Communication.Delegates
 					.FirstOrDefault();
 			}
 
-#if FX3
 			// .NET3 assembly running under .NET4+ runtime doesn't have Closure type yet
 			var closure = @delegate.Target;
 			var closureType = closure?.GetType();
@@ -202,6 +202,7 @@ namespace Zyan.Communication.Delegates
 				}
 			}
 #else
+			// System.Runtime.CompilerServices.Closure class is used by compiled LINQ expressions on FX4+
 			var closure = @delegate.Target as Closure;
 			var closureConstants = closure?.Constants;
 #endif
