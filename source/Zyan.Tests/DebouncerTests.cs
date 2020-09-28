@@ -101,10 +101,11 @@ namespace Zyan.Tests
 
 			var timer = Debouncer.SetInterval(inc, 10);
 			Assert.AreEqual(0, counter);
-
 			Thread.Sleep(100);
+
 			Assert.IsTrue(counter > 1);
 			timer.Dispose();
+			Thread.Sleep(100);
 
 			var lastCounter = counter;
 			Thread.Sleep(100);
