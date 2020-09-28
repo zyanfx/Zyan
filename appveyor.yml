@@ -17,7 +17,7 @@ before_test:
 - where vstest.console
 - where nunit3-console
 #- copy C:\projects\zyan\bin\UnitTests\InterLinq.* "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\*.*"
-#- copy C:\projects\zyan\bin\UnitTests\Debug\net46\Zyan.Communication.dll "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\*.*"
+- copy C:\projects\zyan\bin\UnitTests\Debug\net46\Zyan.Communication.dll "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\*.*"
 #- copy C:\projects\zyan\bin\UnitTests\Debug\net46\Zyan.Tests.dll "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\*.*"
 #- copy C:\projects\zyan\bin\UnitTests\Debug\net35\Zyan.* C:\Tools\NUnit3\
 #- cd C:\projects\zyan\bin\UnitTests\
