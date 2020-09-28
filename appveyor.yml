@@ -21,8 +21,8 @@ before_test:
 #- copy C:\projects\zyan\bin\UnitTests\Debug\net46\Zyan.Tests.dll "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\*.*"
 #- copy C:\projects\zyan\bin\UnitTests\Debug\net35\Zyan.* C:\Tools\NUnit3\
 #- cd C:\projects\zyan\bin\UnitTests\
-- InterLinq.UnitTests.Server.exe install
-- InterLinq.UnitTests.Server.exe start
+- C:\projects\zyan\bin\UnitTests\InterLinq.UnitTests.Server.exe install
+- C:\projects\zyan\bin\UnitTests\InterLinq.UnitTests.Server.exe start
 
 test_script:
 - vstest.console.exe C:\projects\zyan\bin\UnitTests\Debug\net35\Zyan.Tests.dll
