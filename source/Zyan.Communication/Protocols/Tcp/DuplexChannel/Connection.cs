@@ -720,17 +720,23 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// <summary>
 		/// Gets the unique identifier of the local channel.
 		/// </summary>
+		/// <remarks>
+		/// Returns Guid.Empty if the connection is closed.
+		/// </remarks>
 		public Guid LocalChannelID
 		{
-			get { return _channel.ChannelID; }
+			get { return _channel?.ChannelID ?? Guid.Empty; }
 		}
 
 		/// <summary>
 		/// Gets the address of the local channel.
 		/// </summary>
+		/// <remarks>
+		/// Returns null if the connection is closed.
+		/// </remarks>
 		public string LocalAddress
 		{
-			get { return _socket.LocalEndPoint.ToString(); }
+			get { return _socket?.LocalEndPoint?.ToString(); }
 		}
 
 		/// <summary>
