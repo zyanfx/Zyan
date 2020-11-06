@@ -705,5 +705,40 @@ namespace Zyan.Tests
 			conn2.Dispose();
 			host.Dispose();
 		}
+
+		[TestMethod]
+		public void ZyanComponentHostBeforeInvokeAfterInvokeEventsAreFired()
+		{
+			var beforeInvoke = false;
+			var beforeInterfaceName = string.Empty;
+			var beforeMethodName = string.Empty;
+			ZyanHost.BeforeInvoke += (s, e) =>
+			{
+				beforeInvoke = true;
+				beforeInterfaceName = e.InterfaceName;
+				beforeMethodName = e.MethodName;
+			};
+
+			var afterInvoke = false;
+			var afterInterfaceName = string.Empty;
+			var afterMethodName = string.Empty;
+			ZyanHost.AfterInvoke += (s, e) =>
+			{
+				afterInvoke = true;
+				afterInterfaceName = e.InterfaceName;
+				afterMethodName = e.MethodName;
+			};
+
+			var proxy = ZyanConnection.CreateProxy<ISampleServer>("SingleCall");
+			proxy.RaiseTestEvent();
+
+			Assert.IsTrue(beforeInvoke);
+			Assert.AreEqual("SingleCall", beforeInterfaceName);
+			Assert.AreEqual("RaiseTestEvent", beforeMethodName);
+
+			Assert.IsTrue(afterInvoke);
+			Assert.AreEqual("SingleCall", afterInterfaceName);
+			Assert.AreEqual("RaiseTestEvent", afterMethodName);
+		}
 	}
 }
