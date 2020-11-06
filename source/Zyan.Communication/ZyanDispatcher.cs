@@ -264,11 +264,18 @@ namespace Zyan.Communication
 			var sessionID = details.CallContextData.Store.ContainsKey("sessionid") ? (Guid)details.CallContextData.Store["sessionid"] : Guid.Empty;
 			if (!_host.SessionManager.ExistSession(sessionID))
 			{
-				throw new InvalidSessionException(string.Format(LanguageResource.InvalidSessionException_SessionIDInvalid, sessionID.ToString()));
+				throw new InvalidSessionException(string.Format(LanguageResource.InvalidSessionException_SessionIDInvalid, sessionID));
+			}
+
+			// double-check to avoid race condition
+			var session = _host.SessionManager.GetSessionBySessionID(sessionID);
+			if (session == null)
+			{
+				throw new InvalidSessionException(string.Format(LanguageResource.InvalidSessionException_SessionIDInvalid, sessionID));
 			}
 
 			// set current session
-			details.Session = _host.SessionManager.GetSessionBySessionID(sessionID);
+			details.Session = session;
 			details.Session.Timestamp = DateTime.Now;
 			details.Session.ClientAddress = GetCallingClientIPAddress();
 			_host.SessionManager.SetCurrentSession(details.Session);
@@ -407,7 +414,7 @@ namespace Zyan.Communication
 			if (!details.FindMethodInfo())
 			{
 				var methodSignature = MessageHelpers.GetMethodSignature(details.Type, details.MethodName, details.ParamTypes);
-				var exceptionMessage = String.Format(LanguageResource.MissingMethodException_MethodNotFound, methodSignature);
+				var exceptionMessage = string.Format(LanguageResource.MissingMethodException_MethodNotFound, methodSignature);
 				throw new MissingMethodException(exceptionMessage);
 			}
 		}
