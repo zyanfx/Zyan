@@ -10,6 +10,7 @@
  --------------------------------------------------------------------------------------------------------------
 */
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -49,7 +50,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 	{
 		#region Connection management
 
-		private static readonly Dictionary<string, Connection> _connections=new Dictionary<string, Connection>();
+		private static readonly ConcurrentDictionary<string, Connection> _connections = new ConcurrentDictionary<string, Connection>();
 		private static object _connectionsLockObject = new object();
 
 		private static readonly Regex _addressRegEx=new Regex(@"^(?<address>[^:]+)(:(?<port>\d+))?$", RegexOptions.Compiled);
@@ -75,20 +76,19 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 			Trace.WriteLine("TcpEx.Connection.GetConnection: {0}", address);
 
-			Connection connection = null;
-			var newConnectionEstablished = false;
+			var connection = TryGetConnection(address);
+			if (connection != null)
+			{
+				return connection;
+			}
 
+			var newConnectionEstablished = false;
 			lock (_connectionsLockObject)
 			{
-				if (_connections.ContainsKey(address))
+				connection = TryGetConnection(address);
+				if (connection != null)
 				{
-					var foundConnection = _connections[address];
-					Trace.WriteLine("TcpEx.Connection found. ChannelID: {0}", foundConnection._channel.ChannelID);
-
-					if (foundConnection.IsClosed)
-						_connections.Remove(address);
-					else
-						return foundConnection;
+					return connection;
 				}
 
 				try
@@ -97,7 +97,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 					connection = new Connection(address, channel, keepAlive, keepAliveTime, KeepAliveInterval, maxRetries, retryDelay);
 					if (!_connections.ContainsKey(address))
-						_connections.Add(address, connection); // This most often happens when using the loopback address
+						_connections.TryAdd(address, connection); // This most often happens when using the loopback address
 
 					Manager.StartListening(connection);
 					newConnectionEstablished = true;
@@ -105,7 +105,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 				catch (DuplicateConnectionException ex)
 				{
 					connection = _connections[ex.ChannelID.ToString()];
-					_connections.Add(address, connection);
+					_connections.TryAdd(address, connection);
 				}
 				catch (FormatException formatEx)
 				{
@@ -121,6 +121,21 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			return connection;
 		}
 
+		private static Connection TryGetConnection(string address)
+		{
+			if (_connections.TryGetValue(address, out var foundConnection))
+			{ 
+				Trace.WriteLine("TcpEx.Connection found. ChannelID: {0}", foundConnection._channel?.ChannelID);
+
+				if (foundConnection.IsClosed)
+					_connections.TryRemove(address, out var _);
+				else
+					return foundConnection;
+			}
+
+			return null;
+		}
+
 		/// <summary>
 		/// Get all currently running connection of a specified channel.
 		/// </summary>
@@ -134,6 +149,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			lock (_connectionsLockObject)
 			{
 				return from connection in _connections.Values
+					where connection._channel != null
 					where connection._channel.ChannelID.Equals(channel.ChannelID)
 					select connection;
 			}
@@ -152,12 +168,13 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 			{
 				var toBeDeleted =
 					from pair in _connections
+					where pair.Value._channel != null
 					where pair.Value._channel.ChannelID.Equals(channel.ChannelID)
 					select pair.Key;
 
 				foreach (string key in toBeDeleted.ToArray())
 				{
-					_connections.Remove(key);
+					_connections.TryRemove(key, out var _);
 				}
 			}
 		}
@@ -496,7 +513,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 
 				foreach (string key in toBeDeleted.ToList())
 				{
-					_connections.Remove(key);
+					_connections.TryRemove(key, out var _);
 				}
 			}
 
