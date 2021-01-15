@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>Zyan</id>
-    <version>2.13</version>
+    <version>2.14</version>
     <title>Zyan</title>
     <authors>Rainbird,yallie</authors>
     <owners>Hagen Siegel</owners>
@@ -13,6 +13,18 @@
     <description>Zyan is a framework that simplifies development of distributed applications for desktop and mobile platforms. With Zyan you can publish any .NET class for remote access over the network. Zyan is highly customizable and provides you with tools to build modular and plugable distributed applications.</description>
     <summary>Amazingly easy distributed application framework for .NET, Mono and Xamarin.Android</summary>
     <releaseNotes>What's new:
+
+      v2.14: Bugfixes and stability improvements
+      — #85: Connection lock issue in duplex TCP channel
+      — #83: Race condition in ZyanDispatcher related to SessionManager
+      — #82: Unhandled exception in duplex TCP channel
+      — #81: Use SDK-style csproj for .NET 4.0 and above
+      — #80: Improved memory management for very large payloads
+      — #79: Unique name filtering for call interceptors
+      — #77: Event storage high watermark
+      — #76: ReconnectRemoteEvents behavior improvements
+      — #74: Single event handler invocation queue per session
+      — #73: Custom thread pool worker threads annotations
 
       v2.13: Bugfixes and stability improvements
       — #73: RemoveClientServerWires freeze
