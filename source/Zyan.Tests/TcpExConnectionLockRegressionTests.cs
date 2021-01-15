@@ -185,6 +185,7 @@ namespace Zyan.Tests
 		{
 			var url = "tcpex://localhost:8092/TcpExConnectionLockRegressionTestHost_TcpDuplex";
 			var protocol = new TcpDuplexClientProtocolSetup(true);
+			var lessThanTimeout = 10;
 
 			using (var connection = new ZyanConnection(url, protocol))
 			{
@@ -208,7 +209,7 @@ namespace Zyan.Tests
 
 							try
 							{
-								// this connection should time out
+								// this connection should time out in more than lessThanTimeout seconds
 								new ZyanConnection(url.Replace("localhost", "example.com"), protocol);
 							}
 							catch (Exception ex)
@@ -223,7 +224,8 @@ namespace Zyan.Tests
 				sw.Stop();
 
 				Assert.IsTrue(badConnectionInitiated);
-				Assert.IsTrue(sw.Elapsed.TotalSeconds < 10);
+				Assert.IsTrue(sw.Elapsed.TotalSeconds < lessThanTimeout);
+				Trace.WriteLine("** CreateDisposeAndRecreateConnectionUsingTcpDuplexChannel test finished **");
 			}
 		}
 	}
