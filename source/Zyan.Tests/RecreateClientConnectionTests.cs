@@ -367,7 +367,7 @@ namespace Zyan.Tests
 			}
 		}
 
-		[TestMethod]
+		[TestMethod, Explicit]
 		public void ChannelRegistrationRaceConditionTest()
 		{
 			var url = "tcpex://localhost:8084/RecreateClientConnectionTestHost_TcpDuplex";
