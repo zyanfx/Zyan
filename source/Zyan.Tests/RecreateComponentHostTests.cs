@@ -101,5 +101,14 @@ namespace Zyan.Tests
 				host.RegisterComponent<ISampleServer, SampleServer>("SampleServer", ActivationType.SingleCall);
 			}
 		}
+
+		[TestMethod]
+		public void InvalidArgumentTests()
+		{
+			Assert.Throws<ArgumentException>(() => new ZyanComponentHost(null, 123, null));
+			Assert.Throws<ArgumentNullException>(() => new ZyanComponentHost("A", null, default(ISessionManager)));
+			Assert.Throws<ArgumentNullException>(() => new ZyanComponentHost("A", new TcpBinaryServerProtocolSetup(123), default(ISessionManager)));
+			Assert.Throws<ArgumentNullException>(() => new ZyanComponentHost("A", new TcpBinaryServerProtocolSetup(123), new InProcSessionManager(), null));
+		}
 	}
 }
