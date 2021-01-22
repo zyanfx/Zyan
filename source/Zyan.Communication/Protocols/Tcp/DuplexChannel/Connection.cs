@@ -472,16 +472,13 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 		/// </summary>
 		private void AddToConnectionList()
 		{
-			lock (_connectionsLockObject)
-			{
-				_connections[_remoteChannelData.ChannelID.ToString()] = this;
+			_connections[_remoteChannelData.ChannelID.ToString()] = this;
 
-				if (_remoteChannelData.Addresses != null)
+			if (_remoteChannelData.Addresses != null)
+			{
+				foreach (string address in _remoteChannelData.Addresses)
 				{
-					foreach (string address in _remoteChannelData.Addresses)
-					{
-						_connections[address] = this;
-					}
+					_connections[address] = this;
 				}
 			}
 		}
