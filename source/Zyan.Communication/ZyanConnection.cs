@@ -189,23 +189,26 @@ namespace Zyan.Communication
 			string[] addressParts = _serverUrl.Split('/');
 			_componentHostName = addressParts[addressParts.Length - 1];
 
-			_remotingChannel = _protocolSetup.CreateChannel();
-			if (!ZyanSettings.DisableUrlRandomization)
+			lock (_protocolSetup)
 			{
-				_remotingChannel = ChannelWrapper.WrapChannel(_remotingChannel, _protocolSetup.ChannelName);
-			}
+				_remotingChannel = _protocolSetup.CreateChannel();
+				if (!ZyanSettings.DisableUrlRandomization)
+				{
+					_remotingChannel = ChannelWrapper.WrapChannel(_remotingChannel, _protocolSetup.ChannelName);
+				}
 
-			if (_remotingChannel != null)
-			{
-				var registeredChannel = ChannelServices.GetChannel(_remotingChannel.ChannelName);
+				if (_remotingChannel != null)
+				{
+					var registeredChannel = ChannelServices.GetChannel(_remotingChannel.ChannelName);
 
-				if (registeredChannel == null)
-					ChannelServices.RegisterChannel(_remotingChannel, false);
+					if (registeredChannel == null)
+						ChannelServices.RegisterChannel(_remotingChannel, false);
+					else
+						_remotingChannel = registeredChannel;
+				}
 				else
-					_remotingChannel = registeredChannel;
+					throw new ApplicationException(LanguageResource.ApplicationException_NoChannelCreated);
 			}
-			else
-				throw new ApplicationException(LanguageResource.ApplicationException_NoChannelCreated);
 
 			var connectionNotification = _remotingChannel as IConnectionNotification;
 			if (connectionNotification != null)

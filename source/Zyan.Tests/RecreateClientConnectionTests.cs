@@ -1,14 +1,17 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using Zyan.Communication;
 using Zyan.Communication.Security;
 using Zyan.Communication.Protocols;
 using Zyan.Communication.Protocols.Null;
 using Zyan.Communication.Protocols.Tcp;
+using Zyan.Communication.Toolbox;
 
 namespace Zyan.Tests
 {
@@ -364,6 +367,45 @@ namespace Zyan.Tests
 			}
 		}
 
-		#endregion
+		[TestMethod]
+		public void ChannelRegistrationRaceConditionTest()
+		{
+			var url = "tcpex://localhost:8084/RecreateClientConnectionTestHost_TcpDuplex";
+			var protocol = new TcpDuplexClientProtocolSetup(true);
+			var errors = new ConcurrentDictionary<Exception, Exception>();
+
+			for (var i = 0; i < 10; i++)
+			{
+				ThreadPool.QueueUserWorkItem(x =>
+				{
+					try
+					{
+						using (var conn = new ZyanConnection(url, protocol))
+						{
+						}
+					}
+					catch (Exception ex)
+					{
+						errors[ex] = ex;
+					}
+				});
+			}
+
+			Thread.Sleep(100);
+
+			Assert.DoesNotThrow(() =>
+			{
+				if (errors.Any())
+				{
+#if FX3
+					throw errors.Values.First();
+#else
+					throw new AggregateException(errors.Values);
+#endif
+				}
+			});
+		}
+
+#endregion
 	}
 }
