@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net46</TargetFrameworks>
+    <RootNamespace>Zyan.Communication</RootNamespace>
+    <AssemblyName>Zyan.Communication</AssemblyName>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <FileAlignment>512</FileAlignment>
+    <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
+    <DocumentationFile>..\..\bin\$(Configuration)\Zyan.Communication.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="srp" Version="1.0.6" />
+    <PackageReference Include="Zyan.SafeDeserializationHelpers" Version="0.5.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="InterLinq\Properties\**" />
+    <Compile Remove="Toolbox\Android\**" />
+    <Compile Remove="Toolbox\ActionFuncDelegatesFx3.cs" />
+    <Compile Remove="Toolbox\ConcurrentDictionaryFx3.cs" />
+    <Compile Remove="Toolbox\ConcurrentQueueFx3.cs" />
+    <Compile Remove="Toolbox\ExtensionsFx3.cs" />
+    <Compile Remove="Toolbox\IProducerConsumerCollectionFx3.cs" />
+    <Compile Remove="Toolbox\LazyFx3.cs" />
+    <Compile Remove="Toolbox\ObjectPoolFx3.cs" />
+    <Compile Remove="Toolbox\SplitOrderedListFx3.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Runtime.Remoting" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
+  </ItemGroup>
+
+</Project>
