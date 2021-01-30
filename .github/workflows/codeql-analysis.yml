@@ -59,8 +59,8 @@ jobs:
     #    and modify them (or add more) to build your code if your project
     #    uses a compiled language
 
-    #- run: |
-    #    dotnet build source/Zyan.Communication/Zyan.Communication.csproj
+    - run: |
+        dotnet build source/Zyan.Communication/Zyan.Communication.CodeQL.csproj
     #   make bootstrap
     #   make release
 
