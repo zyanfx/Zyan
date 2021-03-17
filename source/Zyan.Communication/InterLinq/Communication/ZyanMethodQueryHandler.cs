@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Reflection;
 using Zyan.Communication;
 using Zyan.Communication.Toolbox;
@@ -38,6 +37,48 @@ namespace Zyan.InterLinq
 			MethodInfo = method;
 		}
 
+		private class CurrentQuerySession
+		{
+			public ComponentRegistration Registration { get; set; }
+
+			public object Instance { get; set; }
+		}
+
+		[ThreadStatic]
+		private static CurrentQuerySession querySession;
+
+		public bool StartSession()
+		{
+			// get component instance and save to the current session
+			var registration = Catalog.GetRegistration(ComponentName);
+			querySession = new CurrentQuerySession
+			{
+				Registration = registration,
+				Instance = Catalog.GetComponentInstance(registration),
+			};
+
+			return true;
+		}
+
+		public bool CloseSession()
+		{
+			// cleanup component instance and release the current session
+			if (querySession != null)
+			{
+				var instance = querySession.Instance;
+				var registration = querySession.Registration;
+				if (instance != null && registration != null && registration.ActivationType == ActivationType.SingleCall)
+				{
+					Catalog.CleanUpComponentInstance(registration, instance);
+					querySession.Instance = null;
+				}
+
+				querySession = null;
+			}
+
+			return true;
+		}
+
 		public IQueryable Get(Type type)
 		{
 			// create generic version of this method and invoke it
@@ -48,48 +89,37 @@ namespace Zyan.InterLinq
 
 		public IQueryable<T> Get<T>() where T : class
 		{
-			// get component instance
-			var registration = Catalog.GetRegistration(ComponentName);
-			var instance = Catalog.GetComponentInstance(registration);
-			var type = instance.GetType();
-
-			try
+			if (querySession == null)
 			{
-				// create generic method
-				var genericMethodInfo = type.GetMethod(MethodInfo.Name, new[] { typeof(T) }, new Type[0]);
-				if (genericMethodInfo == null)
-				{
-					var methodSignature = MessageHelpers.GetMethodSignature(type, MethodInfo.Name, new Type[0]);
-					var exceptionMessage = String.Format(LanguageResource.MissingMethodException_MethodNotFound, methodSignature);
-					throw new MissingMethodException(exceptionMessage);
-				}
-
-				// invoke Get<T> method and return IQueryable<T>
-				object result = genericMethodInfo.Invoke(instance, new object[0]);
-				if (result is IQueryable<T>)
-					return result as IQueryable<T>;
-				if (result is IEnumerable<T>)
-					return (result as IEnumerable<T>).AsQueryable();
-				return null;
+				throw new InvalidOperationException("Session is not started. ZyanMethodQueryHandler requires that StartSession method is called before Get<T>.");
 			}
-			finally
+
+			// get component instance created by
+			var instance = querySession.Instance;
+			var instanceType = instance.GetType();
+
+			// create generic method
+			var genericMethodInfo = instanceType.GetMethod(MethodInfo.Name, new[] { typeof(T) }, new Type[0]);
+			if (genericMethodInfo == null)
 			{
-				if (instance != null && registration.ActivationType == ActivationType.SingleCall)
-				{
-					Catalog.CleanUpComponentInstance(registration, instance);
-					instance = null;
-				}
+				var methodSignature = MessageHelpers.GetMethodSignature(instanceType, MethodInfo.Name, new Type[0]);
+				var exceptionMessage = string.Format(LanguageResource.MissingMethodException_MethodNotFound, methodSignature);
+				throw new MissingMethodException(exceptionMessage);
 			}
-		}
 
-		public bool StartSession()
-		{
-			return true; // TODO
-		}
+			// invoke Get<T> method and return IQueryable<T>
+			object result = genericMethodInfo.Invoke(instance, new object[0]);
+			if (result is IQueryable<T>)
+			{
+				return result as IQueryable<T>;
+			}
 
-		public bool CloseSession()
-		{
-			return true; // TODO
+			if (result is IEnumerable<T>)
+			{
+				return (result as IEnumerable<T>).AsQueryable();
+			}
+
+			return null;
 		}
 	}
 }
