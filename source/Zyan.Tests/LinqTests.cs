@@ -125,6 +125,7 @@ namespace Zyan.Tests
 			ZyanHost.RegisterComponent<IObjectSource, SampleObjectSource>("Sample6");
 			ZyanHost.RegisterComponent<IObjectSource, SampleObjectSource>("Sample7", ActivationType.SingleCall);
 			ZyanHost.RegisterComponent<IEntitySource, DataWrapper>("DbSample", DataWrapper = new DataWrapper());
+			ZyanHost.RegisterComponent<ISampleMethodSource, SampleMethodSource>("Disposable", ActivationType.SingleCall);
 
 			ZyanConnection = new ZyanConnection("null://NullChannel:5432/SampleQueryableServer");
 		}
@@ -219,6 +220,19 @@ namespace Zyan.Tests
 			Assert.AreEqual(
 				"Leó, Lev, Hans, Igor, Glenn, James, Klaus, Leona, Niels, Pyotr, Ralph, Albert, Arthur, Edward, Emilio, " +
 				"Enrico, Ernest, George, Harold, Robert, Robert, Richard, William, Alexander, Stanislaw, Chien-Shiung", result);
+		}
+
+		[TestMethod]
+		public void TestSampleMethodQueryComponent()
+		{
+			var proxy = ZyanConnection.CreateProxy<ISampleMethodSource>("Disposable");
+			var query =
+				from s in proxy.GetTable<string>()
+				where Regex.IsMatch(s, "[nyg]$")
+				select s;
+
+			var result = string.Join(" ", query.ToArray());
+			Assert.AreEqual("brown lazy dog", result);
 		}
 
 		[TestMethod]
