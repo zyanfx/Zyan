@@ -13,11 +13,11 @@ namespace Zyan.Communication.Security
 		/// <summary>
 		/// Überprüft Windows-Anmeldeinformationen.
 		/// </summary>
-		/// <param name="username">Windows-Benutzername</param>
-		/// <param name="password">Windows-Kennwort</param>
-		/// <param name="domain">Windows-Computername oder Active Directory-Domäne</param>
+		/// <param name="userName">Windows-Benutzername</param>
+		/// <param name="userPassword">Windows-Kennwort</param>
+		/// <param name="domainName">Windows-Computername oder Active Directory-Domäne</param>
 		/// <returns>Wahr, wenn die Anmeldung erflgreich war, ansonsten Falsch</returns>
-		private bool ValidateWindowsCredentials(string username, string password, string domain)
+		private bool ValidateWindowsCredentials(string userName, string userPassword, string domainName)
 		{
 			if (MonoCheck.IsRunningOnMono && MonoCheck.IsUnixOS)
 				return false; // Windows-Authentication isn´t supported on Linux or Mac.
@@ -27,9 +27,9 @@ namespace Zyan.Communication.Security
 			try
 			{
 				var success = WindowsSecurityTools.LogonUser(
-					username,
-					domain,
-					password,
+					userName,
+					domainName,
+					userPassword,
 					WindowsSecurityTools.LogonType.LOGON32_LOGON_NETWORK,
 					WindowsSecurityTools.ProviderType.LOGON32_PROVIDER_DEFAULT,
 					out token) != 0;
@@ -79,18 +79,14 @@ namespace Zyan.Communication.Security
 
 			// Benutzer und Kennwort lesen
 			string userName = authRequest.Credentials[AuthRequestMessage.CREDENTIAL_USERNAME] as string;
-			string password = authRequest.Credentials[AuthRequestMessage.CREDENTIAL_PASSWORD] as string;
+			userName = GetWorkingUserName(userName);
+			string userPassword = authRequest.Credentials[AuthRequestMessage.CREDENTIAL_PASSWORD] as string;
 
 			// Variable für Domäne
-			string domain = ".";
-
-			// Wenn eine Domäne angegeben wurde ...
-			if (authRequest.Credentials.ContainsKey(AuthRequestMessage.CREDENTIAL_DOMAIN))
-				// Domäne übernehmen
-				domain = authRequest.Credentials[AuthRequestMessage.CREDENTIAL_DOMAIN] as string;
+			string domainName = GetJoinedDomainName();
 
 			// Wenn der Benutzer bekannt ist und das Kennwort stimmt ...
-			if (ValidateWindowsCredentials(userName, password, domain))
+			if (ValidateWindowsCredentials(userName, userPassword, domainName))
 				// Erfolgsmeldung zurückgeben
 				return new AuthResponseMessage()
 				{
@@ -107,5 +103,18 @@ namespace Zyan.Communication.Security
 				AuthenticatedIdentity = null
 			};
 		}
+
+		/// <summary>
+		/// Gets the name of the joined domain.
+		/// </summary>
+		/// <returns></returns>
+		private string GetJoinedDomainName() => DomainHelper.GetJoinedDomainName();
+
+		/// <summary>
+		/// Gets the user name from LDAP/AD.
+		/// </summary>
+		/// <param name="userName"></param>
+		/// <returns></returns>
+		public virtual string GetWorkingUserName(string userName) => userName;
 	}
 }
