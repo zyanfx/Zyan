@@ -276,6 +276,7 @@
     <Compile Include="Protocols\Versioning.cs" />
     <Compile Include="Security\AuthCredentials.cs" />
     <Compile Include="Security\BasicWindowsAuthProvider.cs" />
+    <Compile Include="Security\DomainHelper.cs" />
     <Compile Include="Security\Exceptions\AccountLockedException.cs" />
     <Compile Include="Security\Exceptions\AccountNotFoundException.cs" />
     <Compile Include="Security\Exceptions\PasswordExpiredException.cs" />
