@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>Zyan</id>
-    <version>2.14</version>
+    <version>2.15</version>
     <title>Zyan</title>
     <authors>Rainbird,yallie</authors>
     <owners>Hagen Siegel</owners>
@@ -13,6 +13,13 @@
     <description>Zyan is a framework that simplifies development of distributed applications for desktop and mobile platforms. With Zyan you can publish any .NET class for remote access over the network. Zyan is highly customizable and provides you with tools to build modular and plugable distributed applications.</description>
     <summary>Amazingly easy distributed application framework for .NET, Mono and Xamarin.Android</summary>
     <releaseNotes>What's new:
+
+      v2.15: Bugfixes and stability improvements
+      — #86: ZyanConnection: remoting channel registration race
+      — #87: TcpEx: another locking issue
+      — #89: InterLINQ query execution
+      — #90: User determination in BasicWindowsAuthProvider
+      — #93: Error returning List&lt;T&gt; or T[]
 
       v2.14: Bugfixes and stability improvements
       — #85: Connection lock issue in duplex TCP channel
@@ -38,11 +45,11 @@
       — #53: Updated SRP package integration to version 1.0.4.
       — #3: Improved the code to synchronize subscriptions when connection is restored.
 
-      v2.11: Security fixes and new features.
+      v2.11: Security fixes and new features
       — #45: Updated Zyan.SafeDeserializationHelpers package.
       — #44: Support for multi-step authentication and SRP-6a protocol.
 
-      v2.10: Security fixes and new features.
+      v2.10: Security fixes and new features
       — #43: Integrate Zyan.SafeDeserializationHelpers package.
       — #40: TcpEx: invalid TCP packet crashing a running server.
       — #35: NIC selection for protocols when creating a channel.
@@ -51,7 +58,7 @@
       — #27: Passing null instead of credentials.
       — #4: Fix session filters behavior.
 
-      v2.9: Bugfixes and stability improvements.
+      v2.9: Bugfixes and stability improvements
       — #17: No remote address specified for reconnect.
       — #16: Fix errors found by the static analysis tools bug.
       — #9: Call interceptors don't always initialize the call context.
