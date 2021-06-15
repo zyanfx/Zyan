@@ -82,8 +82,20 @@ namespace Zyan.Communication.Security
 			userName = GetWorkingUserName(userName);
 			string userPassword = authRequest.Credentials[AuthRequestMessage.CREDENTIAL_PASSWORD] as string;
 
+			string getJoinedDomainName()
+			{
+				// if a user provides his domain name, use it
+				if (authRequest.Credentials.ContainsKey(AuthRequestMessage.CREDENTIAL_DOMAIN))
+				{
+					return authRequest.Credentials[AuthRequestMessage.CREDENTIAL_DOMAIN] as string;
+				}
+
+				// get the name of the joined domain
+				return DomainHelper.GetJoinedDomainName();
+			}
+
 			// Variable für Domäne
-			string domainName = GetJoinedDomainName();
+			var domainName = getJoinedDomainName();
 
 			// Wenn der Benutzer bekannt ist und das Kennwort stimmt ...
 			if (ValidateWindowsCredentials(userName, userPassword, domainName))
@@ -103,12 +115,6 @@ namespace Zyan.Communication.Security
 				AuthenticatedIdentity = null
 			};
 		}
-
-		/// <summary>
-		/// Gets the name of the joined domain.
-		/// </summary>
-		/// <returns></returns>
-		private string GetJoinedDomainName() => DomainHelper.GetJoinedDomainName();
 
 		/// <summary>
 		/// Gets the user name from LDAP/AD.
