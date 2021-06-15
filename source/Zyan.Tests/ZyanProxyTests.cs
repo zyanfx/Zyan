@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using Zyan.Communication;
@@ -17,8 +19,6 @@ namespace Zyan.Tests
 	using ClassCleanup = DummyAttribute;
 	using TestContext = System.Object;
 	using AssertFailedException = NUnit.Framework.AssertionException;
-	using System.Linq;
-	using System.Collections.Generic;
 #else
 	using Microsoft.VisualStudio.TestTools.UnitTesting;
 	using ClassInitializeNonStatic = DummyAttribute;
@@ -187,7 +187,7 @@ namespace Zyan.Tests
 
 			Assert.AreEqual("ipc://ZyanProxyTest/ZyanProxyServer/Zyan.Tests.ZyanProxyTests+ISampleServer", toString);
 		}
-		
+
 		[TestMethod]
 		public void GenericListMethod_ShouldWork()
 		{

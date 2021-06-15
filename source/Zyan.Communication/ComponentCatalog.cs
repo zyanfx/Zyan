@@ -140,9 +140,10 @@ namespace Zyan.Communication
 		{
 			foreach (var mi in typeof(I).GetMethods())
 			{
-				if (mi.IsGenericMethod && mi.GetParameters().Length == 0)
+				if (mi.IsGenericMethod && mi.GetParameters().Length == 0 && mi.ReturnType.IsGenericType)
 				{
-					if (typeof(IEnumerable).IsAssignableFrom(mi.ReturnType) || typeof(IQueryable).IsAssignableFrom(mi.ReturnType))
+					var returnTypeDef = mi.ReturnType.GetGenericTypeDefinition();
+					if (returnTypeDef == typeof(IEnumerable<>) || returnTypeDef == typeof(IQueryable<>))
 					{
 						var queryHandler = new ZyanMethodQueryHandler(this, uniqueName, mi);
 						var remoteHandler = new ZyanServerQueryHandler(queryHandler);

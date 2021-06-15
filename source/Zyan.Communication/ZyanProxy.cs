@@ -390,7 +390,9 @@ namespace Zyan.Communication
 		{
 			if (methodInfo.GetParameters().Length == 0 &&
 				methodInfo.GetGenericArguments().Length == 1 &&
-				(typeof(IEnumerable).IsAssignableFrom(methodInfo.ReturnType) || typeof(IQueryable).IsAssignableFrom(methodInfo.ReturnType)))
+				methodInfo.ReturnType.IsGenericType &&
+				methodInfo.ReturnType.GetGenericTypeDefinition() is Type returnTypeDef &&
+				(returnTypeDef == typeof(IEnumerable<>) || returnTypeDef == typeof(IQueryable<>)))
 			{
 				var elementType = methodInfo.GetGenericArguments().First();
 				var serverHandlerName = ZyanMethodQueryHandler.GetMethodQueryHandlerName(_uniqueName, methodInfo);
