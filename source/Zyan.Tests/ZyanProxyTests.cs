@@ -17,6 +17,8 @@ namespace Zyan.Tests
 	using ClassCleanup = DummyAttribute;
 	using TestContext = System.Object;
 	using AssertFailedException = NUnit.Framework.AssertionException;
+	using System.Linq;
+	using System.Collections.Generic;
 #else
 	using Microsoft.VisualStudio.TestTools.UnitTesting;
 	using ClassInitializeNonStatic = DummyAttribute;
@@ -40,6 +42,12 @@ namespace Zyan.Tests
 			event EventHandler TestEvent;
 
 			void RaiseTestEvent();
+
+			List<T> LoadList<T>() where T : new();
+
+			T[] LoadArray<T>() where T : new();
+
+			IEnumerable<T> LoadEnumerable<T>() where T : new();
 		}
 
 		/// <summary>
@@ -70,6 +78,21 @@ namespace Zyan.Tests
 				{
 					TestEvent(null, EventArgs.Empty);
 				}
+			}
+
+			public List<T> LoadList<T>() where T : new()
+			{
+				return LoadArray<T>().ToList();
+			}
+			
+			public T[] LoadArray<T>() where T : new()
+			{
+				return new[] { new T() };
+			}
+
+			public IEnumerable<T> LoadEnumerable<T>() where T : new()
+			{
+				return LoadList<T>();
 			}
 		}
 
@@ -163,6 +186,39 @@ namespace Zyan.Tests
 			var toString = proxy.ToString();
 
 			Assert.AreEqual("ipc://ZyanProxyTest/ZyanProxyServer/Zyan.Tests.ZyanProxyTests+ISampleServer", toString);
+		}
+		
+		[TestMethod]
+		public void GenericListMethod_ShouldWork()
+		{
+			var proxy = ZyanConnection.CreateProxy<ISampleServer>();
+			var res = proxy.LoadList<Sample>();
+
+			Assert.AreEqual(1, res.Count());
+		}
+
+		[TestMethod]
+		public void GenericArrayMethod_ShouldWork()
+		{
+			var proxy = ZyanConnection.CreateProxy<ISampleServer>();
+			var res = proxy.LoadArray<Sample>(); 
+
+			Assert.AreEqual(1, res.Count());
+		}
+		
+		[TestMethod]
+		public void GenericEnumerableTMethod_ShouldWork()
+		{
+			var proxy = ZyanConnection.CreateProxy<ISampleServer>();
+			var ints = proxy.LoadEnumerable<Sample>();
+
+			// IEnumerable<T> return value is fine 
+			Assert.AreEqual(1, ints.Count());
+		}
+
+		[Serializable]
+		public class Sample
+		{
 		}
 	}
 }
