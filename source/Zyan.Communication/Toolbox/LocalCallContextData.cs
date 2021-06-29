@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Remoting.Messaging;
 using System.Runtime.Serialization;
-using System.Threading;
+using CoreRemoting;
 
 namespace Zyan.Communication.Toolbox
 {
@@ -11,7 +10,7 @@ namespace Zyan.Communication.Toolbox
 	/// Prevents the data from leaving the current application domain.
 	/// </summary>
 	[Serializable]
-	internal sealed class LocalCallContextData : ISerializable, ILogicalThreadAffinative
+	internal sealed class LocalCallContextData : ISerializable
 	{
 		private LocalCallContextData()
 		{

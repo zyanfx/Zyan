@@ -1,4 +1,5 @@
-﻿using System.Security.Principal;
+﻿using System.Security.Claims;
+using System.Security.Principal;
 
 namespace Zyan.Communication.Security
 {
@@ -16,7 +17,7 @@ namespace Zyan.Communication.Security
 		public AuthResponseMessage Authenticate(AuthRequestMessage authRequest)
 		{
 			// Anonyme Identität erstellen
-			IIdentity identity = WindowsIdentity.GetAnonymous();
+			IIdentity identity = new ZyanIdentity(null);
 
 			// Erfolgsmelung zurückgeben
 			return new AuthResponseMessage()

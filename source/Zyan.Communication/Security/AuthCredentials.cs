@@ -92,10 +92,15 @@ namespace Zyan.Communication.Security
 		public virtual void Authenticate(Guid sessionId, IZyanDispatcher dispatcher)
 		{
 			var credentials = CredentialsHashtable;
-			if (credentials != null && credentials.Count == 0)
+			
+			if (credentials is {Count: 0})
 				credentials = null;
 
 			var response = dispatcher.Logon(sessionId, credentials);
+			
+			if (response == null)
+				return;
+			
 			if (!response.Completed)
 			{
 				throw new SecurityException(response.ErrorMessage ?? "Authentication is not completed.");

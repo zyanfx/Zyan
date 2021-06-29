@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading;
 using Zyan.Communication;
-using Zyan.Communication.Protocols.Ipc;
+using Zyan.Communication.Protocols.Websocket;
 using Zyan.Communication.SessionMgmt;
 
 namespace Zyan.Tests
@@ -272,7 +270,7 @@ namespace Zyan.Tests
 			var server = new ReleasableComponent { Handler = () => disposed = true };
 			Assert.IsFalse(disposed);
 
-			var serverSetup = new IpcBinaryServerProtocolSetup("CleanupTest1");
+			var serverSetup = new WebsocketServerProtocolSetup();
 			using (var host = new ZyanComponentHost("SampleServer1", serverSetup))
 			{
 				host.RegisterComponent<ISampleComponent, ReleasableComponent>(
@@ -289,7 +287,7 @@ namespace Zyan.Tests
 			var server = new ReleasableComponent { Handler = () => disposed = true };
 			Assert.IsFalse(disposed);
 
-			var serverSetup = new IpcBinaryServerProtocolSetup("CleanupTest2");
+			var serverSetup = new WebsocketServerProtocolSetup();
 			using (var catalog = new ComponentCatalog())
 			using (var host = new ZyanComponentHost("SampleServer2", serverSetup, new InProcSessionManager(), catalog))
 			{

@@ -2,10 +2,10 @@
 using System.Linq;
 using System.Diagnostics;
 using System.Reflection;
-using System.Runtime.Remoting;
 using System.Text;
 using System.Threading;
 using System.Collections.Generic;
+using CoreRemoting.ClassicRemotingApi;
 
 // TODO: Localize exceptions and trace messages
 namespace Zyan.Communication.Toolbox

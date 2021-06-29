@@ -1,15 +1,13 @@
 using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Net;
-using System.Runtime.Remoting.Messaging;
 using System.Security;
 using System.Security.Principal;
 using System.Threading;
 using System.Transactions;
-using Zyan.Communication.ChannelSinks.ClientAddress;
+using CoreRemoting;
 using Zyan.Communication.Delegates;
 using Zyan.Communication.Security;
 using Zyan.Communication.Toolbox;
@@ -19,7 +17,8 @@ namespace Zyan.Communication
 	/// <summary>
 	/// Central dispatch component for RPC requests.
 	/// </summary>
-	public class ZyanDispatcher : MarshalByRefObject, IZyanDispatcher
+	[SuppressMessage("ReSharper", "InconsistentNaming")]
+	public sealed class ZyanDispatcher : IZyanDispatcher
 	{
 		#region Construction
 
@@ -29,10 +28,7 @@ namespace Zyan.Communication
 		/// <param name="host">Component host</param>
 		public ZyanDispatcher(ZyanComponentHost host)
 		{
-			if (host == null)
-				throw new ArgumentNullException("host");
-
-			_host = host;
+			_host = host ?? throw new ArgumentNullException(nameof(host));
 		}
 
 		#endregion
@@ -40,7 +36,7 @@ namespace Zyan.Communication
 		#region Method invocation
 
 		// Component Host this dispatcher is dispatching for
-		private ZyanComponentHost _host = null;
+		private readonly ZyanComponentHost _host;
 
 		/// <summary>
 		/// Creates wires between client component and server component.
@@ -58,7 +54,10 @@ namespace Zyan.Communication
 			if (currentSession == null)
 				throw new InvalidSessionException(string.Format(LanguageResource.InvalidSessionException_SessionIDInvalid, "(null)"));
 
-			foreach (var correlationInfo in delegateCorrelationSet)
+			var delegateCorrelationInfos = 
+				delegateCorrelationSet as DelegateCorrelationInfo[] ?? delegateCorrelationSet.ToArray();
+			
+			foreach (var correlationInfo in delegateCorrelationInfos)
 			{
 				if (wiringList.ContainsKey(correlationInfo.CorrelationID))
 					continue;
@@ -117,7 +116,7 @@ namespace Zyan.Communication
 				});
 			}
 
-			currentSession.TrackRemoteSubscriptions(delegateCorrelationSet);
+			currentSession.TrackRemoteSubscriptions(delegateCorrelationInfos);
 		}
 
 		/// <summary>
@@ -133,35 +132,35 @@ namespace Zyan.Communication
 				return;
 
 			var currentSession = ServerSession.CurrentSession;
-			foreach (var correlationInfo in delegateCorrelationSet)
+			var delegateCorrelationInfos = 
+				delegateCorrelationSet as DelegateCorrelationInfo[] ?? delegateCorrelationSet.ToArray();
+			
+			foreach (var correlationInfo in delegateCorrelationInfos)
 			{
-				if (wiringList.ContainsKey(correlationInfo.CorrelationID))
+				if (!wiringList.ContainsKey(correlationInfo.CorrelationID))
+					continue;
+
+				lock (wiringList)
 				{
-					var dynamicWire = default(DynamicWireBase);
-					lock (wiringList)
-					{
-						if (!wiringList.ContainsKey(correlationInfo.CorrelationID))
-							continue;
+					if (!wiringList.ContainsKey(correlationInfo.CorrelationID))
+						continue;
 
-						var dynamicWireDelegate = wiringList[correlationInfo.CorrelationID];
-						eventStub.RemoveHandler(correlationInfo.DelegateMemberName, dynamicWireDelegate);
-						wiringList.Remove(correlationInfo.CorrelationID);
-						dynamicWire = DynamicWireFactory.GetDynamicWire(dynamicWireDelegate);
-					}
-
-					_host.OnSubscriptionRemoved(new SubscriptionEventArgs
-					{
-						ComponentType = type,
-						DelegateMemberName = correlationInfo.DelegateMemberName,
-						CorrelationID = correlationInfo.CorrelationID,
-					});
+					var dynamicWireDelegate = wiringList[correlationInfo.CorrelationID];
+					eventStub.RemoveHandler(correlationInfo.DelegateMemberName, dynamicWireDelegate);
+					wiringList.Remove(correlationInfo.CorrelationID);
+					DynamicWireFactory.GetDynamicWire(dynamicWireDelegate);
 				}
+
+				_host.OnSubscriptionRemoved(new SubscriptionEventArgs
+				{
+					ComponentType = type,
+					DelegateMemberName = correlationInfo.DelegateMemberName,
+					CorrelationID = correlationInfo.CorrelationID,
+				});
 			}
 
 			if (currentSession != null)
-			{
-				currentSession.UntrackRemoteSubscriptions(delegateCorrelationSet);
-			}
+				currentSession.UntrackRemoteSubscriptions(delegateCorrelationInfos);
 		}
 
 		/// <summary>
@@ -225,8 +224,10 @@ namespace Zyan.Communication
 		/// <returns></returns>
 		private string GetCallingClientIPAddress()
 		{
-			var ipAddress = CallContext.GetData(ClientAddressServerChannelSink.CallContextSlotName) as IPAddress;
-			return string.Format("{0}", ipAddress);
+			//TODO: Find a way to get the client IP
+			// var ipAddress = CallContext.GetData(ClientAddressServerChannelSink.CallContextSlotName) as IPAddress;
+			// return string.Format("{0}", ipAddress);
+			return "";
 		}
 
 		/// <summary>
@@ -247,11 +248,11 @@ namespace Zyan.Communication
 		private void Invoke_LoadCallContextData(InvocationDetails details)
 		{
 			// check for logical context data
-			details.CallContextData = CallContext.GetData("__ZyanContextData_" + _host.Name) as LogicalCallContextData;
+			details.CallContextData = 
+				CallContext.GetData("__ZyanContextData_" + _host.Name) as LogicalCallContextData;
+			
 			if (details.CallContextData == null)
-			{
 				throw new SecurityException(LanguageResource.SecurityException_ContextInfoMissing);
-			}
 		}
 
 		/// <summary>
@@ -364,17 +365,16 @@ namespace Zyan.Communication
 		private void Invoke_ConvertMethodArguments(InvocationDetails details)
 		{
 			details.DelegateParamIndexes = new Dictionary<int, DelegateInterceptor>();
-			for (int i = 0; i < details.ParamTypes.Length; i++)
+			
+			for (var i = 0; i < details.ParamTypes.Length; i++)
 			{
-				var delegateParamInterceptor = details.Args[i] as DelegateInterceptor;
-				if (delegateParamInterceptor != null)
+				if (details.Args[i] is DelegateInterceptor delegateParamInterceptor)
 				{
 					details.DelegateParamIndexes.Add(i, delegateParamInterceptor);
 					continue;
 				}
 
-				var container = details.Args[i] as CustomSerializationContainer;
-				if (container != null)
+				if (details.Args[i] is CustomSerializationContainer container)
 				{
 					var serializationHandler = _host.SerializationHandling[container.HandledType];
 					if (serializationHandler == null)
@@ -498,13 +498,13 @@ namespace Zyan.Communication
 		/// <param name="paramTypes">Parameter types</param>
 		/// <param name="args">Parameter values</param>
 		/// <returns>Return value</returns>
-		public object Invoke(Guid trackingID, string interfaceName, List<DelegateCorrelationInfo> delegateCorrelationSet, string methodName, Type[] genericArguments, Type[] paramTypes, params object[] args)
+		public object Invoke(Guid trackingID, string interfaceName, List<DelegateCorrelationInfo> delegateCorrelationSet, string methodName, string[] genericArguments, string[] paramTypes, params object[] args)
 		{
 			if (string.IsNullOrEmpty(interfaceName))
-				throw new ArgumentException(LanguageResource.ArgumentException_InterfaceNameMissing, "interfaceName");
+				throw new ArgumentException(LanguageResource.ArgumentException_InterfaceNameMissing, nameof(interfaceName));
 
 			if (string.IsNullOrEmpty(methodName))
-				throw new ArgumentException(LanguageResource.ArgumentException_MethodNameMissing, "methodName");
+				throw new ArgumentException(LanguageResource.ArgumentException_MethodNameMissing, nameof(methodName));
 
 			// Reset session variable (May point to wrong session, if threadpool thread is reused)
 			_host.SessionManager.SetCurrentSession(null);
@@ -515,8 +515,8 @@ namespace Zyan.Communication
 				InterfaceName = interfaceName,
 				DelegateCorrelationSet = delegateCorrelationSet,
 				MethodName = methodName,
-				GenericArguments = genericArguments,
-				ParamTypes = paramTypes,
+				GenericArguments = genericArguments?.Select(Type.GetType).ToArray(),
+				ParamTypes = paramTypes?.Select(Type.GetType).ToArray(),
 				Args = args
 			};
 
@@ -678,49 +678,60 @@ namespace Zyan.Communication
 
 			try
 			{
-				if (!_host.SessionManager.ExistSession(sessionID))
+				if (_host.SessionManager.ExistSession(sessionID))
 				{
-					// reset current session before authentication is complete
-					_host.SessionManager.SetCurrentSession(null);
-
-					// authenticate
-					var authResponse = _host.Authenticate(new AuthRequestMessage
-					{
-						Credentials = credentials,
-						ClientAddress = clientAddress,
-						SessionID = sessionID,
-					});
-
-					// authentication is not completed
-					if (!authResponse.Completed)
-					{
-						return authResponse;
-					}
-
-					// authentication is completed but failed
-					if (!authResponse.Success)
-					{
-						var exception = authResponse.Exception ?? new SecurityException(authResponse.ErrorMessage);
-						throw exception.PreserveStackTrace();
-					}
-
-					// create a new session
-					var session = _host.SessionManager.CreateServerSession(sessionID, DateTime.Now, authResponse.AuthenticatedIdentity);
-					session.ClientAddress = clientAddress;
-					_host.SessionManager.StoreSession(session);
-					_host.SessionManager.SetCurrentSession(session);
-					_host.OnClientLoggedOn(new LoginEventArgs(LoginEventType.Logon, session.Identity, session.ClientAddress, session.Timestamp));
-					return authResponse;
+					// already authenticated, ignore the authentication attempt
+					return null;
 				}
 
-				// already authenticated, ignore the authentication attempt
-				return null;
+				// reset current session before authentication is complete
+				_host.SessionManager.SetCurrentSession(null);
+
+				// authenticate
+				var authResponse = 
+					_host.Authenticate(
+						new AuthRequestMessage {
+							Credentials = credentials,
+							ClientAddress = clientAddress,
+							SessionID = sessionID});
+
+				// authentication is not completed
+				if (!authResponse.Completed)
+					return authResponse;
+
+				// authentication is completed but failed
+				if (!authResponse.Success)
+				{
+					var exception = authResponse.Exception ?? new SecurityException(authResponse.ErrorMessage);
+					throw exception.PreserveStackTrace();
+				}
+
+				// create a new session
+				var session = 
+					_host.SessionManager.CreateServerSession(
+						sessionID, 
+						DateTime.Now, 
+						authResponse.AuthenticatedIdentity);
+				
+				session.ClientAddress = clientAddress;
+				
+				_host.SessionManager.StoreSession(session);
+				_host.SessionManager.SetCurrentSession(session);
+				_host.OnClientLoggedOn(new LoginEventArgs(LoginEventType.Logon, session.Identity, session.ClientAddress, session.Timestamp));
+				
+				return authResponse;
 			}
 			catch (Exception ex)
 			{
-				var args = new LoginEventArgs(LoginEventType.Logon, null, clientAddress, DateTime.Now);
-				args.Exception = ex;
+				var args = 
+					new LoginEventArgs(
+						eventType: LoginEventType.Logon, 
+						identity:null,
+						clientAddress: clientAddress,
+						timestamp: DateTime.Now) { Exception = ex };
+				
 				_host.OnClientLogonCanceled(args);
+				
 				if (args.Exception != null)
 				{
 					// this exception may be translated
@@ -785,10 +796,7 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Gets the maximum sesseion age (in minutes).
 		/// </summary>
-		public int SessionAgeLimit
-		{
-			get { return _host.SessionManager.SessionAgeLimit; }
-		}
+		public int SessionAgeLimit => _host.SessionManager.SessionAgeLimit;
 
 		/// <summary>
 		/// Extends the lifetime of the current session and returs the current session age limit.
@@ -819,20 +827,6 @@ namespace Zyan.Communication
 
 		#endregion
 
-		#region Lifetime management
-
-		/// <summary>
-		/// Initializes the .NET Remoting limetime service of this object.
-		/// </summary>
-		/// <returns>Lease</returns>
-		public override object InitializeLifetimeService()
-		{
-			// Unlimited lifetime
-			return null;
-		}
-
-		#endregion
-
 		#region Detect unexpected disconnection (Polling)
 
 		/// <summary>
@@ -847,7 +841,7 @@ namespace Zyan.Communication
 		/// </remarks>
 		/// </summary>
 		/// <param name="e">Event arguments</param>
-		protected virtual void OnClientHeartbeatReceived(ClientHeartbeatEventArgs e)
+		private void OnClientHeartbeatReceived(ClientHeartbeatEventArgs e)
 		{
 			var eventHandler = ClientHeartbeatReceived;
 			if (eventHandler != null)
@@ -860,7 +854,7 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Called from client to send a heartbeat signal.
 		/// </summary>
-		/// <param name="sessionID">Client´s session key</param>
+		/// <param name="sessionID">Clientï¿½s session key</param>
 		public void ReceiveClientHeartbeat(Guid sessionID)
 		{
 			// validate server session

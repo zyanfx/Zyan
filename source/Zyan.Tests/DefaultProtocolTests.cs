@@ -7,6 +7,7 @@ using Zyan.Communication.Protocols.Http;
 using Zyan.Communication.Protocols.Ipc;
 using Zyan.Communication.Protocols.Null;
 using Zyan.Communication.Protocols.Tcp;
+using Zyan.Communication.Protocols.Websocket;
 
 namespace Zyan.Tests
 {
@@ -35,38 +36,18 @@ namespace Zyan.Tests
 	public class DefaultProtocolTests
 	{
 		[TestMethod]
-		public void HttpUrlResolvesToHttpCustomProtocolSetup()
+		public void HttpUrlResolvesToWebsocketClientProtocolSetup()
 		{
 			var protocol = ClientProtocolSetup.GetClientProtocol("http://some/url");
-			Assert.AreEqual(typeof(HttpCustomClientProtocolSetup), protocol.GetType());
+			Assert.AreEqual(typeof(WebsocketClientProtocolSetup), protocol.GetType());
 		}
 
-		[TestMethod]
-		public void IpcUrlResolvesToIpcBinaryProtocolSetup()
-		{
-			var protocol = ClientProtocolSetup.GetClientProtocol("ipc://some/url");
-			Assert.AreEqual(typeof(IpcBinaryClientProtocolSetup), protocol.GetType());
-		}
-
-		[TestMethod]
-		public void NullUrlResolvesToNullClientProtocolSetup()
-		{
-			var protocol = ClientProtocolSetup.GetClientProtocol("null://NullChannel:1234/svc");
-			Assert.AreEqual(typeof(NullClientProtocolSetup), protocol.GetType());
-		}
-
-		[TestMethod]
-		public void TcpUrlResolvesToTcpBinaryProtocolSetup()
-		{
-			var protocol = ClientProtocolSetup.GetClientProtocol("tcp://localhost:1234/svc");
-			Assert.AreEqual(typeof(TcpBinaryClientProtocolSetup), protocol.GetType());
-		}
-
-		[TestMethod]
-		public void TcpexUrlResolvesToTcpDuplexProtocolSetup()
-		{
-			var protocol = ClientProtocolSetup.GetClientProtocol("tcpex://localhost:1234/svc");
-			Assert.AreEqual(typeof(TcpDuplexClientProtocolSetup), protocol.GetType());
-		}
+		//TODO: Implement fake communication
+		// [TestMethod]
+		// public void NullUrlResolvesToNullClientProtocolSetup()
+		// {
+		// 	var protocol = ClientProtocolSetup.GetClientProtocol("null://NullChannel:1234/svc");
+		// 	Assert.AreEqual(typeof(NullClientProtocolSetup), protocol.GetType());
+		// }
 	}
 }

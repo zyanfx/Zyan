@@ -40,7 +40,7 @@ namespace Zyan.Communication.Delegates
 		#region Wiring
 
 		// Cache for created dynamic wire factories
-		DynamicWireFactoryCache _wireFactoryCache = new DynamicWireFactoryCache();
+		private readonly DynamicWireFactoryCache _wireFactoryCache = new DynamicWireFactoryCache();
 
 		/// <summary>
 		/// Creates a unique wire cache key for a delegate wire factory.
@@ -63,7 +63,7 @@ namespace Zyan.Communication.Delegates
 		private DynamicWireBase CreateWire(Type componentType, string delegateMemberName, bool isEvent)
 		{
 			if (componentType == null)
-				throw new ArgumentNullException("componentType");
+				throw new ArgumentNullException(nameof(componentType));
 
 			if (string.IsNullOrEmpty(delegateMemberName))
 				throw new ArgumentException(LanguageResource.ArgumentException_OutPutPinNameMissing, "delegateMemberName");
@@ -82,10 +82,10 @@ namespace Zyan.Communication.Delegates
 		private DynamicWireFactoryMethod GetOrCreateFactoryMethod(Type componentType, Type delegateType, bool isEvent)
 		{
 			if (componentType == null)
-				throw new ArgumentNullException("componentType");
+				throw new ArgumentNullException(nameof(componentType));
 
 			if (delegateType == null)
-				throw new ArgumentNullException("delegateType");
+				throw new ArgumentNullException(nameof(delegateType));
 
 			// look for cached factory method value
 			var key = CreateKeyForWire(componentType, delegateType, isEvent);
@@ -101,7 +101,7 @@ namespace Zyan.Communication.Delegates
 		/// <summary>
 		/// <see cref="MethodInfo"/> for <see cref="CreateDynamicWire{T}"/> method.
 		/// </summary>
-		private static MethodInfo CreateDynamicWireGenericMethodInfo = typeof(DynamicWireFactory).GetMethod("CreateDynamicWire",
+		private static readonly MethodInfo CreateDynamicWireGenericMethodInfo = typeof(DynamicWireFactory).GetMethod("CreateDynamicWire",
 			BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { typeof(bool) }, null);
 
 		/// <summary>
@@ -176,20 +176,25 @@ namespace Zyan.Communication.Delegates
 			{
 				return target;
 			}
-
-#if FX3
-			// System.Runtime.CompilerServices.ExecutionScope class is used by compiled LINQ expressions on FX3
-			var scope = @delegate.Target as ExecutionScope;
-			if (scope != null && scope.Globals != null)
+			
+			// .NET Standard 2.0 doesn't have ExecutionScope type
+			var scope = @delegate.Target;
+			var scopeType = scope?.GetType();
+			
+			if (scopeType?.Name == "ExecutionScope")
 			{
-				return scope.Globals
-					.OfType<IStrongBox>()
-					.Select(b => b.Value)
-					.OfType<DynamicWireBase>()
-					.FirstOrDefault();
+				if (scopeType.GetProperty("Globals")
+					?.GetValue(scope) is object[] globals)
+				{
+					return globals
+						.OfType<IStrongBox>()
+						.Select(b => b.Value)
+						.OfType<DynamicWireBase>()
+						.FirstOrDefault();
+				}
 			}
 
-			// .NET3 assembly running under .NET4+ runtime doesn't have Closure type yet
+			// .NET Standard 2.0 doesn't have Closure type
 			var closure = @delegate.Target;
 			var closureType = closure?.GetType();
 			var closureConstants = default(object[]);
@@ -201,11 +206,6 @@ namespace Zyan.Communication.Delegates
 					closureConstants = constants.GetValue(closure) as object[];
 				}
 			}
-#else
-			// System.Runtime.CompilerServices.Closure class is used by compiled LINQ expressions on FX4+
-			var closure = @delegate.Target as Closure;
-			var closureConstants = closure?.Constants;
-#endif
 
 			if (closureConstants != null)
 			{
@@ -240,9 +240,18 @@ namespace Zyan.Communication.Delegates
 			var delegateInvokeMethod = delegateType.GetMethod("Invoke");
 
 			// var parameters = new object[] { (object)arg1, (object)arg2, ... };
-			var parameters = delegateInvokeMethod.GetParameters().Select(p => Expression.Parameter(p.ParameterType, p.Name)).ToArray();
-			var objectParameters = parameters.Select(p => Expression.Convert(p, typeof(object)));
-			var parametersArray = Expression.NewArrayInit(typeof(object), objectParameters.OfType<Expression>().ToArray());
+			var parameters = 
+				delegateInvokeMethod
+					?.GetParameters()
+					.Select(p => Expression.Parameter(p.ParameterType, p.Name)).ToArray();
+			
+			var objectParameters = 
+				(parameters ?? Array.Empty<ParameterExpression>())
+					.Select(p => Expression.Convert(p, typeof(object)));
+			
+			var parametersArray = 
+				Expression.NewArrayInit(typeof(object), 
+					objectParameters.OfType<Expression>().ToArray());
 
 			// invokeClientDelegate(parameters);
 			var callExpression = Expression.Call
@@ -254,8 +263,9 @@ namespace Zyan.Communication.Delegates
 
 			// convert return value, if any
 			var resultExpression = callExpression as Expression;
-			if (delegateInvokeMethod.ReturnType != typeof(void))
+			if (delegateInvokeMethod?.ReturnType != typeof(void))
 			{
+				// ReSharper disable once PossibleNullReferenceException
 				resultExpression = Expression.Convert(callExpression, delegateInvokeMethod.ReturnType);
 			}
 
@@ -289,6 +299,7 @@ namespace Zyan.Communication.Delegates
 			var invokeMethod = delegateType.GetMethod("Invoke");
 
 			// figure out parameters
+			// ReSharper disable once PossibleNullReferenceException
 			var paramTypeList = invokeMethod.GetParameters().Select(p => p.ParameterType).ToList();
 			var paramCount = paramTypeList.Count;
 			var ownerType = target.GetType();

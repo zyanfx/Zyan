@@ -1,7 +1,5 @@
 ﻿using System;
-using System.ServiceModel;
 using Zyan.InterLinq.Expressions;
-using Zyan.InterLinq.Communication.Wcf.NetDataContractSerializer;
 
 namespace Zyan.InterLinq
 {
@@ -9,7 +7,6 @@ namespace Zyan.InterLinq
 	/// Interface providing methods to communicate with
 	/// the InterLINQ service.
 	/// </summary>
-	[ServiceContract]
 	public interface IQueryRemoteHandler
 	{
 		/// <summary>
@@ -47,9 +44,6 @@ namespace Zyan.InterLinq
 		///     containing selection and projection.
 		/// </param>
 		/// <returns>Returns requested data.</returns>
-		[OperationContract]
-		[NetDataContractFormat]
-		[FaultContract(typeof(Exception))]
 		object Retrieve(SerializableExpression expression);
 	}
 }

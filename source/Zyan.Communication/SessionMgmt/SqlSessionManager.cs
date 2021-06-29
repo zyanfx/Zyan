@@ -8,7 +8,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Principal;
 using System.Text;
 using System.Transactions;
-using Zyan.SafeDeserializationHelpers;
+using CoreRemoting.Serialization.Binary;
 
 namespace Zyan.Communication.SessionMgmt
 {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Runtime.Remoting.Messaging;
 
 namespace Zyan.Communication
 {
@@ -8,7 +7,7 @@ namespace Zyan.Communication
 	/// Stores data that travels with the call context from client to server and back.
 	/// </summary>
 	[Serializable]
-	public class LogicalCallContextData : ILogicalThreadAffinative
+	public class LogicalCallContextData
 	{
 		// Data store
 		private Hashtable _store = null;

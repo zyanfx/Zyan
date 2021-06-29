@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.Remoting.Messaging;
 
 namespace Zyan.Communication
 {
@@ -55,15 +54,6 @@ namespace Zyan.Communication
 		{
 			get;
 			set;
-		}
-
-		/// <summary>
-		/// Gets the remoting message of the request.
-		/// </summary>
-		public IMethodCallMessage RemotingMessage
-		{
-			get;
-			internal set;
 		}
 
 		/// <summary>

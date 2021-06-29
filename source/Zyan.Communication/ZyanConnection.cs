@@ -5,17 +5,16 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.Remoting;
-using System.Runtime.Remoting.Channels;
-using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using System.Transactions;
+using Castle.DynamicProxy;
+using CoreRemoting;
+using CoreRemoting.Channels.Websocket;
+using CoreRemoting.Serialization.Binary;
 using Zyan.Communication.Delegates;
 using Zyan.Communication.Discovery;
 using Zyan.Communication.Discovery.Metadata;
 using Zyan.Communication.Protocols;
-using Zyan.Communication.Protocols.Tcp.DuplexChannel;
-using Zyan.Communication.Protocols.Wrapper;
 using Zyan.Communication.Security;
 using Zyan.Communication.Toolbox;
 using Zyan.Communication.Toolbox.Diagnostics;
@@ -40,11 +39,13 @@ namespace Zyan.Communication
 		private IClientProtocolSetup _protocolSetup = null;
 
 		// Remoting-Channel
-		private IChannel _remotingChannel = null;
+		private IRemotingClient _remotingClient = null;
 
 		// List of created proxies
 		private List<WeakReference> _proxies;
 
+		private ProxyGenerator _proxyGenerator;
+		
 		/// <summary>
 		/// Gets the alive proxies.
 		/// </summary>
@@ -78,10 +79,7 @@ namespace Zyan.Communication
 		/// <summary>
 		/// Gets the name of the remote component host.
 		/// </summary>
-		public string ComponentHostName
-		{
-			get { return _componentHostName; }
-		}
+		public string ComponentHostName => _componentHostName;
 
 		#endregion
 
@@ -100,17 +98,8 @@ namespace Zyan.Communication
 		/// Creates a new instance of the ZyanConnection class.
 		/// </summary>
 		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp")</param>
-		public ZyanConnection(string serverUrl)
-			: this(serverUrl, ClientProtocolSetup.GetClientProtocol(serverUrl), null, false, true)
-		{
-		}
-
-		/// <summary>
-		/// Creates a new instance of the ZyanConnection class.
-		/// </summary>
-		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp")</param>
 		/// <param name="autoLoginOnExpiredSession">Specifies whether the proxy should relogin automatically when the session expired</param>
-		public ZyanConnection(string serverUrl, bool autoLoginOnExpiredSession)
+		public ZyanConnection(string serverUrl, bool autoLoginOnExpiredSession = false)
 			: this(serverUrl, ClientProtocolSetup.GetClientProtocol(serverUrl), null, autoLoginOnExpiredSession, !autoLoginOnExpiredSession)
 		{
 		}
@@ -120,18 +109,8 @@ namespace Zyan.Communication
 		/// </summary>
 		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp")</param>
 		/// <param name="protocolSetup">Protocol an communication settings</param>
-		public ZyanConnection(string serverUrl, IClientProtocolSetup protocolSetup)
-			: this(serverUrl, protocolSetup, null, false, true)
-		{
-		}
-
-		/// <summary>
-		/// Creates a new instance of the ZyanConnection class.
-		/// </summary>
-		/// <param name="serverUrl">URL of remote server (e.G. "tcp://server1:46123/myapp")</param>
-		/// <param name="protocolSetup">Protocol an communication settings</param>
 		/// <param name="autoLoginOnExpiredSession">Specifies whether the proxy should relogin automatically when the session expired</param>
-		public ZyanConnection(string serverUrl, IClientProtocolSetup protocolSetup, bool autoLoginOnExpiredSession)
+		public ZyanConnection(string serverUrl, IClientProtocolSetup protocolSetup, bool autoLoginOnExpiredSession = false)
 			: this(serverUrl, protocolSetup, null, autoLoginOnExpiredSession, true)
 		{
 		}
@@ -159,19 +138,20 @@ namespace Zyan.Communication
 		public ZyanConnection(string serverUrl, IClientProtocolSetup protocolSetup, AuthCredentials credentials, bool autoLoginOnExpiredSession, bool keepSessionAlive)
 		{
 			if (string.IsNullOrEmpty(serverUrl))
-				throw new ArgumentException(LanguageResource.ArgumentException_ServerUrlMissing, "serverUrl");
+				throw new ArgumentException(LanguageResource.ArgumentException_ServerUrlMissing, nameof(serverUrl));
 
-			if (protocolSetup == null)
-			{
-				// try to select the protocol automatically
-				protocolSetup = ClientProtocolSetup.GetClientProtocol(serverUrl);
-				if (protocolSetup == null)
-					throw new ArgumentNullException("protocolSetup");
-			}
+			// if (protocolSetup == null)
+			// {
+			// 	// try to select the protocol automatically
+			// 	protocolSetup = ClientProtocolSetup.GetClientProtocol(serverUrl);
+			// 	if (protocolSetup == null)
+			// 		throw new ArgumentNullException(nameof(protocolSetup));
+			// }
 
-			if (!protocolSetup.IsUrlValid(serverUrl))
-				throw new ArgumentException(LanguageResource.ArgumentException_ServerUrlIsInvalid, "serverUrl");
+			// if (!protocolSetup.IsUrlValid(serverUrl))
+			// 	throw new ArgumentException(LanguageResource.ArgumentException_ServerUrlIsInvalid, nameof(serverUrl));
 
+			_proxyGenerator = new ProxyGenerator();
 			_proxies = new List<WeakReference>();
 			_protocolSetup = protocolSetup;
 			_sessionID = Guid.NewGuid();
@@ -184,39 +164,25 @@ namespace Zyan.Communication
 
 			_serializationHandling = new SerializationHandlerRepository();
 			CallInterceptionEnabled = false;
-			_callInterceptors = new CallInterceptorCollection();
+			//TODO: Migrate CallInterception 
+			//_callInterceptors = new CallInterceptorCollection();
 			RegisterStandardSerializationHandlers();
 			string[] addressParts = _serverUrl.Split('/');
 			_componentHostName = addressParts[addressParts.Length - 1];
 
-			lock (_protocolSetup)
-			{
-				_remotingChannel = _protocolSetup.CreateChannel();
-				if (!ZyanSettings.DisableUrlRandomization)
-				{
-					_remotingChannel = ChannelWrapper.WrapChannel(_remotingChannel, _protocolSetup.ChannelName);
-				}
+			var	clientConfig = _protocolSetup.BuildClientConfig();
+			clientConfig.Serializer = new BinarySerializerAdapter();
 
-				if (_remotingChannel != null)
-				{
-					var registeredChannel = ChannelServices.GetChannel(_remotingChannel.ChannelName);
-
-					if (registeredChannel == null)
-						ChannelServices.RegisterChannel(_remotingChannel, false);
-					else
-						_remotingChannel = registeredChannel;
-				}
-				else
-					throw new ApplicationException(LanguageResource.ApplicationException_NoChannelCreated);
-			}
-
-			var connectionNotification = _remotingChannel as IConnectionNotification;
+			_remotingClient = new RemotingClient(clientConfig);
+			_remotingClient.Connect();
+			
+			var connectionNotification = _remotingClient as IConnectionNotification;
 			if (connectionNotification != null)
 			{
 				connectionNotification.ConnectionEstablished += Channel_ConnectionEstablished;
 			}
 
-			string channelName = _remotingChannel.ChannelName;
+			string channelName = _protocolSetup.ChannelName;
 
 			if (credentials == null)
 				credentials = new AuthCredentials();
@@ -230,17 +196,12 @@ namespace Zyan.Communication
 			}
 			catch (Exception ex)
 			{
-				// unregister remoting channel
-				var registeredChannel = ChannelServices.GetChannel(channelName);
-				if (registeredChannel != null)
-					ChannelServices.UnregisterChannel(registeredChannel);
+				if (_remotingClient != null)
+				{
+					_remotingClient.Dispose();
+					_remotingClient = null;
+				}
 
-				// dispose channel if it's disposable
-				var disposableChannel = registeredChannel as IDisposable;
-				if (disposableChannel != null)
-					disposableChannel.Dispose();
-
-				_remotingChannel = null;
 				_remoteDispatcher = null;
 				throw ex.PreserveStackTrace();
 			}
@@ -426,14 +387,18 @@ namespace Zyan.Communication
 			if (info == null)
 				throw new ApplicationException(string.Format(LanguageResource.ApplicationException_NoServerComponentIsRegisteredForTheGivenInterface, interfaceType.FullName, _serverUrl));
 
-			var proxy = new ZyanProxy(info.UniqueName, typeof(T), this, implicitTransactionTransfer, keepCallbackSynchronizationContext, _sessionID, _componentHostName, _autoLoginOnExpiredSession, info.ActivationType);
+			var proxy = new ZyanProxy(info.UniqueName, interfaceType, this, implicitTransactionTransfer, keepCallbackSynchronizationContext, _sessionID, _componentHostName, _autoLoginOnExpiredSession, info.ActivationType);
+			
 			lock (_proxies)
 			{
 				var proxyReference = new WeakReference(proxy);
 				_proxies.Add(proxyReference);
 			}
 
-			return (T)proxy.GetTransparentProxy();
+			return 
+				(T)_proxyGenerator.CreateInterfaceProxyWithoutTarget(
+					interfaceToProxy: interfaceType,
+					interceptor: (IInterceptor)proxy);
 		}
 
 		// Proxy of remote dispatcher
@@ -444,21 +409,7 @@ namespace Zyan.Communication
 		/// </summary>
 		protected internal IZyanDispatcher RemoteDispatcher
 		{
-			get
-			{
-				if (_remoteDispatcher == null)
-				{
-					var serverUrl = _serverUrl;
-					if (!ZyanSettings.DisableUrlRandomization)
-					{
-						serverUrl = ChannelWrapper.RandomizeUrl(_serverUrl, _remotingChannel);
-					}
-
-					_remoteDispatcher = (IZyanDispatcher)Activator.GetObject(typeof(IZyanDispatcher), serverUrl);
-				}
-
-				return _remoteDispatcher;
-			}
+			get { return _remoteDispatcher ?? (_remoteDispatcher = _remotingClient.CreateProxy<IZyanDispatcher>()); }
 		}
 
 		#endregion
@@ -545,16 +496,16 @@ namespace Zyan.Communication
 			set;
 		}
 
-		// List of registered call interceptors.
-		private CallInterceptorCollection _callInterceptors = null;
-
-		/// <summary>
-		/// Returns a collection of registred call interceptors.
-		/// </summary>
-		public CallInterceptorCollection CallInterceptors
-		{
-			get { return _callInterceptors; }
-		}
+		// // List of registered call interceptors.
+		// private CallInterceptorCollection _callInterceptors = null;
+		//
+		// /// <summary>
+		// /// Returns a collection of registred call interceptors.
+		// /// </summary>
+		// public CallInterceptorCollection CallInterceptors
+		// {
+		// 	get { return _callInterceptors; }
+		// }
 
 		#endregion
 
@@ -639,8 +590,6 @@ namespace Zyan.Communication
 				{ }
 				catch (WebException)
 				{ }
-				catch (MessageException)
-				{ }
 				catch (Exception ex)
 				{
 					Trace.WriteLine("Unexpected exception of type {0} caught while disposing ZyanConnection: {1}", ex.GetType(), ex.Message);
@@ -652,24 +601,17 @@ namespace Zyan.Communication
 						_connections.Remove(this);
 					}
 				}
-				if (_remotingChannel != null)
+				if (_remotingClient != null)
 				{
+					//TODO: Migrate connection notification.
 					// unsubscribe from connection notifications
-					var connectionNotification = _remotingChannel as IConnectionNotification;
-					if (connectionNotification != null)
-						connectionNotification.ConnectionEstablished -= Channel_ConnectionEstablished;
+					//_remotingClient.ConnectionEstablished -= Channel_ConnectionEstablished;
 
-					// unregister remoting channel
-					var registeredChannel = ChannelServices.GetChannel(_remotingChannel.ChannelName);
-					if (registeredChannel != null && registeredChannel == _remotingChannel)
-						ChannelServices.UnregisterChannel(_remotingChannel);
-
-					// dispose remoting channel, if it's disposable
-					var disposableChannel = _remotingChannel as IDisposable;
-					if (disposableChannel != null)
-						disposableChannel.Dispose();
-
-					_remotingChannel = null;
+					if (_remotingClient != null)
+					{
+						_remotingClient.Dispose();
+						_remotingClient = null;
+					}
 				}
 				_remoteDispatcher = null;
 				_serverUrl = string.Empty;
@@ -683,11 +625,12 @@ namespace Zyan.Communication
 					_registeredComponents.Clear();
 					_registeredComponents = null;
 				}
-				if (_callInterceptors != null)
-				{
-					_callInterceptors.Clear();
-					_callInterceptors = null;
-				}
+				//TODO: Migrate call interception
+				// if (_callInterceptors != null)
+				// {
+				// 	_callInterceptors.Clear();
+				// 	_callInterceptors = null;
+				// }
 				if (_autoLoginCredentials != null)
 				{
 					_autoLoginCredentials = null;

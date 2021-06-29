@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Zyan.Communication.Notification;
 using Zyan.Communication.Delegates;
@@ -11,6 +12,7 @@ namespace Zyan.Communication
 	/// <summary>
 	/// General interface for dispatch component.
 	/// </summary>
+	[SuppressMessage("ReSharper", "InconsistentNaming")]
 	public interface IZyanDispatcher
 	{
 		/// <summary>
@@ -24,7 +26,7 @@ namespace Zyan.Communication
 		/// <param name="paramTypes">Parameter types</param>
 		/// <param name="args">Parameter values</param>
 		/// <returns>Return value</returns>
-		object Invoke(Guid trackingID, string interfaceName, List<DelegateCorrelationInfo> delegateCorrelationSet, string methodName, Type[] genericArguments, Type[] paramTypes, params object[] args);
+		object Invoke(Guid trackingID, string interfaceName, List<DelegateCorrelationInfo> delegateCorrelationSet, string methodName, string[] genericArguments, string[] paramTypes, params object[] args);
 
 		/// <summary>
 		/// Returns an array with metadata about all registered components.

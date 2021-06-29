@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net40;net45;net46</TargetFrameworks>
     <RootNamespace>Zyan.Communication</RootNamespace>
     <AssemblyName>Zyan.Communication</AssemblyName>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -9,12 +8,14 @@
     <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
     <DocumentationFile>..\..\bin\$(Configuration)\Zyan.Communication.xml</DocumentationFile>
     <AssemblyOriginatorKeyFile>..\Zyan.Key\zyan.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>8</LangVersion>
   </PropertyGroup>
 
   <!-- generate key file if it's missing -->
   <PropertyGroup>
-    <PreBuildEvent>$(SolutionDir)..\tools\SnTools\sngen.bat $(SolutionDir)</PreBuildEvent>
+    <!-- Commented out, because it is not working under Linux -->
+    <!-- <PreBuildEvent>$(SolutionDir)..\tools\SnTools\sngen.bat $(SolutionDir)</PreBuildEvent> -->
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -46,8 +47,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CoreRemoting" Version="1.1.7" />
     <PackageReference Include="srp" Version="1.0.6" />
-    <PackageReference Include="Zyan.SafeDeserializationHelpers" Version="0.5.1" />
+    <PackageReference Include="System.ComponentModel.Composition" Version="5.0.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+    <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
+    <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.7.0" />
+    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -61,13 +67,6 @@
     <Compile Remove="Toolbox\LazyFx3.cs" />
     <Compile Remove="Toolbox\ObjectPoolFx3.cs" />
     <Compile Remove="Toolbox\SplitOrderedListFx3.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Runtime.Remoting" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Transactions" />
   </ItemGroup>
 
 </Project>

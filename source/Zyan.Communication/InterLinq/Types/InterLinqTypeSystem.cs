@@ -84,7 +84,12 @@ namespace Zyan.InterLinq.Types
 						createdMemberInfo = new InterLinqPropertyInfo();
 						break;
 					case MemberTypes.TypeInfo:
-						createdMemberInfo = ((Type)memberInfo).IsAnonymous() ? new AnonymousMetaType() : new InterLinqType();
+						//TODO: Find a solution to support anonymous types with .NET Standard 2.0
+						//createdMemberInfo = ((Type)memberInfo).IsAnonymous() ? new AnonymousMetaType() : new InterLinqType();
+						if (((Type) memberInfo).IsAnonymous())
+							throw new NotImplementedException();
+						
+						createdMemberInfo =  new InterLinqType();
 						break;
 					case MemberTypes.NestedType:
 						createdMemberInfo = new InterLinqType();

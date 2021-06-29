@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization.Formatters.Binary;
 using Zyan.Communication;
-using Zyan.SafeDeserializationHelpers;
+using CoreRemoting.Serialization.Binary;
 
 namespace Zyan.InterLinq.Expressions
 {

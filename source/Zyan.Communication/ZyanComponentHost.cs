@@ -1,22 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Runtime.Remoting;
-using System.Runtime.Remoting.Channels;
+using CoreRemoting;
+using CoreRemoting.Channels.Websocket;
+using CoreRemoting.DependencyInjection;
+using CoreRemoting.Serialization.Binary;
 using Zyan.Communication.Discovery;
 using Zyan.Communication.Discovery.Metadata;
-using Zyan.Communication.Notification;
 using Zyan.Communication.Protocols;
-using Zyan.Communication.Protocols.Tcp;
+using Zyan.Communication.Protocols.Websocket;
 using Zyan.Communication.Security;
 using Zyan.Communication.SessionMgmt;
 using Zyan.InterLinq.Expressions;
-#if !XAMARIN
-using DefaultServerProtocolSetup = Zyan.Communication.Protocols.Tcp.TcpBinaryServerProtocolSetup;
-#else
-using DefaultServerProtocolSetup = Zyan.Communication.Protocols.Tcp.TcpDuplexServerProtocolSetup;
-#endif
 
 namespace Zyan.Communication
 {
@@ -25,87 +22,35 @@ namespace Zyan.Communication
 	/// </summary>
 	public class ZyanComponentHost : IComponentCatalog, IDisposable
 	{
-		#region Constructors
+		#region Constructor
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ZyanComponentHost" /> class.
 		/// </summary>
-		/// <param name="name">The name of the component host.</param>
-		/// <param name="tcpPort">The TCP port.</param>
-		public ZyanComponentHost(string name, int tcpPort)
-			: this(name, new DefaultServerProtocolSetup(tcpPort), new InProcSessionManager(), new ComponentCatalog())
-		{
-			DisposeCatalogWithHost = true;
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ZyanComponentHost" /> class.
-		/// </summary>
-		/// <param name="name">The name of the component host.</param>
-		/// <param name="tcpPort">The TCP port.</param>
-		/// <param name="catalog">The component catalog.</param>
-		public ZyanComponentHost(string name, int tcpPort, IComponentCatalog catalog)
-			: this(name, new DefaultServerProtocolSetup(tcpPort), new InProcSessionManager(), catalog)
-		{
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ZyanComponentHost" /> class.
-		/// </summary>
-		/// <param name="name">The name of the component host.</param>
-		/// <param name="protocolSetup">The protocol setup.</param>
-		public ZyanComponentHost(string name, IServerProtocolSetup protocolSetup)
-			: this(name, protocolSetup, new InProcSessionManager(), new ComponentCatalog())
-		{
-			DisposeCatalogWithHost = true;
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ZyanComponentHost" /> class.
-		/// </summary>
-		/// <param name="name">The name of the component host.</param>
-		/// <param name="protocolSetup">The protocol setup.</param>
-		/// <param name="catalog">The component catalog.</param>
-		public ZyanComponentHost(string name, IServerProtocolSetup protocolSetup, IComponentCatalog catalog)
-			: this(name, protocolSetup, new InProcSessionManager(), catalog)
-		{
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ZyanComponentHost" /> class.
-		/// </summary>
-		/// <param name="name">The name of the component host.</param>
-		/// <param name="protocolSetup">The protocol setup.</param>
-		/// <param name="sessionManager">The session manager.</param>
-		public ZyanComponentHost(string name, IServerProtocolSetup protocolSetup, ISessionManager sessionManager)
-			: this(name, protocolSetup, sessionManager, new ComponentCatalog())
-		{
-			DisposeCatalogWithHost = true;
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ZyanComponentHost" /> class.
-		/// </summary>
-		/// <param name="name">The name of the component host.</param>
-		/// <param name="protocolSetup">The protocol setup.</param>
-		/// <param name="sessionManager">The session manager.</param>
-		/// <param name="catalog">The component catalog.</param>
-		public ZyanComponentHost(string name, IServerProtocolSetup protocolSetup, ISessionManager sessionManager, IComponentCatalog catalog)
+		/// <param name="name">The name of the component host</param>
+		/// <param name="protocolSetup">Protocol setup</param>
+		/// <param name="sessionManager">The session manager</param>
+		/// <param name="catalog">The component catalog</param>
+		/// <param name="authProvider">Optional authentication provider</param>
+		public ZyanComponentHost(
+			string name, 
+			IServerProtocolSetup protocolSetup = null,
+			ISessionManager sessionManager = null, 
+			IComponentCatalog catalog = null,
+			IAuthenticationProvider authProvider = null)
 		{
 			if (string.IsNullOrEmpty(name))
 				throw new ArgumentException(LanguageResource.ArgumentException_ComponentHostNameMissing, "name");
-
-			if (protocolSetup == null)
-				throw new ArgumentNullException("protocolSetup");
-
-			if (sessionManager == null)
-				throw new ArgumentNullException("sessionManager");
+			
+			sessionManager ??= new InProcSessionManager();
 
 			if (catalog == null)
-				throw new ArgumentNullException("catalog");
+			{
+				DisposeCatalogWithHost = true;
+				catalog = new ComponentCatalog();
+			}
 
 			_name = name;
-			_protocolSetup = protocolSetup;
 			_sessionManager = sessionManager;
 			_sessionManager.ClientSessionTerminated += (s, e) => OnClientSessionTerminated(e);
 			_catalog = catalog;
@@ -113,15 +58,31 @@ namespace Zyan.Communication
 			_dispatcher = new ZyanDispatcher(this);
 
 			// Set up authentication request delegate
-			_authProvider = protocolSetup.AuthenticationProvider;
+			_authProvider = authProvider ??= new NullAuthenticationProvider();
 			this.Authenticate = _authProvider.Authenticate;
 
+			_protocolSetup = protocolSetup ?? new WebsocketServerProtocolSetup();
+
+			var serverConfig = _protocolSetup.BuildServerConfig();
+			serverConfig.Serializer = new BinarySerializerAdapter();
+			serverConfig.DependencyInjectionContainer = new CastleWindsorDependencyInjectionContainer();
+			serverConfig.AuthenticationProvider = null;
+			serverConfig.AuthenticationRequired = false;
+			
+			// Registers Zyan Dispatcher as CoreRemoting service
+			serverConfig.RegisterServicesAction = container =>
+				container.RegisterService<IZyanDispatcher>(
+					factoryDelegate: () => _dispatcher,
+					lifetime: ServiceLifetime.Singleton);
+			
+			_server = new RemotingServer(serverConfig);
+			
 			// Register standard serialization handlers
 			RegisterStandardSerializationHandlers();
 
 			_hosts.Add(this);
-			StartListening();
-			DiscoverableUrl = _protocolSetup.GetDiscoverableUrl(_name);
+			_server.Start();
+			DiscoverableUrl = _protocolSetup.GetDiscoverableUrl();
 		}
 
 		#endregion
@@ -291,8 +252,8 @@ namespace Zyan.Communication
 
 		#region Network Communication
 
-		// Protocol and communication settings
-		private IServerProtocolSetup _protocolSetup = null;
+		// Server protocol setup
+		private readonly IServerProtocolSetup _protocolSetup = null;
 
 		// Name of the component host (will be included in server URL)
 		private string _name = string.Empty;
@@ -300,6 +261,9 @@ namespace Zyan.Communication
 		// Name of the transport channel
 		private string _channelName = string.Empty;
 
+		// Internal CoreRemoting server instance
+		private RemotingServer _server;
+		
 		/// <summary>
 		/// Gets the name of the component host.
 		/// </summary>
@@ -307,37 +271,13 @@ namespace Zyan.Communication
 		{
 			get { return _name; }
 		}
-
-		/// <summary>
-		/// Starts listening to the client requests.
-		/// </summary>
-		private void StartListening()
-		{
-			var channel = _protocolSetup.CreateChannel();
-			if (channel == null)
-			{
-				throw new ApplicationException(LanguageResource.ApplicationException_NoChannel);
-			}
-
-			// register the channel if needed
-			_channelName = channel.ChannelName;
-			if (ChannelServices.GetChannel(_channelName) == null)
-			{
-				ChannelServices.RegisterChannel(channel, false);
-			}
-
-			// publish the dispatcher
-			RemotingServices.Marshal(_dispatcher, _name);
-		}
-
+		
 		/// <summary>
 		/// Stop listening to the client requests.
 		/// </summary>
 		private void StopListening()
 		{
-			// detach the dispatcher and close the communication channel
-			RemotingServices.Disconnect(_dispatcher);
-			CloseChannel();
+			_server.Stop();
 		}
 
 		/// <summary>
@@ -345,15 +285,11 @@ namespace Zyan.Communication
 		/// </summary>
 		private void CloseChannel()
 		{
-			// unregister remoting channel
-			var channel = ChannelServices.GetChannel(_channelName);
-			if (channel != null)
-				ChannelServices.UnregisterChannel(channel);
-
-			// dispose channel if it's disposable
-			var disposableChannel = channel as IDisposable;
-			if (disposableChannel != null)
-				disposableChannel.Dispose();
+			if (_server == null)
+				return;
+			
+			_server.Dispose();
+			_server = null;
 		}
 
 		#endregion

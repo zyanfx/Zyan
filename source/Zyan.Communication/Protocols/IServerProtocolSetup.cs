@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.Remoting.Channels;
+using CoreRemoting;
+using CoreRemoting.Channels;
 using Zyan.Communication.Security;
 
 namespace Zyan.Communication.Protocols
@@ -10,21 +11,11 @@ namespace Zyan.Communication.Protocols
 	public interface IServerProtocolSetup
 	{
 		/// <summary>
-		/// Gets a list of all Remoting sinks from the client sink chain.
+		/// Build the configuration for the internal CoreRemoting server. 
 		/// </summary>
-		List<IClientChannelSinkProvider> ClientSinkChain { get; }
-
-		/// <summary>
-		/// Gets a list of all Remoting sinks from the server sink chain.
-		/// </summary>
-		List<IServerChannelSinkProvider> ServerSinkChain { get; }
-
-		/// <summary>
-		/// Creates and configures a Remoting channel.
-		/// </summary>
-		/// <returns>Remoting channel</returns>
-		IChannel CreateChannel();
-
+		/// <returns>CoreRemoting server configuration</returns>
+		ServerConfig BuildServerConfig();
+		
 		/// <summary>
 		/// Gets the authentication provider.
 		/// </summary>
@@ -32,12 +23,7 @@ namespace Zyan.Communication.Protocols
 		{
 			get;
 		}
-
-		/// <summary>
-		/// Gets a dictionary with channel settings.
-		/// </summary>
-		Dictionary<string, object> ChannelSettings { get; }
-
+		
 		/// <summary>
 		/// Gets the name of the remoting channel.
 		/// </summary>
@@ -46,7 +32,6 @@ namespace Zyan.Communication.Protocols
 		/// <summary>
 		/// Gets the URL for automatic discovery.
 		/// </summary>
-		/// <param name="zyanHostName">Name of the <see cref="ZyanComponentHost"/> instance.</param>
-		string GetDiscoverableUrl(string zyanHostName);
+		string GetDiscoverableUrl();
 	}
 }

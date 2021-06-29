@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net35;net40;net45;net46</TargetFrameworks>
     <RootNamespace>Zyan.Tests</RootNamespace>
     <AssemblyName>Zyan.Tests</AssemblyName>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -10,6 +9,7 @@
     <RuntimeIdentifiers>win</RuntimeIdentifiers>
     <AssemblyOriginatorKeyFile>..\Zyan.Key\zyan.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
+    <TargetFramework>net48</TargetFramework>
   </PropertyGroup>
 
   <!-- override .NET v3.5 assembly paths -->
@@ -51,6 +51,7 @@
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
     <PackageReference Include="srp" Version="1.0.6" />
+    <PackageReference Include="System.ComponentModel.Composition" Version="5.0.0" />
     <PackageReference Include="Zyan.SafeDeserializationHelpers" Version="0.5.1" />
   </ItemGroup>
 
