@@ -24,7 +24,7 @@ host.RegisterComponent<IHelloWorldService, HelloWordService>();
 
 ``` C#
 // Connect to server
-var connection = new ZyanConnection("tcp://localhost:8080/ZyanDemo");
+var connection = new ZyanConnection("http://localhost:8080/ZyanDemo");
  
 // Create HelloWorldService proxy
 var proxy = connection.CreateProxy<IHelloWorldService>();
