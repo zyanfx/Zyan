@@ -232,7 +232,7 @@
     <value>Address must not be empty.</value>
   </data>
   <data name="Format_Exception_InvalidAddressFormat" xml:space="preserve">
-    <value>Invalid format for 'address' parameter: {0}</value>
+    <value>Invalid format for 'address' parameter: {0}.</value>
   </data>
   <data name="RemotingException_NoAddressForReconnect" xml:space="preserve">
     <value>No remote address specified for reconnect.</value>

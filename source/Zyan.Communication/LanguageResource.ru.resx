@@ -232,7 +232,7 @@
     <value>Адрес не должен быть пустым.</value>
   </data>
   <data name="Format_Exception_InvalidAddressFormat" xml:space="preserve">
-    <value>Недопустимый формат для параметра 'address': {0}</value>
+    <value>Недопустимый формат для параметра 'address': {0}.</value>
   </data>
   <data name="RemotingException_NoAddressForReconnect" xml:space="preserve">
     <value>Адрес для повторной установки соединения не указан.</value>
@@ -277,7 +277,7 @@
     <value>Недопустимый параметр конфигурации: '{0}'.</value>
   </data>
   <data name="ArgumentException_UnsupportedEncryptionAlgorithm" xml:space="preserve">
-    <value>Указанный алгоритм шифрования '{0}' не используется. Укажите алгоритм из следующего списка: '3DES', 'DES', 'RIJNDAEL' или 'RC2'</value>
+    <value>Указанный алгоритм шифрования '{0}' не используется. Укажите алгоритм из следующего списка: '3DES', 'DES', 'RIJNDAEL' или 'RC2'.</value>
   </data>
   <data name="ArgumentException_ServerUrlIsInvalid" xml:space="preserve">
     <value>URL сервера имеет недопустимый формат. Используйте метод FormatUrl класса клиентского протокола, чтобы сформировать корректный URL сервера.</value>

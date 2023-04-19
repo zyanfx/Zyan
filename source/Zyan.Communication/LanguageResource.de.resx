@@ -121,16 +121,16 @@
     <value>Mehrere Modulcontroller im selben Modul sind nicht zulässig.</value>
   </data>
   <data name="ArgumentException_ComponentHostNameMissing" xml:space="preserve">
-    <value>Für den Komponentenhost wurde kein Name angegeben!</value>
+    <value>Für den Komponentenhost wurde kein Name angegeben.</value>
   </data>
   <data name="ArgumentException_EmptySessionIDIsNotAllowed" xml:space="preserve">
-    <value>Leerer Sitzungsschlüssel ist nicht erlaubt!</value>
+    <value>Leerer Sitzungsschlüssel ist nicht erlaubt.</value>
   </data>
   <data name="ArgumentException_FactoryMethodDelegateMissing" xml:space="preserve">
     <value>Keinen Delegaten für Komponentenerzeugung angegeben.</value>
   </data>
   <data name="ArgumentException_InterfaceNameMissing" xml:space="preserve">
-    <value>Kein Schnittstellenname angegeben!</value>
+    <value>Kein Schnittstellenname angegeben.</value>
   </data>
   <data name="ArgumentException_InvalidConfigSetting" xml:space="preserve">
     <value>Ungültige Konfigurationseinstellung: {0}</value>
@@ -145,22 +145,22 @@
     <value>Anzahl der Wiederholungsversuche 'maxRetries' muss mindestens auf 1 eingestellt sein.</value>
   </data>
   <data name="ArgumentException_MethodNameMissing" xml:space="preserve">
-    <value>Kein Methodenname angegeben!</value>
+    <value>Kein Methodenname angegeben.</value>
   </data>
   <data name="ArgumentException_ServerUrlMissing" xml:space="preserve">
     <value>Es wurde kein Server-URL angegeben! Bitte geben Sie einen gültigen Server-URL an, da sonst keine Verbindung zum Komponentenhost aufgebaut werden kann.</value>
   </data>
   <data name="ArgumentException_TypeIsNotAClass" xml:space="preserve">
-    <value>Der angegebene Implementierungstyp ist keine Klasse!</value>
+    <value>Der angegebene Implementierungstyp ist keine Klasse.</value>
   </data>
   <data name="ArgumentException_TypeIsNotAInterface" xml:space="preserve">
-    <value>Der angegebene Schnittstellentyp ist keine Schnittstelle!</value>
+    <value>Der angegebene Schnittstellentyp ist keine Schnittstelle.</value>
   </data>
   <data name="ArgumentOutOfRangeException_InvalidHttpPortRange" xml:space="preserve">
-    <value>Die HTTP-Anschlussnummer muss im Bereich 0-65535 liegen!</value>
+    <value>Die HTTP-Anschlussnummer muss im Bereich 0-65535 liegen.</value>
   </data>
   <data name="ArgumentOutOfRangeException_InvalidTcpPortRange" xml:space="preserve">
-    <value>Die TCP-Anschlussnummer muss im Bereich 0-65535 liegen!</value>
+    <value>Die TCP-Anschlussnummer muss im Bereich 0-65535 liegen.</value>
   </data>
   <data name="CryptoRemotingException_ClientConnectionInfoMissing" xml:space="preserve">
     <value>Keine passenden Client-Verbindungsinformationen gefunden.</value>
@@ -277,7 +277,7 @@
     <value>Für Schnittstelle '{0}' ist auf dem Server '{1}' keine Komponente registriert.</value>
   </data>
   <data name="ApplicationException_SpecifiedTypeIsNotAnInterface" xml:space="preserve">
-    <value>Der angegebene Typ '{0}' ist keine Schnittstelle! Für die Erzeugung einer entfernten Komponenteninstanz, wird deren öffentliche Schnittstelle benötigt!</value>
+    <value>Der angegebene Typ '{0}' ist keine Schnittstelle! Für die Erzeugung einer entfernten Komponenteninstanz, wird deren öffentliche Schnittstelle benötigt.</value>
   </data>
   <data name="ApplicationException_TypeIsNotDelegate" xml:space="preserve">
     <value>Typ ist nicht Delegatentype: {0}.</value>
