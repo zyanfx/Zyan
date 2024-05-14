@@ -326,7 +326,7 @@ namespace Zyan.Communication.Protocols.Tcp.DuplexChannel
 						_listeners.Remove(connection.LocalChannelID);
 						myAr.Complete(connection, m);
 					}
-					else if (_listeners.ContainsKey(connection.LocalAddress))
+					else if (connection.LocalAddress != null && _listeners.ContainsKey(connection.LocalAddress))
 					{
 						AsyncResult myAr = _listeners[connection.LocalAddress];
 						_listeners.Remove(connection.LocalAddress);
