@@ -336,7 +336,8 @@ namespace Zyan.Communication
 		private void StopListening()
 		{
 			// detach the dispatcher and close the communication channel
-			RemotingServices.Disconnect(_dispatcher);
+			if (_dispatcher != null)
+				RemotingServices.Disconnect(_dispatcher);
 			CloseChannel();
 		}
 

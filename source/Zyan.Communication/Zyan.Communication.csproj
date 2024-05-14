@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net40;net45;net46</TargetFrameworks>
+    <TargetFrameworks>net40;net461</TargetFrameworks>
     <RootNamespace>Zyan.Communication</RootNamespace>
     <AssemblyName>Zyan.Communication</AssemblyName>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -45,6 +45,12 @@
     <DefineConstants>$(DefineConstants);FX4</DefineConstants>
   </PropertyGroup>
 
+  <!--
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <FrameworkPathOverride>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.1</FrameworkPathOverride>
+  </PropertyGroup>
+  -->
+	
   <ItemGroup>
     <PackageReference Include="srp" Version="1.0.6" />
     <PackageReference Include="Zyan.SafeDeserializationHelpers" Version="0.5.1" />
