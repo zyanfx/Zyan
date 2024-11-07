@@ -3,6 +3,7 @@ using System.IO;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Messaging;
 using System.Security.Cryptography;
+using Zyan.Communication.Toolbox.Diagnostics;
 
 namespace Zyan.Communication.ChannelSinks.Encryption
 {
@@ -101,11 +102,18 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 			// Generate a request for the shared key
 			CreateSharedKeyRequest(requestHeaders);
 
-			// Send the request to the next sink to communicate with the CryptoServerChannelSink across the wire
-			_next.ProcessMessage(msg, requestHeaders, requestStream, out responseHeaders, out responseStream);
+			// Retry as needed
+			for (var i = 0; i < _maxAttempts; i++)
+			{
+				// Send the request to the next sink to communicate with the CryptoServerChannelSink across the wire
+				if (NextSinkProcessMessage(msg, requestHeaders, requestStream, out responseHeaders, out responseStream))
+				{
+					// Process server's response
+					return ProcessSharedKeyResponse(responseHeaders);
+				}
+			}
 
-			// Process server's response
-			return ProcessSharedKeyResponse(responseHeaders);
+			throw new CryptoRemotingException(DEFAULT_EXCEPTION_TEXT);
 		}
 
 		/// <summary>
@@ -198,6 +206,26 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 			return requestStream;
 		}
 
+		private bool NextSinkProcessMessage(IMessage msg, ITransportHeaders requestHeaders, Stream requestStream, out ITransportHeaders responseHeaders, out Stream responseStream)
+		{
+			try
+			{
+				// Pass the encrypted message to the next sink
+				_next.ProcessMessage(msg, requestHeaders, requestStream, out responseHeaders, out responseStream);
+				return true;
+			}
+			catch (Exception ex)
+			{
+				Trace.WriteLine("Exception in CryptoClientChannelSink: {0}", ex.ToString());
+
+				// ProcessMessage shouldn't throw exceptions
+				responseStream = null;
+				responseHeaders = null;
+				return false;
+			}
+		}
+
+
 		/// <summary>
 		/// Processes the encrypted message.
 		/// </summary>
@@ -220,7 +248,7 @@ namespace Zyan.Communication.ChannelSinks.Encryption
 			}
 
 			// Pass the encrypted message to the next sink
-			_next.ProcessMessage(msg, requestHeaders, requestStream, out responseHeaders, out responseStream);
+			NextSinkProcessMessage(msg, requestHeaders, requestStream, out responseHeaders, out responseStream);
 
 			lock (_lockObject)
 			{
